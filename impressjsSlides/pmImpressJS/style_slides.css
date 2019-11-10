@@ -1,0 +1,222 @@
+@charset "UTF-8";
+
+/*** Reset *** **********************************************************************/
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6,p,blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn,em,img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var,b, u, i,center,dl, dt, dd, ol, ul, li,fieldset, form, label,legend,table, caption, tbody, tfoot, thead, tr, th, td,article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav,output,ruby,section,summary,time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/** IMPRESS.JS ** ********************************************************************/
+body {
+  font: 1em Arial;
+  color: black;
+  background-color: lightgrey;
+}
+header{
+  background-color: black;
+  color: white;
+}
+h1,h2,h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: bold;
+  padding: 0.5em;
+}
+h1{
+  font-size: 1em;
+}
+h2{
+  font-size: 1.25em;
+}
+ul {
+  margin-left: 1em;
+}
+li{
+  padding: 0.25em;
+  list-style-type: square;
+}
+strong{
+  font-weight: bold;
+}
+p{
+  text-align: left;
+}
+p.footer{
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  font-size: 20px;
+  color: black;
+}
+p.footer:hover{
+  color: black;
+  text-shadow: 0 0 1em grey;
+  transition: 0.5s;
+}
+p.footer:active{
+  font-size: 1.25em;
+  transition: 0.1s;
+}
+.step.img{
+  text-align:center;
+}
+img{
+   display: inline-block;
+   width: 40%;
+}
+#impress{
+  padding: 0em;
+}
+
+.impress-not-supported header{
+  display: none;
+}
+.fallback-message {
+    font-family: sans-serif;
+    right: 1em;
+    left: 1em;
+    padding: 1em;
+    margin: 1em;
+    border: 1px solid #E4C652;
+    border-radius: 10px;
+    background: #EEDC94;
+}
+.impress-supported .fallback-message {
+    display: none;
+}
+.impress-supported .step {
+  position: relative;
+  width: 1000px;
+  padding: 1em;
+  margin: 0 auto;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing:    border-box;
+  -ms-box-sizing:     border-box;
+  -o-box-sizing:      border-box;
+  box-sizing:         border-box;
+}
+.impress-supported .slide {
+    margin: 1em;
+    padding: 1em;
+    background-color: white;
+    border: 0.1em solid rgba(0, 0, 0, 0.3);
+    border-radius: 1em;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: rgb(102, 102, 102);
+    text-shadow: 0 0.2em 0.2em rgba(0, 0, 0, 0.1);
+    font-size: 2em;
+    line-height: 1.5em;
+}
+.impress-not-supported .step {
+  margin: 1em;
+  padding: 1em;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing:    border-box;
+  -ms-box-sizing:     border-box;
+  -o-box-sizing:      border-box;
+  box-sizing:         border-box;
+}
+.impress-not-supported .slide {
+    margin: 1em;
+    padding: 1em;
+    background-color: white;
+    border: 0.1em solid rgba(0, 0, 0, 0.3);
+    border-radius: 1em;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: rgb(102, 102, 102);
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+    font-size: 1em;
+}
+.impress-enabled .step {
+    margin: 0;
+    opacity: 0.3;
+    -webkit-transition: opacity 1s;
+    -moz-transition:    opacity 1s;
+    -ms-transition:     opacity 1s;
+    -o-transition:      opacity 1s;
+    transition:         opacity 1s;
+}
+.impress-enabled .step.active {
+  opacity: 1
+}
+#overview {
+  display: none
+}
+.impress-on-overview .step {
+    opacity: 1;
+    cursor: pointer;
+}
+.hint {
+  display: none;
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 1.25em;
+  background: rgba(0,0,0,0.35);
+  color: #EEE;
+  text-align: center;
+  font-size: 1.5em;
+  line-height: 1em;
+  padding: 1em;
+  opacity: 0;
+  -webkit-transition: opacity 1s, -webkit-transform 0.5s 1s;
+  -moz-transition:    opacity 1s,    -moz-transform 0.5s 1s;
+  -ms-transition:     opacity 1s,     -ms-transform 0.5s 1s;
+  -o-transition:      opacity 1s,      -o-transform 0.5s 1s;
+  transition:         opacity 1s,         transform 0.5s 1s;
+}
+.impress-enabled .hint {
+  display: block
+}
+.impress-on-overview .hint {
+    opacity: 1;
+    -webkit-transition: opacity 1s 5s, -webkit-transform 0.5s 4.5s;
+    -moz-transition:    opacity 1s 5s,    -moz-transform 0.5s 4.5s;
+    -ms-transition:     opacity 1s 5s,     -ms-transform 0.5s 4.5s;
+    -o-transition:      opacity 1s 5s,      -o-transform 0.5s 4.5s;
+    transition:         opacity 1s 5s,         transform 0.5s 4.5s;
+}
+.impress-enabled {
+  pointer-events: none
+}
+.impress-enabled #impress {
+  pointer-events: auto
+}
+
+/**** Print slides ***/
+@media print {
+  .fallback-message {
+    display: none;
+  }
+}

@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Proyecto final: II curso de especialista en programación móvil</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="description" content="impress.js slides" />
+    <meta name="author" content="Diego Espínola" />
+    <link rel="stylesheet" href="style_slides.css" />
+  </head>
+  <body class="impress-not-supported">
+
+    <div class="fallback-message">
+      <strong>ATENCIÓN:</strong> Su navegador no soporta las animaciones de <strong>impress.js</strong>. Si no está en un dispositivo móvil, intentelo con el navegador Google Chrome. <strong>Imagenes no mostradas</strong>
+    </div>
+
+    <div class="hint">
+      Usar la barra espaciadora o las flechas direccionales del teclado para avanzar en la presentación. Pulsar sobre la presentación a la cual se deseé navegar. Para volver al overview, pulsar sobre el título de cada presentación.
+    </div>
+
+    <div id="impress">
+
+      <div id="overview" class="step"></div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Introdución</div>
+          <div class="bodyDiv">
+            <div class="imgDiv">
+              <div class="img2Div">
+                <img class="imgShow" style="height: 5em; width: 14em" src="http://www.tranviademurcia.es/images/logo_original_colorjpg.jpg" alt="www.tranviademurcia.es">
+              </div>
+              <div class="img2Div">
+                <img class="imgShow" style="height: 5em; width: 16em" src="http://www.um.es/eubacteria/logosimbolo.jpg" alt="www.um.es">
+              </div>
+            </div>
+            <p class="p1">Aplicación Android de fiscalización de tarjetas Bono Tranvía en un dispositivo de carácter especificado, Famoco fx100</p>
+            <p class="p1"><strong>Idea:</strong> Mejorar la rapidez de la lectura de tarjetas y su comodidad con un nuevo dispositivo más ligero y moderno</p>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Requisitos y Objetivos</div>
+          <div class="bodyDiv">
+            <p class="p1">Dispositivo Android: <a href="https://www.famoco.com/">Famoco fx100,7</a>.</p>
+            <p class="p1">Leer tarjeta Bono Tranvía. Decodificar el mapa de bit disponible. Mifare Classic 1K.</p>
+            <p class="p2">Algunas tarjetas son decodificadas con un clave fija estática (Bono Tranvía Monocolor)</p>
+            <p class="p2">Otras tarjetas requieren una autenticación con el modulo SAM (Secure Access Module) para obtener la clave para la lectura de la tarjeta. (Bono Tranvía Bicolor o Tricolor)</p>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Tecnologías</div>
+          <div class="bodyDiv">
+            <p class="p1">Harware:</p>
+            <p class="p2">NFC. Near Field Communication.</p>
+            <p class="p2">SAM. Secure Access Module</p>
+            <p class="p2">Tarjetas Mifare 1k Classic. 16 sectores de 4 bloques cada uno y cada bloque pose 16 bytes de información. (16 Bloques x 4 Sectores x 16 bytes=1024 bytes = 1Kb). tecnología propiedad de NXP Semiconductors.</p>
+            <p class="p1">Software:</p>
+            <p class="p2">Android Studio.</p>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Diseño</div>
+          <div class="bodyDiv">
+            <p class="p2">La aplicación presenta la siguiente interfaz de usuario:</p>
+            <p class="p1">Splash Screen</p>
+            <p class="p1">Pantallas:</p>
+            <p class="p2">1.Principal</p>
+            <p class="p2">2.Datos de Tarjeta</p>
+            <p class="p2">3.Datos de Control</p>
+            <p class="p2">4.Histórico de Tarjeta</p>
+            <p class="p1">Menú</p>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Diseño</div>
+          <div class="bodyDiv">
+            <div class="imgDiv">
+              <img class="imgShow" style="height: 30em; width: 15em" src="assets/01.png" alt="splash Screen">
+              <img class="imgShow" style="height: 30em; width: 15em" src="assets/02.png" alt="Main">
+              <img class="imgShow" style="height: 30em; width: 15em" src="assets/03.png" alt="Menu">
+            </div>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Código</div>
+          <div class="bodyDiv">
+            <p class="p1">Clases Java:</p>
+            <p class="p2">Splash Screen: Carga previa</p>
+            <p class="p2">MainActivity: Clase principal. Captura de eventos NFC.</p>
+            <p class="p2">MainFragment: Carga Plantillas de Pantallas.</p>
+            <p class="p2">TdmCard: Funciones de decodificación de Tarjeta e interpretación de datos.</p>
+            <p class="p1">Interfaz de Usuario:</p>
+            <p class="p2">Navigation Drawer Activity</p>
+            <p class="p1">Librerias del fabricante: <a href="https://developer.famoco.com/develop/setupexternal-
+secure-element/">SeCommunicaton Library v1.6.0</a></p>
+            <p class="p2">Comunicación dispositivo SAM. Protocolo ALPAR: comandos y respuestas APDU</p>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv" style="border: 0">
+          <div class="headerDiv">Código</div>
+          <div class="bodyDiv">
+            <div class="imgDiv">
+              <img class="imgShow" style="height: 40em; width: 30em" src="assets/04.png" alt="splash Screen">
+            </div>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Comentarios Finales</div>
+          <div class="bodyDiv">
+            <p class="p1">El objetivo alcanzado: Leer Tarjeta Unicolor y decodificar la información.</p>
+            <p class="p1"> Líneas futuras de trabajo:</p>
+            <p class="p2"> La comunicación con el SAM para la obtención de la Key A y/o Key B de cada tarjeta </p>
+            <p class="p2">la Implementación de una solución para gestionar usuarios e incorporar funcionalidades de comunicación de la actividad realizada en la fiscalización con los sistemas centrales de Tranvía de Murcia S.A.</p>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv">
+          <div class="headerDiv">Links</div>
+          <div class="bodyDiv">
+            <p class="p1">Info del dispositivo Famoco: <a href="http://developer.famoco.com">developer.famoco.com</a></p>
+            <p class="p1">Repositorio de código de la App: <a href="https://github.com/diegoee/smartCardFamocoDevice">smartCardFamocoDevice</a></p>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="containerDiv" style="border: 0">
+          <div class="headerDiv">
+            ¡Gracias!
+          </div>
+          <div class="bodyDiv">
+            <div class="imgDiv">
+              <img class="imgShow" style="
+                height: 100%;
+                width: 70%" src="http://www.adelantefianzas.com/images/preguntas.png" alt="thx U">
+            </div>
+          </div>
+          <div class="footerDiv"></div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <script id="jquery" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script id="initImpress" type="text/javascript" src="https://impress.js.org/js/impress.js"></script>
+    <script id="slidesApp" type="text/javascript" src="slidesApp.js"></script>
+    <script>impress().init();</script>
+  </body>
+</html>

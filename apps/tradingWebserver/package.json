@@ -1,0 +1,41 @@
+{
+  "name": "serverVPS",
+  "productName": "Server VPS: Diego E.E.",
+  "version": "1.0.0",
+  "author": "Diego E.E.",
+  "main": "main.js",
+  "description": "Server VPS",
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "license": "ISC",
+  "scripts": {
+    "start": "node server.js 80",
+    "startLocal": "node server.js 8080",
+    "bm": "node benchmark/benchmark.js exe",
+    "installAndStart": "npm install && npm run start",
+    "installAndStartLocal": "npm install && npm run startLocal"
+  },
+  "dependencies": {
+    "alert-node": "^1.2.4",
+    "backbone": "^1.4.0",
+    "body-parser": "^1.18.3",
+    "bootstrap": "^4.0.0",
+    "csv-parser": "^2.2.0",
+    "express": "^4.16.4",
+    "font-awesome": "^4.7.0",
+    "formidable": "^1.2.1",
+    "highcharts": "^7.0.3",
+    "jquery": "^3.2.1",
+    "jsonwebtoken": "^8.5.0",
+    "keypress": "^0.2.1",
+    "mathjs": "^5.10.3",
+    "ml": "^3.5.0",
+    "node-snackbar": "^0.1.15",
+    "opn": "^5.4.0",
+    "popper.js": "^1.14.3",
+    "request": "^2.88.0",
+    "underscore": "^1.9.1"
+  }
+}

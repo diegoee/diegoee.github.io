@@ -1,0 +1,52 @@
+body{
+  background: #F8F8F8;
+}
+html{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.textSize{
+  font-size: 0.75em;
+} 
+.textSize2{
+  font-size: 0.65em;
+} 
+.textSize3{
+  font-size: 0.55em;
+} 
+.textColorRed{
+  color: red;
+}
+.textColorGreen{
+  color: green;
+} 
+.dataTables_filter {
+  float: left !important; 
+} 
+.noteP{
+  font-size: 10px;
+  margin: 0;
+  padding: 0;
+}
+.centerDiv{
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  left: 0;
+  text-align: center;
+}
+.m0{
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.section{
+  display: none;
+}
+.section.active{  
+  display: block;
+}
+ 
