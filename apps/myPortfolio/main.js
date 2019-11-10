@@ -97,7 +97,7 @@ app.on('ready', function() {
   ];
 
   //templateMenu[0].submenu[2].label = 'Dev Tools';
-  mainWindow.webContents.openDevTools(); 
+  //mainWindow.webContents.openDevTools(); 
 
   var menu = Menu.buildFromTemplate(templateMenu);
   Menu.setApplicationMenu(menu);  

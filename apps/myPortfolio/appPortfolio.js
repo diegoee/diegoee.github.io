@@ -318,23 +318,26 @@ var appPortfolio = {
     });
     for (i in res.movData){ 
       var aux = [];
-      if(res.movData[i].cat2==='Acciones'&&res.movData[i].ticker!=='EUR'){ 
-        //TODO: evo mov with ticker
-      }else{
-        for (ii in date){ 
-          if(moment(date[ii],'DD/MM/YYYY').diff(moment(res.movData[i].date,'DD/MM/YYYY'),'days')<0){
-            aux.push([
-              date[ii],
-              0
-            ]);
+      if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Broker')!==-1&&res.movData[i].ticker!=='EUR'){  
+        console.log(res.movData[i]);
+      }
+      for (ii in date){ 
+        if(moment(date[ii],'DD/MM/YYYY').diff(moment(res.movData[i].date,'DD/MM/YYYY'),'days')<0){
+          aux.push([
+            date[ii],
+            0
+          ]);
+        }else{
+          if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Broker')!==-1&&res.movData[i].ticker!=='EUR'){ 
+            //TODO: evo mov with ticker  
           }else{
             aux.push([
               date[ii],
               res.movData[i].value
             ]);
-          }
+          } 
         }
-      }      
+      }   
       temp.push({
         id: res.movData[i].id,
         data: aux

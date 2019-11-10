@@ -24,7 +24,7 @@ function app(){
     window.dispatchEvent(event);  
   });
   
-  $('#sec3').addClass('active');
+  $('#sec1').addClass('active');
   $('.goBtn').on('click',function(){  
     $.each($('.section'),function(){
       $(this).removeClass('active');
@@ -126,19 +126,86 @@ function app(){
 
       //.filterMov
       Highcharts.stockChart('chartEvo', { 
-          series: [{
-              name: 'Mi cartera',
-              data: dataPlot,
-              tooltip: {
-                  valueDecimals: 2
-              }
+        chart: {
+          alignTicks: false
+        },
+        credits: {
+          enabled: false
+        },
+        exporting: {
+          enabled: false
+        },
+        tooltip: {
+          crosshairs: [true,true],
+          valueDecimals: 2,
+          split: true 
+        },
+        xAxis: {                        
+          title: {
+            text: 'Tiempo'
+          },
+          range: 3 * 30 * 24 * 3600 * 1000 // 3 months 
+        },
+        yAxis: {
+          opposite: false,
+          title: {
+            text: 'Euros (€)'
+          }
+        },
+        rangeSelector: {
+          inputEnabled: false,
+          labelStyle: {
+            display: 'none'
+          },
+          buttons: [{
+            type: 'month',
+            count: 1, 
+            text: '1m'
+          }, {
+            type: 'month',
+            count: 2 ,
+            text: '2m'
+          }, {
+            type: 'month',
+            count: 3 ,
+            text: '3m'
+          }, {
+            type: 'month',
+            count: 4 ,
+            text: '4m'
+          }, {
+            type: 'month',
+            count: 6,
+            text: '6m'
+          }, {
+            type: 'year',
+            count: 1,
+            text: '1y '
+          }, {
+            type: 'year',
+            count: 2,
+            text: '2y '
+          },{
+            type: 'all',
+            text: 'All'
           }]
+        },
+        series: [{
+          name: 'Mi cartera',
+          data: dataPlot,
+          tooltip: {
+            valueDecimals: 2
+          }
+        }]
       });
     }
 
     plotDataEvo();
-    $('.filterMov').on('change',function(){
-      plotDataEvo();
+    $('.filterMov').on('change',function(){ 
+      $('#loadingModal').modal('toggle');
+      plotDataEvo(); 
+      exeModal = true;
+      $('#loadingModal').modal('toggle');
     });
 
     //inflate data in DOM y cal data for the charts
