@@ -307,6 +307,11 @@ var appPortfolio = {
         });
       } 
     }
+    
+    //TODO: Eliminar
+    for (i in res.evoData.evoticker){
+      //console.log(res.evoData.evoticker[i].ticker+' - '+res.evoData.evoticker[i].data.length);
+    }
 
     var temp = [];
     var date = [];
@@ -317,10 +322,7 @@ var appPortfolio = {
       return value!=='Invalid date';
     });
     for (i in res.movData){ 
-      var aux = [];
-      if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Broker')!==-1&&res.movData[i].ticker!=='EUR'){  
-        console.log(res.movData[i]);
-      }
+      var aux = []; 
       for (ii in date){ 
         if(moment(date[ii],'DD/MM/YYYY').diff(moment(res.movData[i].date,'DD/MM/YYYY'),'days')<0){
           aux.push([
@@ -328,8 +330,43 @@ var appPortfolio = {
             0
           ]);
         }else{
-          if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Broker')!==-1&&res.movData[i].ticker!=='EUR'){ 
-            //TODO: evo mov with ticker  
+          if(res.movData[i].ticker!=='EUR'){
+            var pos = 0;
+            for (iii in res.evoData.evoticker){
+              if(res.evoData.evoticker[iii].ticker===res.movData[i].ticker){
+                pos = iii;
+                break;
+              }
+            }
+            if(res.evoData.evoticker[pos].data==='ERROR'){  
+              aux.push([
+                date[ii],
+                res.movData[i].value
+              ]);
+            }else{
+              if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Compra')!==-1){  
+                for (iii in res.evoData.evoticker[pos].data){
+                  if(res.evoData.evoticker[pos].data[iii][0]===date[ii]){
+                    aux.push([
+                      date[ii],
+                      res.movData[i].value+res.movData[i].n*res.evoData.evoticker[pos].data[iii][1]
+                    ]);
+                    break;
+                  }
+                } 
+              } 
+              if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Venta')!==-1){  
+                for (iii in res.evoData.evoticker[pos].data){
+                  if(res.evoData.evoticker[pos].data[iii][0]===date[ii]){
+                    aux.push([
+                      date[ii],
+                      res.movData[i].value-res.movData[i].n*res.evoData.evoticker[pos].data[iii][1]
+                    ]);
+                    break;
+                  }
+                } 
+              }
+            }  
           }else{
             aux.push([
               date[ii],
@@ -354,13 +391,130 @@ var appPortfolio = {
     var moment = require('moment');
     var time = moment();
     console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> Start Exe Test'); 
-    await this.requestYahooValueHist('SAN.MC').then(function(dataRes){ 
-      console.log(dataRes[0]);  
-      console.log(dataRes[0][0]);
-      console.log(dataRes[0][1]); 
-    }).catch(function(error){
-      console.log(error);
-    });
+    
+    var tickers = [{
+      ticker: 'TEF.MC',
+      data: [
+        ['01/01/2019', 1],
+        ['02/01/2019', 2],
+        ['03/01/2019', 3],
+        ['04/01/2019', 4]
+      ]
+    },{
+      ticker: 'SAN.MC',
+      data: [
+        ['01/01/2019', 1],
+        ['02/01/2019', 3],
+        ['03/01/2019', 4],
+        ['04/01/2019', 5]
+      ]
+    }]; 
+
+    var movData=[{
+      ticker: 'TEF.MC',
+      date:  '02/01/2019', 
+      cat2: 'Acciones',
+      desc: 'Compra',
+      value: -1 
+    },{
+      ticker: 'TEF.MC',
+      date:  '04/01/2019', 
+      cat2: 'Acciones',
+      desc: 'Venta',
+      value: 2 
+    },{
+      ticker: 'SAN.MC',
+      date:  '04/01/2019',
+      cat2: 'Acciones',
+      desc: 'Compra',
+      value: -3
+    },{
+      ticker: 'EUR',
+      date:  '03/01/2019',
+      cat2: 'Acciones',
+      desc: 'Compra',
+      value: 1
+    }];
+ 
+
+    var date = [];
+    for (i in tickers[0].data){ 
+      date.push(tickers[0].data[i][0]); 
+    } 
+    
+    var temp = [];
+    for (i in movData){  
+      var aux = []; 
+      for (ii in date){ 
+        if(moment(date[ii],'DD/MM/YYYY').diff(moment(movData[i].date,'DD/MM/YYYY'),'days')<0){
+          aux.push([
+            date[ii],
+            0
+          ]);
+        }else{
+          if(movData[i].ticker!=='EUR'){
+            var pos = 0;
+            for (iii in tickers){
+              if(tickers[iii].ticker===movData[i].ticker){
+                pos = iii;
+                break;
+              }
+            }
+            if(movData[i].cat2==='Acciones'&&movData[i].desc.indexOf('Compra')!==-1){  
+              for (iii in tickers[pos].data){
+                if(tickers[pos].data[iii][0]===date[ii]){
+                  aux.push([
+                    date[ii],
+                    movData[i].value+tickers[pos].data[iii][1]
+                  ]);
+                  break;
+                }
+              } 
+            } 
+            if(movData[i].cat2==='Acciones'&&movData[i].desc.indexOf('Venta')!==-1){  
+              for (iii in tickers[pos].data){
+                if(tickers[pos].data[iii][0]===date[ii]){
+                  aux.push([
+                    date[ii],
+                    movData[i].value-tickers[pos].data[iii][1]
+                  ]);
+                  break;
+                }
+              } 
+            }   
+          }else{
+            aux.push([
+              date[ii],
+              movData[i].value
+            ]);
+          } 
+        }
+      }   
+      temp.push({
+        id: movData[i].ticker+' '+movData[i].date+' '+movData[i].cat2+' '+movData[i].desc+' '+movData[i].value, 
+        data: aux
+      }); 
+      delete aux;
+    }
+
+    console.log('--');
+    for (i in temp){ 
+      aux = temp[i].id+' --> ';
+      for (ii in temp[i].data){
+        aux=aux+' - '+temp[i].data[ii][0]+' '+temp[i].data[ii][1];
+      }
+      console.log(aux);
+    } 
+    
+    console.log('--');
+    for (i in tickers){ 
+      aux = tickers[i].ticker+' --> ';
+      for (ii in tickers[i].data){
+        aux=aux+' - '+tickers[i].data[ii][0]+' '+tickers[i].data[ii][1];
+      }
+      console.log(aux);
+    } 
+    
     console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> End Exe Test');  
   }
 }  

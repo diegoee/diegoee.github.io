@@ -121,7 +121,8 @@ function app(){
       }
       dataPlot = [];
       for(i in temp){
-        dataPlot.push([temp[i],temp1[i]]);
+        //TODO: parse to date
+        dataPlot.push([temp[i], temp1[i]]);
       }
 
       //.filterMov
@@ -201,12 +202,15 @@ function app(){
     }
 
     plotDataEvo();
-    $('.filterMov').on('change',function(){ 
-      $('#loadingModal').modal('toggle');
-      plotDataEvo(); 
-      exeModal = true;
-      $('#loadingModal').modal('toggle');
-    });
+    $('#btnEvoData').on('click',function(){   
+      $('#loadingModal').modal('toggle'); 
+      setTimeout(function(){ 
+        plotDataEvo(); 
+        exeModal = true;
+        $('#loadingModal').modal('toggle');
+      },1000); 
+    }); 
+ 
 
     //inflate data in DOM y cal data for the charts
     var $indata = $('.inputdata');
