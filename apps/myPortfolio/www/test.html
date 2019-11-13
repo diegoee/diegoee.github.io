@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+ <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>test</title>
+  </head>
+  <body> 
+    <div id="container"></div>
+    <noscript>JAVASCRIPT IS NOT WORKING!</noscript>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="https://momentjs.com/downloads/moment.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/stock/highstock.js"></script> 
+    <script type="text/javascript"> 
+      console.log('Start Test');
+      var dataPlot=[]; 
+      for(var i=0; i<365*2; i++){
+        dataPlot.push([moment().add(i,'days').format('DD/MM/YYYY') ,Math.random()]);
+      }
+
+      for(i in dataPlot){
+        //dataPlot[i][0] = moment(dataPlot[i][0]).toDate().getTime();
+      } 
+
+      Highcharts.stockChart('container',{  
+        credits: {
+          enabled: false
+        },
+        exporting: {
+          enabled: false
+        }, 
+        series: [{
+          name: 'Mi cartera',
+          data: dataPlot,
+          tooltip: {
+            valueDecimals: 2
+          }
+        }]
+      });  
+      console.log('End Test');
+    </script>  
+  </body>
+</html>

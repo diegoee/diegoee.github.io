@@ -75,8 +75,7 @@ function app(){
       tr = tr + '</tr>';
       $('#tableMov tbody').append(tr); 
     } 
-
-    //TODO: evolution action 
+ 
     function plotDataEvo(){
       var filterIdMov = [];
       $.each($('.filterMov'),function(){
@@ -122,8 +121,12 @@ function app(){
       dataPlot = [];
       for(i in temp){
         //TODO: parse to date
-        dataPlot.push([temp[i], temp1[i]]);
+        //dataPlot.push([moment(temp[i]).toDate().getTime()/1000, temp1[i]]);
+        dataPlot.push([temp[i] , temp1[i]]);
       }
+      //console.log([temp[0], temp1[0]]);
+      //console.log([moment(temp[0]).valueOf()/1000, temp1[0]]);
+      //console.log([moment(temp[0]).toDate().getTime(), temp1[0]]); 
 
       //.filterMov
       Highcharts.stockChart('chartEvo', { 
@@ -144,8 +147,7 @@ function app(){
         xAxis: {                        
           title: {
             text: 'Tiempo'
-          },
-          range: 3 * 30 * 24 * 3600 * 1000 // 3 months 
+          }, 
         },
         yAxis: {
           opposite: false,
