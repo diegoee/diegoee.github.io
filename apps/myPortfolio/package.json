@@ -5,11 +5,11 @@
   "description": "Portfolio Data",
   "main": "main.js",
   "scripts": {
-    "start": " electron .",
+    "start": "electron .",
     "dist": "build"
   },
   "build": {
-    "appId": "com.diegoee.portfolio",
+    "appId": "com.diegoee.myportfolio",
     "win": {
       "target": "portable",
       "icon": "icons/ic_launcher.ico"
@@ -31,7 +31,6 @@
   },
   "devDependencies": {
     "electron": "^4.2.0",
-    "electron-builder": "^20.44.4",
-    "electron-rebuild": "^1.7.3"
+    "electron-builder": "^22.1.0"
   }
 }

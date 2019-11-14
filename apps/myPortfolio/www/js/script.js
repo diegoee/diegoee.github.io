@@ -9,7 +9,7 @@ function app(){
   $('#loadingModal').on('shown.bs.modal', function (e) { 
     if(exeModal){ 
       exeModal = false;
-      $('#loadingModal').modal('toggle'); 
+      $('#loadingModal').modal('hide'); 
     }
   });  
 
@@ -119,16 +119,10 @@ function app(){
         temp1.push(aux);
       }
       dataPlot = [];
-      for(i in temp){
-        //TODO: parse to date
-        //dataPlot.push([moment(temp[i]).toDate().getTime()/1000, temp1[i]]);
-        dataPlot.push([temp[i] , temp1[i]]);
-      }
-      //console.log([temp[0], temp1[0]]);
-      //console.log([moment(temp[0]).valueOf()/1000, temp1[0]]);
-      //console.log([moment(temp[0]).toDate().getTime(), temp1[0]]); 
-
-      //.filterMov
+      for(i in temp){ 
+        dataPlot.push([moment(temp[i],'DD/MM/YYYY').toDate().getTime() , temp1[i]]);
+      } 
+ 
       Highcharts.stockChart('chartEvo', { 
         chart: {
           alignTicks: false
@@ -204,13 +198,14 @@ function app(){
     }
 
     plotDataEvo();
-    $('#btnEvoData').on('click',function(){   
+    $('#btnEvoData').on('click',function(){  
+      exeModal = false; 
       $('#loadingModal').modal('toggle'); 
       setTimeout(function(){ 
         plotDataEvo(); 
         exeModal = true;
         $('#loadingModal').modal('toggle');
-      },1000); 
+      },250); 
     }); 
  
 

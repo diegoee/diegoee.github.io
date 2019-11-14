@@ -19,7 +19,10 @@
       }
 
       for(i in dataPlot){
-        //dataPlot[i][0] = moment(dataPlot[i][0]).toDate().getTime();
+        dataPlot[i][0] =  moment(dataPlot[i][0],'DD/MM/YYYY').toDate().getTime();
+        if(i<3){
+          console.log(dataPlot[i][0]);
+        }
       } 
 
       Highcharts.stockChart('container',{  

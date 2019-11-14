@@ -306,12 +306,7 @@ var appPortfolio = {
           res.evoData.evoticker[i].data = 'ERROR';
         });
       } 
-    }
-    
-    //TODO: Eliminar
-    for (i in res.evoData.evoticker){
-      //console.log(res.evoData.evoticker[i].ticker+' - '+res.evoData.evoticker[i].data.length);
-    }
+    }    
 
     var temp = [];
     var date = [];
