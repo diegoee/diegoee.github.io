@@ -9,8 +9,8 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">  
   </head>
   <body> 
-    <div id="body">
-      <div id="sec1" class="section"> 
+    <div id="body" style="display: inline">
+      <div id="sec1" data-slidr="sec1" class="section"> 
         <div class="container mt-1">
           <div class="row">
             <div class="col-12"> 
@@ -23,8 +23,8 @@
                       <p class="card-text m-0 text-center">Total: <b><span class="inputdata">*****</span></b></p>
                       <p class="card-text text-right m-0">Cash: <b><span class="inputdata">*****</span></b></p>
                       <p class="card-text text-right m-0">Valor Acciones: <b><span class="inputdata">*****</span></b></p>
-                      <p class="card-text m-0 textSize">     Beneficio Diarios: <span class="inputdata">*****</span>    </p>
-                      <p class="card-text m-0 textSize">     Beneficio total: <span class="inputdata">*****</span>    </p> 
+                      <p class="card-text m-0 textSize">Beneficio Diarios: <span class="inputdata">*****</span>    </p>
+                      <p class="card-text m-0 textSize">Beneficio total: <span class="inputdata">*****</span>    </p> 
                     </div>
                     <div class="col-md-2"></div>
                   </div> 
@@ -39,13 +39,13 @@
               <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec2"><i class="fa fa-list"></i> Movimientos</button>  
             </div>
             <div class="col-md-2">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block" data-toggle="modal" data-target="#modalChart1"><i class="fa fa-pie-chart"></i> </button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec3" ><i class="fa fa-globe"></i> </button>  
             </div>
             <div class="col-md-3 text-right">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block" data-toggle="modal" data-target="#modalOldActive">Antiguos valores de la Cartera</button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec5"><i class="fa fa-chevron-circle-left"></i> Antiguos Valores</button>  
             </div>  
             <div class="col-md-4">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block" data-toggle="modal" data-target="#modalChart2">Nº de Valores Activos en Cartera: <b><span class="inputdata">*****</span></b></button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec4">Nº de Valores Activos en Cartera: <b><span class="inputdata">*****</span></b></button>  
             </div> 
           </div>
         </div>
@@ -80,7 +80,7 @@
           </div>   
         </div> 
       </div>
-      <div id="sec2" class="section"> 
+      <div id="sec2" data-slidr="sec2" class="section"> 
         <div class="container mt-1">
           <div class="row mt-1">
             <div class="col-md-3">  
@@ -124,6 +124,82 @@
           </div>   
         </div>  
       </div> 
+      <div id="sec3" class="section"> 
+        <div class="container mt-1">
+          <div class="row mt-1">
+            <div class="col-md-3">  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1"><i class="fa fa-chevron-left"></i> Back</button>  
+            </div> 
+            <div class="col-md-9">  
+              <select id="inputTicker" class="form-control"> 
+              </select>
+            </div>
+          </div> 
+          <div class="row mt-1">
+            <div class="col-12">            
+              <div id="chartEvoTicker"></div>
+            </div>  
+          </div>    
+        </div>  
+      </div>
+      <div id="sec4" class="section"> 
+        <div class="container mt-1">
+          <div class="row mt-1">
+            <div class="col-md-3">  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1"><i class="fa fa-chevron-left"></i> Back</button>  
+            </div>
+            <div class="col-md-6">  
+              <button type="button" class="btn btn-light btn-sm btn-block"><b>Datos de Cartera</b></button> 
+            </div>
+            <div class="col-md-3">  
+            </div>
+          </div>  
+          <div class="row mt-1">
+            <div class="col-12">
+              <p class="text-center">Peso de los valores en Cartera: <b>Precio actual</b></p>
+              <div id="chart2" style="height: 700px"></div>          
+            </div>
+            <br>
+            <div class="col-12"> 
+              <p class="text-center m-0">Valor de la cartera: <b>Tipo</b></p> 
+              <div id="chart1"></div>  
+            </div>    
+              
+          </div>   
+        </div>  
+      </div> 
+      <div id="sec5" class="section"> 
+          <div class="container mt-1">
+            <div class="row mt-1">
+              <div class="col-md-3">  
+                <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1"><i class="fa fa-chevron-left"></i> Back</button>  
+              </div>
+              <div class="col-md-6">  
+                <button type="button" class="btn btn-light btn-sm btn-block"><b>Antiguos Valores</b></button> 
+              </div>
+              <div class="col-md-3">  
+              </div>
+            </div>  
+            <div class="row mt-1">
+              <div class="col-12"> 
+                  <div class="table-responsive">
+                    <table id="tableSharesOld" class="table table-striped table-bordered table-condensed table-hover dataTable textSize">
+                      <thead>
+                        <tr>
+                          <th class="align-top">Ticker</th>
+                          <th class="align-top">Empresa</th> 
+                          <th class="align-top">Ganancia/<br>Perdida(€)</th> 
+                          <th class="align-top">Movimientos</th> 
+                        </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                  </div>         
+              </div>  
+            </div>   
+          </div>  
+        </div>
     </div> 
 
     <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -141,28 +217,6 @@
       </div>
     </div>  
 
-    <div class="modal fade" id="modalChart1" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button> 
-          </div>
-          <div class="modal-body"> 
-            <div class="row">
-                <div class="col-12 m-0">
-                  <p class="text-center m-0">Valor de la cartera: <b>Tipo</b></p>
-                </div> 
-                <div class="col-12">
-                  <div id="chart1"></div> 
-                </div>      
-              </div>
-          </div> 
-        </div>
-      </div>
-    </div>
-
     <div class="modal fade" id="modalOldActive" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -174,48 +228,13 @@
           <div class="modal-body"> 
             <div class="row"> 
               <div class="col-12">
-                <div class="table-responsive">
-                  <table id="tableSharesOld" class="table table-striped table-bordered table-condensed table-hover dataTable textSize">
-                    <thead>
-                      <tr>
-                        <th class="align-top">Ticker</th>
-                        <th class="align-top">Empresa</th> 
-                        <th class="align-top">Ganancia/<br>Perdida(€)</th> 
-                        <th class="align-top">Movimientos</th> 
-                      </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                  </table>
-                </div>
+                
               </div> 
             </div> 
           </div>
         </div>
       </div>
     </div> 
-
-    <div class="modal fade" id="modalChart2" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button> 
-          </div>
-          <div class="modal-body"> 
-            <div class="row">
-                <div class="col-12">
-                  <p class="text-center">Peso de los valores en Cartera: <b>Precio actual</b></p>
-                </div> 
-                <div class="col-12">
-                  <div id="chart2" style="height: 700px"></div> 
-                </div>      
-              </div>
-          </div> 
-        </div>
-      </div>
-    </div>   
 
     <noscript>JAVASCRIPT IS NOT WORKING!</noscript>
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>  

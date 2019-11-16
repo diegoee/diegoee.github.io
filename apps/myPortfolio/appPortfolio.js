@@ -239,7 +239,7 @@ var appPortfolio = {
       //console.log(' - '+res.oldValue.length+' -> '+(i+1));
       await this.requestYahooValue(res.oldValue[i].ticker).then(function(dataRes){       
         var $ = require('jquery')((new jsdom(dataRes)).window);
-        res.oldValue[i].name = $('#quote-header-info [data-reactid="7"]').html();          
+        res.oldValue[i].name = ($('#quote-header-info [data-reactid="7"]').html()===undefined?'':$('#quote-header-info [data-reactid="7"]').html());          
         delete $;
         res.gTot = res.gTot + res.oldValue[i].value;
         res.oldValue[i].gTot = Math.round(res.oldValue[i].value*100)/100;
@@ -271,12 +271,14 @@ var appPortfolio = {
       await this.requestYahooValueHist(res.activeValue[i].ticker).then(function(dataRes){ 
         res.evoData.evoticker.push({
           ticker: res.activeValue[i].ticker,
+          name: res.activeValue[i].name,
           data: dataRes
         });
       }).catch(function(error){
         console.log(' Error: '+res.activeValue[i].ticker+' - '+error); 
         res.evoData.evoticker.push({
           ticker: res.activeValue[i].ticker,
+          name: '',
           data: 'ERROR'
         });
       });
@@ -286,12 +288,14 @@ var appPortfolio = {
       await this.requestYahooValueHist(res.oldValue[i].ticker).then(function(dataRes){ 
         res.evoData.evoticker.push({
           ticker: res.oldValue[i].ticker,
+          name: res.oldValue[i].name,
           data: dataRes
         });
       }).catch(function(error){
         console.log(' Error: '+res.oldValue[i].ticker+' - '+error); 
         res.evoData.evoticker.push({
-          ticker: res.oldValue[i].ticker,
+          ticker: res.oldValue[i].ticker, 
+          name: '',
           data: 'ERROR'
         });
       });
@@ -339,7 +343,7 @@ var appPortfolio = {
                 res.movData[i].value
               ]);
             }else{
-              if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Compra')!==-1){  
+              if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Compra Broker')!==-1){  
                 for (iii in res.evoData.evoticker[pos].data){
                   if(res.evoData.evoticker[pos].data[iii][0]===date[ii]){
                     aux.push([
@@ -350,7 +354,7 @@ var appPortfolio = {
                   }
                 } 
               } 
-              if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Venta')!==-1){  
+              if(res.movData[i].cat2==='Acciones'&&res.movData[i].desc.indexOf('Venta Broker')!==-1){  
                 for (iii in res.evoData.evoticker[pos].data){
                   if(res.evoData.evoticker[pos].data[iii][0]===date[ii]){
                     aux.push([
@@ -376,6 +380,7 @@ var appPortfolio = {
       }); 
       delete aux;
     }
+    res.evoticker = res.evoData.evoticker;
     res.evoData = temp;
     delete temp;
  
@@ -455,7 +460,7 @@ var appPortfolio = {
                 break;
               }
             }
-            if(movData[i].cat2==='Acciones'&&movData[i].desc.indexOf('Compra')!==-1){  
+            if(movData[i].cat2==='Acciones'&&movData[i].desc.indexOf('Compra Broker')!==-1){  
               for (iii in tickers[pos].data){
                 if(tickers[pos].data[iii][0]===date[ii]){
                   aux.push([
@@ -466,7 +471,7 @@ var appPortfolio = {
                 }
               } 
             } 
-            if(movData[i].cat2==='Acciones'&&movData[i].desc.indexOf('Venta')!==-1){  
+            if(movData[i].cat2==='Acciones'&&movData[i].desc.indexOf('Venta Broker')!==-1){  
               for (iii in tickers[pos].data){
                 if(tickers[pos].data[iii][0]===date[ii]){
                   aux.push([

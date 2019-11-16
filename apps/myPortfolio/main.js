@@ -30,7 +30,7 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {   
   var mainWindow = new BrowserWindow({
     title: 'My Portfolio',
-    width: 1000,
+    width: 1200,
     minWidth: 400,
     height: 700,    
     minHeight: 400,
@@ -51,21 +51,7 @@ app.on('ready', function() {
   var templateMenu=[
     {
       label: 'Menu',
-      submenu:[
-        {
-          label: 'Reload ...',
-          click: function(){  
-            mainWindow.loadURL(url.format({
-              pathname: path.join(__dirname,'/www/index.html'),
-              hash: 'about',
-              protocol: 'file',
-              slashes: true
-            }));
-          } 
-        },
-        {
-          type: 'separator'
-        },
+      submenu:[ 
         {
           label: 'Dev Tools',
           click: function(e){
@@ -97,7 +83,7 @@ app.on('ready', function() {
   ];
 
   //templateMenu[0].submenu[2].label = 'Dev Tools';
-  //mainWindow.webContents.openDevTools(); 
+  mainWindow.webContents.openDevTools(); 
 
   var menu = Menu.buildFromTemplate(templateMenu);
   Menu.setApplicationMenu(menu);  

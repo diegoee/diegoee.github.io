@@ -31,15 +31,24 @@ function app(){
     });
     var sec = $(this).attr('go-to');
     $(sec).addClass('active');
+    var event;
+    if(typeof(Event) === 'function') { //CHROME
+          event = new Event('resize');
+    }else{ // IE
+      event = window.document.createEvent('UIEvents'); 
+      event.initUIEvent('resize', true, false, window, 0);  
+    }
+    window.dispatchEvent(event);
   }); 
 
   try{
     var ipcRenderer = require('electron').ipcRenderer;    
     ipcRenderer.on('reply1',function(event, arg){
-      //console.log(arg);  
-      renderData(arg);
-      exeModal = true;
-      $('#loadingModal').modal('toggle'); 
+      console.log(arg); 
+      if(arg!==null){ 
+        renderData(arg);exeModal = true;
+        $('#loadingModal').modal('toggle');
+      } 
     }); 
     ipcRenderer.send('request1', true);
   }catch(e){
@@ -48,8 +57,8 @@ function app(){
     $('#loadingModal').modal('toggle'); 
     renderData({
       name: 'testing...', 
-      cashValue: 120,
-      shareValue: 330 
+      cashValue: 1234,
+      shareValue: 4321 
     }); 
   } 
 
@@ -121,8 +130,8 @@ function app(){
       dataPlot = [];
       for(i in temp){ 
         dataPlot.push([moment(temp[i],'DD/MM/YYYY').toDate().getTime() , temp1[i]]);
-      } 
- 
+      }  
+      
       Highcharts.stockChart('chartEvo', { 
         chart: {
           alignTicks: false
@@ -207,7 +216,117 @@ function app(){
         $('#loadingModal').modal('toggle');
       },250); 
     }); 
- 
+
+    function plotDataEvoTicker(ticker,name){
+      var dataPlot = 0;
+      for (i in data.evoticker){
+        if(data.evoticker[i].ticker===ticker){
+          dataPlot = data.evoticker[i].data; 
+          break;
+        } 
+      }   
+
+      if (dataPlot!=='ERROR'){  
+        var temp = [];
+        for(i in dataPlot){
+          if(moment(dataPlot[i][0],'DD/MM/YYYY').toDate().getTime()>0){
+            temp.push([moment(dataPlot[i][0],'DD/MM/YYYY').toDate().getTime(),dataPlot[i][1]])
+          }  
+        } 
+        dataPlot=temp;
+
+        //console.log(dataPlot[0]);    
+        Highcharts.stockChart('chartEvoTicker', { 
+          chart: {
+            alignTicks: false
+          },
+          credits: {
+            enabled: false
+          },
+          exporting: {
+            enabled: false
+          },
+          tooltip: {
+            crosshairs: [true,true],
+            valueDecimals: 2,
+            split: true 
+          },
+          xAxis: {                        
+            title: {
+              text: 'Tiempo'
+            }, 
+          },
+          yAxis: {
+            opposite: false,
+            title: {
+              text: 'Euros (€)'
+            }
+          },
+          rangeSelector: {
+            inputEnabled: false,
+            labelStyle: {
+              display: 'none'
+            },
+            buttons: [{
+              type: 'month',
+              count: 1, 
+              text: '1m'
+            }, {
+              type: 'month',
+              count: 2 ,
+              text: '2m'
+            }, {
+              type: 'month',
+              count: 3 ,
+              text: '3m'
+            }, {
+              type: 'month',
+              count: 4 ,
+              text: '4m'
+            }, {
+              type: 'month',
+              count: 6,
+              text: '6m'
+            }, {
+              type: 'year',
+              count: 1,
+              text: '1y '
+            }, {
+              type: 'year',
+              count: 2,
+              text: '2y '
+            },{
+              type: 'all',
+              text: 'All'
+            }]
+          },
+          series: [{
+            name: name,
+            data: dataPlot,
+            tooltip: {
+              valueDecimals: 2
+            }
+          }]
+        }); 
+      }else{
+        $('#chartEvoTicker').html('');
+      }
+    }
+
+    for (i in data.evoticker){
+      if(i===0){
+        $('#inputTicker').append('<option value="'+data.evoticker[i].ticker+'" selected>'+(data.evoticker[i].name===''||data.evoticker[i].name===undefined?data.evoticker[i].ticker:data.evoticker[i].name)+'</option>');  
+      }else{ 
+        $('#inputTicker').append('<option value="'+data.evoticker[i].ticker+'" >'+(data.evoticker[i].name===''||data.evoticker[i].name===undefined?data.evoticker[i].ticker:data.evoticker[i].name)+'</option>'); 
+      } 
+    } 
+
+    $('#chartEvoTicker').height($(window).height()-100); 
+    plotDataEvoTicker($('#inputTicker').val(),$("#inputTicker option:selected").text());
+    $('#inputTicker').on('change',function(){ 
+      $('#chartEvoTicker').height($(window).height()-100);
+      plotDataEvoTicker($('#inputTicker').val(),$("#inputTicker option:selected").text());
+    }); 
 
     //inflate data in DOM y cal data for the charts
     var $indata = $('.inputdata');
@@ -384,8 +503,3 @@ function app(){
   } 
 } 
 app(); 
-
- 
-
-   
-
