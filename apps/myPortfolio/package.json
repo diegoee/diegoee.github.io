@@ -1,13 +1,12 @@
 {
   "name": "myportfolio",
-  "productName": "My Portffolio finnance",
+  "productName": "MyPortfolioFinnance",
   "version": "0.0.0",
   "description": "Portfolio Data",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "build",
-    "package": "electron-packager . MyApp --overwrite --asar --prune=true --platform=win32 --arch=ia32 --icon=icons/ic_launcher.ico --prune=true --out=dist"
+    "dist": "electron-builder"
   },
   "build": {
     "appId": "com.diegoee.myportfolio",
@@ -19,6 +18,7 @@
   "author": "Diego E.E.",
   "license": "ISC",
   "dependencies": {
+    "alert-node": "^2.0.3",
     "bootstrap": "^4.0.0",
     "convert-excel-to-json": "^1.6.1",
     "datatables.net-dt": "^1.10.20",
@@ -26,13 +26,12 @@
     "font-awesome": "^4.7.0",
     "highcharts": "^7.2.0",
     "jquery": "^3.4.1",
-    "jsdom": "^15.2.0", 
+    "jsdom": "^15.2.0",
     "moment": "^2.24.0",
     "popper.js": "^1.14.3"
   },
   "devDependencies": {
     "electron": "^4.2.0",
-    "electron-builder": "^22.1.0",
-    "electron-packager": "^14.1.0"
+    "electron-builder": "^22.1.0"
   }
 }

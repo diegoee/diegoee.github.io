@@ -1,4 +1,5 @@
 @echo off
-cls 
+cls  
+echo My Portfolio: start electron ...
 npm run start 
 
