@@ -7,11 +7,14 @@ var BrowserWindow = electron.BrowserWindow;
 var Menu = electron.Menu;  
 var ipcMain = electron.ipcMain;  
  
-ipcMain.on('request1',function(event, arg){
-  if(arg){ 
+ipcMain.on('requestStart',function(event, arg){
+  //arg = 'data\\Movements.xls';
+  if(arg!==undefined){ 
     var data = undefined; 
-    require('./appPortfolio').exe().then(function(data){ 
-      event.sender.send('reply1', data); 
+    require('./appPortfolio').exe(function(log){
+      event.sender.send('replyConsole','TERMINAL: '+log);
+    },arg).then(function(data){ 
+      event.sender.send('replyStart', data); 
       console.log('data sent');
     }).catch(function(e){ 
       console.log('Error in appPortfolio.js promise');

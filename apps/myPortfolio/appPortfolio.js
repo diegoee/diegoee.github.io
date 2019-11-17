@@ -1,4 +1,8 @@
 var appPortfolio = {  
+  log: function(data,fnLog){
+    console.log(data);
+    fnLog(data);    
+  },
   requestYahooValue: function(ticker){
     var request = require('request');    
     return new Promise(function(resolve,reject){  
@@ -76,14 +80,14 @@ var appPortfolio = {
       }); 
     });
   },
-  exe: async function(){
+  exe: async function(fnLog,rootFile){
     //load require  
     var excelToJson = require('convert-excel-to-json');
     var jsdom = require('jsdom').JSDOM;
     var moment = require('moment');
 
     var time = moment();
-    console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> Start Exe');
+    appPortfolio.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> Start Exe',fnLog);
  
     var res = { 
       name: 'ING Direct Cartera',
@@ -101,14 +105,18 @@ var appPortfolio = {
       evoData: undefined
     } 
  
-    console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 01.-load excel');
-    var data = excelToJson({
-      sourceFile: 'data\\Movements.xls',
-      header:{ 
-        rows: 1 
-      }
-    });
-    data = data.Movimientos; 
+    appPortfolio.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 01.-load excel',fnLog);
+    try{
+      var data = excelToJson({
+        sourceFile: rootFile,
+        header:{ 
+          rows: 1 
+        }
+      });
+      data = data.Movimientos; 
+    }catch(error){ 
+      appPortfolio.log(error,fnLog);
+    }
 
     for(i in data){
       data[i].id = i;
@@ -129,9 +137,9 @@ var appPortfolio = {
       delete data[i].G;
       delete data[i].H; 
     }
-    console.log(' loaded excel: data l='+data.length);     
+    appPortfolio.log(' loaded excel: data l='+data.length,fnLog);     
     res.movData = data; 
-    console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 02.-parsing data');
+    appPortfolio.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 02.-parsing data',fnLog);
     function onlyUnique(value, index, self) { 
       return self.indexOf(value) === index;
     } 
@@ -204,11 +212,10 @@ var appPortfolio = {
       delete res.oldValue[i].n; 
     }  
 
-    console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 03.-requesting data... ');    
+    appPortfolio.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 03.-requesting data... ',fnLog);    
 
-    console.log(' active Value');
-    for (i in res.activeValue){
-      //console.log(' - '+res.activeValue.length+' -> '+(i+1));
+    appPortfolio.log(' active Value',fnLog);
+    for (i in res.activeValue){ 
       await this.requestYahooValue(res.activeValue[i].ticker).then(function(dataRes){       
         var $ = require('jquery')((new jsdom(dataRes)).window);
         res.activeValue[i].name =  $('#quote-header-info [data-reactid="7"]').html();         
@@ -225,7 +232,7 @@ var appPortfolio = {
         res.activeValue[i].value = Math.round((res.activeValue[i].value)*100)/100;
         delete $;
       },function(error){
-        console.log(' '+res.activeValue[i].ticker+': '+error);
+        appPortfolio.log(' '+res.activeValue[i].ticker+': '+error,fnLog);
       });  
     }
     for (i in res.activeValue){
@@ -234,9 +241,8 @@ var appPortfolio = {
     res.shareValue = Math.round(res.shareValue*100)/100;
     res.cValue = res.shareValue+res.cashValue;  
 
-    console.log(' old Value');
-    for (i in res.oldValue){
-      //console.log(' - '+res.oldValue.length+' -> '+(i+1));
+    appPortfolio.log(' old Value',fnLog);
+    for (i in res.oldValue){ 
       await this.requestYahooValue(res.oldValue[i].ticker).then(function(dataRes){       
         var $ = require('jquery')((new jsdom(dataRes)).window);
         res.oldValue[i].name = ($('#quote-header-info [data-reactid="7"]').html()===undefined?'':$('#quote-header-info [data-reactid="7"]').html());          
@@ -246,7 +252,7 @@ var appPortfolio = {
         res.oldValue[i].gTotClass = (res.oldValue[i].gTot<0?'table-danger':'table-success');
         delete res.oldValue[i].value;
       },function(res){
-        console.log(' '+res.oldValue[i].ticker+': '+res);
+        appPortfolio.log(' '+res.oldValue[i].ticker+': '+res,fnLog);
       });  
     }    
     
@@ -263,10 +269,10 @@ var appPortfolio = {
     res.cashValue = Math.round(res.cashValue*100)/100+'€';
     res.shareValue = Math.round(res.shareValue*100)/100+'€';  
  
-    console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 04.-calculating evo data... '); 
+    appPortfolio.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 04.-calculating evo data... ',fnLog); 
     res.evoData = {};
     res.evoData.evoticker=[];
-    console.log(' evo data active Value');
+    appPortfolio.log(' evo data active Value',fnLog);
     for (i in res.activeValue){
       await this.requestYahooValueHist(res.activeValue[i].ticker).then(function(dataRes){ 
         res.evoData.evoticker.push({
@@ -275,7 +281,7 @@ var appPortfolio = {
           data: dataRes
         });
       }).catch(function(error){
-        console.log(' Error: '+res.activeValue[i].ticker+' - '+error); 
+        appPortfolio.log(' Error: '+res.activeValue[i].ticker+' - '+error,fnLog); 
         res.evoData.evoticker.push({
           ticker: res.activeValue[i].ticker,
           name: '',
@@ -283,7 +289,7 @@ var appPortfolio = {
         });
       });
     }
-    console.log(' evo data old Value');
+    appPortfolio.log(' evo data old Value',fnLog);
     for (i in res.oldValue){
       await this.requestYahooValueHist(res.oldValue[i].ticker).then(function(dataRes){ 
         res.evoData.evoticker.push({
@@ -292,7 +298,7 @@ var appPortfolio = {
           data: dataRes
         });
       }).catch(function(error){
-        console.log(' Error: '+res.oldValue[i].ticker+' - '+error); 
+        appPortfolio.log(' Error: '+res.oldValue[i].ticker+' - '+error,fnLog); 
         res.evoData.evoticker.push({
           ticker: res.oldValue[i].ticker, 
           name: '',
@@ -300,13 +306,13 @@ var appPortfolio = {
         });
       });
     }
-    console.log(' getting again data from error tickers');
+    appPortfolio.log(' getting again data from error tickers',fnLog);
     for (i in res.evoData.evoticker){
       if (res.evoData.evoticker[i].data==='ERROR'){
         await this.requestYahooValueHist(res.evoData.evoticker[i].ticker).then(function(dataRes){ 
           res.evoData.evoticker[i].data = dataRes;
         }).catch(function(error){
-          console.log(' Error: '+res.evoData.evoticker[i].ticker+' - '+error); 
+          appPortfolio.log(' Error: '+res.evoData.evoticker[i].ticker+' - '+error,fnLog); 
           res.evoData.evoticker[i].data = 'ERROR';
         });
       } 
@@ -384,7 +390,7 @@ var appPortfolio = {
     res.evoData = temp;
     delete temp;
  
-    console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> End Exe'); 
+    appPortfolio.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> End Exe',fnLog); 
     return res;
   },
   exeTest: async function(){ 
@@ -520,7 +526,8 @@ var appPortfolio = {
 }  
 module.exports = appPortfolio;
 if (process.argv[2]==='exe'){ 
-  appPortfolio.exe();
+  appPortfolio.exe(function(){    
+  },'data\\Movements.xls');
 } 
 if (process.argv[2]==='test'){ 
   appPortfolio.exeTest();

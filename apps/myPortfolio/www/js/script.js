@@ -12,6 +12,10 @@ function app(){
       $('#loadingModal').modal('hide'); 
     }
   });  
+  function cleanLoadModal(){
+    $('#loadingModal .modal-body').html('<div class="progress"> <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>  </div>');
+    $('#loadingModal .modal-title').html('Loading...');
+  }
 
   $('.modal').on('shown.bs.modal',function(){
     var event;
@@ -39,18 +43,36 @@ function app(){
       event.initUIEvent('resize', true, false, window, 0);  
     }
     window.dispatchEvent(event);
-  }); 
+  });  
 
   try{
-    var ipcRenderer = require('electron').ipcRenderer;    
-    ipcRenderer.on('reply1',function(event, arg){
-      console.log(arg); 
+    var ipcRenderer = require('electron').ipcRenderer; 
+    $('#loadingModal .modal-title').html('Choose xls file to read...');
+    
+    $('#loadingModal .modal-body').html('<div class="form-group"><div class="input-group"><div class="custom-file"><input id="fileInput" class="form-control-file" type="file" name=""/></div></div></div>');
+  
+    $('#fileInput').on('change',function(event){ 
+      cleanLoadModal(); 
+      var path = event.target.files[0].path;
+      cleanLoadModal(); 
+      $('#loadingModal .modal-body').append('<div class="small"><div class="small">File: '+path+'</div></div>');
+      ipcRenderer.send('requestStart', path); 
+    }); 
+    ipcRenderer.on('replyStart',function(event, arg){
+      console.log(arg);
+      cleanLoadModal(); 
       if(arg!==null){ 
-        renderData(arg);exeModal = true;
-        $('#loadingModal').modal('toggle');
+        renderData(arg);
+        exeModal = true;
+        setTimeout(function(){ 
+          $('#loadingModal').modal('toggle');
+        },1000);
       } 
     }); 
-    ipcRenderer.send('request1', true);
+    ipcRenderer.on('replyConsole',function(event, arg){
+      console.log(arg);  
+      $('#loadingModal .modal-body').append('<div class="small"><div class="small">'+arg+'</div></div>'); 
+    }); 
   }catch(e){
     console.error(e);  
     exeModal = true;
