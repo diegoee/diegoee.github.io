@@ -6,7 +6,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder",     
+    "phonegap": " "
   },
   "build": {
     "appId": "com.diegoee.myportfolio",
