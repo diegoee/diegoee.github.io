@@ -7,5 +7,5 @@ rmdir /S /Q release-builds
 rmdir /S /Q dist
 del package-lock.json
 del data\data.json
-TIMEOUT /T 15 
+TIMEOUT /T 5 
 

@@ -9,8 +9,8 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">  
   </head>
   <body> 
-    <div id="body" style="display: inline">
-      <div id="sec1" data-slidr="sec1" class="section"> 
+    <div id="body">
+      <div id="sec1" class="section"> 
         <div class="container mt-1">
           <div class="row">
             <div class="col-12"> 
@@ -36,16 +36,16 @@
         <div class="container mt-1">
           <div class="row">
             <div class="col-md-3">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec2"><i class="fa fa-list"></i> Movimientos</button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec2" go-from="#sec1"><i class="fa fa-list"></i> Movimientos</button>  
             </div>
             <div class="col-md-2">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec3" ><i class="fa fa-globe"></i> </button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec3" go-from="#sec1"><i class="fa fa-globe"></i> </button>  
             </div>
             <div class="col-md-3 text-right">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec5"><i class="fa fa-chevron-circle-left"></i> Antiguos Valores</button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec5" go-from="#sec1"><i class="fa fa-chevron-circle-left"></i> Antiguos Valores</button>  
             </div>  
             <div class="col-md-4">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec4">Nº de Valores Activos en Cartera: <b><span class="inputdata">*****</span></b></button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec4" go-from="#sec1">Nº de Valores Activos en Cartera: <b><span class="inputdata">*****</span></b></button>  
             </div> 
           </div>
         </div>
@@ -80,11 +80,11 @@
           </div>   
         </div> 
       </div>
-      <div id="sec2" data-slidr="sec2" class="section"> 
+      <div id="sec2" class="section"> 
         <div class="container mt-1">
           <div class="row mt-1">
             <div class="col-md-3">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1"><i class="fa fa-chevron-left"></i> Back</button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1" go-from="#sec2"><i class="fa fa-chevron-left"></i> Home</button>  
             </div>
             <div class="col-md-6">  
               <button type="button" class="btn btn-light btn-sm btn-block"><b>Movimentos y Evolución Cartera</b></button> 
@@ -128,7 +128,7 @@
         <div class="container mt-1">
           <div class="row mt-1">
             <div class="col-md-3">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1"><i class="fa fa-chevron-left"></i> Back</button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1" go-from="#sec3"><i class="fa fa-chevron-left"></i> Home</button>  
             </div> 
             <div class="col-md-9">  
               <select id="inputTicker" class="form-control"> 
@@ -136,6 +136,9 @@
             </div>
           </div> 
           <div class="row mt-1">
+            <div class="col-12">            
+              <p id="linkEvoTicker"></p> 
+            </div> 
             <div class="col-12">            
               <div id="chartEvoTicker"></div>
             </div>  
@@ -146,7 +149,7 @@
         <div class="container mt-1">
           <div class="row mt-1">
             <div class="col-md-3">  
-              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1"><i class="fa fa-chevron-left"></i> Back</button>  
+              <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1" go-from="#sec4"><i class="fa fa-chevron-left"></i> Home</button>  
             </div>
             <div class="col-md-6">  
               <button type="button" class="btn btn-light btn-sm btn-block"><b>Datos de Cartera</b></button> 
@@ -172,7 +175,7 @@
           <div class="container mt-1">
             <div class="row mt-1">
               <div class="col-md-3">  
-                <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1"><i class="fa fa-chevron-left"></i> Back</button>  
+                <button type="button" class="btn btn-outline-dark btn-sm btn-block goBtn" go-to="#sec1" go-from="#sec5"><i class="fa fa-chevron-left"></i> Home</button>  
               </div>
               <div class="col-md-6">  
                 <button type="button" class="btn btn-light btn-sm btn-block"><b>Antiguos Valores</b></button> 
@@ -217,7 +220,7 @@
       </div>
     </div> 
 
-    <noscript>JAVASCRIPT IS NOT WORKING!</noscript>
+    <noscript>JAVASCRIPT IS NOT WORKING!</noscript> 
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>  
     <script type="text/javascript" >window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.js');</script>
     <script type="text/javascript" src="../node_modules/popper.js/dist/umd/popper.js"></script> 
@@ -228,6 +231,7 @@
     <script type="text/javascript" src="../node_modules/highcharts/highstock.js"></script> 
     <script type="text/javascript" >window.Highcharts = require('../node_modules/highcharts/highcharts.js');</script>
     <script type="text/javascript" >window.Highcharts = require('../node_modules/highcharts/highstock.js');</script>
+    <script type="text/javascript" src="../node_modules/impress.js/js/impress.js"></script> 
     <script type="text/javascript" src="js/script.js"></script> 
   </body>
 </html>

@@ -1,7 +1,6 @@
 function app(){
-  'use strict';
-
-   var exeModal = false;
+  'use strict'; 
+  var exeModal = false;
   $('#loadingModal').modal({ 
     backdrop: 'static',
     keyboard: false
@@ -27,22 +26,59 @@ function app(){
     }
     window.dispatchEvent(event);  
   });
-  
+
+  //animation page
+  $.each($('.section'),function(){
+    $(this).removeClass('active');
+  }); 
   $('#sec1').addClass('active');
-  $('.goBtn').on('click',function(){  
+    
+  $.each($('.section'),function(){
+    $(this).css({ 
+      left: $(window).width()
+    });
+  });
+  $('#sec1').css({ 
+    left: 0
+  }); 
+  function movScreen(secFrom,secTo){
     $.each($('.section'),function(){
       $(this).removeClass('active');
-    });
-    var sec = $(this).attr('go-to');
-    $(sec).addClass('active');
-    var event;
+    }); 
+    $(secFrom).addClass('active');  
+    $(secTo).addClass('active');
+    var mov = 0; 
+
+    if (secFrom==='#sec1'||(secFrom==='#sec5'&&secTo==='#sec3')){      
+      mov = -$(window).width();
+    }else{
+      mov = $(window).width();
+    }
+
+    $(secTo).animate({  
+      left: 0
+    },500); 
+    $(secFrom).animate({  
+      left: mov
+    },500,function(){
+      $(secFrom).removeClass('active');
+      if(secFrom==='#sec5'&&secTo==='#sec3'){ 
+        $(secFrom).css({ 
+          left: -mov
+        });
+      }
+    }); 
+
     if(typeof(Event) === 'function') { //CHROME
-          event = new Event('resize');
+      event = new Event('resize');
     }else{ // IE
       event = window.document.createEvent('UIEvents'); 
       event.initUIEvent('resize', true, false, window, 0);  
     }
-    window.dispatchEvent(event);
+    window.dispatchEvent(event); 
+  }
+  $('.goBtn').on('click',function(){  
+    movScreen($(this).attr('go-from'),$(this).attr('go-to'));         
   });  
 
   try{
@@ -343,11 +379,14 @@ function app(){
       } 
     } 
 
-    $('#chartEvoTicker').height($(window).height()-100); 
-    plotDataEvoTicker($('#inputTicker').val(),$("#inputTicker option:selected").text());
-    $('#inputTicker').on('change',function(){ 
-      $('#chartEvoTicker').height($(window).height()-100);
+    function activeTicker(){
+      $('#chartEvoTicker').height($(window).height()-110);  
+      $('#linkEvoTicker').html('<a href="https://es.finance.yahoo.com/quote/'+$('#inputTicker').val()+'?p='+$('#inputTicker').val()+'" target="_blank"> Link Yahoo ('+$('#inputTicker').val()+')</a>');   
       plotDataEvoTicker($('#inputTicker').val(),$("#inputTicker option:selected").text());
+    }
+    activeTicker();
+    $('#inputTicker').on('change',function(){ 
+      activeTicker();
     }); 
 
     //inflate data in DOM y cal data for the charts
@@ -366,7 +405,7 @@ function app(){
     tab = data.activeValue;
     for(var i in tab){ 
       var tr = '<tr>';
-      tr = tr + '<td><a href="https://es.finance.yahoo.com/quote/'+tab[i].ticker+'?p='+tab[i].ticker+'" target="_blank">'+tab[i].ticker+'</a></td>';
+      tr = tr + '<td><button class="btn btn-link btn-sm goBtnTicker1">'+tab[i].ticker+'</button></td>';
       tr = tr + '<td>'+tab[i].name+'</td>';  
       tr = tr + '<td class="'+tab[i].gTotClass+' text-right">'+tab[i].gTotPor+'</td>';
       tr = tr + '<td class="'+tab[i].gTotClass+' text-right">'+tab[i].gTot+'</td>';
@@ -385,13 +424,13 @@ function app(){
       tr = tr + '<td class="text-right">'+tab[i].nValue+'</td>'; 
       tr = tr + '</tr>';
       $('#tableShares tbody').append(tr); 
-    } 
+    }   
 
     $('#tableSharesOld tbody').html('');
     tab = data.oldValue;
     for(var i in tab){ 
       var tr = '<tr>';
-      tr = tr + '<td><a href="https://es.finance.yahoo.com/quote/'+tab[i].ticker+'?p='+tab[i].ticker+'" target="_blank">'+tab[i].ticker+'</a></td>';
+      tr = tr + '<td><button class="btn btn-link btn-sm goBtnTicker2">'+tab[i].ticker+'</button></td>';
       tr = tr + '<td>'+tab[i].name+'</td>';   
       tr = tr + '<td class="'+tab[i].gTotClass+' text-right">'+tab[i].gTot+'</td>';  
       var aux = '<ul class="list-group">';        
@@ -402,8 +441,19 @@ function app(){
       tr = tr + '<td class="text-left">'+aux+'</td>';
       tr = tr + '</tr>';
       $('#tableSharesOld tbody').append(tr); 
-    }     
-   
+    }   
+
+    $('.goBtnTicker1').on('click',function(){ 
+      movScreen('#sec1','#sec3');
+      $('#inputTicker').val($(this).html());
+      activeTicker();
+    });
+    $('.goBtnTicker2').on('click',function(){ 
+      movScreen('#sec5','#sec3');
+      $('#inputTicker').val($(this).html());
+      activeTicker();
+    });
+
     // Build the chart
     Highcharts.chart('chart1',{
       chart: {

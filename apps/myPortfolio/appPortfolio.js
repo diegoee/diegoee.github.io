@@ -284,7 +284,7 @@ var appPortfolio = {
         appPortfolio.log(' Error: '+res.activeValue[i].ticker+' - '+error,fnLog); 
         res.evoData.evoticker.push({
           ticker: res.activeValue[i].ticker,
-          name: '',
+          name: res.activeValue[i].name,
           data: 'ERROR'
         });
       });
@@ -301,7 +301,7 @@ var appPortfolio = {
         appPortfolio.log(' Error: '+res.oldValue[i].ticker+' - '+error,fnLog); 
         res.evoData.evoticker.push({
           ticker: res.oldValue[i].ticker, 
-          name: '',
+          name: res.oldValue[i].name,
           data: 'ERROR'
         });
       });
