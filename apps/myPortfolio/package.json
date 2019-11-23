@@ -1,7 +1,7 @@
 {
   "name": "myportfolio",
   "productName": "MyPortfolioFinnance",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Portfolio Data",
   "main": "main.js",
   "scripts": {
