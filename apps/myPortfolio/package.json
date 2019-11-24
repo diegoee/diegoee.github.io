@@ -9,21 +9,13 @@
   "scripts": {
     "start": "electron .",
     "electronBuilder": "electron-builder",
-    "androidjs": "androidjs b"
+    "phonegap": "phonegap create phonegap --id \"org.diegoee.myportfolio\" --name \"MyPortfolioFinnance\""
   },
-  "app-name": "MyPortfolioFinnance",
-  "package-name": "myportfolio",
-  "project-type": "webview",
-  "icon": "views/icons/ic_launcher.png",
-  "permission": [
-    "android.permission.READ_EXTERNAL_STORAGE"
-  ],
-  "dist-path": "dist",
   "build": {
     "appId": "com.diegoee.myportfolio",
     "win": {
       "target": "portable",
-      "icon": "views/icons/ic_launcher.ico"
+      "icon": "www/icons/ic_launcher.ico"
     }
   },
   "dependencies": {
@@ -36,8 +28,7 @@
     "jquery": "^3.4.1",
     "jsdom": "^15.2.0",
     "moment": "^2.24.0",
-    "popper.js": "^1.14.3",
-    "androidjs": "^1.0.5"
+    "popper.js": "^1.14.3"
   },
   "devDependencies": {
     "electron": "^4.2.0",
