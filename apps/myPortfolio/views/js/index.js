@@ -573,5 +573,5 @@ function app(){
       });
     }); 
   } 
-} 
-app(); 
+}  
+app();

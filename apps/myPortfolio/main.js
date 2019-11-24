@@ -36,12 +36,12 @@ app.on('ready', function() {
     minWidth: 400,
     height: 700,    
     minHeight: 400,
-    icon: path.join(__dirname, 'icons/ic_launcher.ico'), 
+    icon: path.join(__dirname, 'views/icons/ic_launcher.ico'), 
     backgroundColor: '#ced4da'
   });  
   
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname,'/www/index.html'),
+    pathname: path.join(__dirname,'/views/index.html'),
     protocol: 'file',
     slashes: true
   }));

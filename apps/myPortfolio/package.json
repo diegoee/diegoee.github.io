@@ -2,23 +2,31 @@
   "name": "myportfolio",
   "productName": "MyPortfolioFinnance",
   "version": "1.0.1",
+  "author": "diegoee",
+  "license": "ISC",
   "description": "Portfolio Data",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder",     
-    "phonegap": " "
+    "electronBuilder": "electron-builder",
+    "androidjs": "androidjs b"
   },
+  "app-name": "MyPortfolioFinnance",
+  "package-name": "myportfolio",
+  "project-type": "webview",
+  "icon": "views/icons/ic_launcher.png",
+  "permission": [
+    "android.permission.READ_EXTERNAL_STORAGE"
+  ],
+  "dist-path": "dist",
   "build": {
     "appId": "com.diegoee.myportfolio",
     "win": {
       "target": "portable",
-      "icon": "icons/ic_launcher.ico"
+      "icon": "views/icons/ic_launcher.ico"
     }
-  }, 
-  "author": "Diego E.E.",
-  "license": "ISC",
-  "dependencies": { 
+  },
+  "dependencies": {
     "bootstrap": "^4.0.0",
     "convert-excel-to-json": "^1.6.1",
     "datatables.net-dt": "^1.10.20",
@@ -28,7 +36,8 @@
     "jquery": "^3.4.1",
     "jsdom": "^15.2.0",
     "moment": "^2.24.0",
-    "popper.js": "^1.14.3"
+    "popper.js": "^1.14.3",
+    "androidjs": "^1.0.5"
   },
   "devDependencies": {
     "electron": "^4.2.0",
