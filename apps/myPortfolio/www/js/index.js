@@ -189,8 +189,9 @@ function app(){
       for(i in temp){ 
         dataPlot.push([moment(temp[i],'DD/MM/YYYY').toDate().getTime() , temp1[i]]);
       }  
-      
-      Highcharts.stockChart('chartEvo', { 
+
+      $('#chartEvo').height($(window).height()-110); 
+      var chart = Highcharts.stockChart('chartEvo', { 
         chart: {
           alignTicks: false
         },
@@ -208,13 +209,59 @@ function app(){
         xAxis: {                        
           title: {
             text: 'Tiempo'
-          }, 
+          },
+          events: { 
+            setExtremes: function (e) {
+              var yStart =  Math.round(e.target.series[0].processedYData[0]*100)/100; 
+              var yEnd =  Math.round(e.target.series[0].processedYData[e.target.series[0].processedYData.length-1]*100)/100;
+              //moment(1574165831072.1).format('DD/MM/YYYY') 
+              var inc = Math.round((yEnd/yStart>1?yEnd/yStart-1:-(1-yEnd/yStart))*10000)/100+' %';
+              chart.update({
+                yAxis: {
+                  plotLines: [{
+                    value: yEnd,
+                    color: 'green',
+                    dashStyle: 'shortdash',
+                    width: 2,
+                    label: {
+                      text: 'Fin: '+yEnd+'€ -> Inc: '+inc
+                    }
+                  },{
+                    value: yStart,
+                    color: 'red',
+                    dashStyle: 'shortdash',
+                    width: 2,
+                    label: {
+                      text: 'Inicio: '+yStart+'€'
+                    }
+                  }]
+                }, 
+              });  
+            }
+          }
         },
         yAxis: {
           opposite: false,
           title: {
             text: 'Euros (€)'
-          }
+          },
+          plotLines: [{
+            value: Math.round(dataPlot[0][1]*100)/100,
+            color: 'green',
+            dashStyle: 'shortdash',
+            width: 2,
+            label: {
+              text: 'Fin: '+Math.round(dataPlot[0][1]*100)/100+'€'
+            }
+          },{
+            value: Math.round(dataPlot[dataPlot.length-1][1]*100)/100,
+            color: 'red',
+            dashStyle: 'shortdash',
+            width: 2,
+            label: {
+              text: 'Inicio: '+Math.round(dataPlot[dataPlot.length-1][1]*100)/100+'€'
+            }
+          }]
         },
         rangeSelector: {
           inputEnabled: false,
@@ -264,7 +311,7 @@ function app(){
       });
     }
 
-    plotDataEvo();
+    plotDataEvo(); 
     $('#btnEvoData').on('click',function(){  
       exeModal = false; 
       $('#loadingModal').modal('toggle'); 
