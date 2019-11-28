@@ -6,22 +6,6 @@ var app = electron.app;
 var BrowserWindow = electron.BrowserWindow;
 var Menu = electron.Menu;  
 var ipcMain = electron.ipcMain;  
- 
-ipcMain.on('requestStart',function(event, arg){
-  //arg = 'data\\Movements.xls';
-  if(arg!==undefined){ 
-    var data = undefined; 
-    require('./appPortfolio').exe(function(log){
-      event.sender.send('replyConsole','TERMINAL: '+log);
-    },arg).then(function(data){ 
-      event.sender.send('replyStart', data); 
-      console.log('data sent');
-    }).catch(function(e){ 
-      console.log('Error in appPortfolio.js promise');
-      console.log(e);
-    });     
-  } 
-}); 
 
 app.on('window-all-closed', function() { 
   if(process.platform !='darwin') {
@@ -38,7 +22,7 @@ app.on('ready', function() {
     minHeight: 400,
     icon: path.join(__dirname, '/www/icons/ic_launcher.ico'), 
     backgroundColor: '#ced4da'
-  });  
+  });   
   
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname,'/www/index.html'),
@@ -55,7 +39,17 @@ app.on('ready', function() {
       label: 'Menu',
       submenu:[ 
         {
-          label: 'Dev Tools',
+          label: 'Reload Data', 
+          enabled: true,
+          click: function(e){ 
+            mainWindow.loadURL(url.format({
+              pathname: path.join(__dirname,'/www/index.html'),
+              protocol: 'file',
+              slashes: true
+            }));
+          }
+        },{
+          label: 'Dev Tools', 
           click: function(e){
             if (mainWindow!==null){ 
               if(mainWindow.webContents.isDevToolsOpened()){ 
@@ -72,7 +66,7 @@ app.on('ready', function() {
           type: 'separator'
         },
         {
-          label: 'Exit',
+          label: 'Exit', 
           click: function(){
             if (mainWindow!==null){
               mainWindow.close();
@@ -83,11 +77,30 @@ app.on('ready', function() {
       ]
     }
   ];
-
-  //templateMenu[0].submenu[2].label = 'Dev Tools';
-  //mainWindow.webContents.openDevTools(); 
-
-  var menu = Menu.buildFromTemplate(templateMenu);
-  Menu.setApplicationMenu(menu);  
+ 
+  Menu.setApplicationMenu(Menu.buildFromTemplate(templateMenu));  
+  function enableReloadButton(flag){
+    templateMenu[0].submenu[0].enabled = flag;
+    Menu.setApplicationMenu(Menu.buildFromTemplate(templateMenu));
+  }
+  
+  ipcMain.on('requestStart',function(event, arg){ 
+    if(arg!==undefined){   
+      enableReloadButton(false);    
+      var data = undefined;  
+      require('./appPortfolio').exe(function(log){
+        event.sender.send('replyConsole','TERMINAL: '+log);
+      },arg).then(function(data){ 
+        event.sender.send('replyConsole','TERMINAL: data sent');
+        console.log('data sent'); 
+        event.sender.send('replyStart', data);  
+        enableReloadButton(true);         
+      }).catch(function(e){ 
+        console.log('Error in appPortfolio.js promise');
+        console.log(e);  
+        enableReloadButton(true);    
+      });     
+    }
+  });
 
 });  
