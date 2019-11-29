@@ -34,11 +34,9 @@ app.on('ready', function() {
     mainWindow = null;
   });   
 
-  var templateMenu=[
-    {
+  var templateMenu=[{
       label: 'Menu',
-      submenu:[ 
-        {
+      submenu:[{
           label: 'Reload Data', 
           enabled: true,
           click: function(e){ 
@@ -61,11 +59,9 @@ app.on('ready', function() {
             menu = Menu.buildFromTemplate(templateMenu);
             Menu.setApplicationMenu(menu);  
           }
-        },
-        {
+        },{
           type: 'separator'
-        },
-        {
+        },{
           label: 'Exit', 
           click: function(){
             if (mainWindow!==null){
@@ -73,10 +69,8 @@ app.on('ready', function() {
             }
             app.quit();
           }
-        },
-      ]
-    }
-  ];
+        }]
+    }];
  
   Menu.setApplicationMenu(Menu.buildFromTemplate(templateMenu));  
   function enableReloadButton(flag){

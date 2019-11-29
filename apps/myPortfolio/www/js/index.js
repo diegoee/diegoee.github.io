@@ -41,7 +41,8 @@ function app(){
   $('#sec1').css({ 
     left: 0
   }); 
-  function movScreen(secFrom,secTo){
+  function movScreen(secFrom,secTo,ms,fn){
+
     $.each($('.section'),function(){
       $(this).removeClass('active');
     }); 
@@ -49,7 +50,7 @@ function app(){
     $(secTo).addClass('active');
     var mov = 0; 
 
-    if (secFrom==='#sec1'||(secFrom==='#sec5'&&secTo==='#sec3')){      
+    if (secFrom==='#sec1'){      
       mov = -$(window).width();
     }else{
       mov = $(window).width();
@@ -57,11 +58,14 @@ function app(){
 
     $(secTo).animate({  
       left: 0
-    },500); 
+    },ms); 
     $(secFrom).animate({  
       left: mov
-    },500,function(){
+    },ms,function(){
       $(secFrom).removeClass('active');
+      if (typeof fn === "function"){ 
+        fn();
+      }
       if(secFrom==='#sec5'&&secTo==='#sec3'){ 
         $(secFrom).css({ 
           left: -mov
@@ -78,7 +82,7 @@ function app(){
     window.dispatchEvent(event); 
   }
   $('.goBtn').on('click',function(){  
-    movScreen($(this).attr('go-from'),$(this).attr('go-to'));         
+    movScreen($(this).attr('go-from'),$(this).attr('go-to'),500,null);         
   });  
 
   try{
@@ -135,7 +139,7 @@ function app(){
       if (tab[i].ticker==='EUR'){
         tr = tr + '<td>'+tab[i].ticker+'</td>';
        }else{
-        tr = tr + '<td><a href="https://es.finance.yahoo.com/quote/'+tab[i].ticker+'?p='+tab[i].ticker+'" target="_blank">'+tab[i].ticker+'</a></td>';
+        tr = tr + '<td><button class="btn btn-link btn-sm goBtnTicker3">'+tab[i].ticker+'</button></td>';
       }
       tr = tr + '<td class="text-right">'+tab[i].n+'</td>';
       tr = tr + '<td class="text-right"><div class="form-check"><input class="form-check-input filterMov" type="checkbox" value="'+tab[i].id+'" checked></div></td>';      
@@ -190,7 +194,7 @@ function app(){
         dataPlot.push([moment(temp[i],'DD/MM/YYYY').toDate().getTime() , temp1[i]]);
       }  
 
-      $('#chartEvo').height($(window).height()-110); 
+      $('#chartEvo').height($(window).height()-120); 
       var chart = Highcharts.stockChart('chartEvo', { 
         chart: {
           alignTicks: false
@@ -427,7 +431,7 @@ function app(){
     } 
 
     function activeTicker(){
-      $('#chartEvoTicker').height($(window).height()-110);  
+      $('#chartEvoTicker').height($(window).height()-120);  
       $('#linkEvoTicker').html('<a href="https://es.finance.yahoo.com/quote/'+$('#inputTicker').val()+'?p='+$('#inputTicker').val()+'" target="_blank"> Link Yahoo ('+$('#inputTicker').val()+')</a>');   
       plotDataEvoTicker($('#inputTicker').val(),$("#inputTicker option:selected").text());
     }
@@ -436,8 +440,6 @@ function app(){
       activeTicker();
     }); 
 
-    //inflate data in DOM y cal data for the charts
-    var $indata = $('.inputdata');
     $($('.inputdata')[0]).html(data.name);
     $($('.inputdata')[1]).html(data.cValue);  
     $($('.inputdata')[2]).html(data.cashValue);  
@@ -488,17 +490,26 @@ function app(){
       tr = tr + '<td class="text-left">'+aux+'</td>';
       tr = tr + '</tr>';
       $('#tableSharesOld tbody').append(tr); 
-    }   
+    }    
 
     $('.goBtnTicker1').on('click',function(){ 
-      movScreen('#sec1','#sec3');
       $('#inputTicker').val($(this).html());
       activeTicker();
+      movScreen('#sec1','#sec3',500, null);  
     });
     $('.goBtnTicker2').on('click',function(){ 
-      movScreen('#sec5','#sec3');
       $('#inputTicker').val($(this).html());
       activeTicker();
+      movScreen('#sec5','#sec1',10,function(){ 
+        movScreen('#sec1','#sec3',500, null);
+      });
+    });
+    $('.goBtnTicker3').on('click',function(){ 
+      $('#inputTicker').val($(this).html());
+      activeTicker();
+      movScreen('#sec2','#sec1',10,function(){ 
+        movScreen('#sec1','#sec3',500, null);
+      });
     });
 
     // Build the chart
