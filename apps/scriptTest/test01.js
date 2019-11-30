@@ -21,6 +21,4 @@ var app = {
     console.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> End Exe Test');  
   }, 
 }  
-if (process.argv[2]==='exe'){ 
-  app.exe();
-} 
+app.exe(); 
