@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-clear
 echo "************************** EXE scrip test **************************"
 rm -r storage/shared/temp
 echo "************************** SVN exporting ..."
