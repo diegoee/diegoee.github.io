@@ -31,6 +31,7 @@ function app(){
   $.each($('.section'),function(){
     $(this).removeClass('active');
   }); 
+  
   $('#sec1').addClass('active');
     
   $.each($('.section'),function(){
@@ -38,9 +39,11 @@ function app(){
       left: $(window).width()
     });
   });
+
   $('#sec1').css({ 
     left: 0
   }); 
+
   function movScreen(secFrom,secTo,ms,fn){
 
     $.each($('.section'),function(){
@@ -81,6 +84,7 @@ function app(){
     }
     window.dispatchEvent(event); 
   }
+
   $('.goBtn').on('click',function(){  
     movScreen($(this).attr('go-from'),$(this).attr('go-to'),500,null);         
   });  

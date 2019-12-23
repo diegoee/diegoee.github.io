@@ -411,7 +411,15 @@ if (process.argv[2]==='exe'){
       rootFileMovements = process.argv[3];
     }
     appPortfolio.exe(nullFn,rootFileMovements).then(function(res){
-      appPortfolio.log('DONE!!!',nullFn);
+      appPortfolio.log(' ',nullFn);
+      appPortfolio.log('**** RESULTADOS *********',nullFn);
+      appPortfolio.log('**** '+res.name,nullFn); 
+      appPortfolio.log(' Total:  '+res.cValue,nullFn); 
+      appPortfolio.log('  Cash:  '+'('+Math.round(parseFloat(res.cashValue)/(parseFloat(res.cashValue)+parseFloat(res.shareValue))*10000)/100+' %) '+res.cashValue,nullFn); 
+      appPortfolio.log('  Acc.:  '+'('+Math.round(parseFloat(res.shareValue)/(parseFloat(res.cashValue)+parseFloat(res.shareValue))*10000)/100+' %) '+res.shareValue,nullFn); 
+      appPortfolio.log(' Ben. dia.: '+(res.gDiaClass==='textColorGreen'?'↑↑':'↓↓')+' ('+res.gDiaPor+')'+' '+res.gDia,nullFn); 
+      appPortfolio.log(' Ben. Tot.: '+(res.gDiaClass==='textColorGreen'?'↑↑':'↓↓')+' ('+res.gTotPor+')'+' '+res.gTot,nullFn);  
+      appPortfolio.log('**** FIN ****************',nullFn);
     }); 
   }catch(error){ 
     appPortfolio.log(error,nullFn);
