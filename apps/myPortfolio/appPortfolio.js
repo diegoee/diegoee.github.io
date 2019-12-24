@@ -402,8 +402,10 @@ var appPortfolio = {
   }
 }  
 module.exports = appPortfolio;
+
+//node appPortfolio.js exe C:/Users/alamo/Downloads/Movements.xls
 if (process.argv[2]==='exe'){ 
-  var rootFileMovements = 'data\\Movements.xls'; 
+  var rootFileMovements = 'C:/Users/alamo/Downloads/Movements.xls'; 
   function nullFn(){  
   }
   try {
@@ -425,6 +427,7 @@ if (process.argv[2]==='exe'){
     appPortfolio.log(error,nullFn);
   }
 } 
+
 if (process.argv[2]==='test'){ 
   appPortfolio.exeTest();
 } 

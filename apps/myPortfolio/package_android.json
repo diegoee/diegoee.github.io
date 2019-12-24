@@ -1,0 +1,12 @@
+{
+  "name": "myportfolio",  
+  "author": "diegoee",
+  "license": "ISC", 
+  "main": "appPortfolio.js", 
+  "dependencies": { 
+    "convert-excel-to-json": "^1.6.1",   
+    "jquery": "^3.4.1",
+    "jsdom": "^15.2.0",
+    "moment": "^2.24.0" 
+  } 
+}
