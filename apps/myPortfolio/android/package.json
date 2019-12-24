@@ -7,6 +7,9 @@
     "convert-excel-to-json": "^1.6.1",   
     "jquery": "^3.4.1",
     "jsdom": "^15.2.0",
+    "canvas": "^2.5.0",
+    "bufferutil": "^4.0.1",
+    "utf-8-validate": "^5.0.2",
     "moment": "^2.24.0" 
   } 
 }
