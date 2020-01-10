@@ -1,5 +1,27 @@
 function app(){
-  'use strict'; 
+  'use strict';  
+  var fn = {
+    keyToken: 'token_server_VPS_diegop_EE',
+    tokensession: undefined,
+    getSession: function(){
+      fn.tokensession = sessionStorage.getItem(fn.keyToken);  
+    }
+  };  
+  fn.getSession();
+
+  var ipcRenderer = undefined;
+  function getScenario(){ 
+    var scenario = 'electron';
+    try{
+      ipcRenderer = require('electron').ipcRenderer; 
+    }catch(e){
+      scenario ='server';
+      console.error(e);  
+    } 
+    return scenario;
+  }
+  var scenario = getScenario();
+
   var exeModal = false;
   $('#loadingModal').modal({ 
     backdrop: 'static',
@@ -45,7 +67,6 @@ function app(){
   }); 
 
   function movScreen(secFrom,secTo,ms,fn){
-
     $.each($('.section'),function(){
       $(this).removeClass('active');
     }); 
@@ -88,19 +109,15 @@ function app(){
   $('.goBtn').on('click',function(){  
     movScreen($(this).attr('go-from'),$(this).attr('go-to'),500,null);         
   });  
-
-  try{
-    var ipcRenderer = require('electron').ipcRenderer; 
-    $('#loadingModal .modal-title').html('Choose xls file to read...');
     
-    $('#loadingModal .modal-body').html('<div class="form-group"><div class="input-group"><div class="custom-file"><input id="fileInput" class="form-control-file" type="file" name=""/></div></div></div>');
-  
-    $('#fileInput').on('change',function(event){ 
-      cleanLoadModal(); 
-      var path = event.target.files[0].path;
-      cleanLoadModal(); 
-      $('#loadingModal .modal-body').append('<div class="small"><div class="small">File: '+path+'</div></div>');
-      ipcRenderer.send('requestStart', path); 
+  if (scenario==='electron'){
+    $('#loadingModal .modal-title').html('Choose xls file to read...');
+    $('#loadingModal .modal-body').html('<div class="form-group"><div class="input-group"><div class="custom-file"><input id="fileInput" class="form-control-file" type="file" value="" name=""/></div></div></div>');
+    $('#fileInput').on('change',function(event){  
+      var path = event.target.files[0].path;      
+      ipcRenderer.send('requestStart', path);        
+      cleanLoadModal();
+      $('#loadingModal .modal-body').append('<div class="small"><div class="small">File: '+path+'</div></div>');     
     }); 
     ipcRenderer.on('replyStart',function(event, arg){
       console.log(arg);
@@ -116,17 +133,71 @@ function app(){
     ipcRenderer.on('replyConsole',function(event, arg){
       console.log(arg);  
       $('#loadingModal .modal-body').append('<div class="small"><div class="small">'+arg+'</div></div>'); 
-    }); 
-  }catch(e){
-    console.error(e);  
-    exeModal = true;
-    $('#loadingModal').modal('toggle'); 
-    renderData({
-      name: 'testing...', 
-      cashValue: 1234,
-      shareValue: 4321 
-    }); 
-  } 
+    });
+  }
+
+  if(scenario==='server'){ 
+    function readFile(){
+      $('#loadingModal .modal-title').html('Choose path to read file...');
+      $('#loadingModal .modal-body').html('<div class="form-group"><div class="input-group"><div class="custom-file"><input id="pathText" class="form-control-file" type="text" value="" name=""/></div></div><div class="input-group"><button id="pathBtn" class="btn btn-success btn-lg btn-block"><i class="fa fa-upload"></i></button></div></div>');
+      //C:\Users\alamo\Downloads\Movements_TEST.xls  
+      $('#pathBtn').on('click',function(){
+        var path = $('#pathText').val(); 
+        cleanLoadModal();
+        $('#loadingModal .modal-body').append('<div class="small"><div id="logModal" class="small"></div></div>');
+        //TODO: add evo
+        var logInterval = setInterval(function(){
+          $.ajax({
+            url: '/getStatusLog',
+            type: 'get', 
+            headers: {
+              authorization: fn.tokensession
+            }, 
+            success: function (data){
+              $('#logModal').html(data);
+            },
+            error: function (res){ 
+              clearInterval(logInterval);
+              if (res.status===401){ 
+                $('#logModal').html('Error gettting StatusLog'); 
+              }
+            }
+          }); 
+        }, 500);
+        
+        $.ajax({
+          url: '/calData',
+          type: 'post', 
+          headers: {
+            authorization: fn.tokensession
+          }, 
+          data: {
+            path: path
+          },
+          success: function (data){
+            clearInterval(logInterval); 
+            if(data.cValue===0&&data.cashValue===0&&data.shareValue===0){
+              Snackbar.show({text: 'Error: All value 0. Perphaps there is no file ...'}); 
+              readFile(); 
+            }
+            renderData(data);
+            exeModal = true;
+            setTimeout(function(){ 
+              $('#loadingModal').modal('toggle');
+            },1000);
+          },
+          error: function (res){ 
+            clearInterval(logInterval);
+            if (res.status===401){ 
+              Snackbar.show({text: 'Error on request file read'});
+              readFile(); 
+            }
+          }
+        }); 
+      });
+    } 
+    readFile();
+  }
 
   function renderData(data){
     $('#tableMov tbody').html(''); 

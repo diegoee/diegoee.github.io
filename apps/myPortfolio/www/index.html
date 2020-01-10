@@ -6,9 +6,10 @@
     <title>Desktop</title>
     <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../node_modules/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="../node_modules/node-snackbar/dist/snackbar.min.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css">  
   </head>
-  <body> 
+  <body>
     <div id="body">
       <div id="sec1" class="section"> 
         <div class="container mt-1">
@@ -218,19 +219,29 @@
           </div> 
         </div>
       </div>
-    </div> 
-
+    </div>
     <noscript>JAVASCRIPT IS NOT WORKING!</noscript> 
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>  
-    <script type="text/javascript" >window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.js');</script>
+    <script type="text/javascript" >
+      try{
+        window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.js');
+      }catch(error){
+        console.error(error);
+      }
+    </script>
     <script type="text/javascript" src="../node_modules/popper.js/dist/umd/popper.js"></script> 
     <script type="text/javascript" src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="../node_modules/moment/moment.js"></script> 
-    <script type="text/javascript" src="../node_modules/highcharts/highcharts.js"></script> 
     <script type="text/javascript" src="../node_modules/highcharts/highstock.js"></script> 
-    <script type="text/javascript" >window.Highcharts = require('../node_modules/highcharts/highcharts.js');</script>
-    <script type="text/javascript" >window.Highcharts = require('../node_modules/highcharts/highstock.js');</script>
+    <script type="text/javascript" >
+      try{
+        window.Highcharts = require('../node_modules/highcharts/highstock.js');
+      }catch(error){
+        console.error(error);
+      }
+    </script> 
+    <script type="text/javascript" src="../node_modules/node-snackbar/dist/snackbar.min.js"></script>
     <script type="text/javascript" src="js/index.js"></script> 
   </body>
 </html>
