@@ -1,13 +1,5 @@
 function app(){
   'use strict';  
-  var fn = {
-    keyToken: 'token_server_VPS_diegop_EE',
-    tokensession: undefined,
-    getSession: function(){
-      fn.tokensession = sessionStorage.getItem(fn.keyToken);  
-    }
-  };  
-  fn.getSession();
 
   var ipcRenderer = undefined;
   function getScenario(){ 
@@ -22,7 +14,7 @@ function app(){
   }
   var scenario = getScenario();
 
-  var exeModal = false;
+  var exeModal = false; 
   $('#loadingModal').modal({ 
     backdrop: 'static',
     keyboard: false
@@ -47,8 +39,7 @@ function app(){
       event.initUIEvent('resize', true, false, window, 0);  
     }
     window.dispatchEvent(event);  
-  });
-
+  }); 
   //animation page
   $.each($('.section'),function(){
     $(this).removeClass('active');
@@ -110,7 +101,7 @@ function app(){
     movScreen($(this).attr('go-from'),$(this).attr('go-to'),500,null);         
   });  
     
-  if (scenario==='electron'){
+  if (scenario==='electron'){  
     $('#loadingModal .modal-title').html('Choose xls file to read...');
     $('#loadingModal .modal-body').html('<div class="form-group"><div class="input-group"><div class="custom-file"><input id="fileInput" class="form-control-file" type="file" value="" name=""/></div></div></div>');
     $('#fileInput').on('change',function(event){  
@@ -137,6 +128,14 @@ function app(){
   }
 
   if(scenario==='server'){ 
+    var fn = {
+      keyToken: 'token_server_VPS_diegop_EE',
+      tokensession: undefined,
+      getSession: function(){ 
+        fn.tokensession = sessionStorage.getItem(fn.keyToken);  
+      }
+    };  
+    fn.getSession();
     function readFile(){
       $('#loadingModal .modal-title').html('Choose path to read file...');
       $('#loadingModal .modal-body').html('<div class="form-group"><div class="input-group"><div class="custom-file"><input id="pathText" class="form-control-file" type="text" value="" name=""/></div></div><div class="input-group"><button id="pathBtn" class="btn btn-success btn-lg btn-block"><i class="fa fa-upload"></i></button></div></div>');
@@ -154,6 +153,7 @@ function app(){
               authorization: fn.tokensession
             }, 
             success: function (data){
+              console.log(data);
               $('#logModal').html(data);
             },
             error: function (res){ 
@@ -220,7 +220,18 @@ function app(){
       tr = tr + '<td class="text-right"><div class="form-check"><input class="form-check-input filterMov" type="checkbox" value="'+tab[i].id+'" checked></div></td>';      
       tr = tr + '</tr>';
       $('#tableMov tbody').append(tr); 
-    } 
+    }  
+    $('#filterMovAll').on('click',function(){  
+      $('.filterMov').each(function(){ 
+        if($('#filterMovAll').is(':checked')){
+          $(this).prop('checked',true);
+          $(this).attr('checked',true);
+        }else{
+          $(this).prop('checked',false);
+          $(this).attr('checked',false);
+        }
+      }); 
+    }); 
  
     function plotDataEvo(){
       var filterIdMov = [];
@@ -389,16 +400,26 @@ function app(){
         }]
       });
     }
-
     plotDataEvo(); 
     $('#btnEvoData').on('click',function(){  
-      exeModal = false; 
-      $('#loadingModal').modal('toggle'); 
-      setTimeout(function(){ 
-        plotDataEvo(); 
-        exeModal = true;
-        $('#loadingModal').modal('toggle');
-      },250); 
+      var anyCheckedMov = false;
+      $('.filterMov').each(function(){ 
+        if($(this).is(':checked')){
+          anyCheckedMov = true;
+        } 
+      }); 
+      console.log(anyCheckedMov);
+      if(anyCheckedMov){
+        exeModal = false; 
+        $('#loadingModal').modal('toggle'); 
+        setTimeout(function(){ 
+          plotDataEvo(); 
+          exeModal = true;
+          $('#loadingModal').modal('toggle');
+        },250); 
+      }else{ 
+        Snackbar.show({text: 'Error: Select some Mov. ...'}); 
+      }
     }); 
 
     function plotDataEvoTicker(ticker,name){
