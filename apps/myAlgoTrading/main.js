@@ -149,10 +149,26 @@ var mth = {
 }; 
 
 //
+var namefile = 'test';
+var user = undefined;
+var pass = undefined;
 process.argv.forEach(function(val,index) {  
-  var namefile = 'file';
   if (index===2&&(val!==undefined||val!==null||val!=='')){
     namefile = val;
-  }   
-  mth.exe(user,pass,namefile); 
+  } 
 });
+console.log('File Name: '+namefile);
+var readline = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
+
+readline.question('User: ',function(data){
+  user=data;
+  readline.question('Pass: ',function(data){
+    pass=data;
+    readline.close()
+  });
+});
+
+//mth.exe(user,pass,namefile); 
