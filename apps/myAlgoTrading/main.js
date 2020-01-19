@@ -1,26 +1,11 @@
 /*globals require, console, clearInterval, setInterval, Promise, module*/ 
 var mth = {
   //ATRIBUTES
-  url: 'https://demo-api.ig.com/gateway',
-  loginInfo: undefined, 
   param: undefined, 
   nameLog: undefined, 
-  inputLoginFile: '../input/loginInfo.txt', 
-  outputDataLog: 'output/datalog',  
+  outputFolder: 'output', 
   ig: undefined,
   spread: 0.00006,
-  method:[{
-    id: 'mth00',
-    desc: 'Random - 1 pos'
-   },{
-    id: 'mth01',
-    desc: 'BUY/SELL pend price - 1 pos - MINUTE_5 12*3'   
-    },{
-    id: 'mth02',
-    desc: 'BUY/SELL pend price - inf pos - HOUR 24*3'   
-  }],
-  stopIncVal:[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,35,40,45,50,100,200],
-  limIncVal:[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,35,40,45,50,100,200], 
   //GENERAL FUNCTIONS
   log: function(txt){
     var fs = require('fs');  
@@ -28,63 +13,34 @@ var mth = {
     fs.appendFileSync(path.join(path.resolve()+'/'+mth.nameLog), (new Date()).toISOString().substring(0, 19).replace(/T/g,' ')+' -> '+txt+'\n', 'utf8');
     console.log(txt);
   }, 
-  init: function(ver){ 
+  init: function(user,pass,nameLog){ 
     var fs = require('fs');
     var path = require('path');     
     mth.ig = require('./igAPI');
+    mth.ig.init(user,pass);
     
     var output = path.join(path.resolve()+'/'+mth.outputFolder);
     if (!fs.existsSync(output)){
       fs.mkdirSync(output);
     } 
     var dateFile = (new Date()).toISOString().substring(0, 19).replace(/:|T|-/g,'_');   
-    mth.nameLog = mth.outputFolder+'/log_'+dateFile+'.txt';
-    fs.writeFileSync(
-      path.join(path.resolve()+'/'+mth.outputFolder+'/'+mth.outputDataLog),
-      JSON.stringify({name: mth.nameLog}), 'utf8'
-    ); 
+    mth.nameLog = mth.outputFolder+'/log_'+nameLog+'_'+dateFile+'.txt';
     
-  },
-  //MTHs  
-  intervalMethod: undefined, 
-  paramMethod: {
-    method: 'mth00',
-    stopInc: 5,
-    limInc: 5
-  },
-  exe: function(){  
-    mth.paramMethod.method=(method===null||method===undefined)?mth.method[0].id:method
-    mth.paramMethod.stopInc=(stopInc===null||stopInc===undefined)?mth.stopIncVal[8]:stopInc;
-    mth.paramMethod.limInc=(limInc===null||limInc===undefined)?mth.limIncVal[8]:limInc;   
-    if (mth.intervalMethod===undefined){ 
-      mth.init();
-      mth.startMethod();
-      return true;
-    }else{
-      mth.stopMethod();
-      return false;
-    }
-  },
-  stopMethod: function(){
-    clearInterval(mth.intervalMethod);
-    mth.intervalMethod = undefined;
+  },   
+  exe: function (user,pass,nameLog){ 
+    mth.init(user,pass,nameLog); 
     mth.log('');
-    mth.log(' --- Method: Stop');
-  }, 
-  startMethod: function (){  
-    mth.log('');
-    mth.log(' --- Method: Start'); 
+    mth.log(' --- Exe'); 
     var timeSync = 5*60*1000; //5min 
     var marketName = 'EUR/USD Mini';
     var search = 'forex';
     
     var inc = {
-      limit: mth.paramMethod.limInc,
-      stop: mth.paramMethod.stopInc,
-    };
-    var method = mth.paramMethod.method;
+      limit: 5,
+      stop: 5,
+    }; 
     
-    mth.log(' mth: '+method);
+    mth.log(' Name: '+nameLog);
     mth.log(' limit: '+inc.limit);
     mth.log(' stop: '+inc.stop);
     
@@ -191,4 +147,12 @@ var mth = {
     return type; 
   }
 }; 
-mth.exe(); 
+
+//
+process.argv.forEach(function(val,index) {  
+  var namefile = 'file';
+  if (index===2&&(val!==undefined||val!==null||val!=='')){
+    namefile = val;
+  }   
+  mth.exe(user,pass,namefile); 
+});

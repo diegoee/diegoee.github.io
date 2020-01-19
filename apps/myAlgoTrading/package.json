@@ -2,15 +2,20 @@
   "name": "myalgotrading",
   "productName": "Algotrading: Diego E.E.",
   "version": "1.0.0",
-  "author": "Diego E.E.",  
+  "author": "Diego E.E.",
   "repository": {
     "type": "",
     "url": ""
   },
   "license": "ISC",
-  "scripts": {
-    "start": "node main.js" 
-  },
-  "dependencies": { 
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "formidable": "^1.2.1",
+    "jsonwebtoken": "^8.5.0",
+    "keypress": "^0.2.1",
+    "mathjs": "^5.10.3",
+    "ml": "^3.5.0",
+    "request": "^2.88.0"
   }
 }

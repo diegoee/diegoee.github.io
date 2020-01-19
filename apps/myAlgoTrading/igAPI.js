@@ -1,12 +1,18 @@
 /*globals require, Promise, module*/ 
 var ig = {
   //ATRIBUTES
-  url: 'https://demo-api.ig.com/gateway',  
+  url: 'https://demo-api.ig.com/gateway', 
+  key: '4e81b6d9faebd2668eeb278737d0e2c76b435da8',
+  user: undefined,
+  pass: undefined,
+  init: function(user,pass){
+    ig.user=user;
+    ig.pass=pass;
+  },
   //FUNCTIONS  API 
   login: function (fnOk,fnError){  
     var fs = require('fs');
-    var path = require('path'); 
-    var loginInfo = JSON.parse(fs.readFileSync(path.join(path.resolve()+'/'+ig.inputLoginFile), 'utf8'));     
+    var path = require('path');     
     var request = require('request');  
     request({
       method: 'POST',
@@ -14,12 +20,12 @@ var ig = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json; charset=UTF-8',
         'VERSION': 1,
-        'X-IG-API-KEY': loginInfo.key
+        'X-IG-API-KEY': ig.key
       },
       url: ig.url+'/deal/session',
       body: {
-        identifier: loginInfo.user, 
-        password: loginInfo.pass,
+        identifier: ig.user, 
+        password: ig.pass,
         encryptedPassword: null 
       },
       json: true

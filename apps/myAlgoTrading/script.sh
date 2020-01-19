@@ -3,4 +3,4 @@
 rm -r output &   
 rm -r node_modules &   
 pkill node & 
-npm run start &
+node main.js &
