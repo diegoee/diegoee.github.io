@@ -148,27 +148,48 @@ var mth = {
   }
 }; 
 
-//
 var namefile = 'test';
 var user = undefined;
 var pass = undefined;
+
+
 process.argv.forEach(function(val,index) {  
   if (index===2&&(val!==undefined||val!==null||val!=='')){
     namefile = val;
   } 
 });
-console.log('File Name: '+namefile);
-var readline = require('readline').createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
 
+user='';
+pass='';
+mth.exe(user,pass,namefile); 
+
+/*
+var readline = require('readline');
+var writable = require('stream').Writable;
+var mutableStdout = new writable({
+  write: function(chunk, encoding, callback) {
+    if (!this.muted)
+      process.stdout.write(chunk, encoding);
+    callback();
+  }
+});
+mutableStdout.muted = false;
+var readline = readline.createInterface({
+  input: process.stdin,
+  output: mutableStdout,
+  terminal: true
+}); 
+
+console.log('File Name: '+namefile);
 readline.question('User: ',function(data){
-  user=data;
+  user=data; 
   readline.question('Pass: ',function(data){
-    pass=data;
+    pass=data;  
+    mth.exe(user,pass,namefile);
+    mutableStdout.muted = false;    
     readline.close()
-  });
+  }); 
+  mutableStdout.muted = true;
 });
 
-//mth.exe(user,pass,namefile); 
+*/
