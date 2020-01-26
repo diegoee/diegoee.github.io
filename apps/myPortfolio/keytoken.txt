@@ -1,1 +1,1 @@
-{"username":"user","password":"pass","keytoken":"userandpass"}
+{"username":"user","password":"pass","keytoken":"whatever"}

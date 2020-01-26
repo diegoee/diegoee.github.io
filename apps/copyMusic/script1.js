@@ -1,9 +1,8 @@
 /*globals require*/
 console.log('\n***Start Script***');
  
-var fs = require('fs');
+var fs = require('fs'); 
 
- 
 //Obtenemos la ruta y la carpeta
 //var pth = require('path').resolve();
 var pth = 'C:\\Users\\alamo\\Music\\iTunes\\iTunes Media\\Music';
@@ -12,7 +11,6 @@ var folders = [
   'C:\\Users\\alamo\\Downloads\\AlterEgo'
 ];
 console.log('Music folder: '+pth);
-
 
 function deleteFolderRecursive(folder) {
   var files = [];
@@ -26,24 +24,25 @@ function deleteFolderRecursive(folder) {
               fs.unlinkSync(curPath);
           }
       });
-      fs.rmdirSync(folder);
+      fs.rmdirSync(folder); 
   }
-}
+} 
 
-//Borrarmos las carpeta y todos su archivos y las volvemos a crear
+console.log('Borramos las carpetas, todos sus archivos y las volvemos a crear');
 for(var j = 0; j<folders.length; j++){
-  deleteFolderRecursive(folders[j]);
+  console.log(j+' - '+folders[j]); 
+  deleteFolderRecursive(folders[j]);  
   fs.mkdirSync(folders[j]);
-}
+} 
 
-//Obtnemos todos los ficheros .mp3 de la carpeta y subcarpetas
-var allFiles =[];
+console.log('Obtenemos todos los ficheros .mp3 de la carpeta y subcarpetas'); 
+var allFiles = [];
 (function lookFile(pth){
   var files;
   try{
     files = fs.readdirSync(pth);
     files.forEach(function(f){
-      lookFile(pth+'/'+f);
+      lookFile(pth+'\\'+f);
     });
   }catch(e){  
     if ((e.path.indexOf('.mp3')>0)&&(e.path.indexOf('._')===-1)){  
@@ -51,30 +50,44 @@ var allFiles =[];
     }
   }
 })(pth);
-
  
-// copiamos todos los ficheros a la carpeta
-function copyFile(i,f,fEnd){
-  i++;
-  fs.createReadStream(f).pipe(fs.createWriteStream(fEnd));
-  return i;
-}
+console.log('Contamos el total de ficheros a copiar');  
+var tot=[0,0];
+allFiles.forEach(function(f) {     
+  if(f.indexOf('99')!==-1){
+    tot[1]++;
+  }else{
+    tot[0]++;
+  };
+});
 
 for(var z = 0; z<folders.length; z++){
-  var i = 0;
-  
-  allFiles.forEach(function(f) { 
+  console.log(z+' - '+tot[z]+'\t ficheros a copiar en: '+folders[z]);
+} 
+ 
+console.log('Copiamos todos los ficheros a las carpetas'); 
+function copyFile(f,fEnd){ 
+  fs.createReadStream(f).pipe(fs.createWriteStream(fEnd)); 
+}
+var counter = [0,0];
+for(var z = 0; z<folders.length; z++){ 
+  for(var i = 0; i<allFiles.length; i++){
+    var f = allFiles[i];
     var fEnd = f.split('\\')[f.split('\\').length-1];
-    fEnd = folders[z]+'\\'+fEnd;
+    fEnd = folders[z]+'\\'+fEnd; 
     
     var c1 = (f.indexOf('.mp3')>0);
     var c2 = (f.indexOf('99')!==-1);
     
-    if ((z===0)&&c1&&!c2){ i = copyFile(i,f,fEnd); }
-    if ((z===1)&&c2){ i = copyFile(i,f,fEnd); }    
-    
-  });
-  console.log(z+' - Copiados un total de *** '+i+' *** en: '+folders[z]);
-}
-  
+    if ((z===0)&&c1&&!c2){ 
+      copyFile(f,fEnd); 
+      counter[z]++;
+    }
+    if ((z===1)&&c2){ 
+       copyFile(f,fEnd); 
+      counter[z]++;
+    } 
+    //console.log(z+' - \t'+counter[z]+'\t/'+tot[z]+' de la ruta: '+folders[z]); 
+  } 
+}  
 console.log('***End Script***\n');

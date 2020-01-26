@@ -1,11 +1,11 @@
 {
   "name": "myportfolio",
   "productName": "MyPortfolioFinnance",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "author": "diegoee",
   "license": "ISC",
   "description": "Portfolio Data",
-  "main": "main.js",
+  "main": "main_electron.js",
   "scripts": {
     "electron": "electron .",
     "electronBuilder": "electron-builder"
