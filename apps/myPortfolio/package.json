@@ -18,10 +18,10 @@
     }
   },
   "dependencies": {
+    "electron-promise-ipc": "^1.6.0",
     "bootstrap": "^4.0.0",
     "convert-excel-to-json": "^1.6.1",
     "datatables.net-dt": "^1.10.20",
-    "electron-promise-ipc": "^1.6.0",
     "font-awesome": "^4.7.0",
     "highcharts": "^7.2.0",
     "jquery": "^3.4.1",

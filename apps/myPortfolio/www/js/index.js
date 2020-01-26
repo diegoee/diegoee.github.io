@@ -728,32 +728,4 @@ function app(){
     }); 
   } 
 }  
-app();
-
-var app_phonegap = {
-  initialize: function() {
-    document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
-  },
-  onDeviceReady: function() {
-    $('#loadingModal').remove(); 
-    $('#body').html(''); 
-    $('#body').on('click',function(){ 
-      nodejs.channel.send(Math.floor((Math.random() * 100) + 1)); 
-    });
-    nodejs.channel.setListener(function(data){
-      $('#body').append('<p>'+data+'</p>'); 
-    });
-    nodejs.start('main_phonegap.js', function(err){
-      if (err) {
-        console.log(err);
-        $('#body').append('<p>'+err+'</p>');
-        showMessage(err);
-      } else {
-        console.log ('Node.js Mobile Engine started');
-        $('#body').append('<p>Node.js Mobile Engine started</p>'); 
-      }
-    });
-  }
-};
-app_phonegap.initialize();
- 
+app(); 
