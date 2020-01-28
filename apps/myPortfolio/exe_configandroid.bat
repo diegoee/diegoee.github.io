@@ -15,9 +15,9 @@ xcopy "%cd%\www" "%cd%\myPortfolioAndroid\app\src\main\assets\www" /s /e
 xcopy "%cd%\main_server.js" "%cd%\myPortfolioAndroid\app\src\main\assets\nodejs-project"
 xcopy "%cd%\appPortfolio.js" "%cd%\myPortfolioAndroid\app\src\main\assets\nodejs-project"
 xcopy "%cd%\package.json" "%cd%\myPortfolioAndroid\app\src\main\assets" 
-cd myPortfolioAndroid\app\src\main\assets
-call npm install
-cd ..\..\..\..\..
+::cd myPortfolioAndroid\app\src\main\assets
+::call npm install
+::cd ..\..\..\..\..
 call npm install axios
 call npm install progress 
 call node downloadfile.js https://github.com/janeasystems/nodejs-mobile/releases/download/nodejs-mobile-v0.1.3/nodejs-mobile-v0.1.3-android.zip nodejs-mobile-v0.1.3-android.zip 
