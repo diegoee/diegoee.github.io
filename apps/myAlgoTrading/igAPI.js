@@ -35,7 +35,7 @@ var ig = {
           //console.log(response.headers);
           //console.log(loginInfo);
         if (response.statusCode===200){   
-          fnOk(response.headers,loginInfo);
+          fnOk(response.headers);
         }else{
           //fnOk(response.body.errorCode);
           fnError();
@@ -45,164 +45,108 @@ var ig = {
       }
     }); 
   }, 
-  getOpenPositions: function (fnOk,fnError){
+  getOpenPositions: function (){
     var request = require('request');
-    ig.login(function(params,loginInfo){
-      request({
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          "Accept": "application/json; charset=UTF-8",
-          "VERSION": "1",
-          "X-IG-API-KEY": loginInfo.key,
-          "X-SECURITY-TOKEN": params['x-security-token'],
-          "CST": params['cst']
-        },
-        url: ig.url+'/deal/positions',
-        json: true
-      }, function(error,response){ 
-        if (response.statusCode===200){ 
-          fnOk(response.body.positions); 
-        }else{ 
-          fnOk(response.body);
-          fnError();
-        } 
-      }); 
-    },fnError); 
-  },
-  deletePosition: function (data,fnOk,fnError){
-    var request = require('request');
-    ig.login(function(params,loginInfo){      
-      console.log(data);      
-      request({
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          "Accept": "application/json; charset=UTF-8",
-          "VERSION": "1",
-          "X-IG-API-KEY": loginInfo.key,
-          "X-SECURITY-TOKEN": params['x-security-token'],
-          "CST": params['cst'],
-          "_method": "DELETE"
-        },
-        url: ig.url+'/deal/positions/otc',
-        body: { 
-          "dealId": data.dealId, 
-          "direction": data.direction,
-          "size": data.size, 
-          "orderType": "MARKET" 
-        },
-        json: true
-      }, function(error,response){ 
-          //console.log(response.statusCode);
-        if (response.statusCode===200){
-          //console.log(response.body);
-          fnOk(response.body.dealReference); 
-        }else{  
-          //console.log(response.body);
-          fnError();
-        } 
-      }); 
-    },fnError); 
-  },  
-  getAccountsInfo: function(fnOk,fnError){  
-    var request = require('request'); 
-    ig.login(function(params,loginInfo){
-      request({
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          "Accept": "application/json; charset=UTF-8",
-          "VERSION": "1",
-          "X-IG-API-KEY": loginInfo.key,
-          "X-SECURITY-TOKEN": params['x-security-token'],
-          "CST": params['cst']
-        },
-        url: ig.url+'/deal/accounts',
-        json: true
-      }, function(error,response){ 
-        if (response.statusCode===200){ 
-          fnOk(response.body.accounts);
-        }else{ 
-          fnOk(response.body);
-          fnError();
-        }
-      }); 
-    },fnError);  
-  },  
-  getHistMov: function(fnOk,fnError){
-    var request = require('request'); 
-    ig.login(function(params,loginInfo){
-      request({
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          "Accept": "application/json; charset=UTF-8",
-          "VERSION": "2",
-          "X-IG-API-KEY": loginInfo.key,
-          "X-SECURITY-TOKEN": params['x-security-token'],
-          "CST": params['cst']
-        },
-        url: ig.url+'/deal/history/transactions?from=2019-06-01&pageSize=100&pageNumber=100',
-        json: true
-      }, function(error,response){ 
-        if (response.statusCode===200){ 
-          fnOk(response.body.transactions);
-        }else{  
-          fnOk(response.body);
-          fnError();
-        }
-      });
-    },fnError);  
-  },
-  getActMov: function(fnOk,fnError){
-    var request = require('request'); 
-    ig.login(function(params,loginInfo){
-      request({
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          "Accept": "application/json; charset=UTF-8",
-          "VERSION": "3",
-          "X-IG-API-KEY": loginInfo.key,
-          "X-SECURITY-TOKEN": params['x-security-token'],
-          "CST": params['cst']
-        },
-        url: ig.url+'/deal/history/activity?from=2018-12-01&detailed=true&pageSize=200',
-        json: true
-      }, function(error,response){ 
-        if (response.statusCode===200){ 
-          fnOk(response.body.activities);
-        }else{  
-          fnOk(response.body);
-          fnError();
-        }
-      });
-    },fnError);  
-  },
-  continueP: function(res){
     return new Promise(function(resolve, reject){
-      resolve(res);
-    });
-  },
-  getMarketEpic: function(search,marketName){  
-    var request = require('request'); 
-    return new Promise(function(resolve, reject){ 
-      ig.login(function(param,loginInfo){
+      ig.login(function(params){
         request({
           method: 'GET',
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
             "Accept": "application/json; charset=UTF-8",
             "VERSION": "1",
-            "X-IG-API-KEY": loginInfo.key,
+            "X-IG-API-KEY": ig.key,
+            "X-SECURITY-TOKEN": params['x-security-token'],
+            "CST": params['cst']
+          },
+          url: ig.url+'/deal/positions',
+          json: true
+        }, function(error,response){ 
+          if (response.statusCode===200){ 
+            resolve(response.body.positions); 
+          }else{ 
+            reject(response.body); 
+          } 
+        }); 
+      },function(){
+        reject('ERROR login');
+      }); 
+    });
+  }, 
+  getAccountsInfo: function(){  
+    var request = require('request');  
+    return new Promise(function(resolve, reject){ 
+      ig.login(function(params){
+        request({
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8",
+            "VERSION": "1",
+            "X-IG-API-KEY": ig.key,
+            "X-SECURITY-TOKEN": params['x-security-token'],
+            "CST": params['cst']
+          },
+          url: ig.url+'/deal/accounts',
+          json: true
+        }, function(error,response){ 
+          if (response.statusCode===200){ 
+            resolve(response.body.accounts);
+          }else{  
+            reject(response.body);
+          }
+        }); 
+      },function(){
+        reject('ERROR login');
+      });   
+    });
+  },  
+  getHistMov: function(){
+    var request = require('request');  
+    return new Promise(function(resolve, reject){ 
+      ig.login(function(params){
+        request({
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8",
+            "VERSION": "2",
+            "X-IG-API-KEY": ig.key,
+            "X-SECURITY-TOKEN": params['x-security-token'],
+            "CST": params['cst']
+          },
+          url: ig.url+'/deal/history/transactions?from=2020-01-01&pageSize=100&pageNumber=100',
+          json: true
+        }, function(error,response){ 
+          if (response.statusCode===200){ 
+            resolve(response.body.transactions);
+          }else{  
+            reject(response.body); 
+          }
+        });
+      },function(){
+        reject('ERROR login');
+      });   
+    });
+  },
+  getMarketEpic: function(search,marketName){  
+    var request = require('request'); 
+    return new Promise(function(resolve, reject){ 
+      ig.login(function(param){
+        request({
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8",
+            "VERSION": "1",
+            "X-IG-API-KEY": ig.key,
             "X-SECURITY-TOKEN": param['x-security-token'],
             "CST": param['cst']
           },
           url: ig.url+'/deal/markets?searchTerm='+search,
           body: {
-            identifier: loginInfo.user, /*read file*/ 
-            password: loginInfo.pass, /*read file*/ 
+            identifier: ig.user, /*read file*/ 
+            password: ig.pass, /*read file*/ 
             encryptedPassword: null 
           },
           json: true
@@ -224,69 +168,26 @@ var ig = {
         return null;
       });
     });
-  },
-  getOpenPos: function (idMarket){ 
-    var request = require('request'); 
-    return new Promise(function(resolve, reject){ 
-      ig.login(function(param,loginInfo){
-        request({
-          method: 'GET',
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            "Accept": "application/json; charset=UTF-8",
-            "VERSION": "1",
-            "X-IG-API-KEY": loginInfo.key,
-            "X-SECURITY-TOKEN": param['x-security-token'],
-            "CST": param['cst']
-          },
-          url: ig.url+'/deal/positions',
-          body: {
-            identifier: loginInfo.user, /*read file*/ 
-            password: loginInfo.pass, /*read file*/ 
-            encryptedPassword: null 
-          },
-          json: true
-        },function(error,response){ 
-          if (response.statusCode===200){ 
-            var isOk = true;
-            if(response.body.positions.length>=1){  
-              var pos = response.body.positions; 
-              for (var i = 0; i<pos.length ;i++){
-                if (pos[i].market.epic===idMarket){
-                  isOk = false; 
-                  break;
-                } 
-              }  
-            } 
-            resolve(isOk);
-          }else{ 
-            reject(response.body.errorCode);
-          } 
-        }); 
-      },function(){
-        return null;
-      });
-    });
   }, 
   getHisPrice: function (idMarket,slot,slotInterval){   
     var urlvar = idMarket+'?resolution='+slot+'&max='+slotInterval+'&pageSize='+slotInterval;
     var request = require('request'); 
     return new Promise(function(resolve, reject){ 
-      ig.login(function(param,loginInfo){
+      ig.login(function(param){
         request({
           method: 'GET',
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
             "Accept": "application/json; charset=UTF-8",
             "VERSION": "3",
-            "X-IG-API-KEY": loginInfo.key,
+            "X-IG-API-KEY": ig.key,
             "X-SECURITY-TOKEN": param['x-security-token'],
             "CST": param['cst']
           },
           url: ig.url+'/deal/prices/'+urlvar,
           body: {
-            identifier: loginInfo.user, /*read file*/ 
-            password: loginInfo.pass, /*read file*/ 
+            identifier: ig.user, /*read file*/ 
+            password: ig.pass, /*read file*/ 
             encryptedPassword: null 
           },
           json: true
@@ -306,14 +207,12 @@ var ig = {
       });
     }); 
   }, 
-  createPosition: function (type,idMarket,inc){ 
+  createPosition: function (type,idMarket,stop,lim){ 
     var info = {}; 
     info.type = type; 
     var request = require('request'); 
     return new Promise(function(resolve,reject){
-      ig.login(function(param,loginInfo){
-        var stop = inc.stop;  
-        var lim = inc.limit; 
+      ig.login(function(param){  
         info.stop = stop;
         info.lim = lim; 
 
@@ -323,7 +222,7 @@ var ig = {
             'Content-Type': 'application/json; charset=UTF-8',
             'Accept': 'application/json; charset=UTF-8',
             'VERSION': '2',
-            'X-IG-API-KEY': loginInfo.key,
+            'X-IG-API-KEY': ig.key,
             "X-SECURITY-TOKEN": param['x-security-token'],
             "CST": param['cst']
           },
@@ -358,7 +257,7 @@ var ig = {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Accept': 'application/json; charset=UTF-8',
                 'VERSION': '1',
-                'X-IG-API-KEY': loginInfo.key,
+                'X-IG-API-KEY': ig.key,
                 "X-SECURITY-TOKEN": param['x-security-token'],
                 "CST": param['cst']
               },

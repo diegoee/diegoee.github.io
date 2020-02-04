@@ -5,7 +5,6 @@ var mth = {
   nameLog: undefined, 
   outputFolder: 'output', 
   ig: undefined,
-  spread: 0.00006,
   //GENERAL FUNCTIONS
   log: function(txt){
     var fs = require('fs');  
@@ -27,98 +26,108 @@ var mth = {
     mth.nameLog = mth.outputFolder+'/log_'+nameLog+'_'+dateFile+'.txt';
     
   },   
-  exe: function (user,pass,nameLog){ 
+  exe: async function (user,pass,nameLog){ 
     mth.init(user,pass,nameLog); 
     mth.log('');
-    mth.log(' --- Exe'); 
-    var timeSync = 5*60*1000; //5min 
+    mth.log(' --- Exe');     
+
+    await mth.ig.getAccountsInfo().then(function(res){ 
+      mth.log(' - Accounts Info:');
+      res.forEach(function(val,i){
+        mth.log(
+          'Acount: '+i+' \t'+
+          val.accountId+' \t'+
+          val.accountName+'  type: '+
+          val.accountType+'  currency: '+
+          val.currency+'  status: '+
+          val.status+' --> Balance: ' +
+          val.balance.balance+' \tdeposit: '+
+          val.balance.deposit+' \tprofitLoss: '+
+          val.balance.profitLoss+' \tavailable: '+
+          val.balance.available+''
+        );
+      });
+    }).catch(function(res){ 
+      mth.log('getAccountsInfo');
+      mth.log(res);
+    }); 
+
+    await mth.ig.getHistMov().then(function(res){ 
+      mth.log(' - Historical Mov. Info: (last 10)');  
+      res = res.slice(0,10); 
+    }).catch(function(res){ 
+      mth.log('getActMov');
+      mth.log(res);
+    });  
+
+    await mth.ig.getOpenPositions().then(function(res){ 
+      mth.log(' - Open Positions Info:'); 
+      res.forEach(function(val,i){
+        mth.log(
+          'Pos: '+i+' \t'+
+          val.position.dealId+' '+
+          val.market.instrumentName+' --> '+
+          val.position.createdDate+' \tSize:'+
+          val.position.dealSize+' \t'+
+          val.position.direction+' \topen:'+
+          Math.round(val.position.openLevel*10000)/10000+' \tlim:'+
+          Math.round(val.position.limitLevel*10000)/10000+' \tstp:'+
+          Math.round(val.position.stopLevel*10000)/10000+' \t Market:'+
+          Math.round((val.market.bid+val.market.offer)/2*10000)/10000
+        );
+      });
+    }).catch(function(res){ 
+      mth.log('getOpenPositions');
+      mth.log(res);
+    }); 
+    
     var marketName = 'EUR/USD Mini';
     var search = 'forex';
-    
-    var inc = {
-      limit: 5,
-      stop: 5,
-    }; 
-    
-    mth.log(' Name: '+nameLog);
-    mth.log(' limit: '+inc.limit);
-    mth.log(' stop: '+inc.stop);
-    
-    var prices = [];
-    var dir = 'NONE';
- 
-    mth.ig.getMarketEpic(search,marketName).then(function(idMarket){ 
-      mth.log(search+' '+marketName+' -> '+idMarket);  
-      async function start(count){ 
-        var openPos = false; 
-        dir = 'NONE'; 
-        await mth.ig.getOpenPos(idMarket).then(function(data){
-          openPos = !data;
-        }); 
-        if (method===mth.method[1].id){
-          if (!openPos){
-            prices = [];
-            var slotInterval = 12*3;
-            var slot = 'MINUTE_5';
-            await mth.ig.getHisPrice(idMarket,slot,slotInterval).then(function(data){
-              prices=data;
-            }).catch(function(res){
-              mth.log('getHisPrice');
-              mth.log(res);
-            }); 
-            if (prices.length!==0){
-              dir = mth.logicSlopeMean(prices);
-            }
-            dir = ('BUY'===dir||'SELL'===dir)?dir:'NONE'; 
-          }
-        }else if(method===mth.method[2].id) {
-          openPos = false;
-          prices = [];
-          var slotInterval = 24*3;
-          var slot = 'HOUR';
-          await mth.ig.getHisPrice(idMarket,slot,slotInterval).then(function(data){
-            prices=data;
-          }).catch(function(res){
-            mth.log('getHisPrice');
-            mth.log(res);
-          }); 
-          if (prices.length!==0){
-            dir = mth.logicSlopeMean(prices);
-          }
-          dir = ('BUY'===dir||'SELL'===dir)?dir:'NONE'; 
-        }else{
-          dir = (Math.floor(Math.random()*2)+1)===1?'BUY':'SELL'; 
-        }  
-        
-        // open Position
-        if (dir!=='NONE'&&!openPos){
-          mth.ig.createPosition(dir,idMarket,inc).then(function(info){
-            if (info!==undefined){
-              mth.log('Pos created: type='+info.type+' dealStatus='+info.dealStatus+' reason='+info.reason);  
-            }
-          }).catch(function(res){ 
-            mth.log('createPosition');
-            mth.log(res);
-          });  
-        }else{
-          mth.log('Pos not created: dir='+dir+' openPos?='+openPos);
-        }        
-      }
-      var count = 0;
-      start(count);
-      mth.intervalMethod = setInterval(function(){
-        count++; 
-        start(count);
-      },timeSync);  
-      
+    var idMarket = undefined;
+    var spread = 0.00006; 
+
+    mth.log(' - Lets open a position!!');
+    await mth.ig.getMarketEpic(search,marketName).then(function(id){ 
+      idMarket=id;
+      mth.log('search:'+search+'  market:'+marketName+'  -> id:'+id);  
     }).catch(function(res){ 
       mth.log('getMarketEpic');
       mth.log(res);
     });  
+        
+    var prices = undefined;
+    var slot = 'HOUR_4';
+    var slotInterval = 4*6*7;
+    await mth.ig.getHisPrice(idMarket,slot,slotInterval).then(function(data){
+      prices=data;
+    }).catch(function(res){
+      mth.log('getHisPrice');
+      mth.log(res);
+    }); 
+
+    var dir = 'NONE';
+    var stopLim = 0;
+    if (prices.length!==0){
+      [dir,stopLim] = mth.logicSlopeMean(prices);
+    }  
+    
+    if (dir!=='NONE'){
+      mth.ig.createPosition(dir,idMarket,20,20).then(function(info){
+        if (info!==undefined){
+          mth.log('Pos created?: type='+info.type+' dealStatus='+info.dealStatus+' reason='+info.reason);  
+        }
+      }).catch(function(res){ 
+        mth.log('createPosition');
+        mth.log(res);
+      });
+    }else{
+      mth.log('Pos not created dir='+dir);
+    }
   },
   //MTH LOGIC 
   logicSlopeMean: function(prices){
     var i = 0;
+    var type ='NONE';
     for (i=0; i<prices.length; i++){
       prices[i].timeDate = (new Date(prices[i].snapshotTimeUTC)).getTime()         
     }
@@ -134,62 +143,35 @@ var mth = {
     } 
 
     var ml = require('ml');  
+    var math = require('mathjs');
     var reg = new ml.SimpleLinearRegression(time,med); 
     var type = 'NONE';  
-    
     //ckeck SELL or BUY
+    stopLim = 0;
     if(reg.slope<0){
       type ='SELL';
+      stopLim=math.max(med);
     }else{
       type ='BUY';
+      stopLim=math.min(med);
     } 
     
-    return type; 
+    return [type,stopLim]; 
   }
 }; 
 
 var namefile = 'test';
 var user = undefined;
-var pass = undefined;
-
-
-process.argv.forEach(function(val,index) {  
+var pass = undefined; 
+process.argv.forEach(function(val,index) { 
   if (index===2&&(val!==undefined||val!==null||val!=='')){
-    namefile = val;
+    user = val;
   } 
-});
-
-user='';
-pass='';
-mth.exe(user,pass,namefile); 
-
-/*
-var readline = require('readline');
-var writable = require('stream').Writable;
-var mutableStdout = new writable({
-  write: function(chunk, encoding, callback) {
-    if (!this.muted)
-      process.stdout.write(chunk, encoding);
-    callback();
-  }
-});
-mutableStdout.muted = false;
-var readline = readline.createInterface({
-  input: process.stdin,
-  output: mutableStdout,
-  terminal: true
+  if (index===3&&(val!==undefined||val!==null||val!=='')){
+    pass = val;
+  }  
+  if (index===4&&(val!==undefined||val!==null||val!=='')){
+    namefile = val;
+  }  
 }); 
-
-console.log('File Name: '+namefile);
-readline.question('User: ',function(data){
-  user=data; 
-  readline.question('Pass: ',function(data){
-    pass=data;  
-    mth.exe(user,pass,namefile);
-    mutableStdout.muted = false;    
-    readline.close()
-  }); 
-  mutableStdout.muted = true;
-});
-
-*/
+mth.exe(user,pass,namefile);
