@@ -53,8 +53,19 @@ var mth = {
     }); 
 
     await mth.ig.getHistMov().then(function(res){ 
-      mth.log(' - Historical Mov. Info: (last 10)');  
-      res = res.slice(0,10); 
+      mth.log(' - Historical Mov. Info: (last 20)');  
+      res = res.slice(0,20);  
+      res.forEach(function(val,i){  
+        mth.log(
+          'Mov: '+i+' -> Date:'+
+          val.openDateUtc+'  Name:'+
+          val.instrumentName+'  size: '+
+          val.size+'  currency: '+
+          val.currency+'  status: '+
+          val.status+' --> profitAndLoss: ' +
+          val.profitAndLoss+''
+        ); 
+      });
     }).catch(function(res){ 
       mth.log('getActMov');
       mth.log(res);
@@ -106,13 +117,13 @@ var mth = {
     }); 
 
     var dir = 'NONE';
-    var stopLim = 0;
+    var stopLim = 30;
     if (prices.length!==0){
-      [dir,stopLim] = mth.logicSlopeMean(prices);
+      dir = mth.logicSlopeMean(prices);
     }  
     
     if (dir!=='NONE'){
-      mth.ig.createPosition(dir,idMarket,20,20).then(function(info){
+      mth.ig.createPosition(dir,idMarket,stopLim,stopLim).then(function(info){
         if (info!==undefined){
           mth.log('Pos created?: type='+info.type+' dealStatus='+info.dealStatus+' reason='+info.reason);  
         }
@@ -147,16 +158,13 @@ var mth = {
     var reg = new ml.SimpleLinearRegression(time,med); 
     var type = 'NONE';  
     //ckeck SELL or BUY
-    stopLim = 0;
     if(reg.slope<0){
       type ='SELL';
-      stopLim=math.max(med);
     }else{
       type ='BUY';
-      stopLim=math.min(med);
     } 
     
-    return [type,stopLim]; 
+    return type; 
   }
 }; 
 
