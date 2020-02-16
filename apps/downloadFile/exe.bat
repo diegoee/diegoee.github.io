@@ -1,23 +1,22 @@
 @echo off
-cls 
-set tempFolder = download
-rmdir /S /Q %tempFolder%  
-echo Download a File in folder: %tempFolder%  
-mkdir %tempFolder%
-xcopy "%cd%\downloadfile.js" "%cd%\%tempFolder%"
-cd %tempFolder%
+cls  
+rmdir /S /Q download 
+echo Download a File in folder: download  
+mkdir download
+xcopy "%cd%\downloadfile.js" "%cd%\download"
+cd download
 call npm install axios
 call npm install progress 
 
-set fileUrl = https://github.com/janeasystems/nodejs-mobile/releases/download/nodejs-mobile-v0.1.3/nodejs-mobile-v0.1.3-android.zip
-set fileName = nodejs-mobile-v0.1.3-android.zip 
+::MANUAL: call node downloadfile.js  url  fileName
+call node downloadfile.js  https://github.com/janeasystems/nodejs-mobile/releases/download/nodejs-mobile-v0.1.3/nodejs-mobile-v0.1.3-android.zip  nodejs-mobile-v0.1.3-android.zip
 
-call node downloadfile.js  %fileUrl%  %fileName%
 ::call node downloadfile.js http://stahlworks.com/dev/unzip.exe unzip.exe 
-::call unzip %fileName% 
+::MANUAL: call unzip fileName
+::call unzip nodejs-mobile-v0.1.3-android.zip
 
 echo Copy de file ...
 TIMEOUT /T 360 
 cd ..
-rmdir /S /Q download 
+rmdir /S /Q download
 TIMEOUT /T 10   

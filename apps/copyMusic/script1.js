@@ -8,7 +8,8 @@ var fs = require('fs');
 var pth = 'C:\\Users\\alamo\\Music\\iTunes\\iTunes Media\\Music';
 var folders = [
   'C:\\Users\\alamo\\Downloads\\DiegoEos',
-  'C:\\Users\\alamo\\Downloads\\AlterEgo'
+  'C:\\Users\\alamo\\Downloads\\AlterEgo',
+  'C:\\Users\\alamo\\Downloads\\TrumpetList'
 ];
 console.log('Music folder: '+pth);
 
@@ -52,13 +53,20 @@ var allFiles = [];
 })(pth);
  
 console.log('Contamos el total de ficheros a copiar');  
-var tot=[0,0];
-allFiles.forEach(function(f) {     
-  if(f.indexOf('99')!==-1){
-    tot[1]++;
-  }else{
+var tot=[0,0,0];
+allFiles.forEach(function(f) {  
+  var c1 = f.indexOf('.mp3')>0;
+  var c2 = f.indexOf('99')!==-1;
+  var c3 = f.indexOf('80')!==-1;    
+  if(c1&&!c2&&!c3){
     tot[0]++;
-  };
+  }
+  if(c1&&c2){
+    tot[1]++;
+  }
+  if(c1&&c3){
+    tot[2]++;
+  }
 });
 
 for(var z = 0; z<folders.length; z++){
@@ -78,15 +86,20 @@ for(var z = 0; z<folders.length; z++){
     
     var c1 = (f.indexOf('.mp3')>0);
     var c2 = (f.indexOf('99')!==-1);
+    var c3 = (f.indexOf('80')!==-1);
     
-    if ((z===0)&&c1&&!c2){ 
+    if((z===0)&&c1&&!c2&&!c3){ 
       copyFile(f,fEnd); 
       counter[z]++;
     }
-    if ((z===1)&&c2){ 
+    if((z===1)&&c2){ 
        copyFile(f,fEnd); 
       counter[z]++;
     } 
+    if((z===2)&&c3){ 
+      copyFile(f,fEnd); 
+     counter[z]++;
+   } 
     //console.log(z+' - \t'+counter[z]+'\t/'+tot[z]+' de la ruta: '+folders[z]); 
   } 
 }  
