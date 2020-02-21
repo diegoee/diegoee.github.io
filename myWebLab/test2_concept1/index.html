@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Web test">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <title>Web Test2_concept1</title>
     <style>       
@@ -15,21 +15,72 @@
     <div id="btnStart" class="fixed-action-btn">
       <a class="btn-floating btn-large green"><i class="material-icons">play_arrow</i></a> 
     </div>
+    <div class="container">
+      <div class="row">
+        <div class="col s12">
+          <div id="canvasContainer" class="card-panel hoverable">  
+          </div>
+        </div> 
+      </div>
+    </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>         
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
     <script type="text/javascript"> 
-      (function exe(){       
+      (function exe(){  
+             
         $('#btnStart').on('click',function(){
           if($(this).hasClass('active')){
             $(this).removeClass('active');
             $(this).find('a').first().removeClass('red').addClass('green');
             $(this).find('a i').first().html('play_arrow');
+            actOnOff(false);
           }else{  
             $(this).addClass('active');
             $(this).find('a').first().removeClass('green').addClass('red');
             $(this).find('a i').first().html('stop');
+            actOnOff(true);
           } 
-        });
+        }); 
+
+        function actOnOff(state){ 
+          M.Toast.dismissAll();
+          var toastMsg = M.toast({
+            html: '<span>'+((state)?'ON':'OFF')+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
+            displayLength: 2500, 
+          }); 
+          $('.btnToast').on('click',function(){
+            M.Toast.dismissAll();
+          });
+        }
+
+        function plotCanvas(){
+          //fabric.js
+          var canvas = new fabric.Canvas('canvas',{ 
+            width: $('#canvasContainer').innerWidth()-48, 
+            height: $('#canvasContainer').innerHeight()-48 
+          }); 
+          
+          var rect = new fabric.Rect({
+            left: 0,
+            top: 0,
+            fill: 'BLACK',
+            width: canvas.width,
+            height: canvas.height
+          });
+ 
+          canvas.add(rect); 
+          canvas.renderAll();           
+        } 
+
+        function resize(){
+          $('#canvasContainer').innerHeight($(window).innerHeight()-50);
+          $('#canvasContainer').html('<canvas id="canvas"></canvas>');
+          plotCanvas();
+        }
+
+        resize();
+        $(window).on('resize',resize); 
       })();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
