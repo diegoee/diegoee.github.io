@@ -8,10 +8,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <title>Web Test2_concept1</title>
-    <style>       
+    <style> 
+      #loading{
+        background-color: rgb(255,255,255,0.85);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }     
     </style>
   </head>
-  <body>     
+  <body> 
+    <div id="loading"> 
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+    </div>   
     <div id="btnStart" class="fixed-action-btn">
       <a class="btn-floating btn-large green"><i class="material-icons">play_arrow</i></a> 
     </div>
@@ -29,21 +54,22 @@
     <script type="text/javascript"> 
       (function exe(){  
              
+        var actionCanvas = false;
         $('#btnStart').on('click',function(){
+          var state = true;
           if($(this).hasClass('active')){
             $(this).removeClass('active');
             $(this).find('a').first().removeClass('red').addClass('green');
             $(this).find('a i').first().html('play_arrow');
-            actOnOff(false);
+            state=false;
+            actionCanvas=false;
           }else{  
             $(this).addClass('active');
             $(this).find('a').first().removeClass('green').addClass('red');
             $(this).find('a i').first().html('stop');
-            actOnOff(true);
+            state=true;
+            actionCanvas=true;
           } 
-        }); 
-
-        function actOnOff(state){ 
           M.Toast.dismissAll();
           var toastMsg = M.toast({
             html: '<span>'+((state)?'ON':'OFF')+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
@@ -51,36 +77,86 @@
           }); 
           $('.btnToast').on('click',function(){
             M.Toast.dismissAll();
-          });
-        }
+          }); 
+        });  
 
+        function onOffLoading(state){ 
+          if(state){
+            $('#loading').css({
+              display: 'flex'
+            });
+          }else{
+            $('#loading').css({
+              display: 'none'
+            });
+          } 
+        }
+        onOffLoading(true);
+
+        var inter = undefined;
         function plotCanvas(){
+          clearInterval(inter);
+          onOffLoading(true);
           //fabric.js
           var canvas = new fabric.Canvas('canvas',{ 
             width: $('#canvasContainer').innerWidth()-48, 
             height: $('#canvasContainer').innerHeight()-48 
-          }); 
-          
-          var rect = new fabric.Rect({
+          });  
+
+          var fabricObj = []; 
+          var colorW = true;
+          var colorH = true;
+          var n = 0;
+          for (var h=0; h<canvas.height; h=h+3){
+            colorH=!colorH;
+            colorW=colorH; 
+            for (var w=0; w<canvas.width; w=w+3){
+              n++;
+              fabricObj.push(new fabric.Rect({
+                left: w,
+                top: h,
+                fill: (colorW)?'BLACK':'WHITE',
+                width: 2,
+                height: 2
+              }));   
+              colorW=!colorW;
+              //console.log(Math.round(canvas.width)+' - '+w);
+              //console.log(Math.round(canvas.height)+' - '+h);
+            } 
+          }  
+ 
+          var group = new fabric.Group(fabricObj,{
             left: 0,
-            top: 0,
-            fill: 'BLACK',
-            width: canvas.width,
-            height: canvas.height
+            top: 0
           });
  
-          canvas.add(rect); 
-          canvas.renderAll();           
+          canvas.add(group); 
+          canvas.renderAll();
+          
+          for (var i = 0; i<n; i++){
+            group.item(i).set('fill','WHITE');
+          }    
+          canvas.renderAll();       
+ 
+          inter = setInterval(function(){
+            if(actionCanvas){
+              var rnd = Math.floor(Math.random()*n)+0;
+              group.item(rnd).set('fill','BLACK');
+              canvas.renderAll(); 
+            }  
+          },1000);
+          
+          canvas.renderAll();
+          onOffLoading(false);          
         } 
-
         function resize(){
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
           $('#canvasContainer').html('<canvas id="canvas"></canvas>');
           plotCanvas();
         }
-
+         
         resize();
-        $(window).on('resize',resize); 
+        $(window).on('resize',resize);   
       })();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
