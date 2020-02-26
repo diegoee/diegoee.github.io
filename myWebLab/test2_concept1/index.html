@@ -53,22 +53,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
     <script type="text/javascript"> 
       (function exe(){  
-             
-        var actionCanvas = false;
-        $('#btnStart').on('click',function(){
+              
+        function actionBtn(){
           var state = true;
-          if($(this).hasClass('active')){
-            $(this).removeClass('active');
-            $(this).find('a').first().removeClass('red').addClass('green');
-            $(this).find('a i').first().html('play_arrow');
-            state=false;
-            actionCanvas=false;
+          var $e = $('#btnStart');
+          if($e.hasClass('active')){
+            $e.removeClass('active');
+            $e.find('a').first().removeClass('red').addClass('green');
+            $e.find('a i').first().html('play_arrow');
+            state=false; 
           }else{  
-            $(this).addClass('active');
-            $(this).find('a').first().removeClass('green').addClass('red');
-            $(this).find('a i').first().html('stop');
-            state=true;
-            actionCanvas=true;
+            $e.addClass('active');
+            $e.find('a').first().removeClass('green').addClass('red');
+            $e.find('a i').first().html('stop');
+            state=true; 
           } 
           M.Toast.dismissAll();
           var toastMsg = M.toast({
@@ -78,7 +76,7 @@
           $('.btnToast').on('click',function(){
             M.Toast.dismissAll();
           }); 
-        });  
+        }
 
         function onOffLoading(state){ 
           if(state){
@@ -97,8 +95,9 @@
         function plotCanvas(){
           clearInterval(inter);
           onOffLoading(true);
+
           //fabric.js
-          var canvas = new fabric.Canvas('canvas',{ 
+          var canvas = new fabric.StaticCanvas('canvas',{ 
             width: $('#canvasContainer').innerWidth()-48, 
             height: $('#canvasContainer').innerHeight()-48 
           });  
@@ -107,47 +106,52 @@
           var colorW = true;
           var colorH = true;
           var n = 0;
-          for (var h=0; h<canvas.height; h=h+3){
+          for (var h=0; h<canvas.height; h=h+11){
             colorH=!colorH;
             colorW=colorH; 
-            for (var w=0; w<canvas.width; w=w+3){
+            for (var w=0; w<canvas.width; w=w+11){
               n++;
               fabricObj.push(new fabric.Rect({
                 left: w,
                 top: h,
                 fill: (colorW)?'BLACK':'WHITE',
-                width: 2,
-                height: 2
+                width: 10,
+                height: 10
               }));   
               colorW=!colorW;
-              //console.log(Math.round(canvas.width)+' - '+w);
-              //console.log(Math.round(canvas.height)+' - '+h);
             } 
           }  
  
           var group = new fabric.Group(fabricObj,{
             left: 0,
-            top: 0
+            top: 0, 
+            selectable: false
           });
  
           canvas.add(group); 
-          canvas.renderAll();
+          canvas.renderAll();   
           
-          for (var i = 0; i<n; i++){
-            group.item(i).set('fill','WHITE');
-          }    
-          canvas.renderAll();       
- 
-          inter = setInterval(function(){
-            if(actionCanvas){
-              var rnd = Math.floor(Math.random()*n)+0;
-              group.item(rnd).set('fill','BLACK');
-              canvas.renderAll(); 
-            }  
-          },1000);
+          function animate(){
+            if(startStop){
+              group.animate('scaleY', (group.get('scaleY')===1)?2:1, {
+                duration: 1000,
+                onChange: canvas.renderAll.bind(canvas),
+                onComplete: function(){ 
+                  animate();                                  
+                },
+                easing: fabric.util.ease.easeOutBack
+              });
+            }           
+          } 
           
-          canvas.renderAll();
-          onOffLoading(false);          
+          var startStop = false;
+          $('#btnStart').on('click',function(){
+            actionBtn(); 
+            startStop = !startStop;
+            animate(); 
+          }); 
+          
+          onOffLoading(false); 
         } 
         function resize(){
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
