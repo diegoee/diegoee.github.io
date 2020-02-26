@@ -92,7 +92,6 @@
         onOffLoading(true);
 
         var inter = undefined;
-        var startStop = false;
         function plotCanvas(){
           clearInterval(inter);
           onOffLoading(true);
@@ -145,6 +144,7 @@
             }           
           } 
                     
+          var startStop = false;
           $('#btnStart').off('click');
           $('#btnStart').on('click',function(){
             actionBtn(); 
@@ -157,6 +157,9 @@
         function resize(){
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
           $('#canvasContainer').html('<canvas id="canvas"></canvas>');
+          $('#btnStart').removeClass('active');
+          $('#btnStart').find('a').first().removeClass('red').addClass('green');
+          $('#btnStart').find('a i').first().html('play_arrow');
           plotCanvas();
         }
          
