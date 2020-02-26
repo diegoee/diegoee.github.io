@@ -92,6 +92,7 @@
         onOffLoading(true);
 
         var inter = undefined;
+        var startStop = false;
         function plotCanvas(){
           clearInterval(inter);
           onOffLoading(true);
@@ -143,8 +144,8 @@
               });
             }           
           } 
-          
-          var startStop = false;
+                    
+          $('#btnStart').off('click');
           $('#btnStart').on('click',function(){
             actionBtn(); 
             startStop = !startStop;
