@@ -99,18 +99,20 @@
           //fabric.js
           var canvas = new fabric.StaticCanvas('canvas',{ 
             width: $('#canvasContainer').innerWidth()-48, 
-            height: $('#canvasContainer').innerHeight()-48 
+            height: $('#canvasContainer').innerHeight()-48,
+             
           });  
 
+          var matrixPos = [];
           var fabricObj = []; 
           var colorW = true;
-          var colorH = true;
-          var n = 0;
+          var colorH = true; 
           for (var h=0; h<canvas.height; h=h+11){
             colorH=!colorH;
             colorW=colorH; 
+            var aux = [];
             for (var w=0; w<canvas.width; w=w+11){
-              n++;
+              aux.push([h,w]);
               fabricObj.push(new fabric.Rect({
                 left: w,
                 top: h,
@@ -118,13 +120,19 @@
                 width: 10,
                 height: 10
               }));   
-              colorW=!colorW;
+              colorW=!colorW; 
             } 
+            matrixPos.push(aux);   
           }  
+          delete aux,colorH,colorW;
+          window.matrixPos=matrixPos;
+          //console.log(matrixPos);
  
           var group = new fabric.Group(fabricObj,{
-            left: 0,
-            top: 0, 
+            left: canvas.width/2,
+            top: canvas.height/2, 
+            originX: 'center',
+            originY: 'center',
             selectable: false
           });
  
@@ -133,8 +141,12 @@
           
           function animate(){
             if(startStop){
-              group.animate('scaleY', (group.get('scaleY')===1)?2:1, {
-                duration: 1000,
+              group.animate({ 
+                  'angle': (group.get('angle')===180)?0:180, 
+                  'scaleY': (group.get('scaleY')===1)?2:1, 
+                  'scaleX': (group.get('scaleX')===1)?2:1
+                },{
+                duration: 5000,
                 onChange: canvas.renderAll.bind(canvas),
                 onComplete: function(){ 
                   animate();                                  
@@ -156,7 +168,7 @@
         } 
         function resize(){
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
-          $('#canvasContainer').html('<canvas id="canvas"></canvas>');
+          $('#canvasContainer').html('<canvas id="canvas" style ="border: solid 1px; border-color: rgba(0, 0, 0, 0.25);"></canvas>');
           $('#btnStart').removeClass('active');
           $('#btnStart').find('a').first().removeClass('red').addClass('green');
           $('#btnStart').find('a i').first().html('play_arrow');
