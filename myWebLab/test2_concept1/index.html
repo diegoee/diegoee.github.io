@@ -53,29 +53,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
     <script type="text/javascript"> 
       (function exe(){  
-              
-        function actionBtn(){
-          var state = true;
-          var $e = $('#btnStart');
-          if($e.hasClass('active')){
-            $e.removeClass('active');
-            $e.find('a').first().removeClass('red').addClass('green');
-            $e.find('a i').first().html('play_arrow');
-            state=false; 
-          }else{  
-            $e.addClass('active');
-            $e.find('a').first().removeClass('green').addClass('red');
-            $e.find('a i').first().html('stop');
-            state=true; 
-          } 
+
+        function toast(text){
           M.Toast.dismissAll();
           var toastMsg = M.toast({
-            html: '<span>'+((state)?'ON':'OFF')+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
-            displayLength: 2500, 
+            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
+            displayLength: 1500, 
           }); 
           $('.btnToast').on('click',function(){
             M.Toast.dismissAll();
           }); 
+        }
+        function actionBtnOn(){
+          var $e = $('#btnStart'); 
+          $e.addClass('active');
+          $e.find('a').first().removeClass('green').addClass('red');
+          $e.find('a i').first().html('stop');
+        } 
+        function actionBtnOff(){
+          var $e = $('#btnStart');
+          $e.removeClass('active');
+          $e.find('a').first().removeClass('red').addClass('green');
+          $e.find('a i').first().html('play_arrow'); 
+        }
+        function actionBtn(){
+          var state = true;
+          var $e = $('#btnStart');
+          if($e.hasClass('active')){
+            actionBtnOff(); 
+            state=false; 
+          }else{ 
+            actionBtnOn(); 
+            state=true; 
+          } 
+          toast(((state)?'ON':'OFF'));
         }
 
         function onOffLoading(state){ 
@@ -95,83 +106,170 @@
         function plotCanvas(){
           clearInterval(inter);
           onOffLoading(true);
-
-          //fabric.js
+          
           var canvas = new fabric.StaticCanvas('canvas',{ 
             width: $('#canvasContainer').innerWidth()-48, 
-            height: $('#canvasContainer').innerHeight()-48,
-             
+            height: $('#canvasContainer').innerHeight()-48             
           });  
 
           var matrixPos = [];
           var fabricObj = []; 
-          var colorW = true;
-          var colorH = true; 
-          for (var h=0; h<canvas.height; h=h+11){
-            colorH=!colorH;
-            colorW=colorH; 
+          var cc = 10;
+          for (var h=0; h<canvas.height; h=h+cc+1){ 
             var aux = [];
-            for (var w=0; w<canvas.width; w=w+11){
-              aux.push([h,w]);
-              fabricObj.push(new fabric.Rect({
-                left: w,
-                top: h,
-                fill: (colorW)?'BLACK':'WHITE',
-                width: 10,
-                height: 10
-              }));   
-              colorW=!colorW; 
+            for (var w=0; w<canvas.width; w=w+cc+1){
+              aux.push([h,w]);  
             } 
             matrixPos.push(aux);   
           }  
-          delete aux,colorH,colorW;
-          window.matrixPos=matrixPos;
-          //console.log(matrixPos);
- 
-          var group = new fabric.Group(fabricObj,{
-            left: canvas.width/2,
-            top: canvas.height/2, 
-            originX: 'center',
-            originY: 'center',
-            selectable: false
-          });
- 
-          canvas.add(group); 
-          canvas.renderAll();   
-          
-          function animate(){
-            if(startStop){
-              group.animate({ 
-                  'angle': (group.get('angle')===180)?0:180, 
-                  'scaleY': (group.get('scaleY')===1)?2:1, 
-                  'scaleX': (group.get('scaleX')===1)?2:1
-                },{
-                duration: 5000,
-                onChange: canvas.renderAll.bind(canvas),
-                onComplete: function(){ 
-                  animate();                                  
-                },
-                easing: fabric.util.ease.easeOutBack
-              });
-            }           
+          delete aux,h,w;  
+
+          for(var i=0; i<matrixPos.length; i++){
+            fabricObj.push(new fabric.Rect({
+              left: 0,
+              top:  matrixPos[i][0][0],
+              fill: 'BLACK',
+              width: canvas.width,
+              height: 0.35
+            }));   
           } 
-                    
-          var startStop = false;
+          
+          for(var i=0; i<matrixPos[0].length; i++){
+            fabricObj.push(new fabric.Rect({
+              left: matrixPos[0][i][1],
+              top: 0,
+              fill: 'BLACK',
+              width: 0.35,
+              height: canvas.height
+            }));   
+          }  
+          delete i; 
+          var group = new fabric.Group(fabricObj);  
+
+          // life!!!!
+          //1 start
+          var path = [];  
+          function createPath(){   
+            canvas.clear();
+
+            canvas.add(group); 
+            canvas.renderAll(); 
+
+            var seqIter = [];      
+            //Math.floor(Math.random()*10)+1;  // returns a random integer from 1 to 10
+            //path.push([Math.floor(Math.random()*(matrixPos.length-1))+0,Math.floor(Math.random()*(matrixPos[0].length-1))+0]);
+            path.push([Math.round((matrixPos[0].length-1)/2),Math.round((matrixPos.length-1)/2)]);
+            function addPathElement(){             
+              //2 rndN candidates path          
+              seqIter = [[-1,0],[1,0],[0,-1],[0,1]];
+              seqIter.sort(function(a,b){
+                return (Math.random()-0.5);
+              });
+              
+              for(var i=0; i<seqIter.length; i++){
+                seqIter[i][0]=path[path.length-1][0]+seqIter[i][0];
+                seqIter[i][1]=path[path.length-1][1]+seqIter[i][1];
+              }     
+  
+              //console.log('geting path'); 
+              //3 check candidates
+              var seqIterOk = []; 
+              for (var i =0; i<seqIter.length; i++){
+                val = path.find(function(value,index){
+                  return ((value[0]===seqIter[i][0])&&(value[1]===seqIter[i][1])); 
+                });    
+                val = val===undefined;  
+                if((seqIter[i][0]>matrixPos.length-1)||(seqIter[i][0]<0)){
+                  val = false;
+                } 
+                if((seqIter[i][1]>matrixPos[0].length-1)||(seqIter[i][1]<0)){
+                  val = false;
+                } 
+                seqIterOk.push(val);
+              }   
+
+              if(seqIterOk.some(function(e){
+                return e;
+              })){  
+                path.push(seqIter[seqIterOk.indexOf(true)]);
+                addPathElement(); 
+              }else{
+                return;
+              }  
+            }
+            addPathElement(); 
+
+            var rect = new fabric.Rect({
+              left: matrixPos[path[0][0]][path[0][1]][1],
+              top: matrixPos[path[0][0]][path[0][1]][0],   
+              fill: '#000',
+              width: cc, 
+              height: cc
+            }); 
+            canvas.add(rect);
+            canvas.renderAll();
+
+          } 
+          createPath();  
+          
+          
+          var count = 0;
+          function animate(){
+            if(startStop&&path.length!==0){
+                var rect = new fabric.Rect({
+                  left: matrixPos[path[0][0]][path[0][1]][1],
+                  top: matrixPos[path[0][0]][path[0][1]][0],   
+                  fill: '#000',
+                  width: cc, 
+                  height: cc
+                });   
+
+                canvas.add(rect);
+                canvas.renderAll();  
+              if(path.length>1){
+                //console.log(count+' - '+path[0]+' -> '+path[1]);
+                count++;
+                rect.animate({ 
+                    left: matrixPos[path[1][0]][path[1][1]][1],
+                    top: matrixPos[path[1][0]][path[1][1]][0], 
+                  },{
+                  duration: 100,
+                  onChange: canvas.renderAll.bind(canvas),
+                  onComplete: function(){ 
+                    path.shift();//delete 1st element
+                    animate();                                   
+                  },
+                  easing: fabric.util.ease.easeOutBack
+                });
+              }else{
+                path.shift();
+                actionBtnOff();
+                toast('The End! l='+count);
+              }
+            }           
+          }  
+          var startStop = false; 
           $('#btnStart').off('click');
+          actionBtnOff();
           $('#btnStart').on('click',function(){
             actionBtn(); 
             startStop = !startStop;
+            if(path.length===0){
+              createPath(); 
+              startStop=true;
+            }
             animate(); 
-          }); 
-          
+          });  
+          /**/
           onOffLoading(false); 
         } 
+
         function resize(){
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
           $('#canvasContainer').html('<canvas id="canvas" style ="border: solid 1px; border-color: rgba(0, 0, 0, 0.25);"></canvas>');
-          $('#btnStart').removeClass('active');
-          $('#btnStart').find('a').first().removeClass('red').addClass('green');
-          $('#btnStart').find('a i').first().html('play_arrow');
+          $('#btnStart').on('click',function(){
+            actionBtn();  
+          });
           plotCanvas();
         }
          
