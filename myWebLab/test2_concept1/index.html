@@ -114,7 +114,7 @@
 
           var matrixPos = [];
           var fabricObj = []; 
-          var cc = 10;
+          var cc = 25;
           for (var h=0; h<canvas.height; h=h+cc+1){ 
             var aux = [];
             for (var w=0; w<canvas.width; w=w+cc+1){
@@ -130,7 +130,7 @@
               top:  matrixPos[i][0][0],
               fill: 'BLACK',
               width: canvas.width,
-              height: 0.35
+              height: 0.5
             }));   
           } 
           
@@ -139,7 +139,7 @@
               left: matrixPos[0][i][1],
               top: 0,
               fill: 'BLACK',
-              width: 0.35,
+              width: 0.5,
               height: canvas.height
             }));   
           }  
@@ -157,13 +157,14 @@
 
             var seqIter = [];      
             //Math.floor(Math.random()*10)+1;  // returns a random integer from 1 to 10
-            //path.push([Math.floor(Math.random()*(matrixPos.length-1))+0,Math.floor(Math.random()*(matrixPos[0].length-1))+0]);
-            path.push([Math.round((matrixPos[0].length-1)/2),Math.round((matrixPos.length-1)/2)]);
+            path.push([Math.floor(Math.random()*(matrixPos.length-1))+0,Math.floor(Math.random()*(matrixPos[0].length-1))+0]);
             function addPathElement(){             
               //2 rndN candidates path          
               seqIter = [[-1,0],[1,0],[0,-1],[0,1]];
               seqIter.sort(function(a,b){
-                return (Math.random()-0.5);
+                var s = Math.random();
+                //s = (new Date()).getSeconds()/60;
+                return s-0.5;
               });
               
               for(var i=0; i<seqIter.length; i++){
@@ -233,7 +234,7 @@
                     left: matrixPos[path[1][0]][path[1][1]][1],
                     top: matrixPos[path[1][0]][path[1][1]][0], 
                   },{
-                  duration: 100,
+                  duration: 75,
                   onChange: canvas.renderAll.bind(canvas),
                   onComplete: function(){ 
                     path.shift();//delete 1st element
