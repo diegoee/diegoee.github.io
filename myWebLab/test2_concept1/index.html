@@ -76,17 +76,12 @@
           $e.find('a').first().removeClass('red').addClass('green');
           $e.find('a i').first().html('play_arrow'); 
         }
-        function actionBtn(){
-          var state = true;
-          var $e = $('#btnStart');
-          if($e.hasClass('active')){
+        function actionBtn(){ 
+          if($('#btnStart').hasClass('active')){
             actionBtnOff(); 
-            state=false; 
           }else{ 
             actionBtnOn(); 
-            state=true; 
           } 
-          toast(((state)?'ON':'OFF'));
         }
         function onOffLoading(state){ 
           if(state){
