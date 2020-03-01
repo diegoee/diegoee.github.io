@@ -114,7 +114,7 @@
 
           var matrixPos = [];
           var fabricObj = []; 
-          var cc = 25;
+          var cc = 50;
           for (var h=0; h<canvas.height; h=h+cc+1){ 
             var aux = [];
             for (var w=0; w<canvas.width; w=w+cc+1){
@@ -122,14 +122,14 @@
             } 
             matrixPos.push(aux);   
           }  
-          delete aux,h,w;  
+          delete aux,h,w; 
 
           for(var i=0; i<matrixPos.length; i++){
             fabricObj.push(new fabric.Rect({
               left: 0,
               top:  matrixPos[i][0][0],
               fill: 'BLACK',
-              width: canvas.width,
+              width: matrixPos[0][matrixPos[0].length-1][1],
               height: 0.5
             }));   
           } 
@@ -140,11 +140,21 @@
               top: 0,
               fill: 'BLACK',
               width: 0.5,
-              height: canvas.height
+              height: matrixPos[matrixPos.length-1][0][0]
             }));   
           }  
           delete i; 
-          var group = new fabric.Group(fabricObj);  
+          var group = new fabric.Group(fabricObj,{
+            top: canvas.height/2,
+            left: canvas.width/2,
+            originX: 'center',
+            originY: 'center'
+          });  
+           
+          for(var i=0; i<matrixPos.length-1; i++){
+           matrixPos[i].pop();
+          }
+          matrixPos.pop(); 
 
           // life!!!!
           //1 start
@@ -199,27 +209,29 @@
               }  
             }
             addPathElement(); 
-
+ 
             var rect = new fabric.Rect({
-              left: matrixPos[path[0][0]][path[0][1]][1],
-              top: matrixPos[path[0][0]][path[0][1]][0],   
+              //left: canvas.width/2+matrixPos[path[0][0]][path[0][1]][1],
+              //top: canvas.height/2+matrixPos[path[0][0]][path[0][1]][0],   
+              left: group.left-group.width/2 + matrixPos[path[0][0]][path[0][1]][1],
+              top: group.top-group.height/2 +matrixPos[path[0][0]][path[0][1]][0], 
               fill: '#000',
               width: cc, 
-              height: cc
+              height: cc 
             }); 
             canvas.add(rect);
             canvas.renderAll();
-
+            
+            count = 0; 
           } 
-          createPath();  
-          
-          
+          createPath();             
+
           var count = 0;
           function animate(){
             if(startStop&&path.length!==0){
                 var rect = new fabric.Rect({
-                  left: matrixPos[path[0][0]][path[0][1]][1],
-                  top: matrixPos[path[0][0]][path[0][1]][0],   
+                  left: group.left-group.width/2 + matrixPos[path[0][0]][path[0][1]][1],
+                  top: group.top-group.height/2 + matrixPos[path[0][0]][path[0][1]][0],   
                   fill: '#000',
                   width: cc, 
                   height: cc
@@ -231,8 +243,8 @@
                 //console.log(count+' - '+path[0]+' -> '+path[1]);
                 count++;
                 rect.animate({ 
-                    left: matrixPos[path[1][0]][path[1][1]][1],
-                    top: matrixPos[path[1][0]][path[1][1]][0], 
+                    left: group.left-group.width/2 + matrixPos[path[1][0]][path[1][1]][1],
+                    top: group.top-group.height/2 + matrixPos[path[1][0]][path[1][1]][0], 
                   },{
                   duration: 75,
                   onChange: canvas.renderAll.bind(canvas),
@@ -261,19 +273,22 @@
             }
             animate(); 
           });  
-          /**/
+           
           onOffLoading(false); 
         } 
 
         function resize(){
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
-          $('#canvasContainer').html('<canvas id="canvas" style ="border: solid 1px; border-color: rgba(0, 0, 0, 0.25);"></canvas>');
+          $('#canvasContainer').html('<canvas id="canvas" ></canvas>');
+          $('#canvas').css({
+            //'border': 'solid 1px',
+            //'border-color': 'rgba(0, 0, 0, 0.25)' 
+          });
           $('#btnStart').on('click',function(){
             actionBtn();  
           });
           plotCanvas();
-        }
-         
+        }         
         resize();
         $(window).on('resize',resize);   
       })();
