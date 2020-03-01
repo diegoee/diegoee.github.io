@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Test3_concept2</title>
+    <style> 
+      #loading{
+        background-color: rgb(255,255,255,0.85);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }     
+    </style>
+  </head>
+  <body> 
+    <div id="loading"> 
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+    </div>  
+    <div class="container">
+      <div class="row">
+        <div class="col s12"> 
+          <div id="canvasContainer">  
+          </div>
+        </div> 
+      </div>
+    </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
+    <script type="text/javascript"> 
+      (function exe(){  
+
+        function toast(text){
+          M.Toast.dismissAll();
+          var toastMsg = M.toast({
+            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
+            displayLength: 1500, 
+          }); 
+          $('.btnToast').on('click',function(){
+            M.Toast.dismissAll();
+          }); 
+        } 
+
+        function onOffLoading(state){ 
+          if(state){
+            $('#loading').css({
+              display: 'flex'
+            });
+          }else{
+            $('#loading').css({
+              display: 'none'
+            });
+          } 
+        }
+        onOffLoading(true);
+        setTimeout(function(){
+          onOffLoading(false);
+          toast('Wellcome!');
+        },1000);
+
+        function resize(){
+          $('#canvasContainer').innerHeight($(window).innerHeight()-50);
+          $('#canvasContainer').html('<canvas id="canvas"></canvas>'); 
+          $('#canvas').css({
+            'border': 'solid 1px',
+            'border-color': 'rgba(0, 0, 0, 0.25)' 
+          }); 
+        }         
+        //resize();
+        //$(window).on('resize',resize);   
+      })();
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>

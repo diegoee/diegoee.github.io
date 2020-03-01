@@ -88,7 +88,6 @@
           } 
           toast(((state)?'ON':'OFF'));
         }
-
         function onOffLoading(state){ 
           if(state){
             $('#loading').css({
@@ -105,16 +104,14 @@
         var inter = undefined;
         function plotCanvas(){
           clearInterval(inter);
-          onOffLoading(true);
-          
+          onOffLoading(true);          
           var canvas = new fabric.StaticCanvas('canvas',{ 
             width: $('#canvasContainer').innerWidth()-48, 
             height: $('#canvasContainer').innerHeight()-48             
           });  
-
           var matrixPos = [];
           var fabricObj = []; 
-          var cc = 50;
+          var cc = 20;
           for (var h=0; h<canvas.height; h=h+cc+1){ 
             var aux = [];
             for (var w=0; w<canvas.width; w=w+cc+1){
@@ -161,7 +158,6 @@
           var path = [];  
           function createPath(){   
             canvas.clear();
-
             canvas.add(group); 
             canvas.renderAll(); 
 
@@ -172,17 +168,16 @@
               //2 rndN candidates path          
               seqIter = [[-1,0],[1,0],[0,-1],[0,1]];
               seqIter.sort(function(a,b){
-                var s = Math.random();
-                //s = (new Date()).getSeconds()/60;
+                // RANDOM ALGO PATHING
+                var s = Math.random(); 
                 return s-0.5;
               });
               
               for(var i=0; i<seqIter.length; i++){
                 seqIter[i][0]=path[path.length-1][0]+seqIter[i][0];
                 seqIter[i][1]=path[path.length-1][1]+seqIter[i][1];
-              }     
-  
-              //console.log('geting path'); 
+              }
+              
               //3 check candidates
               var seqIterOk = []; 
               for (var i =0; i<seqIter.length; i++){
@@ -211,8 +206,6 @@
             addPathElement(); 
  
             var rect = new fabric.Rect({
-              //left: canvas.width/2+matrixPos[path[0][0]][path[0][1]][1],
-              //top: canvas.height/2+matrixPos[path[0][0]][path[0][1]][0],   
               left: group.left-group.width/2 + matrixPos[path[0][0]][path[0][1]][1],
               top: group.top-group.height/2 +matrixPos[path[0][0]][path[0][1]][0], 
               fill: '#000',
@@ -272,18 +265,18 @@
               startStop=true;
             }
             animate(); 
-          });  
-           
+          });           
           onOffLoading(false); 
-        } 
-
+        }
         function resize(){
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
           $('#canvasContainer').html('<canvas id="canvas" ></canvas>');
+          /*
           $('#canvas').css({
-            //'border': 'solid 1px',
-            //'border-color': 'rgba(0, 0, 0, 0.25)' 
+            'border': 'solid 1px',
+            'border-color': 'rgba(0, 0, 0, 0.25)' 
           });
+          */
           $('#btnStart').on('click',function(){
             actionBtn();  
           });
