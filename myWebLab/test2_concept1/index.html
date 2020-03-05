@@ -20,6 +20,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      } 
+      #monitorFloat{ 
+        position: absolute;
+        top: 0;
+        right: 0; 
+        z-index: 100; 
       }     
     </style>
   </head>
@@ -36,7 +42,9 @@
           </div>
         </div>
       </div>
-    </div>   
+    </div>  
+    <div id="monitorFloat">  
+    </div> 
     <div id="btnStart" class="fixed-action-btn">
       <a class="btn-floating btn-large green"><i class="material-icons">play_arrow</i></a> 
     </div>
@@ -51,8 +59,18 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script> 
     <script type="text/javascript"> 
-      (function exe(){  
+      (function exe(){   
+        var stats = new Stats();
+        stats.showPanel(2); // 0: fps, 1: ms, 2: mb, 3+: custom
+        $('#monitorFloat').html(stats.domElement);  
+        function animateMemo(){
+          stats.begin();
+          stats.end();
+          requestAnimationFrame(animateMemo);
+        }
+        requestAnimationFrame(animateMemo);
 
         function toast(text){
           M.Toast.dismissAll();
@@ -95,18 +113,17 @@
           } 
         }
         onOffLoading(true);
-        
-        var inter = undefined;
-        function plotCanvas(){
-          clearInterval(inter);
+         
+        var canvas = undefined;
+        function plotCanvas(){ 
           onOffLoading(true);          
-          var canvas = new fabric.StaticCanvas('canvas',{ 
+          canvas = new fabric.StaticCanvas('canvas',{ 
             width: $('#canvasContainer').innerWidth()-48, 
             height: $('#canvasContainer').innerHeight()-48             
           });  
           var matrixPos = [];
           var fabricObj = []; 
-          var cc = 20;
+          var cc = 10;
           for (var h=0; h<canvas.height; h=h+cc+1){ 
             var aux = [];
             for (var w=0; w<canvas.width; w=w+cc+1){
@@ -147,18 +164,21 @@
            matrixPos[i].pop();
           }
           matrixPos.pop(); 
+ 
+          //1 start  
+          var countBack = 0;
+          var pathCounter = 0;
+          var path = [];   
 
-          // life!!!!
-          //1 start
-          var path = [];  
-          function createPath(){   
-            canvas.clear();
-            canvas.add(group); 
-            canvas.renderAll(); 
-
-            var seqIter = [];      
+          function restartPath(){ 
+            pathCounter = 0;
+            path = []; 
             //Math.floor(Math.random()*10)+1;  // returns a random integer from 1 to 10
-            path.push([Math.floor(Math.random()*(matrixPos.length-1))+0,Math.floor(Math.random()*(matrixPos[0].length-1))+0]);
+            path.push([Math.floor(Math.random()*(matrixPos.length-1))+0,Math.floor(Math.random()*(matrixPos[0].length-1))+0]); 
+          }
+          
+          function calPath(){  
+            var seqIter = [];      
             function addPathElement(){             
               //2 rndN candidates path          
               seqIter = [[-1,0],[1,0],[0,-1],[0,1]];
@@ -199,7 +219,11 @@
               }  
             }
             addPathElement(); 
- 
+          } 
+          
+          function restartCanvasWithPath(){
+            canvas.clear();
+            canvas.add(group);  
             var rect = new fabric.Rect({
               left: group.left-group.width/2 + matrixPos[path[0][0]][path[0][1]][1],
               top: group.top-group.height/2 +matrixPos[path[0][0]][path[0][1]][0], 
@@ -209,76 +233,92 @@
             }); 
             canvas.add(rect);
             canvas.renderAll();
-            
-            count = 0; 
-          } 
-          createPath();             
+          }
+          
+          restartPath();
+          calPath();   
+          restartCanvasWithPath();
 
-          var count = 0;
-          function animate(){
-            if(startStop&&path.length!==0){
+          function animate(){  
+            if(startStop){
+              if(pathCounter<path.length-1){
                 var rect = new fabric.Rect({
-                  left: group.left-group.width/2 + matrixPos[path[0][0]][path[0][1]][1],
-                  top: group.top-group.height/2 + matrixPos[path[0][0]][path[0][1]][0],   
+                  left: group.left-group.width/2 + matrixPos[path[pathCounter][0]][path[pathCounter][1]][1],
+                  top: group.top-group.height/2 + matrixPos[path[pathCounter][0]][path[pathCounter][1]][0],   
                   fill: '#000',
                   width: cc, 
                   height: cc
-                });   
-
+                });    
                 canvas.add(rect);
-                canvas.renderAll();  
-              if(path.length>1){
-                //console.log(count+' - '+path[0]+' -> '+path[1]);
-                count++;
+                canvas.renderAll();   
                 rect.animate({ 
-                    left: group.left-group.width/2 + matrixPos[path[1][0]][path[1][1]][1],
-                    top: group.top-group.height/2 + matrixPos[path[1][0]][path[1][1]][0], 
+                    left: group.left-group.width/2 + matrixPos[path[pathCounter+1][0]][path[pathCounter+1][1]][1],
+                    top: group.top-group.height/2 + matrixPos[path[pathCounter+1][0]][path[pathCounter+1][1]][0], 
                   },{
-                  duration: 75,
+                  duration: 25,
                   onChange: canvas.renderAll.bind(canvas),
                   onComplete: function(){ 
-                    path.shift();//delete 1st element
-                    animate();                                   
+                    pathCounter++;
+                    animate();
                   },
                   easing: fabric.util.ease.easeOutBack
                 });
               }else{
-                path.shift();
-                actionBtnOff();
-                toast('The End! l='+count);
-              }
-            }           
+                countBack++;
+                toast('Back!! n='+countBack); 
+                if (path.length>=15){ 
+                  for (var i=0; i<15; i++){
+                    pathCounter--;
+                    path.pop();
+                    canvas.remove(canvas.item(canvas.getObjects().length-1));
+                  } 
+                  if(path.length===0){ 
+                    restartPath();
+                    calPath(); 
+                    restartCanvasWithPath(); 
+                  }else{
+                    calPath(); 
+                    canvas.renderAll(); 
+                  } 
+                }else{  
+                  restartPath();
+                  calPath(); 
+                  restartCanvasWithPath();
+                } 
+                animate(); 
+              }   
+            }   
           }  
+
           var startStop = false; 
-          $('#btnStart').off('click');
-          actionBtnOff();
-          $('#btnStart').on('click',function(){
-            actionBtn(); 
+          $('#btnStart').on('click',function(){ 
             startStop = !startStop;
-            if(path.length===0){
-              createPath(); 
-              startStop=true;
-            }
-            animate(); 
+            if(path.length===0){  
+              restartPath();
+              calPath(); 
+              restartCanvasWithPath();
+              startStop = true; 
+            }  
+            animate();  
           });           
           onOffLoading(false); 
         }
-        function resize(){
+        
+        function resize(){  
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
           $('#canvasContainer').html('<canvas id="canvas" ></canvas>');
-          /*
-          $('#canvas').css({
-            'border': 'solid 1px',
-            'border-color': 'rgba(0, 0, 0, 0.25)' 
-          });
-          */
+          $('#btnStart').off('click');
+          actionBtnOff();          
           $('#btnStart').on('click',function(){
             actionBtn();  
           });
           plotCanvas();
         }         
         resize();
-        $(window).on('resize',resize);   
+        $(window).on('resize',function(){
+          window.location.reload();
+          resize();
+        });   
       })();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
