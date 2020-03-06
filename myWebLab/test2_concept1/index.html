@@ -165,8 +165,7 @@
           }
           matrixPos.pop(); 
  
-          //1 start  
-          var countBack = 0;
+          //1 start   
           var pathCounter = 0;
           var path = [];   
 
@@ -263,9 +262,7 @@
                   },
                   easing: fabric.util.ease.easeOutBack
                 });
-              }else{
-                countBack++;
-                toast('Back!! n='+countBack); 
+              }else{ 
                 if (path.length>=15){ 
                   for (var i=0; i<15; i++){
                     pathCounter--;
@@ -312,7 +309,8 @@
           $('#btnStart').on('click',function(){
             actionBtn();  
           });
-          plotCanvas();
+          plotCanvas();          
+          toast('Start!!'); 
         }         
         resize();
         $(window).on('resize',function(){
