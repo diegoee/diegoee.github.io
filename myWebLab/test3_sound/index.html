@@ -67,8 +67,7 @@
               display: 'none'
             });
           } 
-        }
-        
+        }        
         
         var synth = new Tone.Synth().toMaster(); 
         function plotCanvas(){     
@@ -100,40 +99,47 @@
           }         
 
           canvas.on({ 
-            'mouse:down': function(options) { 
-              var pos = 0; 
-              for(var i=0; i<allNotes.length; i++){  
-                if(allNotes[i].x[0]<=options.e.offsetX&&allNotes[i].x[1]>options.e.offsetX &&allNotes[i].y[0]<=options.e.offsetY&&allNotes[i].y[1]>options.e.offsetY){
-                  pos = i;
-                  break;
-                }
-              }                
-              synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n, '8n'); 
-              var circle = new fabric.Circle({ 
-                radius: 1,  
-                opacity: allNotes[pos].opacity,
-                fill: allNotes[pos].color, 
-                selectable: false,
-                top: options.e.offsetY, 
-                left: options.e.offsetX, 
-                originX: 'center',
-                originY: 'center' 
-              });
-              canvas.add(circle);
-              canvas.renderAll(); 
-              circle.animate({ 
-                radius: 1000, 
-                opacity: 0
-              },{
-                duration: 1000,
-                onChange: canvas.renderAll.bind(canvas),
-                onComplete: function(){ 
-                  canvas.remove(circle);                    
-                },
-                easing: fabric.util.ease.easeInQuad
-              });
+            'mouse:down': function(options) {  
+              var posX = (options.e.type==='mousedown')?options.e.offsetX:options.e.touches[0].clientX-20;
+              var posY = (options.e.type==='mousedown')?options.e.offsetY:options.e.touches[0].clientY-20;  
+              createCircleClick(posX,posY);
             }
           });
+
+          function createCircleClick(posX,posY){
+            var pos = 0; 
+            for(var i=0; i<allNotes.length; i++){  
+              if(allNotes[i].x[0]<=posX&&allNotes[i].x[1]>posX&&allNotes[i].y[0]<=posY&&allNotes[i].y[1]>posY){
+                pos = i;
+                break;
+              }
+            }                
+            synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n, '8n'); 
+            var circle = new fabric.Circle({ 
+              radius: 1,  
+              opacity: allNotes[pos].opacity,
+              fill: allNotes[pos].color, 
+              selectable: false,
+              top: posY, 
+              left: posX, 
+              originX: 'center',
+              originY: 'center' 
+            });
+            canvas.add(circle);
+            canvas.renderAll(); 
+            circle.animate({ 
+              radius: 1000, 
+              opacity: 0
+            },{
+              duration: 1000,
+              onChange: canvas.renderAll.bind(canvas),
+              onComplete: function(){ 
+                canvas.remove(circle);                    
+              },
+              easing: fabric.util.ease.easeInQuad
+            });
+          }
+
         }
 
         function resize(){  
