@@ -165,12 +165,32 @@ var mth = {
     } 
     
     return type; 
+  },
+  getIGData: async function(user,pass){
+    mth.init(user,pass,'getData'); 
+    mth.log('');
+    mth.log(' --- Start: getData');
+
+    var marketName = 'Gold';
+    var search = 'forex';
+    var idMarket = undefined;
+
+    await mth.ig.getMarketEpic(search,marketName).then(function(id){ 
+      idMarket=id;
+      mth.log('search:'+search+'  market:'+marketName+'  -> id:'+id);  
+    }).catch(function(res){ 
+      mth.log('getMarketEpic');
+      mth.log(res);
+    }); 
+
+    mth.log(' --- End: getData');
   }
 }; 
 
 var namefile = 'test';
 var user = undefined;
 var pass = undefined; 
+var exe = undefined;
 process.argv.forEach(function(val,index) { 
   if (index===2&&(val!==undefined||val!==null||val!=='')){
     user = val;
@@ -179,7 +199,15 @@ process.argv.forEach(function(val,index) {
     pass = val;
   }  
   if (index===4&&(val!==undefined||val!==null||val!=='')){
+    exe = val;
+  }
+  if (index===5&&(val!==undefined||val!==null||val!=='')){
     namefile = val;
-  }  
+  }   
 }); 
-mth.exe(user,pass,namefile);
+if(exe==='getdata'){ 
+  mth.getIGData(user,pass);
+}
+if(exe==='exe'){ 
+  mth.exe(user,pass,namefile);
+}

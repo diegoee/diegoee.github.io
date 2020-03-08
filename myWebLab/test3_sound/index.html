@@ -69,7 +69,9 @@
           } 
         }        
         
-        var synth = new Tone.Synth().toMaster(); 
+        var intervalpointsTimeline = []; 
+        var intervaltimelineStarted = undefined; 
+        var synth = new Tone.Synth().toMaster();  
         function plotCanvas(){     
           var canvas = new fabric.Canvas('canvas',{ 
             selection: false,
@@ -78,43 +80,170 @@
             height: $(window).innerHeight()-46             
           });  
 
-          var color = ['red','pink','purple', 'indigo', 'blue', 'cyan', 'teal', 'green', 'yellow', 'orange', 'brown', 'grey'];
-          var opacityOctave = [0.85,0.65,0.45,0.25];
-          var numberOctave = ['2','3','4','5'];
-          var notes = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-          var spaceX = Math.floor(canvas.width/notes.length);
-          var spaceY = Math.floor(canvas.height/opacityOctave.length);
+          var color = ['red', 'pink', 'purple', 'indigo', 'blue', 'cyan', 'teal', 'green', 'yellow', 'orange', 'brown', 'grey'];
+          var opacityOctave = [0.95,0.5,0.15];
+          var numberOctave = ['2', '3', '4'];
+          var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+          var spaceX = Math.floor(canvas.width/opacityOctave.length);
+          var spaceY = Math.floor(canvas.height/notes.length);
           var allNotes = [];
+          var time = 8000; 
+
           for(var i=0; i<notes.length; i++){
             for(var ii=0; ii<opacityOctave.length; ii++){
               allNotes.push({
-                x: [i*spaceX,(i+1)*spaceX-1],
-                y: [ii*spaceY,(ii+1)*spaceY-1],
+                x: [ii*spaceX,(ii+1)*spaceX-1],
+                y: [i*spaceY,(i+1)*spaceY-1],
                 opacity: opacityOctave[ii],
                 n: numberOctave[ii],
                 color: color[i],
                 note: notes[i],
               });
             } 
-          }         
+          }      
 
-          canvas.on({ 
-            'mouse:down': function(options) {  
-              var posX = (options.e.type==='mousedown')?options.e.offsetX:options.e.touches[0].clientX-20;
-              var posY = (options.e.type==='mousedown')?options.e.offsetY:options.e.touches[0].clientY-20;  
-              createCircleClick(posX,posY);
-            }
-          });
-
-          function createCircleClick(posX,posY){
+          function getPosAllNotes(posX,posY){
             var pos = 0; 
             for(var i=0; i<allNotes.length; i++){  
               if(allNotes[i].x[0]<=posX&&allNotes[i].x[1]>posX&&allNotes[i].y[0]<=posY&&allNotes[i].y[1]>posY){
                 pos = i;
                 break;
               }
-            }                
-            synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n, '8n'); 
+            } 
+            return pos;
+          }   
+
+          var diffTimeMS = 0;
+          canvas.on({ 
+            'mouse:down': function(options) { 
+              diffTimeMS=options.e.timeStamp; 
+              var posX = (options.e.type==='mousedown')?options.e.offsetX:options.e.touches[0].clientX-20;
+              var posY = (options.e.type==='mousedown')?options.e.offsetY:options.e.touches[0].clientY-20;  
+              createPointTimeline(posX,posY);
+              createCircleClick(posX,posY);
+              startTimeline();
+            },
+            'mouse:up': function(options) { 
+              diffTimeMS=options.e.timeStamp-diffTimeMS; 
+              if(diffTimeMS>1000){
+                toast('clear All!');
+                clearAllPlay();
+              }
+            }
+          });
+ 
+          var timeline = undefined;
+          function clearAllPlay(){
+            for(var i = 0; i<intervalpointsTimeline.length; i++){
+              clearInterval(intervalpointsTimeline[i]);
+            }
+            clearInterval(intervaltimelineStarted);
+            canvas.remove(timeline); 
+            intervaltimelineStarted = undefined;
+            intervalpointsTimeline = []; 
+            timeline = undefined;
+          }  
+
+          function createPointTimeline(posX,posY){  
+            var pos = getPosAllNotes(posX,posY); 
+
+            function playPlot(){
+              synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n,'8n'); 
+              var circle = new fabric.Circle({ 
+                radius: 25,  
+                opacity: allNotes[pos].opacity,
+                fill: allNotes[pos].color, 
+                selectable: false,
+                top: (allNotes[pos].y[0]+allNotes[pos].y[1])/2, 
+                left: canvas.width-4,
+                originX: 'center',
+                originY: 'center' 
+              });
+              canvas.add(circle);
+              canvas.renderAll(); 
+              circle.animate({ 
+                left: 0
+              },{
+                duration: time,
+                onChange: canvas.renderAll.bind(canvas),
+                onComplete: function(){ 
+                  canvas.remove(circle);      
+                },
+                easing: function(t,b,c,d){
+                  return c*t/d+b; 
+                }
+              }); 
+            }
+
+            playPlot();
+            intervalpointsTimeline.push(setInterval(playPlot,time)
+            );
+          }
+ 
+          function startTimeline(){
+            console.log('startTimeline');
+            //console.log(intervaltimelineStarted); 
+            if(intervaltimelineStarted===undefined){ 
+              console.log('we'); 
+              clearInterval(intervaltimelineStarted);
+              intervaltimelineStarted = setInterval(function(){
+                createLineStart();
+              },time); 
+              createLineStart();
+            }
+            function createLineStart(){
+              var lineStart = new fabric.Rect({ 
+                fill: 'black', 
+                width: 2,
+                height: 30,
+                selectable: false,
+                top: canvas.height/2, 
+                left: canvas.width-3,
+                originX: 'center',
+                originY: 'center'    
+              }); 
+              lineStart.animate({  
+                left:  0 
+              },{
+                duration: time,
+                onChange: canvas.renderAll.bind(canvas),
+                onComplete: function(){ 
+                  canvas.remove(lineStart); 
+                },
+                easing: function(t,b,c,d){
+                  return c*t/d+b; 
+                }
+              }); 
+              canvas.add(lineStart);
+              canvas.renderAll(); 
+            } 
+            
+            if(timeline===undefined){ 
+              timeline = new fabric.Rect({ 
+                fill: 'black', 
+                width: canvas.width,
+                height: 1,
+                selectable: false,
+                top: canvas.height/2, 
+                left: canvas.width   
+              }); 
+              timeline.animate({  
+                left:  0 
+              },{
+                duration: time,
+                onChange: canvas.renderAll.bind(canvas), 
+                easing: function(t,b,c,d){
+                  return c*t/d+b; 
+                  }
+              }); 
+              canvas.add(timeline);
+              canvas.renderAll(); 
+            }
+          }
+
+          function createCircleClick(posX,posY){
+            var pos = getPosAllNotes(posX,posY);                
+            //synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n,'8n'); 
             var circle = new fabric.Circle({ 
               radius: 1,  
               opacity: allNotes[pos].opacity,
@@ -128,10 +257,10 @@
             canvas.add(circle);
             canvas.renderAll(); 
             circle.animate({ 
-              radius: 1000, 
+              radius: 750, 
               opacity: 0
             },{
-              duration: 1000,
+              duration: 750,
               onChange: canvas.renderAll.bind(canvas),
               onComplete: function(){ 
                 canvas.remove(circle);                    
@@ -151,6 +280,10 @@
               'border': 'solid 1px',
               'border-color': 'rgba(0, 0, 0, 0.25)' 
             });
+            for(var i = 0; i<intervalpointsTimeline.length; i++){
+              clearInterval(intervalpointsTimeline[i]);
+            }
+            clearInterval(intervaltimelineStarted);
             plotCanvas(); 
             onOffLoading(false);
           });
