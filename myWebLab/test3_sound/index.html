@@ -84,16 +84,16 @@
           var opacityOctave = [0.95,0.5,0.15];
           var numberOctave = ['2', '3', '4'];
           var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-          var spaceX = Math.floor(canvas.width/opacityOctave.length);
-          var spaceY = Math.floor(canvas.height/notes.length);
+          var spaceX = Math.floor(canvas.width/notes.length);
+          var spaceY = Math.floor(canvas.height/opacityOctave.length);
           var allNotes = [];
           var time = 8000; 
 
           for(var i=0; i<notes.length; i++){
             for(var ii=0; ii<opacityOctave.length; ii++){
               allNotes.push({
-                x: [ii*spaceX,(ii+1)*spaceX-1],
-                y: [i*spaceY,(i+1)*spaceY-1],
+                x: [i*spaceX,(i+1)*spaceX-1],
+                y: [ii*spaceY,(ii+1)*spaceY-1],
                 opacity: opacityOctave[ii],
                 n: numberOctave[ii],
                 color: color[i],
@@ -132,16 +132,16 @@
             }
           });
  
-          var timeline = undefined;
+          var timemark = undefined;
           function clearAllPlay(){
             for(var i = 0; i<intervalpointsTimeline.length; i++){
               clearInterval(intervalpointsTimeline[i]);
             }
             clearInterval(intervaltimelineStarted);
-            canvas.remove(timeline); 
+            canvas.remove(timemark); 
             intervaltimelineStarted = undefined;
             intervalpointsTimeline = []; 
-            timeline = undefined;
+            timemark = undefined;
           }  
 
           function createPointTimeline(posX,posY){  
@@ -154,15 +154,15 @@
                 opacity: allNotes[pos].opacity,
                 fill: allNotes[pos].color, 
                 selectable: false,
-                top: (allNotes[pos].y[0]+allNotes[pos].y[1])/2, 
-                left: canvas.width-4,
+                top: 0, 
+                left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2,
                 originX: 'center',
                 originY: 'center' 
               });
               canvas.add(circle);
               canvas.renderAll(); 
               circle.animate({ 
-                left: 0
+                top: canvas.height
               },{
                 duration: time,
                 onChange: canvas.renderAll.bind(canvas),
@@ -184,7 +184,6 @@
             console.log('startTimeline');
             //console.log(intervaltimelineStarted); 
             if(intervaltimelineStarted===undefined){ 
-              console.log('we'); 
               clearInterval(intervaltimelineStarted);
               intervaltimelineStarted = setInterval(function(){
                 createLineStart();
@@ -194,16 +193,16 @@
             function createLineStart(){
               var lineStart = new fabric.Rect({ 
                 fill: 'black', 
-                width: 2,
-                height: 30,
+                width: canvas.width-10,
+                height: 1,
                 selectable: false,
-                top: canvas.height/2, 
-                left: canvas.width-3,
+                top: 1, 
+                left: canvas.width/2,
                 originX: 'center',
                 originY: 'center'    
               }); 
               lineStart.animate({  
-                left:  0 
+                top:  canvas.height 
               },{
                 duration: time,
                 onChange: canvas.renderAll.bind(canvas),
@@ -218,26 +217,8 @@
               canvas.renderAll(); 
             } 
             
-            if(timeline===undefined){ 
-              timeline = new fabric.Rect({ 
-                fill: 'black', 
-                width: canvas.width,
-                height: 1,
-                selectable: false,
-                top: canvas.height/2, 
-                left: canvas.width   
-              }); 
-              timeline.animate({  
-                left:  0 
-              },{
-                duration: time,
-                onChange: canvas.renderAll.bind(canvas), 
-                easing: function(t,b,c,d){
-                  return c*t/d+b; 
-                  }
-              }); 
-              canvas.add(timeline);
-              canvas.renderAll(); 
+            if(timemark===undefined){  
+              //TODO: create group 
             }
           }
 
