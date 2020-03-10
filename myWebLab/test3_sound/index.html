@@ -89,6 +89,41 @@
           var allNotes = [];
           var time = 8000; 
 
+           
+          var group = new fabric.Group([
+            new fabric.Rect({
+              left: 0,
+              top: canvas.height/4,
+              fill: 'black',
+              width: canvas.width,
+              height: 1
+            }),
+            new fabric.Rect({
+              left: 0,
+              top: 3*canvas.height/4,
+              fill: 'black',
+              width: canvas.width,
+              height: 1
+            }),
+            new fabric.Rect({
+              left: 0,
+              top: 2*canvas.height/4,
+              fill: 'black',
+              width: canvas.width,
+              height: 1
+            })
+          ],{ 
+            selectable: false,
+            opacity: 0.15,
+            //top: 0,
+            //left: 0,
+            //originX: 'center',
+            //originY: 'center'
+          }); 
+          canvas.clear();
+          canvas.add(group);
+          canvas.renderAll();
+
           for(var i=0; i<notes.length; i++){
             for(var ii=0; ii<opacityOctave.length; ii++){
               allNotes.push({
@@ -131,34 +166,42 @@
               }
             }
           });
- 
-          var timemark = undefined;
+  
           function clearAllPlay(){
             for(var i = 0; i<intervalpointsTimeline.length; i++){
               clearInterval(intervalpointsTimeline[i]);
             }
-            clearInterval(intervaltimelineStarted);
-            canvas.remove(timemark); 
+            clearInterval(intervaltimelineStarted); 
             intervaltimelineStarted = undefined;
-            intervalpointsTimeline = []; 
-            timemark = undefined;
+            intervalpointsTimeline = [];  
           }  
 
           function createPointTimeline(posX,posY){  
             var pos = getPosAllNotes(posX,posY); 
 
             function playPlot(){
-              synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n,'8n'); 
-              var circle = new fabric.Circle({ 
-                radius: 25,  
-                opacity: allNotes[pos].opacity,
-                fill: allNotes[pos].color, 
-                selectable: false,
-                top: 0, 
-                left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2,
-                originX: 'center',
-                originY: 'center' 
-              });
+              synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n,'8n');  
+
+              var circle = new fabric.Group([
+                new fabric.Circle({ 
+                  radius: 30,  
+                  opacity: allNotes[pos].opacity,
+                  fill: allNotes[pos].color,  
+                  top: 0, 
+                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2,
+                  originX: 'center',
+                  originY: 'center' 
+                }),
+                new fabric.Text(allNotes[pos].note+allNotes[pos].n,{
+                  fontFamily: 'Comic Sans',
+                  fontSize: 30,
+                  top: 0, 
+                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2,
+                  originX: 'center',
+                  originY: 'center'
+                }) 
+              ]); 
+
               canvas.add(circle);
               canvas.renderAll(); 
               circle.animate({ 
@@ -215,11 +258,7 @@
               }); 
               canvas.add(lineStart);
               canvas.renderAll(); 
-            } 
-            
-            if(timemark===undefined){  
-              //TODO: create group 
-            }
+            }  
           }
 
           function createCircleClick(posX,posY){
