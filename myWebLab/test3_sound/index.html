@@ -188,7 +188,7 @@
                   opacity: allNotes[pos].opacity,
                   fill: allNotes[pos].color,  
                   top: 0, 
-                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2,
+                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2, 
                   originX: 'center',
                   originY: 'center' 
                 }),
@@ -196,12 +196,14 @@
                   fontFamily: 'Comic Sans',
                   fontSize: 30,
                   top: 0, 
-                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2,
+                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2, 
                   originX: 'center',
                   originY: 'center'
                 }) 
               ],{ 
-                selectable: false
+                selectable: false, 
+                originX: 'center',
+                originY: 'center'
               }); 
 
               canvas.add(circle);
