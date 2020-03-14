@@ -45,9 +45,6 @@
     </div>  
     <div id="monitorFloat">  
     </div> 
-    <div id="btnStart" class="fixed-action-btn">
-      <a class="btn-floating btn-large green"><i class="material-icons">play_arrow</i></a> 
-    </div>
     <div class="container">
       <div class="row">
         <div class="col s12">
@@ -72,35 +69,17 @@
         }
         requestAnimationFrame(animateMemo);
 
-        function toast(text){
+        function toast(text,fn){
           M.Toast.dismissAll();
           var toastMsg = M.toast({
             html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
             displayLength: 1500, 
+            completeCallback: fn
           }); 
           $('.btnToast').on('click',function(){
             M.Toast.dismissAll();
           }); 
-        }
-        function actionBtnOn(){
-          var $e = $('#btnStart'); 
-          $e.addClass('active');
-          $e.find('a').first().removeClass('green').addClass('red');
-          $e.find('a i').first().html('stop');
         } 
-        function actionBtnOff(){
-          var $e = $('#btnStart');
-          $e.removeClass('active');
-          $e.find('a').first().removeClass('red').addClass('green');
-          $e.find('a i').first().html('play_arrow'); 
-        }
-        function actionBtn(){ 
-          if($('#btnStart').hasClass('active')){
-            actionBtnOff(); 
-          }else{ 
-            actionBtnOn(); 
-          } 
-        }
         function onOffLoading(state){ 
           if(state){
             $('#loading').css({
@@ -117,13 +96,15 @@
         var canvas = undefined;
         function plotCanvas(){ 
           onOffLoading(true);          
-          canvas = new fabric.StaticCanvas('canvas',{ 
+          canvas = new fabric.Canvas('canvas',{ 
             width: $('#canvasContainer').innerWidth()-48, 
-            height: $('#canvasContainer').innerHeight()-48             
+            height: $('#canvasContainer').innerHeight()-48,
+            selection: false,
+            preserveObjectStacking: true,             
           });  
           var matrixPos = [];
           var fabricObj = []; 
-          var cc = 10;
+          var cc = 15;
           for (var h=0; h<canvas.height; h=h+cc+1){ 
             var aux = [];
             for (var w=0; w<canvas.width; w=w+cc+1){
@@ -139,7 +120,8 @@
               top:  matrixPos[i][0][0],
               fill: 'BLACK',
               width: matrixPos[0][matrixPos[0].length-1][1],
-              height: 0.5
+              height: 0.5,
+              selectable: false 
             }));   
           } 
           
@@ -149,7 +131,8 @@
               top: 0,
               fill: 'BLACK',
               width: 0.5,
-              height: matrixPos[matrixPos.length-1][0][0]
+              height: matrixPos[matrixPos.length-1][0][0],
+              selectable: false 
             }));   
           }  
           delete i; 
@@ -157,7 +140,8 @@
             top: canvas.height/2,
             left: canvas.width/2,
             originX: 'center',
-            originY: 'center'
+            originY: 'center',
+            selectable: false
           });  
            
           for(var i=0; i<matrixPos.length-1; i++){
@@ -219,16 +203,19 @@
             }
             addPathElement(); 
           } 
-          
+
+          var color = ['black','red', 'pink', 'purple', 'indigo', 'blue', 'cyan', 'teal', 'green', 'yellow', 'orange', 'brown', 'grey'];
+          var colorPos = 0;
           function restartCanvasWithPath(){
             canvas.clear();
             canvas.add(group);  
             var rect = new fabric.Rect({
               left: group.left-group.width/2 + matrixPos[path[0][0]][path[0][1]][1],
               top: group.top-group.height/2 +matrixPos[path[0][0]][path[0][1]][0], 
-              fill: '#000',
+              fill: color[colorPos],
               width: cc, 
-              height: cc 
+              height: cc,
+              selectable: false 
             }); 
             canvas.add(rect);
             canvas.renderAll();
@@ -244,9 +231,10 @@
                 var rect = new fabric.Rect({
                   left: group.left-group.width/2 + matrixPos[path[pathCounter][0]][path[pathCounter][1]][1],
                   top: group.top-group.height/2 + matrixPos[path[pathCounter][0]][path[pathCounter][1]][0],   
-                  fill: '#000',
+                  fill: color[colorPos],
                   width: cc, 
-                  height: cc
+                  height: cc,
+                  selectable: false 
                 });    
                 canvas.add(rect);
                 canvas.renderAll();   
@@ -287,36 +275,51 @@
             }   
           }  
 
-          var startStop = false; 
-          $('#btnStart').on('click',function(){ 
-            startStop = !startStop;
-            if(path.length===0){  
-              restartPath();
-              calPath(); 
-              restartCanvasWithPath();
-              startStop = true; 
-            }  
-            animate();  
-          });           
+          //TODO: Seguir por aqui
+          var startStop = false;          
+          var diffTimeMS = 0;
+          canvas.on({ 
+            'mouse:down': function(options) { 
+              diffTimeMS = options.e.timeStamp;   
+              if(!startStop){ 
+                toast('Start');
+                startStop = true;
+                if(path.length===0){ 
+                  restartPath();
+                  calPath(); 
+                  restartCanvasWithPath(); 
+                }
+                animate(); 
+              }else{
+                colorPos++;
+                if(colorPos>color.length-1){
+                  colorPos=0;
+                }
+              }
+            },
+            'mouse:up': function(options) { 
+              diffTimeMS=options.e.timeStamp-diffTimeMS; 
+              if(diffTimeMS>500){
+                toast('Stop');
+                startStop = false; 
+              }
+            }
+          });
           onOffLoading(false); 
         }
         
         function resize(){  
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
           $('#canvasContainer').html('<canvas id="canvas" ></canvas>');
-          $('#btnStart').off('click');
-          actionBtnOff();          
-          $('#btnStart').on('click',function(){
-            actionBtn();  
-          });
-          plotCanvas();          
-          toast('Start!!'); 
-        }         
+          plotCanvas(); 
+        }  
+                 
+        toast('Start: Press on screen'); 
         resize();
         $(window).on('resize',function(){
           window.location.reload();
           resize();
-        });   
+        }); 
       })();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
