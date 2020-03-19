@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Test4_instagram</title>
+    <style> 
+      #loading{
+        background-color: rgb(255,255,255,0.85);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }  
+      .aligner {
+        display: flex;
+      }   
+      .aligner-item {
+        margin:auto;
+      }    
+      </style>
+  </head>
+  <body>  
+    <div class="fixed-action-btn"> 
+      <a id="btn" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">send</i></a> 
+    </div>
+    <div class="container">
+      <div class="row valign-wrapper">
+        <div class="col s12 aligner"> 
+          <div class="aligner-item">
+            <div class="card" > 
+              <div class="card-content" style="margin: 1em;">
+                <span class="card-title grey-text text-darken-4 activator ">Sentence</span>      
+                <p class="activator" id="sentence"></p>  
+              </div>
+              <div class="card-reveal">
+                <span class="card-title grey-text text-darken-4 activator">Author<i class="material-icons right">close</i></span>      
+                <p class="activator" id="author"></p>
+              </div>
+            </div> 
+          </div>
+        </div> 
+      </div>
+    </div> 
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
+    <script type="text/javascript"> 
+      (function exe(){  
+
+        function toast(text,fn){
+          M.Toast.dismissAll();
+          var toastMsg = M.toast({
+            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
+            displayLength: 1500, 
+            completeCallback: fn
+          }); 
+          $('.btnToast').on('click',function(){
+            M.Toast.dismissAll();
+          }); 
+        } 
+         
+        function resize(){  
+          toast('Welcome!');   
+
+          var dataSen = [{
+              sentence: 'null',
+              author: 'null',
+          }];
+          function createSentence(){ 
+            var pos = Math.floor(Math.random()*(dataSen.length-1))+0; 
+            $('#sentence').html(dataSen[pos].sentence);
+            $('#author').html(dataSen[pos].author);
+          }
+          $('#btn').on('click', createSentence);
+
+          $.ajax({
+            url: 'sentence.json',
+            type: 'get',  
+            success: function (data){ 
+              dataSen = data; 
+              createSentence();
+            },
+            error: function (jqXHR){   
+              if (jqXHR.status===401){   
+                toast(jqXHR.responseText); 
+              }else{ 
+                toast(jqXHR.statusText); 
+              }              
+            }
+          });   
+
+          
+          $('.aligner').innerHeight($(window).innerHeight()-25);
+        }         
+        resize();
+        $(window).on('resize',resize);   
+      })();
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>
