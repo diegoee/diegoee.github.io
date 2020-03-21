@@ -4,7 +4,7 @@ var path = require('path');
 var request = require('request'); 
 var cheerio = require('cheerio');  
  
-var N = 500; 
+var N = 5000; 
 var data = []; 
 
 function requestSentence(){ 
