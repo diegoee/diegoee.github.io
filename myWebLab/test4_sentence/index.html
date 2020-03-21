@@ -29,23 +29,14 @@
       }    
       </style>
   </head>
-  <body>  
-    <div class="fixed-action-btn"> 
-      <a id="btn" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">send</i></a> 
-    </div>
+  <body>   
     <div class="container">
       <div class="row valign-wrapper">
         <div class="col s12 aligner"> 
           <div class="aligner-item">
-            <div class="card" > 
-              <div class="card-content" style="margin: 1em;">
-                <span class="card-title grey-text text-darken-4 activator ">Sentence</span>      
-                <p class="activator" id="sentence"></p>  
-              </div>
-              <div class="card-reveal">
-                <span class="card-title grey-text text-darken-4 activator">Author<i class="material-icons right">close</i></span>      
-                <p class="activator" id="author"></p>
-              </div>
+            <div id="btn" class="card-panel waves-effect" >   
+              <p id="sentence" class="flow-text"></p>
+              <p>Author: <span class="grey-text" id="author"></span></p>    
             </div> 
           </div>
         </div> 
@@ -80,7 +71,9 @@
             $('#sentence').html(dataSen[pos].sentence);
             $('#author').html(dataSen[pos].author);
           }
-          $('#btn').on('click', createSentence);
+          $('#btn').on('click', function(){
+            createSentence();
+          });
 
           $.ajax({
             url: 'sentence.json',
