@@ -308,7 +308,7 @@
                 var res = JSON.parse(this.responseText).tree;
                 var a = [];
                 for(var i=0; i<res.length; i++){
-                  if ((res[i].path.indexOf('myWebLab/')!==-1)){
+                  if ((res[i].path.indexOf('webLab/')!==-1)){
                     var aux = res[i].path.split('/');
                     a.push(aux[1]);
                   }
