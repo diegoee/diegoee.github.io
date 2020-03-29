@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <title>Web Test4_instagram</title>
+    <title>Web Test4_sentence</title>
     <style> 
       #loading{
         background-color: rgb(255,255,255,0.85);
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
@@ -19,7 +19,8 @@
         z-index: 1000;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: center; 
+        opacity: 0.75;
       }  
       .aligner {
         display: flex;
@@ -30,22 +31,37 @@
       </style>
   </head>
   <body>   
-    <div class="container">
-      <div class="row valign-wrapper">
-        <div class="col s12 aligner"> 
-          <div class="aligner-item">
-            <div id="btn" class="card-panel waves-effect" >   
-              <p id="sentence" class="flow-text"></p>
-              <p>Author: <span class="grey-text" id="author"></span></p>    
-            </div> 
+    <div id="loading"> 
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
           </div>
-        </div> 
+        </div>
       </div>
+    </div> 
+    <div class="container">  
     </div> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
     <script type="text/javascript"> 
-      (function exe(){  
+      (function exe(){   
+        function onOffLoading(state){ 
+          if(state){
+            $('#loading').css({
+              display: 'flex'
+            });
+          }else{
+            $('#loading').css({
+              display: 'none'
+            });
+          } 
+        } 
+        onOffLoading(true); 
 
         function toast(text,fn){
           M.Toast.dismissAll();
@@ -58,44 +74,60 @@
             M.Toast.dismissAll();
           }); 
         } 
-         
-        function resize(){  
-          toast('Welcome!');   
-
-          var dataSen = [{
-              sentence: 'null',
-              author: 'null',
-          }];
-          function createSentence(){ 
-            var pos = Math.floor(Math.random()*(dataSen.length-1))+0; 
-            $('#sentence').html(dataSen[pos].sentence);
-            $('#author').html(dataSen[pos].author);
-          }
-          $('#btn').on('click', function(){
-            createSentence();
-          });
-
-          $.ajax({
-            url: 'sentence.json',
-            type: 'get',  
-            success: function (data){ 
-              dataSen = data; 
-              createSentence();
-            },
-            error: function (jqXHR){   
-              if (jqXHR.status===401){   
-                toast(jqXHR.responseText); 
-              }else{ 
-                toast(jqXHR.statusText); 
-              }              
-            }
-          });   
-
-          
+        var templateCard = '<div class="row valign-wrapper"><div class="col s12 aligner"><div class="aligner-item"><div class="btnSentence card-panel waves-effect"><p class="sentence flow-text"></p> <p>Author: <span class="author grey-text"></span></p></div></div></div></div>';
+        
+        function createSentence(){ 
+          onOffLoading(true);
+          var pos = Math.floor(Math.random()*(dataSen.length-1))+0;
+          var $card = $(templateCard);  
+          $card.find('.sentence').html(dataSen[pos].sentence);
+          $card.find('.author').html(dataSen[pos].author);
+          $('.container').append($card.html());
           $('.aligner').innerHeight($(window).innerHeight()-25);
-        }         
-        resize();
-        $(window).on('resize',resize);   
+          $('.btnSentence').off('click');
+          $('.btnSentence').on('click', function(){
+            createSentence();
+          }); 
+          $('html, body').animate({ 
+            scrollTop: $(document).height() 
+          },{
+            easing: 'swing',
+            duration: 1500,
+            complete: function(){ 
+              onOffLoading(false);
+            }
+          });
+        }  
+        
+        function resize(){  
+          $('.container').html('');       
+          toast('Welcome!');
+          createSentence();  
+          onOffLoading(false);
+        }   
+
+        var dataSen = [{
+            sentence: 'null',
+            author: 'null',
+        }];
+
+        $.ajax({
+          url: 'sentence.json',
+          type: 'get',  
+          success: function (data){ 
+            dataSen = data; 
+            resize();
+            $(window).on('resize',resize); 
+          },
+          error: function (jqXHR){   
+            if (jqXHR.status===401){   
+              toast(jqXHR.responseText); 
+            }else{ 
+              toast(jqXHR.statusText); 
+            }              
+          }
+        });
+         
       })();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
