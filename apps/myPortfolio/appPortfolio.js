@@ -3,14 +3,15 @@ var appPortfolio = {
     console.log(data);
     fnLog(data);    
   },
-  requestYahooValue: function(ticker){
+  requestYahooValue: function(ticker){ 
     var request = require('request');    
     return new Promise(function(resolve,reject){  
       request({
         method: 'GET',
         headers: { 
         },
-        url: 'https://es.finance.yahoo.com/quote/'+ticker
+        // OTHER WAY: 'https://query1.finance.yahoo.com/v7/finance/quote?formatted=false&symbols='+ticker
+        url: 'https://es.finance.yahoo.com/quote/'+ticker+'/profile?p='+ticker
       }, function(error,response){ 
         if (response.statusCode===200){ 
           resolve(response.body);
@@ -212,24 +213,29 @@ var appPortfolio = {
       appPortfolio.log(moment.utc(moment().diff(time)).format("HH:mm:ss.SSS")+' -> 03.-requesting data... ',fnLog);    
 
       appPortfolio.log(' active Value',fnLog);
-      for (i in res.activeValue){ 
+      for (i in res.activeValue){   
         await this.requestYahooValue(res.activeValue[i].ticker).then(function(dataRes){       
-          var $ = require('jquery')((new jsdom(dataRes)).window);
-          res.activeValue[i].name =  $('#quote-header-info [data-reactid="7"]').html();         
-          res.activeValue[i].nValue =  parseFloat($('#quote-header-info [data-reactid="34"]').html().replace(',','.')); 
-          res.activeValue[i].gDia =  parseFloat($('#quote-header-info [data-reactid="35"]').html().split('(')[0].replace(',','.'));
-          res.gDia = res.gDia + res.activeValue[i].gDia;
-          res.activeValue[i].gDiaClass = (res.activeValue[i].gDia<0?'table-danger':'table-success'); 
-          res.activeValue[i].gDiaPor =  ($('#quote-header-info [data-reactid="35"]').html().split('(')[1]).split(')')[0];   
-          res.activeValue[i].gTot = res.activeValue[i].value + res.activeValue[i].n*res.activeValue[i].nValue;
-          res.gTot = res.gTot + res.activeValue[i].gTot;
-          res.activeValue[i].gTot = Math.round(res.activeValue[i].gTot*100)/100;
-          res.activeValue[i].gTotClass = (res.activeValue[i].gTot<0?'table-danger':'table-success'); 
-          res.activeValue[i].gTotPor = Math.round(res.activeValue[i].gTot/Math.abs(res.activeValue[i].value)*10000)/100+'%'; 
-          res.activeValue[i].value = Math.round((res.activeValue[i].value)*100)/100;
+          var $ = require('jquery')((new jsdom(dataRes)).window);   
+          try{      
+            res.activeValue[i].name = $('#quote-header-info [data-reactid="7"]').html();  
+            res.activeValue[i].nValue = parseFloat($('#quote-header-info [data-reactid="32"]').html().replace(',','.')); 
+            res.activeValue[i].gDia = parseFloat($('#quote-header-info [data-reactid="33"]').html().split('(')[0].replace(',','.'));
+            res.gDia = res.gDia + res.activeValue[i].gDia;
+            res.activeValue[i].gDiaClass = (res.activeValue[i].gDia<0?'table-danger':'table-success'); 
+            res.activeValue[i].gDiaPor = ($('#quote-header-info [data-reactid="33"]').html().split('(')[1]).split(')')[0];   
+            res.activeValue[i].gTot = res.activeValue[i].value + res.activeValue[i].n*res.activeValue[i].nValue;
+            res.gTot = res.gTot + res.activeValue[i].gTot;
+            res.activeValue[i].gTot = Math.round(res.activeValue[i].gTot*100)/100;
+            res.activeValue[i].gTotClass = (res.activeValue[i].gTot<0?'table-danger':'table-success'); 
+            res.activeValue[i].gTotPor = Math.round(res.activeValue[i].gTot/Math.abs(res.activeValue[i].value)*10000)/100+'%'; 
+            res.activeValue[i].value = Math.round((res.activeValue[i].value)*100)/100;
+          }catch(e){ 
+            appPortfolio.log(' ERROR: ('+res.activeValue[i].ticker+') Maybe url html ( https://es.finance.yahoo.com/quote/'+res.activeValue[i].ticker+' ) has change ... ',fnLog);
+            console.error(e);
+          }
           delete $;
         },function(error){
-          appPortfolio.log(' '+res.activeValue[i].ticker+': '+error,fnLog);
+          appPortfolio.log(' ERROR: ('+res.activeValue[i].ticker+') '+error,fnLog);
         });  
       }
       for (i in res.activeValue){
@@ -405,7 +411,7 @@ module.exports = appPortfolio;
 
 //node appPortfolio.js exe C:/Users/alamo/Downloads/Movements.xls
 if (process.argv[2]==='exe'){ 
-  var rootFileMovements = 'C:/Users/alamo/Downloads/Movements.xls'; 
+  var rootFileMovements = 'C:/Users/alamo/Downloads/Movements_TEST.xls'; 
   function nullFn(){  
   }
   try {
