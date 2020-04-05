@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Test5_image</title>
+    <style> 
+      #loading{
+        background-color: rgb(255,255,255,0.85);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+        opacity: 0.75;
+      }  
+      .aligner {
+        display: flex;
+      }   
+      .aligner-item {
+        margin:auto;
+      }    
+      </style>
+  </head>
+  <body>   
+    <div id="loading"> 
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+    </div> 
+    <div id="app"></div> 
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
+    <script type="text/javascript"> 
+      (function exe(){   
+        function onOffLoading(state){ 
+          if(state){
+            $('#loading').css({
+              display: 'flex'
+            });
+          }else{
+            $('#loading').css({
+              display: 'none'
+            });
+          } 
+        } 
+        onOffLoading(true); 
+
+        function toast(text,fn){
+          M.Toast.dismissAll();
+          var toastMsg = M.toast({
+            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
+            displayLength: 1500, 
+            completeCallback: fn
+          }); 
+          $('.btnToast').on('click',function(){
+            M.Toast.dismissAll();
+          }); 
+        }  
+
+        function resize(){  
+          $('#app').html('');       
+          toast('Welcome!');
+          onOffLoading(false);
+        }   
+
+        setTimeout(function(){ 
+          resize();
+        },2000);
+        $(window).on('resize',resize); 
+      })();
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>

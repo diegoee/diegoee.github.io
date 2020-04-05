@@ -232,14 +232,30 @@ function app(){
         }
       }); 
     }); 
- 
+
     function plotDataEvo(){
       var filterIdMov = [];
       $.each($('.filterMov'),function(){
         if($(this).is(':checked')===true){
           filterIdMov.push($(this).val());
         } 
-      }); 
+      });  
+  
+      var minDate = [];
+      for (i in filterIdMov){
+        minDate.push(data.movData.filter(function(value, index, array){
+          return value.id===filterIdMov[i];
+        })[0]);
+      } 
+      for (i in minDate){
+        minDate[i] = moment(minDate[i].date,'DD/MM/YYYY').add(1,'days').toDate().getTime();
+      } 
+      var aux = minDate[0];
+      for (i in minDate){
+        aux = Math.min(aux,minDate[i]); 
+      }
+      minDate = aux;  
+
       var dataPlot = [];
       for (i in filterIdMov){
         dataPlot.push(data.evoData.filter(function(value, index, array){
@@ -249,7 +265,7 @@ function app(){
       dataPlot = dataPlot.filter(function(value, index, array){
         return value.data.length>0;
       }); 
- 
+      
       var temp = [];
       for(i in dataPlot){
         temp = temp.concat(dataPlot[i].data);
@@ -296,7 +312,8 @@ function app(){
           valueDecimals: 2,
           split: true 
         },
-        xAxis: {                        
+        xAxis: { 
+          min:  minDate,                     
           title: {
             text: 'Tiempo'
           },
@@ -408,7 +425,7 @@ function app(){
           anyCheckedMov = true;
         } 
       }); 
-      console.log(anyCheckedMov);
+      //console.log(anyCheckedMov);
       if(anyCheckedMov){
         exeModal = false; 
         $('#loadingModal').modal('toggle'); 
