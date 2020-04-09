@@ -17,7 +17,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 1000;
+        z-index: 100000;
         display: flex;
         align-items: center;
         justify-content: center; 
@@ -69,7 +69,7 @@
         </div>  
       </div> 
     </div> 
-    <div id="lightbox" uk-lightbox>
+    <div id="lightbox" uk-lightbox style="display: none;">
       <a class="uk-button uk-button-default" data-caption="" href="https://getuikit.com/docs/images/photo.jpg">Lightbox</a>
     </div> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -93,9 +93,15 @@
            
         $('#inputText').on('focus',function(){ 
           $('#inputTextContainer span').attr('uk-icon','commenting');
-          $('#inputTextContainer').addClass('buzz').on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function() { 
+          $('#inputTextContainer').addClass('buzz').on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(){ 
             $(this).removeClass('buzz'); 
           });
+          $(document).on('keydown', function(e){ 
+            if(e.keyCode===13){
+              $(document).off('keydown');
+              $('#btnGo').trigger('click');
+            }
+          }); 
         });    
         $('#inputText').on('focusout',function(){ 
           $('#inputTextContainer span').attr('uk-icon','comment');
@@ -106,14 +112,29 @@
          
         function search(text){ 
           $('#lightbox a').attr('data-caption',text);  
-          UIkit.lightbox('#lightbox').show(0);           
+          onOffLoading(true); 
+          UIkit.lightbox('#lightbox').show(0);
+          onOffLoading(false); 
+          /*
+          $.ajax({
+            url: 
+            type: 'get',  
+            success: function (data){  
+              onOffLoading(false); 
+              console.log(data);
+              UIkit.lightbox('#lightbox').show(0);  
+            },
+            error: function (jqXHR){  
+              onOffLoading(false); 
+              //alert('Error: '+jqXHR.status); 
+            }
+          });    
+          */       
         }
 
         function resize(){      
-          $('.aligner').innerHeight($(window).innerHeight());  
-          //$('#inputText').val('something...');
-          //$('#btn').trigger('click');
-          onOffLoading(false);   
+          $('.aligner').innerHeight($(window).innerHeight());   
+          onOffLoading(false);    
         }
         resize();
         $(window).on('resize',resize); 
