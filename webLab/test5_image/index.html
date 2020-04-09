@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Web test">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/css/uikit.min.css" />    
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <title>Web Test5_image</title>
     <style> 
@@ -27,7 +28,10 @@
       }   
       .aligner-item {
         margin:auto;
-        width: 75%; 
+        width: 90%; 
+      }
+      .mt{
+        margin-top: 0.5em;
       }     
       @media screen and (min-width: 600px) {
         .aligner-item{ 
@@ -41,48 +45,37 @@
       } 
       .buzz{
         -webkit-animation: tiembla 0.1s;
+        animation-iteration-count: 3;
       }
       @-webkit-keyframes tiembla{
-        0%  { -webkit-transform:rotateZ(-5deg); }
-        50% { -webkit-transform:rotateZ( 0deg) scale(.8); }
-        100%{ -webkit-transform:rotateZ( 5deg); }
+        0%  { -webkit-transform:rotateZ(-1deg); }
+        50% { -webkit-transform:rotateZ( 0deg) scale(.9); }
+        100%{ -webkit-transform:rotateZ( 1deg); }
       }
       </style>
   </head>
   <body>   
     <div id="loading"> 
-      <div class="preloader-wrapper big active">
-        <div class="spinner-layer spinner-blue-only">
-          <div class="circle-clipper left">
-            <div class="circle"></div>
-          </div><div class="gap-patch">
-            <div class="circle"></div>
-          </div><div class="circle-clipper right">
-            <div class="circle"></div>
-          </div>
-        </div>
-      </div>
+      <div uk-spinner="ratio: 3"></div>
     </div> 
     <div id="app" class="aligner">      
-      <div class="aligner-item"> 
-        <div class="input-field" id="inputTextContainer">
-          <i class="large material-icons prefix">sentiment_satisfied</i>
-          <input id="inputText" type="text">
-          <label for="icon_prefix">write, please ...</label>
-        </div>  
-        <div class="input-field">  
-          <div class="row">
-            <div class="col s4"></div>
-            <div class="col s4 center-align"> 
-              <button class="btn waves-effect waves-light" id="btn"><i class="material-icons left">flight_takeoff</i>Go! </button>
-            </div> 
-            <div class="col s4"></div>
-          </div>
+      <div class="aligner-item">   
+        <div class="uk-inline uk-width-1-1" id="inputTextContainer">
+          <span class="uk-form-icon" uk-icon="comment"></span>  
+          <input class="uk-input" id="inputText" type="text" placeholder="write, please ..." placeholder="100">
+        </div> 
+        <div class="uk-width-1-1 uk-text-center mt">   
+          <button class="uk-button uk-button-default uk-button-small" id="btnGo"><span class="uk-margin-small-right" uk-icon="happy"></span> Go! </button> 
         </div>  
       </div> 
     </div> 
+    <div id="lightbox" uk-lightbox>
+      <a class="uk-button uk-button-default" data-caption="" href="https://getuikit.com/docs/images/photo.jpg">Lightbox</a>
+    </div> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit-icons.min.js"></script> 
     <script type="text/javascript"> 
       (function exe(){   
         function onOffLoading(state){ 
@@ -97,31 +90,30 @@
           } 
         } 
         onOffLoading(true);  
-          
-        $('#inputTextContainer label').on('click',function(){      
-          $('#inputText').trigger('focus');
-        });   
+           
         $('#inputText').on('focus',function(){ 
-          $('#inputTextContainer i').text('sentiment_very_satisfied');
-          $('#inputTextContainer i').addClass('buzz');
+          $('#inputTextContainer span').attr('uk-icon','commenting');
+          $('#inputTextContainer').addClass('buzz').on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function() { 
+            $(this).removeClass('buzz'); 
+          });
         });    
         $('#inputText').on('focusout',function(){ 
-          $('#inputTextContainer i').text('sentiment_satisfied');
-          $('#inputTextContainer i').removeClass('buzz');
+          $('#inputTextContainer span').attr('uk-icon','comment');
         }); 
-        $('#btn').on('click',function(){    
-          search($('#inputText').val());
+        $('#btnGo').on('click',function(){    
+          search($('#inputText').val()); 
         });  
-        
-        function search(text){
-          console.log(text);
+         
+        function search(text){ 
+          $('#lightbox a').attr('data-caption',text);  
+          UIkit.lightbox('#lightbox').show(0);           
         }
 
         function resize(){      
           $('.aligner').innerHeight($(window).innerHeight());  
           //$('#inputText').val('something...');
           //$('#btn').trigger('click');
-          onOffLoading(false);
+          onOffLoading(false);   
         }
         resize();
         $(window).on('resize',resize); 
