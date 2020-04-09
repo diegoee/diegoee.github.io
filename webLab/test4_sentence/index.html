@@ -61,19 +61,8 @@
             });
           } 
         } 
-        onOffLoading(true); 
+        onOffLoading(true);  
 
-        function toast(text,fn){
-          M.Toast.dismissAll();
-          var toastMsg = M.toast({
-            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
-            displayLength: 1500, 
-            completeCallback: fn
-          }); 
-          $('.btnToast').on('click',function(){
-            M.Toast.dismissAll();
-          }); 
-        } 
         var templateCard = '<div class="row valign-wrapper"><div class="col s12 aligner"><div class="aligner-item"><div class="btnSentence card-panel waves-effect"><p class="sentence flow-text"></p> <p>Author: <span class="author grey-text"></span></p></div></div></div></div>';
         
         function createSentence(){ 
@@ -100,8 +89,7 @@
         }  
         
         function resize(){  
-          $('.container').html('');       
-          toast('Welcome!');
+          $('.container').html('');   
           createSentence();  
           onOffLoading(false);
         }   
