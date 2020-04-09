@@ -8,7 +8,7 @@
     <!-- UIkit CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/css/uikit.min.css" />    
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <title>Web Test5_image</title>
+    <title>Web Test5_text2image</title>
     <style> 
       #loading{
         background-color: rgb(255,255,255,0.85);
@@ -69,9 +69,12 @@
         </div>  
       </div> 
     </div> 
-    <div id="lightbox" uk-lightbox style="display: none;">
-      <a class="uk-button uk-button-default" data-caption="" href="https://getuikit.com/docs/images/photo.jpg">Lightbox</a>
-    </div> 
+    <div id="modal-center" class="uk-flex-top" uk-modal>
+      <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <button class="uk-modal-close-default" type="button" uk-close></button> 
+        <div id="modalContainer"></div>
+      </div>
+    </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <!-- UIkit JS -->
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
@@ -111,25 +114,11 @@
         });  
          
         function search(text){ 
-          $('#lightbox a').attr('data-caption',text);  
-          onOffLoading(true); 
-          UIkit.lightbox('#lightbox').show(0);
-          onOffLoading(false); 
-          /*
-          $.ajax({
-            url: 
-            type: 'get',  
-            success: function (data){  
-              onOffLoading(false); 
-              console.log(data);
-              UIkit.lightbox('#lightbox').show(0);  
-            },
-            error: function (jqXHR){  
-              onOffLoading(false); 
-              //alert('Error: '+jqXHR.status); 
-            }
-          });    
-          */       
+          onOffLoading(true);  
+          $('#lightbox a').attr('data-caption',text); 
+          $('#modalContainer').html('<h3>'+text+'</h3>');
+          UIkit.modal('#modal-center').show();    
+          onOffLoading(false);    
         }
 
         function resize(){      
