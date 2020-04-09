@@ -27,7 +27,26 @@
       }   
       .aligner-item {
         margin:auto;
-      }    
+        width: 75%; 
+      }     
+      @media screen and (min-width: 600px) {
+        .aligner-item{ 
+          width: 50%; 
+        } 
+      }
+      @media screen and (min-width: 1024px) {
+        .aligner-item{ 
+          width: 30%; 
+        } 
+      } 
+      .buzz{
+        -webkit-animation: tiembla 0.1s;
+      }
+      @-webkit-keyframes tiembla{
+        0%  { -webkit-transform:rotateZ(-5deg); }
+        50% { -webkit-transform:rotateZ( 0deg) scale(.8); }
+        100%{ -webkit-transform:rotateZ( 5deg); }
+      }
       </style>
   </head>
   <body>   
@@ -44,7 +63,24 @@
         </div>
       </div>
     </div> 
-    <div id="app"></div> 
+    <div id="app" class="aligner">      
+      <div class="aligner-item"> 
+        <div class="input-field" id="inputTextContainer">
+          <i class="large material-icons prefix">sentiment_satisfied</i>
+          <input id="inputText" type="text">
+          <label for="icon_prefix">write, please ...</label>
+        </div>  
+        <div class="input-field">  
+          <div class="row">
+            <div class="col s4"></div>
+            <div class="col s4 center-align"> 
+              <button class="btn waves-effect waves-light" id="btn"><i class="material-icons left">flight_takeoff</i>Go! </button>
+            </div> 
+            <div class="col s4"></div>
+          </div>
+        </div>  
+      </div> 
+    </div> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
     <script type="text/javascript"> 
@@ -60,29 +96,34 @@
             });
           } 
         } 
-        onOffLoading(true); 
+        onOffLoading(true);  
+          
+        $('#inputTextContainer label').on('click',function(){      
+          $('#inputText').trigger('focus');
+        });   
+        $('#inputText').on('focus',function(){ 
+          $('#inputTextContainer i').text('sentiment_very_satisfied');
+          $('#inputTextContainer i').addClass('buzz');
+        });    
+        $('#inputText').on('focusout',function(){ 
+          $('#inputTextContainer i').text('sentiment_satisfied');
+          $('#inputTextContainer i').removeClass('buzz');
+        }); 
+        $('#btn').on('click',function(){    
+          search($('#inputText').val());
+        });  
+        
+        function search(text){
+          alert('text');
+        }
 
-        function toast(text,fn){
-          M.Toast.dismissAll();
-          var toastMsg = M.toast({
-            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
-            displayLength: 1500, 
-            completeCallback: fn
-          }); 
-          $('.btnToast').on('click',function(){
-            M.Toast.dismissAll();
-          }); 
-        }  
-
-        function resize(){  
-          $('#app').html('');       
-          toast('Welcome!');
+        function resize(){      
+          $('.aligner').innerHeight($(window).innerHeight());  
+          //$('#inputText').val('something...');
+          //$('#btn').trigger('click');
           onOffLoading(false);
-        }   
-
-        setTimeout(function(){ 
-          resize();
-        },2000);
+        }
+        resize();
         $(window).on('resize',resize); 
       })();
     </script>
