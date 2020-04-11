@@ -79,6 +79,8 @@
     <!-- UIkit JS -->
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit-icons.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.2/math.min.js"></script>  
     <script type="text/javascript"> 
       (function exe(){   
         function onOffLoading(state){ 
@@ -113,16 +115,100 @@
           search($('#inputText').val()); 
         });  
          
+        var stop = false;
         function search(text){ 
-          onOffLoading(true);  
-          $('#lightbox a').attr('data-caption',text); 
-          $('#modalContainer').html('<h3>'+text+'</h3>');
-          UIkit.modal('#modal-center').show();    
-          onOffLoading(false);    
+          onOffLoading(true);   
+          UIkit.modal('#modal-center').show(); 
+          $('#modal-center').one('shown',function(){  
+            stop = false;
+            createCanvas();
+          }); 
+          $('#modal-center').one('hide',function(){ 
+            stop = true;
+          }); 
+          function createCanvas(){ 
+            $('#modalContainer').html('<canvas id="canvas"></canvas>'); 
+              $('#canvas').css({ 
+                'border-radius': '5px', 
+                'border': 'solid 1px',
+                'border-color': 'rgba(0, 0, 0, 0.05)' 
+              });
+            var canvas = new fabric.Canvas('canvas',{ 
+              selection: false,
+              preserveObjectStacking: true,
+              originX: 'center',
+              originY: 'center',
+              width: $('#modalContainer').innerWidth(), 
+              height: $(window).innerHeight()-175             
+            });   
+
+            // START. Invención...
+            // ASCII secret text 2 image...  
+            if (text.length<2||text===undefined||text===null){
+              text='AB';
+            } 
+
+            var coor = [];   
+            var xx = [];   
+            var yy = [];   
+            for(var i=0; i<text.length; i++){ 
+              var x = 0;
+              var y = 0;
+              if (i<text.length-1){
+                y = (text.charCodeAt(i)-text.charCodeAt(i+1));
+              }else{
+                y = (text.charCodeAt(i)-text.charCodeAt(0));
+              }
+              if (i>0){
+                x = (text.charCodeAt(i-1)-text.charCodeAt(i));
+              }else{
+                x = (text.charCodeAt(text.length-1)-text.charCodeAt(0));
+              } 
+              xx.push(x); 
+              yy.push(y); 
+            } 
+            for(var i=0; i<xx.length; i++){ 
+              coor.push([canvas.width*(xx[i]-math.min(xx))/(math.max(xx)-math.min(xx)),canvas.height*(yy[i]-math.min(yy))/(math.max(yy)-math.min(yy))]);  
+            }  
+            // END: Invención...
+            onOffLoading(false); 
+ 
+            function create_line(i){
+              //line : [x1, y1, x2, y2]
+              var line = new fabric.Line([coor[i-1][0], coor[i-1][1], coor[i-1][0], coor[i-1][1]],{
+                fill: 'black',
+                stroke: 'black',
+                strokeWidth: 1, 
+                selectable: false,
+                evented: false,
+              }); 
+              canvas.add(line); 
+              canvas.renderAll();
+
+              line.animate({ 
+                  x2: coor[i][0],
+                  y2: coor[i][1], 
+                },{
+                duration: 100,
+                onChange: canvas.renderAll.bind(canvas),
+                onComplete: function(){     
+                  if(i+1<coor.length&&!stop){
+                    create_line(i+1);
+                  }else{ 
+                    $('#canvas').css({  
+                      'border-color': 'rgba(0, 0, 0, 1)' 
+                    });
+                  }            
+                },
+                easing: fabric.util.ease.easeOutBack
+              });
+            } 
+            create_line(1);  
+          }
         }
 
         function resize(){      
-          $('.aligner').innerHeight($(window).innerHeight());   
+          $('.aligner').innerHeight($(window).innerHeight()); 
           onOffLoading(false);    
         }
         resize();
