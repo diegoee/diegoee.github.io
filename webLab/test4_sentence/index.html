@@ -120,30 +120,60 @@
           });
           $(document).on('keydown', function(e){ 
             if(e.keyCode===13){
-              $(document).off('keydown');
               $('#btnGo').trigger('click');
             }
           }); 
         });    
         $('#inputText').on('focusout',function(){ 
+          $(document).off('keydown');
           $('#inputTextContainer span').attr('uk-icon','comment');
         }); 
         $('#btnGo').on('click',function(){ 
-          createFilterLabel($('#inputText').val()); 
           filterData($('#inputText').val()); 
-          createSentence($('#inputText').val());  
-        });
+          createFilterLabel($('#inputText').val()); 
+          createSentence();  
+        }); 
 
-        function filterData(text){
-          //TODO: filter by text
-          dataFilter=dataSen;
+        function adaptedText(textToAdapt){ 
+          var textUpdated = textToAdapt; 
+          var from = "ÃÀÁÄÂÈÉËÊÌÍÏÎÒÓÖÔÙÚÜÛãàáäâèéëêìíïîòóöôùúüûÑñÇç";
+          var to   = "AAAAAEEEEIIIIOOOOUUUUaaaaaeeeeiiiioooouuuuNnCc";
+          function setCharAt(str,index,chr) {
+              if(index > str.length-1) return str;
+              return str.substr(0,index) + chr + str.substr(index+1);
+          }
+          function translateUTF8(str) {
+              //TODO: Method
+              //&#xED; = í
+              return str;
+          }
+          textUpdated = translateUTF8(textUpdated)
+          for(var i = 0; i<textToAdapt.length; i++){
+            if(from.indexOf(textToAdapt[i])!==-1){ 
+              textUpdated = setCharAt(textUpdated,i,to[from.indexOf(textToAdapt[i])]);                
+            }
+          }
+          textUpdated = textUpdated.toUpperCase();
+          return textUpdated;
+        }
+        function filterData(text){    
+          dataFilter = dataSen.filter(function(value, index){
+            var inElem = false;
+            if(adaptedText(value.sentence).indexOf(adaptedText(text))!==-1){ 
+              inElem = true;
+            }
+            if(adaptedText(value.author).indexOf(adaptedText(text))!==-1){ 
+              inElem = true;
+            }
+            return inElem;
+          });
         }
         
         function createFilterLabel(text){
           if(text===null||text===undefined||text.replace(/\s/g,'')===''){
             $('#filterLabel').html('<button type="button" class="uk-button uk-button-text"><span class="whiteText" uk-icon="icon: chevron-up"></span></button>');
           }else{
-            $('#filterLabel').html('<button type="button" class="uk-button uk-button-text"><span class="wSen whiteText">Filter by: '+text+'</span><span class="whiteText" uk-icon="icon: chevron-up"></span></button>');
+            $('#filterLabel').html('<button type="button" class="uk-button uk-button-text"><span class="wSen whiteText">Filter by: '+adaptedText(text)+' ('+dataFilter.length+'/'+dataSen.length+')</span><span class="whiteText" uk-icon="icon: chevron-up"></span></button>');
           }
           $('#filterLabel button').on('click',function(){  
               onOffLoading(true);
@@ -154,7 +184,8 @@
               },{
                 easing: 'swing',
                 duration: 1500,
-                complete: function(){ 
+                complete: function(){                   
+                  $('#containerSen').html(' ');
                   onOffLoading(false);
                 }
               });
@@ -162,27 +193,31 @@
         }
  
         var templateCard = '<div><div class="aligner"><div class="aligner-item wSen btnSentence uk-card-default uk-card-hover"><p class="sentence uk-text-secondary uk-text-large"></p><p class="uk-text-emphasis uk-text-small">Author: <span class="author uk-text-muted"></span></p></div></div></div>';
-        function createSentence(filterText){ 
+        function createSentence(){ 
           onOffLoading(true);
-          var pos = Math.floor(Math.random()*(dataFilter.length-1))+0;
-          var $card = $(templateCard);
-          $card.find('.sentence').html(dataFilter[pos].sentence);
-          $card.find('.author').html(dataFilter[pos].author);
-          $('#containerSen').append($card.html());
-          $('.aligner').innerHeight($(window).innerHeight());
-          $('.btnSentence').off('click');
-          $('.btnSentence').on('click', function(){
-            createSentence();
-          }); 
-          $('html, body').animate({ 
-            scrollTop: $(document).height() 
-          },{
-            easing: 'swing',
-            duration: 1500,
-            complete: function(){ 
-              onOffLoading(false);
-            }
-          });
+          if(dataFilter.length>0){
+            var pos = Math.floor(Math.random()*(dataFilter.length-1))+0;
+            var $card = $(templateCard);
+            $card.find('.sentence').html(dataFilter[pos].sentence);
+            $card.find('.author').html(dataFilter[pos].author);
+            $('#containerSen').append($card.html());
+            $('.aligner').innerHeight($(window).innerHeight());
+            $('.btnSentence').off('click');
+            $('.btnSentence').on('click', function(){
+              createSentence();
+            }); 
+            $('html, body').animate({ 
+              scrollTop: $(document).height() 
+            },{
+              easing: 'swing',
+              duration: 1500,
+              complete: function(){ 
+                onOffLoading(false);
+              }
+            });
+          }else{
+            onOffLoading(false);
+          }
         }  
         
         function resize(){   
