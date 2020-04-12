@@ -52,11 +52,17 @@
       @media screen and (min-width: 600px) {
         .wfilter{ 
           width: 50%; 
+        }
+        .wSen{
+          width: 75%; 
         } 
       }
       @media screen and (min-width: 1024px) {
         .wfilter{ 
           width: 30%; 
+        } 
+        .wSen{
+          width: 65%; 
         } 
       } 
       .buzz{
@@ -142,6 +148,7 @@
           $('#filterLabel button').on('click',function(){  
               onOffLoading(true);
               $('#filterLabel').html(' ');
+              $('#inputText').val(' ');
               $('html, body').animate({ 
                 scrollTop: 0 
               },{
@@ -179,7 +186,6 @@
         }  
         
         function resize(){   
-          $('#containerSen').html(''); 
           $('.aligner').innerHeight($(window).innerHeight());  
           onOffLoading(false);
         }   
