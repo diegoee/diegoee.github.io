@@ -240,9 +240,7 @@
         }  
         
         function resize(){   
-          $('.aligner').innerHeight($(window).innerHeight());  
-          $('#inputText').val(''); 
-          $('#btnGo').trigger('click'); 
+          $('.aligner').innerHeight($(window).innerHeight()); 
           onOffLoading(false);
         }   
 
@@ -258,8 +256,10 @@
           success: function (data){ 
             dataSen = data; 
             dataFilter = dataSen;
-            resize();
-            $(window).on('resize',resize); 
+            resize();   
+            $(window).on('resize',resize);           
+            $('#inputText').val(''); 
+            $('#btnGo').trigger('click'); 
           },
           error: function (jqXHR){   
             if (jqXHR.status===401){   
