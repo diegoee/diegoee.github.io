@@ -140,20 +140,14 @@
             filterData($('#inputText').val());
             createFilterLabel($('#inputText').val());
             createSentence();  
-            $('#timeLabel').html('<button type="button" class="uk-button uk-button-text"><span class="wSen whiteText">Last exe search: '+((new Date()).getTime()-start.getTime())+'ms</span></button>');
-            $('#timeLabel button').on('click',function(){ 
-              $('#timeLabel').html(' '); 
-            });
+            if(!($('#inputText').val()===null||$('#inputText').val()===undefined||$('#inputText').val().replace(/\s/g,'')==='')){ 
+              $('#timeLabel').html('<button type="button" class="uk-button uk-button-text"><span class="wSen whiteText">Last exe search: '+((new Date()).getTime()-start.getTime())+'ms</span></button>');
+              $('#timeLabel button').on('click',function(){ 
+                $('#timeLabel').html(' '); 
+              }); 
+            }
           },250); 
-        });        
-
-        /*      
-        setTimeout(function(){
-          //dataSen = dataSen.slice(0,100);
-          $('#inputText').val('ón'); 
-          $('#btnGo').trigger('click'); 
-        },1000);
-        */
+        });         
                 
         function adaptedText(textToAdapt,decodeHTMLEntities){ 
           var textUpdated = textToAdapt; 
@@ -177,24 +171,28 @@
           textUpdated = textUpdated.toUpperCase();
           return textUpdated;
         }
-        function filterData(text){     
-          dataFilter = dataSen.filter(function(value, index){
-            var inElem = false;
-            if(adaptedText(value.sentence,true).indexOf(adaptedText(text))!==-1){ 
-              inElem = true;
-            } 
-            if(adaptedText(value.author,true).indexOf(adaptedText(text))!==-1){  
-              inElem = true;
-            }
-            return inElem;
-          });
+        function filterData(text){  
+          if(text===null||text===undefined||text.replace(/\s/g,'')===''){
+            dataFilter = dataSen;
+          }else{  
+            dataFilter = dataSen.filter(function(value, index){
+              var inElem = false;
+              if(adaptedText(value.sentence,true).indexOf(adaptedText(text))!==-1){ 
+                inElem = true;
+              } 
+              if(adaptedText(value.author,true).indexOf(adaptedText(text))!==-1){  
+                inElem = true;
+              }
+              return inElem;
+            });
+          }
         }
         
         function createFilterLabel(text){
           if(text===null||text===undefined||text.replace(/\s/g,'')===''){
             $('#filterLabel').html('<button type="button" class="uk-button uk-button-text"><span class="whiteText" uk-icon="icon: chevron-up"></span></button>');
           }else{
-            $('#filterLabel').html('<button type="button" class="uk-button uk-button-text"><span class="wSen whiteText">Filter by: '+adaptedText(text)+' ('+dataFilter.length+'/'+dataSen.length+')</span><span class="whiteText" uk-icon="icon: chevron-up"></span></button>');
+            $('#filterLabel').html('<button type="button" class="uk-button uk-button-text"><span class="wSen whiteText">Filter by: '+adaptedText(text)+''+(dataFilter.length===0?' (0 results)':'')+'</span><span class="whiteText" uk-icon="icon: chevron-up"></span></button>');
           }
           $('#filterLabel button').on('click',function(){  
               onOffLoading(true);
@@ -243,6 +241,8 @@
         
         function resize(){   
           $('.aligner').innerHeight($(window).innerHeight());  
+          $('#inputText').val(''); 
+          $('#btnGo').trigger('click'); 
           onOffLoading(false);
         }   
 
