@@ -47,11 +47,13 @@
               display: 'none'
             });
           } 
-        } 
-        onOffLoading(true);  
+        }  
 
-        function resize(){      
-          //onOffLoading(false);    
+        function resize(){   
+          onOffLoading(true); 
+          setTimeout(function(){ 
+            onOffLoading(false); 
+          },2000);    
         }
         resize();
         $(window).on('resize',resize); 
