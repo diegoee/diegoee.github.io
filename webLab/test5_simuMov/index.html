@@ -29,6 +29,47 @@
     <div id="loading"> 
       <div uk-spinner="ratio: 5"></div>
     </div> 
+    <div id="app">
+      <div class="uk-grid-collapse uk-grid-match  uk-child-width-expand@s uk-padding-small" uk-grid>
+        <div class="uk-width-1-4@m">
+          <div class="uk-placeholder">
+            <div class="uk-margin">
+              <label class="uk-form-label" for="form-stacked-text">Nº point</label>
+              <div class="uk-form-controls">
+                <select id="sel1" class="uk-select uk-form-small">
+                  <option>Option 01</option>
+                  <option>Option 02</option>
+                </select>
+              </div>
+            </div>
+            <div class="uk-margin">
+              <label class="uk-form-label" for="form-stacked-text">Speed</label>
+              <div class="uk-form-controls">
+                <select id="sel2" class="uk-select uk-form-small">
+                  <option>Option 01</option>
+                  <option>Option 02</option>
+                </select>
+              </div>
+            </div>
+            <div class="uk-margin">
+              <label class="uk-form-label" for="form-stacked-text">Mobility</label>
+              <div class="uk-form-controls">
+                <select id="sel3" class="uk-select uk-form-small">
+                  <option>Option 01</option>
+                  <option>Option 02</option>
+                </select>
+              </div>
+            </div>
+            <div class="uk-margin">              
+              <button id="btn1" class="uk-button uk-width-1-1 uk-button-primary"><span uk-icon="icon: play-circle"></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="uk-width-expand@m">
+            <div class="uk-placeholder">Item</div>
+        </div>
+      </div>
+    </div> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <!-- UIkit JS -->
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
@@ -48,12 +89,26 @@
             });
           } 
         }  
+        var executing = false;
+        $('#btn1').on('click',function(){
+          if(!executing){
+            $('#btn1').html('<span uk-icon="icon: ban"></span>');
+            $('#btn1').removeClass('uk-button-primary');
+            $('#btn1').removeClass('uk-button-danger');
+            $('#btn1').addClass('uk-button-danger');
+          }else{
+            $('#btn1').html('<span uk-icon="icon: play-circle"></span>');
+            $('#btn1').removeClass('uk-button-primary');
+            $('#btn1').removeClass('uk-button-danger');
+            $('#btn1').addClass('uk-button-primary');
+          }
+          executing=!executing;
+        })
 
         function resize(){   
           onOffLoading(true); 
-          setTimeout(function(){ 
-            onOffLoading(false); 
-          },2000);    
+          onOffLoading(false);
+          $('#app').innerHeight($(window).innerHeight());    
         }
         resize();
         $(window).on('resize',resize); 
