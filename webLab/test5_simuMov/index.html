@@ -32,48 +32,46 @@
     <div id="app">
       <div class="uk-grid-collapse uk-grid-match  uk-child-width-expand@s uk-padding-small" uk-grid>
         <div class="uk-width-1-4@m">
-          <div class="uk-placeholder">
+          <div class="uk-placeholder">  
+            <div class="uk-margin">              
+              <button id="btn1" class="uk-button uk-width-1-1 uk-button-primary"><span uk-icon="icon: play-circle"></span></button>
+            </div>
             <div class="uk-margin">
               <label class="uk-form-label" for="form-stacked-text">Nº point</label>
               <div class="uk-form-controls">
-                <select id="sel1" class="uk-select uk-form-small">
-                  <option>Option 01</option>
-                  <option>Option 02</option>
-                </select>
+                <select id="sel1" class="uk-select uk-form-small"></select>
               </div>
             </div>
             <div class="uk-margin">
               <label class="uk-form-label" for="form-stacked-text">Speed</label>
               <div class="uk-form-controls">
-                <select id="sel2" class="uk-select uk-form-small">
-                  <option>Option 01</option>
-                  <option>Option 02</option>
-                </select>
+                <select id="sel2" class="uk-select uk-form-small"></select>
               </div>
             </div>
             <div class="uk-margin">
               <label class="uk-form-label" for="form-stacked-text">Mobility</label>
               <div class="uk-form-controls">
-                <select id="sel3" class="uk-select uk-form-small">
-                  <option>Option 01</option>
-                  <option>Option 02</option>
-                </select>
+                <select id="sel3" class="uk-select uk-form-small"></select>
               </div>
-            </div>
-            <div class="uk-margin">              
-              <button id="btn1" class="uk-button uk-width-1-1 uk-button-primary"><span uk-icon="icon: play-circle"></span></button>
             </div>
           </div>
         </div>
         <div class="uk-width-expand@m">
-            <div class="uk-placeholder">Item</div>
+            <div class="uk-placeholder">              
+              <div class="uk-margin">
+                <canvas id="chart"></canvas>
+              </div>
+              <div class="uk-margin">
+                <canvas id="canvas"></canvas>
+              </div>
+            </div>
         </div>
       </div>
     </div> 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <!-- UIkit JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit-icons.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.2/math.min.js"></script>  
     <script type="text/javascript"> 
@@ -96,19 +94,66 @@
             $('#btn1').removeClass('uk-button-primary');
             $('#btn1').removeClass('uk-button-danger');
             $('#btn1').addClass('uk-button-danger');
+            $('select').attr('disabled',true);
+            start();
           }else{
             $('#btn1').html('<span uk-icon="icon: play-circle"></span>');
             $('#btn1').removeClass('uk-button-primary');
             $('#btn1').removeClass('uk-button-danger');
             $('#btn1').addClass('uk-button-primary');
+            $('select').removeAttr('disabled');
+            stop();
           }
           executing=!executing;
-        })
+        });
+
+        (function initSelect(){
+          $('#sel1').append('<option value="10">10</option>');
+          $('#sel1').append('<option value="50">50</option>');        
+          $('#sel1').append('<option value="100">100</option>');
+          $('#sel2').append('<option value="10">10</option>');
+          $('#sel2').append('<option value="25">25</option>');
+          $('#sel2').append('<option value="50">50</option>');
+          $('#sel3').append('<option value="10">10</option>');
+          $('#sel3').append('<option value="100">100</option>');
+          $('#sel3').append('<option value="1000">1000</option>');
+        })();
+
+        var interval = undefined;
+        function start(){
+          var data = {
+            label: [],
+            datasets: [{
+                data: [],
+                label: 'state 1'
+              }
+            ]
+          };
+          var chart = new Chart('chart',{
+            type: 'line',
+            data: data
+          });
+          var pos = 0;
+          /*
+          interval = setInterval(function(){ 
+            chart.data.label.push(pos); 
+            pos++;
+            chart.data.datasets.forEach(function(dataset){
+              dataset.data.push(Math.random());
+            });         
+            chart.update();
+          },1000);
+          */
+        }
+        function stop(){
+          clearInterval(interval);
+        }
 
         function resize(){   
           onOffLoading(true); 
-          onOffLoading(false);
-          $('#app').innerHeight($(window).innerHeight());    
+          $('#app').innerHeight($(window).innerHeight());           
+          onOffLoading(false); 
+          $('#btn1').trigger('click');  
         }
         resize();
         $(window).on('resize',resize); 
