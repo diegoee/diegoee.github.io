@@ -37,18 +37,12 @@
               <button id="btn1" class="uk-button uk-width-1-1 uk-button-primary"><span uk-icon="icon: play-circle"></span></button>
             </div>
             <div class="uk-margin" uk-grid> 
-              <div class="uk-width-1-2">
+              <div class="uk-width-1-1">
                 <label class="uk-form-label" for="form-stacked-text">Nº point</label>
                 <div class="uk-form-controls">
                   <select id="sel1" class="uk-select uk-form-small"></select>
                 </div>
-              </div>
-              <div class="uk-width-1-2">
-                <label class="uk-form-label" for="form-stacked-text">Speed</label>
-                <div class="uk-form-controls">
-                  <select id="sel2" class="uk-select uk-form-small"></select>
-                </div>
-              </div>
+              </div> 
             </div> 
             <div class="uk-margin" uk-grid>
               <div class="uk-width-1-2">
@@ -66,8 +60,8 @@
             </div>
             <div class="uk-margin">
               <label id ="textGraph" class="uk-form-label" for="form-stacked-text">Evolution</label>
-              <div class="uk-form-controls">
-                <canvas id="chart"></canvas>
+              <div class="uk-form-controls"> 
+                <div id="chartContainer"></div>
               </div>
             </div>  
           </div>
@@ -75,8 +69,7 @@
         <div class="uk-width-expand@m">
             <div class="uk-placeholder">            
               <div class="uk-margin">
-                <div id="canvasContainer">
-                </div>
+                <div id="canvasContainer"></div>
               </div>
             </div>
         </div>
@@ -90,41 +83,61 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.2/math.min.js"></script>  
     <script type="text/javascript"> 
       (function exe(){   
-        var simu = {
-          interCanvas: undefined, 
-          interGraph: undefined,
-          canvas: undefined, 
-          states: [10,10,10],
-          start: function(){
-            dApp.createCanvas();
-            canvas = new fabric.Canvas('canvas',{ 
+        var simu = {  
+          interGraph: undefined, 
+          running: false,
+          states: [0,0,0],
+          countStates: function(objs){ 
+            var aux = [0,0,0];
+            for (var i in objs){
+              if(objs[i].state===0){
+                aux[0]++;
+              }else if(objs[i].state===1){
+                aux[1]++;
+              }else{
+                aux[2]++;
+              }
+            }
+            simu.states=aux; 
+          },
+          start: function(){ 
+            dApp.createCanvas(); 
+            var canvas = new fabric.Canvas('canvas',{ 
               selection: false,
               preserveObjectStacking: true,
               width: $('#canvasContainer').innerWidth(), 
               height: $('#canvasContainer').innerHeight()             
             }); 
-            canvas.on({ 
-              'mouse:over': function(options) { 
-                $('#canvas').addClass('uk-box-shadow-large'); 
-              },
-              'mouse:out': function(options) { 
-                $('#canvas').removeClass('uk-box-shadow-large'); 
-              }
-            });
 
             for(var i=0; i<dApp.getNpoint(); i++){
               var point = new fabric.Circle({ 
-                radius: 5,   
-                fill: 'black', 
-                state: 'lol', 
+                radius: 0.01*canvas.height/2*Math.PI,   
+                fill: 'green', 
+                state: 0, 
+                time: 0,
                 top: canvas.height*Math.random(), 
                 left: canvas.width*Math.random(), 
                 originX: 'center',
-                originY: 'center' 
+                originY: 'center', 
+                selectable: false 
               });
               canvas.add(point);
               canvas.renderAll();
             }
+            //start state
+            var aux = [];
+            for(var i=0; i<Math.round(dApp.getNpoint()*dApp.getStartPoint()/100); i++){
+              aux.push((Math.floor(Math.random()*dApp.getNpoint())+1)-1);
+            }
+            for (var i in aux){ 
+              canvas.getObjects()[aux[i]].set({ 
+                state: 1,
+                fill: 'red',
+                time: 100
+              });  
+            }            
+            simu.countStates(canvas.getObjects());
+            canvas.renderAll();
 
             //TODO: borrar            
             //$('#chart').css({
@@ -132,43 +145,65 @@
             //});
             
             //window.canvas=canvas;
-            //console.log(canvas);
-            this.interCanvas = setInterval(function(){  
-              for (var i in canvas.getObjects()){
-                var x = canvas.getObjects()[i].left+(Math.random()-0.5)*dApp.getMobility();
-                var y = canvas.getObjects()[i].top+(Math.random()-0.5)*dApp.getMobility();
+            //console.log(canvas); 
+            this.running = true;
+            setTimeout(function animate() {
+              canvas.forEachObject(function(obj){ 
+                var x = obj.left+(Math.random()-0.5)*dApp.getMobility();
+                var y = obj.top+(Math.random()-0.5)*dApp.getMobility();
                 if(x>0&&x<canvas.width){ 
-                  canvas.getObjects()[i].left=x;
+                  obj.left=x;
                 }
                 if(y>0&&y<canvas.height){ 
-                  canvas.getObjects()[i].top=y;
+                  obj.top=y;
                 } 
+                obj.set({  
+                  fill: (obj.state===0)?'green':(obj.state===1)?'red':'blue',
+                  state: (obj.state===1&&obj.time===0)?2:obj.state,
+                  time: (obj.time===0)?0:obj.time-1
+                });   
+                canvas.forEachObject(function(o){
+                  if (obj === o) return; 
+                  if (obj.intersectsWithObject(o)&&o.state===1&&obj.state===0){ 
+                    console.log('bad news! '+o.state+' '+obj.state);
+                    obj.set({  
+                      fill: 'red',
+                      state: 1,
+                      time: 100
+                    });
+                  } 
+                }); 
+              });  
+              simu.countStates(canvas.getObjects()); 
+              canvas.renderAll();
+              if(simu.running){ 
+                setTimeout(animate, 50);
               }
-              canvas.renderAll(); 
-            },50); 
+            },50);  
 
+            dApp.createChart();
             var chart = new Chart('chart',{
               type: 'line',
               data: {
                 labels: [],
                 datasets: [{
                   data: [this.states[0]],
-                  borderColor: 'red',
-					        backgroundColor: 'red',
-                  fill: true,  
-                  label: 'state 1'
-                } ,{
-                  data: [this.states[1]],
                   borderColor: 'green',
 					        backgroundColor: 'green',
                   fill: true,  
-                  label: 'state 2'
+                  label: 's1'
+                } ,{
+                  data: [this.states[1]],
+                  borderColor: 'red',
+					        backgroundColor: 'red',
+                  fill: true,  
+                  label: 's2'
                 },{
                   data: [this.states[2]],
                   borderColor: 'blue',
 					        backgroundColor: 'blue',
                   fill: true,  
-                  label: 'state 3'
+                  label: 's3'
                 }]
               },
               options: {
@@ -222,20 +257,16 @@
                 chart.data.datasets[i].data.push(simu.states[i]); 
               }      
               chart.update();
-              dApp.setTextGraph('Evolution: '+Math.round(pos/n)+'/'+posEnd/n);
-              if(pos>posEnd){
+              dApp.setTextGraph('Evolution: '+pos/n+'/'+posEnd/n);
+              if(pos>=posEnd){
                 simu.stop();
                 dApp.fireExeClick();
               }
             },timef);  
           },
           stop: function(){
-            if (this.canvas!==undefined){
-              this.canvas.clear();
-            }
-            dApp.createCanvas();
-            clearInterval(this.interGraph);
-            clearInterval(this.interCanvas);
+            this.running = false;
+            clearInterval(this.interGraph); 
           }
         }
         var dApp = {
@@ -255,10 +286,14 @@
             $('#app').innerHeight($(window).innerHeight());  
             simu.stop();   
             dApp.btnStop();   
+            dApp.createCanvas();
             dApp.onOffLoading(false);  
           },
           fireExeClick: function(){
             $('#btn1').trigger('click'); 
+          },
+          createChart: function(){ 
+            $('#chartContainer').html('<canvas id="chart"></canvas>'); 
           },
           createCanvas: function(){
             $('#canvasContainer').html('<canvas id="canvas"></canvas>');
@@ -274,15 +309,25 @@
               'width': '100%',
               'height': '100%'
             });
+            $('#canvasContainer').off('mouseenter');
+            $('#canvasContainer').off('mouseleave');
+            $('#canvasContainer').on({ 
+              mouseenter: function(options) { 
+                $('#canvasContainer').addClass('uk-box-shadow-large'); 
+              },
+              mouseleave: function(options) { 
+                $('#canvasContainer').removeClass('uk-box-shadow-large'); 
+              } 
+            });
           },
           getNpoint: function(){
             return parseInt($('#sel1').val()); 
-          },
-          getSpeed: function(){
-            return parseInt($('#sel2').val()); 
-          },
+          }, 
           getMobility: function(){
             return parseInt($('#sel3').val()); 
+          },
+          getStartPoint: function(){
+            return parseInt($('#sel4').val()); 
           },
           setTextGraph: function(text){
             $('#textGraph').text(text); 
@@ -302,25 +347,30 @@
             $('select').removeAttr('disabled');
           },
           exe: function(){
-            $('#sel1').append('<option value="10">10</option>');
-            $('#sel1').append('<option value="50">50</option>');        
-            $('#sel1').append('<option value="100">100</option>');
-            $('#sel2').append('<option value="10">10</option>');
-            $('#sel2').append('<option value="25">25</option>');
-            $('#sel2').append('<option value="50">50</option>');
+            $('#sel1').append('<option value="50">50</option>');
+            $('#sel1').append('<option value="100">100</option>');        
+            $('#sel1').append('<option value="500">500</option>'); 
             $('#sel3').append('<option value="10">10</option>');
+            $('#sel3').append('<option value="25">25</option>'); 
             $('#sel3').append('<option value="50">50</option>');
             $('#sel3').append('<option value="100">100</option>'); 
             $('#sel4').append('<option value="1">1</option>');
             $('#sel4').append('<option value="5">5</option>');
-            $('#sel4').append('<option value="20">20</option>');
+            $('#sel4').append('<option value="25">25</option>');
+            $('#sel4').append('<option value="50">50</option>'); 
+            $('#sel3').val(25);
+            $('#sel4').val(25);
             $('#btn1').on('click',function(){
               if($('#btn1').hasClass('uk-button-primary')){
-                dApp.btnStart();
-                simu.start();
+                dApp.btnStart(); 
+                dApp.onOffLoading(true);
+                simu.start(); 
+                dApp.onOffLoading(false);
               }else{  
                 dApp.btnStop();
+                dApp.onOffLoading(true);
                 simu.stop();
+                dApp.onOffLoading(false);
               }
             });
             this.resize();
