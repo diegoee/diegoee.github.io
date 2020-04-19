@@ -58,10 +58,17 @@
                 </div>
               </div> 
             </div>
-            <div class="uk-margin">
-              <label id ="textGraph" class="uk-form-label" for="form-stacked-text">Evolution</label>
-              <div class="uk-form-controls"> 
-                <div id="chartContainer"></div>
+            <div class="uk-margin" uk-grid>
+              <div class="uk-width-1-2"> 
+                <label id ="textGraph" class="uk-form-label" for="form-stacked-text">Evolution</label>
+              </div>
+              <div class="uk-width-1-2 uk-text-right"> 
+                <label id ="textCanvas" class="uk-form-label" for="form-stacked-text"></label>
+              </div>  
+              <div class="uk-width-1-1"> 
+                <div class="uk-form-controls"> 
+                  <div id="chartContainer"></div>
+                </div>
               </div>
             </div>  
           </div>
@@ -111,7 +118,7 @@
             
             for(var i=0; i<dApp.getNpoint(); i++){
               var point = new fabric.Circle({ 
-                radius: 0.01*canvas.height/2*Math.PI,   
+                radius: (canvas.height>canvas.width?0.0175*canvas.height/2*Math.PI:0.0175*canvas.width/2*Math.PI),   
                 fill: 'black', 
                 state: 0, 
                 time: 0,
@@ -129,18 +136,34 @@
             for(var i=0; i<Math.round(dApp.getNpoint()*dApp.getStartPoint()/100); i++){
               aux.push((Math.floor(Math.random()*dApp.getNpoint())+1)-1);
             }
+            var timeState = 100;
             for (var i in aux){ 
               canvas.getObjects()[aux[i]].set({ 
                 state: 1,
-                time: 100+(Math.floor(Math.random()*50)+1)
+                time: timeState+(Math.floor(Math.random()*timeState/4)+1)
               });  
             }            
             simu.countStates(canvas.getObjects());
             canvas.renderAll();
+ 
+            var prevTime = Date.now(); 
+            var myfps = 60;
+            var frames = 0; 
+            dApp.setTextCanvas('FPS: 0/' + myfps);
 
-            this.running = true;
-            setTimeout(function animate() {+
-              canvas.forEachObject(function(obj){ 
+            this.running = true; 
+            function animate(){
+              var time = Date.now();
+              frames++; 
+              if ( time > prevTime + 1000 ) {
+                var fps = Math.round( ( frames * 1000 ) / ( time - prevTime ) );
+                prevTime = time;
+                frames = 0; 
+                dApp.setTextCanvas('FPS: '+(fps<10?'0'+fps:fps)+'/'+myfps);
+              }
+
+             
+              canvas.forEachObject(function(obj){  
                 var x = obj.left+(Math.random()-0.5)*dApp.getMobility();
                 var y = obj.top+(Math.random()-0.5)*dApp.getMobility();
                 if(x>0&&x<canvas.width){ 
@@ -156,24 +179,26 @@
                 });  
                 
                 canvas.forEachObject(function(o){
-                  if (obj === o) return; 
+                  if (obj === o) return;   
                   obj.setCoords();
                   if (obj.intersectsWithObject(o)&&o.state===1&&obj.state===0){
                     obj.set({  
                       state: 1,
-                      time: 100+(Math.floor(Math.random()*50)+1)
+                      time: timeState+(Math.floor(Math.random()*timeState/4)+1)
                     });
                   } 
                 });  
 
               });  
               simu.countStates(canvas.getObjects()); 
-              canvas.renderAll();
               if(simu.running){ 
-                setTimeout(animate, 50);
+                fabric.util.requestAnimFrame(animate, canvas.getElement()); 
+                canvas.renderAll();
               }
-            },50);  
-            /**/
+            }
+            fabric.util.requestAnimFrame(animate, canvas.getElement()); 
+            canvas.renderAll();
+            
             dApp.createChart();
             var chart = new Chart('chart',{
               type: 'line',
@@ -242,7 +267,7 @@
             var pos = 1;
             var n = 4;
             var posEnd = 60*n;
-            var timef = 1000/n;             
+            var ms = 1000/n;             
             this.interGraph = setInterval(function(){ 
               chart.data.labels.push(pos); 
               pos++;     
@@ -250,16 +275,17 @@
                 chart.data.datasets[i].data.push(simu.states[i]); 
               }      
               chart.update();
-              dApp.setTextGraph('Evolution: '+pos/n+'/'+posEnd/n);
+              dApp.setTextGraph('Evolution: '+Math.floor(pos/n)+'/'+posEnd/n);
               if(pos>=posEnd){
                 simu.stop();
                 dApp.fireExeClick();
               }
-            },timef);  
+            },ms);  
           },
           stop: function(){
             this.running = false;
-            clearInterval(this.interGraph); 
+            clearInterval(this.interGraph);  
+            dApp.resetText();  
           }
         }
         var dApp = {
@@ -325,6 +351,9 @@
           setTextGraph: function(text){
             $('#textGraph').text(text); 
           },
+          setTextCanvas: function(text){
+            $('#textCanvas').text(text); 
+          },
           btnStart: function(){ 
             $('#btn1').html('<span uk-icon="icon: ban"></span>');
             $('#btn1').removeClass('uk-button-danger');
@@ -340,10 +369,10 @@
             $('select').removeAttr('disabled');
           },
           setCombos: function(){
+            $('#sel1').append('<option value="10">10</option>');
             $('#sel1').append('<option value="50">50</option>');
             $('#sel1').append('<option value="100">100</option>');   
-            $('#sel1').append('<option value="250">250</option>');        
-            $('#sel1').append('<option value="500">500</option>'); 
+            $('#sel1').append('<option value="250">250</option>');  
             $('#sel3').append('<option value="5">5</option>');
             $('#sel3').append('<option value="10">10</option>');
             $('#sel3').append('<option value="25">25</option>'); 
@@ -352,10 +381,8 @@
             $('#sel4').append('<option value="1">1</option>');
             $('#sel4').append('<option value="5">5</option>');
             $('#sel4').append('<option value="10">10</option>');
-            $('#sel4').append('<option value="25">25</option>');
-            $('#sel4').append('<option value="50">50</option>'); 
-            $('#sel1').val(100);
-            $('#sel3').val(25);
+            $('#sel1').val(50);
+            $('#sel3').val(10);
             $('#sel4').val(5);
           },
           setActionButton: function(){
@@ -373,9 +400,14 @@
               }
             });
           },
+          resetText: function(){
+            dApp.setTextCanvas('FPS: --/--');
+            dApp.setTextGraph('Evolution: --/--');  
+          },
           exe: function(){
             this.setCombos();
-            this.setActionButton();            
+            this.setActionButton();  
+            this.resetText();            
             this.resize();
             $(window).on('resize',this.resize);
             setTimeout(function(){ 
