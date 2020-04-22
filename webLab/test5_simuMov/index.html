@@ -66,19 +66,18 @@
                 <label id ="textCanvas" class="uk-form-label" for="form-stacked-text"></label>
               </div>  
               <div class="uk-width-1-1"> 
-                <div class="uk-form-controls"> 
-                  <div id="chartContainer"></div>
+                <div id="slideContainer" class="uk-form-controls">
                 </div>
-              </div>
-            </div>  
+              </div>  
+            </div> 
           </div>
         </div>
         <div class="uk-width-expand@m">
-            <div class="uk-placeholder">            
-              <div class="uk-margin">
-                <div id="canvasContainer"></div>
-              </div>
+          <div class="uk-placeholder">            
+            <div class="uk-margin">
+              <div id="canvasContainer"></div>
             </div>
+          </div>
         </div>
       </div>
     </div> 
@@ -162,7 +161,6 @@
                 dApp.setTextCanvas('FPS: '+(fps<10?'0'+fps:fps)+'/'+myfps);
               }
 
-             
               canvas.forEachObject(function(obj){  
                 var x = obj.left+(Math.random()-0.5)*dApp.getMobility();
                 var y = obj.top+(Math.random()-0.5)*dApp.getMobility();
@@ -199,8 +197,8 @@
             fabric.util.requestAnimFrame(animate, canvas.getElement()); 
             canvas.renderAll();
             
-            dApp.createChart();
-            var chart = new Chart('chart',{
+            var sChart = dApp.createChart();
+            var chart = new Chart(sChart.id,{
               type: 'line',
               data: {
                 labels: [],
@@ -227,7 +225,8 @@
               options: {
                 responsive: true,
                 title: {
-                  display: false
+                  display: true,
+                  text: sChart.title
                 },
                 tooltips: {
                   mode: 'index',
@@ -266,7 +265,7 @@
             });
             var pos = 1;
             var n = 4;
-            var posEnd = 60*n;
+            var posEnd = 30*n;
             var ms = 1000/n;             
             this.interGraph = setInterval(function(){ 
               chart.data.labels.push(pos); 
@@ -289,6 +288,7 @@
           }
         }
         var dApp = {
+          nChart: -1,
           onOffLoading: function(state){ 
             if(state){
               $('#loading').css({
@@ -312,7 +312,14 @@
             $('#btn1').trigger('click'); 
           },
           createChart: function(){ 
-            $('#chartContainer').html('<canvas id="chart"></canvas>');  
+            this.nChart++;
+            var idChart = 'chart'+(this.nChart<10?'0'+this.nChart:this.nChart);
+            var desc = 'Npoint: '+this.getNpoint()+' - Mobility: '+this.getMobility()+' - %start: '+this.getStartPoint();
+            $('#slideContainer').prepend('<canvas id="'+idChart+'"></canvas>');
+            return {
+              id: idChart,
+              title: desc
+            };
           },
           createCanvas: function(){
             $('#canvasContainer').html('<canvas id="canvas"></canvas>');
@@ -410,9 +417,6 @@
             this.resetText();            
             this.resize();
             $(window).on('resize',this.resize);
-            setTimeout(function(){ 
-              dApp.fireExeClick();
-            },250); 
           }
         }
         dApp.exe();
