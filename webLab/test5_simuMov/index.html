@@ -53,13 +53,13 @@
               <div class="uk-width-1-2">
                 <label class="uk-form-label" for="form-stacked-text">Mobility</label>
                 <div class="uk-form-controls">
-                  <select id="sel3" class="uk-select uk-form-small"></select>
+                  <select id="sel2" class="uk-select uk-form-small"></select>
                 </div>
               </div>
               <div class="uk-width-1-2">
                 <label class="uk-form-label" for="form-stacked-text">% start</label>
                 <div class="uk-form-controls">
-                  <select id="sel4" class="uk-select uk-form-small"></select>
+                  <select id="sel3" class="uk-select uk-form-small"></select>
                 </div>
               </div> 
             </div>
@@ -346,10 +346,10 @@
             return parseInt($('#sel1').val()); 
           }, 
           getMobility: function(){
-            return parseInt($('#sel3').val()); 
+            return parseInt($('#sel2').val()); 
           },
           getStartPoint: function(){
-            return parseInt($('#sel4').val()); 
+            return parseInt($('#sel3').val()); 
           },
           setTextGraph: function(text){
             $('#textGraph').text(text); 
@@ -372,21 +372,21 @@
             $('select').removeAttr('disabled');
           },
           setCombos: function(){
-            $('#sel1').append('<option value="10">10</option>');
-            $('#sel1').append('<option value="50">50</option>');
-            $('#sel1').append('<option value="100">100</option>');   
-            $('#sel1').append('<option value="250">250</option>');  
+            for(var i=10; i<=250; i=i+10){              
+              $('#sel1').append('<option value="'+i+'">'+i+'</option>');
+            }
+            
+            $('#sel2').append('<option value="1">1</option>');
+            $('#sel2').append('<option value="5">5</option>');
+            for(var i=10; i<=100; i=i+10){              
+              $('#sel2').append('<option value="'+i+'">'+i+'</option>');
+            }
+            $('#sel3').append('<option value="1">1</option>');
+            $('#sel3').append('<option value="2">2</option>');
             $('#sel3').append('<option value="5">5</option>');
-            $('#sel3').append('<option value="10">10</option>');
-            $('#sel3').append('<option value="25">25</option>'); 
-            $('#sel3').append('<option value="50">50</option>');
-            $('#sel3').append('<option value="100">100</option>'); 
-            $('#sel4').append('<option value="1">1</option>');
-            $('#sel4').append('<option value="5">5</option>');
-            $('#sel4').append('<option value="10">10</option>');
             $('#sel1').val(50);
-            $('#sel3').val(10);
-            $('#sel4').val(5);
+            $('#sel2').val(10);
+            $('#sel3').val(2);
           },
           setActionButton: function(){
             $('#btn1').on('click',function(){
