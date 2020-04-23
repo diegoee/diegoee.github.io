@@ -305,14 +305,6 @@
               });
             } 
           },
-          resize: function(){    
-            dApp.onOffLoading(true); 
-            $('#app').innerHeight($(window).innerHeight());  
-            simu.stop();   
-            dApp.btnStop();   
-            dApp.createCanvas();
-            dApp.onOffLoading(false);  
-          },
           fireExeClick: function(){
             $('#btn1').trigger('click'); 
           },
@@ -433,9 +425,13 @@
             this.setCombos();
             this.setActionButton(); 
             this.setDeleteButton();  
-            this.resetText();            
-            this.resize();
-            $(window).on('resize',this.resize);
+            this.resetText();   
+            dApp.onOffLoading(true); 
+            $('#app').innerHeight($(window).innerHeight());  
+            simu.stop();   
+            dApp.btnStop();   
+            dApp.createCanvas();
+            dApp.onOffLoading(false);   
           }
         }
         dApp.exe();
