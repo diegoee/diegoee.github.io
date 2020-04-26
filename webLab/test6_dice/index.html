@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.css"/>    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>   
+    <script src="https://threejs.org/build/three.js"></script>
+    <title>Web Test6_dice</title> 
+    <style>
+      #loading{ 
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100000;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+        padding-left: 25%; 
+        padding-right: 25%;
+        background-color: white;
+      } 
+      #app{ 
+        background-color: black;
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      } 
+      .note{ 
+        position: fixed;
+        bottom: 0;
+        right: 0; 
+        margin: 1em;
+      }
+      #container{ 
+        cursor: pointer;
+        position: fixed; 
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100000;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+        color: #DDD;  
+        font-size: 0.125em; 
+        transition: font-size 1s ease-in-out, text-shadow 0.5s ease-in-out;
+      } 
+      #container:hover{  
+        text-shadow: 0px 0px 200px #FFF;  
+      } 
+      #container.on{  
+        font-size: 20em;
+        color: #FFF; 
+      } 
+    </style>
+    </head>
+  <body>   
+    <div id="loading"><progress class="progress is-large is-dark"></progress></div> 
+    <div id="app"></div> 
+    <script type="text/javascript"> 
+      (function app(){   
+        var dice = {   
+          getRndN: function(nstart,nEnd){
+            return Math.floor(Math.random()*nEnd)+nstart;
+          },
+          create: function(){ 
+            var self = this;
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( 75, $(window).innerWidth()/$(window).innerHeight(), 0.1, 1000);
+            var renderer = new THREE.WebGLRenderer();
+            
+            renderer.setSize($(window).innerWidth(),$(window).innerHeight());
+            dom.set(renderer.domElement); 
+
+            var loader = new THREE.FontLoader();
+            loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',function(font){
+              var geometry = new THREE.TextGeometry(' '+self.getRndN(1,6)+' ',{ 
+                font: font,
+                size: 100,
+                height: 5,
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+              });
+              var material = new THREE.MeshBasicMaterial({ 
+                color: 0x00ff00 
+              });
+              var text = new THREE.Mesh(geometry,material);
+              scene.add(text);
+
+              //geometry = new THREE.BoxGeometry();
+              material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+              var cube = new THREE.Mesh( geometry, material );
+              scene.add( cube );
+              
+              renderer.render( scene, camera );
+            });  
+          }
+        }
+        var dataStore = {
+          reset: function(){
+          },
+          start: function(){
+          },
+          set: function(){
+          },
+          get: function(){
+          }
+        }
+        var dom = {
+          exeLoading: function(state){ 
+            if(state){
+              $('#loading').css({
+                display: 'flex'
+              });
+            }else{
+              $('#loading').css({
+                display: 'none'
+              });
+            } 
+          },
+          reset: function(){
+            $('#app').html(' ');
+          },
+          set: function(e){
+            $('#app').html(e);
+          },   
+          exeNotification: function(text,title,ms){
+            $('.note').find('button.delete').trigger('click');
+            var $note = $('<div class="message note"><div class="message-header"><p>'+title+'</p><button class="delete"></button></div><div class="message-body">'+text+'</div></div>'); 
+            $('body').append($note);   
+            $note.css({
+              bottom: -1.65*$note.innerHeight()+'px'
+            });
+            $note.find('button.delete').on('click',function(){ 
+              $note.animate({
+                opacity: '0',
+                bottom: -1.65*$note.innerHeight()+'px'
+              },{
+                duration: 500,
+                complete: function(){
+                  $note.remove(); 
+                }
+              });
+            });  
+            $note.animate({ 
+              bottom: '0'
+            },{
+              duration: 500 
+            });
+            if(ms>0){
+              setTimeout(function(){  
+                $note.find('button.delete').trigger('click');
+              },ms);
+            }
+          },
+          exe: function(){ 
+            self = this;
+            self.exeLoading(true);
+            self.reset();
+            dataStore.start();
+
+            self.set('<div id="container"></div>');
+            var $e = $('#container'); 
+            $e.html(dice.getRndN(1,6)); 
+            $e.on('click',function(){  
+              $e.toggleClass('on');
+            });
+            $e.on('transitionend webkitTransitionEnd oTransitionEnd', function (e){ 
+              if(e.originalEvent.propertyName==='font-size'&&!$e.hasClass('on')){ 
+                $e.trigger('click');
+              } 
+            });             
+            $e.on('transitionstart webkitTransitionStart oTransitionStart', function (e){ 
+              if(e.originalEvent.propertyName==='font-size'&&$e.hasClass('on')){
+                $e.html(dice.getRndN(1,6));  
+              } 
+            });            
+            $e.trigger('click');
+
+            self.exeNotification('<button id="btnReset" class="button is-danger">Reset</button> <button id="btnView" class="button is-primary">View old Value</button>','Data',0); 
+            $('#btnReset').on('click',function(){  
+              self.exeNotification('Delete old value','Result',2000);                 
+            });
+            $('#btnView').on('click',function(){  
+              self.exeNotification('Delete old value','Result',2000); 
+            }); 
+
+            $(window).off('resize');
+            $(window).on('resize',function(){
+              self.exe();
+            });            
+            self.exeLoading(false); 
+          }
+        }
+        dom.exe();
+      })();
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>
