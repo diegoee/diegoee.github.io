@@ -6,8 +6,7 @@
     <meta name="description" content="Web test"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.css"/>    
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>   
-    <script src="https://threejs.org/build/three.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>  
     <title>Web Test6_dice</title> 
     <style>
       #loading{ 
@@ -68,56 +67,44 @@
     <div id="loading"><progress class="progress is-large is-dark"></progress></div> 
     <div id="app"></div> 
     <script type="text/javascript"> 
-      (function app(){   
-        var dice = {   
-          getRndN: function(nstart,nEnd){
-            return Math.floor(Math.random()*nEnd)+nstart;
-          },
-          create: function(){ 
-            var self = this;
-            var scene = new THREE.Scene();
-            var camera = new THREE.PerspectiveCamera( 75, $(window).innerWidth()/$(window).innerHeight(), 0.1, 1000);
-            var renderer = new THREE.WebGLRenderer();
-            
-            renderer.setSize($(window).innerWidth(),$(window).innerHeight());
-            dom.set(renderer.domElement); 
-
-            var loader = new THREE.FontLoader();
-            loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',function(font){
-              var geometry = new THREE.TextGeometry(' '+self.getRndN(1,6)+' ',{ 
-                font: font,
-                size: 100,
-                height: 5,
-                curveSegments: 12,
-                bevelEnabled: true,
-                bevelThickness: 10,
-                bevelSize: 8,
-                bevelOffset: 0,
-                bevelSegments: 5
-              });
-              var material = new THREE.MeshBasicMaterial({ 
-                color: 0x00ff00 
-              });
-              var text = new THREE.Mesh(geometry,material);
-              scene.add(text);
-
-              //geometry = new THREE.BoxGeometry();
-              material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-              var cube = new THREE.Mesh( geometry, material );
-              scene.add( cube );
-              
-              renderer.render( scene, camera );
-            });  
-          }
-        }
+      (function app(){ 
         var dataStore = {
+          nameVar: 'values_dice',
+          values: [], 
           reset: function(){
+            this.values = [];
+            if (typeof(Storage)!=='undefined'){
+              window.localStorage.removeItem(this.nameVar);
+            }
           },
-          start: function(){
+          clearLastValue: function(){
+            var aux = [];
+            if(this.values.length>6){
+              for(var i=0; i<6; i++){
+                aux.push(this.values[i]);
+              }
+              this.values=aux;
+            }
           },
-          set: function(){
+          start: function(fnError){
+            this.value = [];
+            if (typeof(Storage)!=='undefined') {
+              var valuesString = window.localStorage.getItem(this.nameVar);
+              if (valuesString!==null){
+                this.values = valuesString.split(',');
+              }
+            }else{ 
+              if (typeof(fnError)==='function'){
+                fnError();
+              }             
+            }
           },
-          get: function(){
+          save: function(n){ 
+            this.values.unshift(n);
+            this.clearLastValue();
+            if (typeof(Storage)!=='undefined'){
+              window.localStorage.setItem(this.nameVar,this.values.toString());
+            }
           }
         }
         var dom = {
@@ -166,16 +153,38 @@
                 $note.find('button.delete').trigger('click');
               },ms);
             }
+          },          
+          getRndN: function(nstart,nEnd){
+            return Math.floor(Math.random()*nEnd)+nstart;
           },
           exe: function(){ 
             self = this;
             self.exeLoading(true);
             self.reset();
-            dataStore.start();
+            dataStore.start(function(){
+              self.exeNotification('Store not enable','Warnning',3000);
+            });
+
+            var htmlNote = '<button id="btnReset" class="button is-danger">Reset</button> <button id="btnView" class="button is-primary">View old Value</button>';
+            self.exeNotification(htmlNote,'Data',0); 
+            //TODO: when resize not exe!!
+            $('#btnReset').on('click',function(){  
+              dataStore.reset();
+              self.exeNotification('Delete old value','Result',3000);                 
+            });
+            $('#btnView').on('click',function(){  
+              var displayTest = '';
+              for(var i=0;i<dataStore.values.length&&i<6; i++){
+                displayTest=displayTest+dataStore.values[i]+', '
+              }
+              displayTest = displayTest+' ...';
+              self.exeNotification(displayTest,'Last Values',0); 
+            });
 
             self.set('<div id="container"></div>');
             var $e = $('#container'); 
-            $e.html(dice.getRndN(1,6)); 
+            $e.html(self.getRndN(1,6)); 
+            dataStore.save($e.html());
             $e.on('click',function(){  
               $e.toggleClass('on');
             });
@@ -186,18 +195,11 @@
             });             
             $e.on('transitionstart webkitTransitionStart oTransitionStart', function (e){ 
               if(e.originalEvent.propertyName==='font-size'&&$e.hasClass('on')){
-                $e.html(dice.getRndN(1,6));  
+                $e.html(self.getRndN(1,6)); 
+                dataStore.save($e.html()); 
               } 
             });            
             $e.trigger('click');
-
-            self.exeNotification('<button id="btnReset" class="button is-danger">Reset</button> <button id="btnView" class="button is-primary">View old Value</button>','Data',0); 
-            $('#btnReset').on('click',function(){  
-              self.exeNotification('Delete old value','Result',2000);                 
-            });
-            $('#btnView').on('click',function(){  
-              self.exeNotification('Delete old value','Result',2000); 
-            }); 
 
             $(window).off('resize');
             $(window).on('resize',function(){
