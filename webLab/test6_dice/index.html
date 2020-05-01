@@ -3,27 +3,62 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Web test"> 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.css"/>    
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>  
-    <title>Web Test6_dice</title> 
-    <style>
-      #loading{ 
+    <meta name="description" content="Web test">    
+    <title>Web Test6_dice</title>  
+    <style> 
+      html, body{ 
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+      }       
+      #btnMenu{ 
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 100000;
-        display: flex;
-        align-items: center;
-        justify-content: center; 
-        padding-left: 25%; 
-        padding-right: 25%;
-        background-color: white;
+        right: 10px; 
+        top: 10px;
+        width: 50px;
+        height: 45px;
+        z-index: 100;
+        display: flex;  
+        cursor: pointer;
+        border-radius: 5px; 
+        background-color: black; 
       } 
-      #app{ 
+      #btnMenu span{
+        position: fixed;
+        cursor: pointer;
+        border-radius: 5px; 
+        margin: 5px;  
+        width: 40px;
+        height: 5px;
+        background-color: white;
+        transition: transform 0.15s ease-in-out, top 0.15s ease-in-out;
+      } 
+      #btnMenu span:nth-child(1) {  
+        top: 10px;
+      }
+      #btnMenu span:nth-child(2) {  
+        top: 25px;
+      }
+      #btnMenu span:nth-child(3) {  
+        top: 40px;
+      } 
+      #btnMenu.open span:nth-child(1) {
+        top: 25px; 
+        transform: rotate(45deg); 
+      }
+      #btnMenu.open span:nth-child(2) { 
+        transform: rotateY(90deg);
+      }
+      #btnMenu.open span:nth-child(3) {
+        top: 25px;
+        transform: rotate(-45deg); 
+      }   
+      #menu{ 
+        transform: rotateY(90deg);
         background-color: black;
         position: fixed;
         top: 0;
@@ -32,14 +67,99 @@
         padding: 0;
         width: 100%;
         height: 100%;
+        z-index: 10;   
+        transition: transform 0.15s ease-in-out;    
       } 
-      .note{ 
+      #menu.open{ 
+        transform: rotateY(0deg);
+      }  
+      #buttonContainer{  
         position: fixed;
-        bottom: 0;
-        right: 0; 
-        margin: 1em;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 40%;   
+        align-items: center;
+        justify-content: center;   
+      } 
+      #buttonContainer>div{
+        height: 25%; 
+        display: flex;
+        align-items: center;
+        justify-content: center; 
       }
-      #container{ 
+      #buttonContainer>div:nth-child(1){
+        height: 50%; 
+        font-size: 2em;
+        color: white;
+      } 
+      .button{ 
+        cursor: pointer;
+        padding: 1em;
+        color:#000000;
+        font-size: 1em;
+        border-radius: 5px;
+        width: 50%; 
+        text-align: center;
+        background-color:#FFFFFF;
+        transition: all 0.15s ease-in-out;
+      }
+      .button:hover{ 
+        width: 48.75%;
+        box-shadow: 0px 0px 5px #FFF; 
+      }  
+      .button:active{
+        animation: tiembla 0.1s;
+        animation-iteration-count: 3;
+      }
+      @keyframes tiembla{
+        0%  { -webkit-transform:rotateZ(-0.5deg); }
+        50% { -webkit-transform:rotateZ( 0deg) scale(0.9); }
+        100%{ -webkit-transform:rotateZ( 0.5deg); }
+      } 
+      #msg{  
+        position: fixed; 
+        top: 40%;
+        left: 0;
+        width: 100%;
+        height: 60%;   
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease-in-out;
+      }
+      #msg>div{    
+        color:white;  
+        border-style: solid;
+        border-color: white;
+        border-radius: 5px;
+        border-width: 1px; 
+        width: 75%; 
+        height: 75%;  
+        display: flex;
+        align-items: center;  
+        justify-content: center;
+        animation: zoom 0.125s linear forwards; 
+        -webkit-transform: scale(0.1);
+        transform: scale(0.1); 
+      }
+      @keyframes zoom{
+        100%{ 
+          -webkit-transform: scale(1);
+          transform: scale(1); 
+        }
+      }   
+      #body{ 
+        background-color: black;
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }   
+      #dice{ 
         cursor: pointer;
         position: fixed; 
         top: 0;
@@ -54,20 +174,38 @@
         font-size: 0.125em; 
         transition: font-size 1s ease-in-out, text-shadow 0.5s ease-in-out;
       } 
-      #container:hover{  
+      #dice:hover{  
         text-shadow: 0px 0px 200px #FFF;  
       } 
-      #container.on{  
+      #dice.on{  
         font-size: 20em;
         color: #FFF; 
       } 
     </style>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>    
     </head>
-  <body>   
-    <div id="loading"><progress class="progress is-large is-dark"></progress></div> 
-    <div id="app"></div> 
-    <script type="text/javascript"> 
+  <body>     
+    <div id="btnMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div> 
+    <div id="menu">
+      <div id="buttonContainer">
+        <div>Menu</div>
+        <div><a class="button" id="btnValue">View Value</a></div> 
+        <div><a class="button" id="btnReset">Reset All Value</a></div>
+      </div>
+      <div id="msg"><div>Hola</div></div>
+    </div>   
+    <div id="body"></div> 
+    <script type="text/javascript">   
       (function app(){ 
+        var dice = {
+          getRndN: function(nstart,nEnd){
+            return Math.floor(Math.random()*nEnd)+nstart;
+          }
+        }
         var dataStore = {
           nameVar: 'values_dice',
           values: [], 
@@ -106,85 +244,46 @@
               window.localStorage.setItem(this.nameVar,this.values.toString());
             }
           }
-        }
+        } 
         var dom = {
-          exeLoading: function(state){ 
-            if(state){
-              $('#loading').css({
-                display: 'flex'
-              });
-            }else{
-              $('#loading').css({
-                display: 'none'
-              });
-            } 
-          },
           reset: function(){
-            $('#app').html(' ');
+            $('#body').html(' ');
           },
-          set: function(e){
-            $('#app').html(e);
-          },   
-          exeNotification: function(text,title,ms){
-            $('.note').find('button.delete').trigger('click');
-            var $note = $('<div class="message note"><div class="message-header"><p>'+title+'</p><button class="delete"></button></div><div class="message-body">'+text+'</div></div>'); 
-            $('body').append($note);   
-            $note.css({
-              bottom: -1.65*$note.innerHeight()+'px'
-            });
-            $note.find('button.delete').on('click',function(){ 
-              $note.animate({
-                opacity: '0',
-                bottom: -1.65*$note.innerHeight()+'px'
-              },{
-                duration: 500,
-                complete: function(){
-                  $note.remove(); 
-                }
-              });
-            });  
-            $note.animate({ 
-              bottom: '0'
-            },{
-              duration: 500 
-            });
-            if(ms>0){
-              setTimeout(function(){  
-                $note.find('button.delete').trigger('click');
-              },ms);
-            }
-          },          
-          getRndN: function(nstart,nEnd){
-            return Math.floor(Math.random()*nEnd)+nstart;
+          add: function(e){
+            $('#body').append(e);
           },
-          exe: function(){ 
-            self = this;
-            self.exeLoading(true);
-            self.reset();
-            dataStore.start(function(){
-              self.exeNotification('Store not enable','Warnning',3000);
+          addMsg: function(text){
+            $('#msg').html('<div>'+text+'</div>')
+          },           
+          createMenu: function(store){
+            var self = this;  
+            $('#msg').html(' ');
+            $('#btnMenu').off('click');
+            $("#btnMenu").on('click',function() {
+              $("#btnMenu").toggleClass('open');
+              $("#menu").toggleClass('open');
+              $('#msg').html(' ');
+            });    
+            $('#btnReset').off('click');
+            $('#btnReset').on('click',function(){
+              store.reset(); 
+              self.addMsg('Delete Old Value');                        
             });
-
-            var htmlNote = '<button id="btnReset" class="button is-danger">Reset</button> <button id="btnView" class="button is-primary">View old Value</button>';
-            self.exeNotification(htmlNote,'Data',0); 
-            //TODO: when resize not exe!!
-            $('#btnReset').on('click',function(){  
-              dataStore.reset();
-              self.exeNotification('Delete old value','Result',3000);                 
-            });
-            $('#btnView').on('click',function(){  
+            $('#btnValue').off('click');
+            $('#btnValue').on('click',function(){  
               var displayTest = '';
-              for(var i=0;i<dataStore.values.length&&i<6; i++){
-                displayTest=displayTest+dataStore.values[i]+', '
+              for(var i=0;i<store.values.length&&i<6; i++){
+                displayTest=displayTest+store.values[i]+', '
               }
-              displayTest = displayTest+' ...';
-              self.exeNotification(displayTest,'Last Values',0); 
+              displayTest = displayTest+' ...'; 
+              self.addMsg(displayTest);  
             });
-
-            self.set('<div id="container"></div>');
-            var $e = $('#container'); 
-            $e.html(self.getRndN(1,6)); 
-            dataStore.save($e.html());
+          },
+          createDice: function(store){ 
+            this.add('<div id="dice"></div>');
+            var $e = $('#dice'); 
+            $e.html(dice.getRndN(1,6)); 
+            store.save($e.html());
             $e.on('click',function(){  
               $e.toggleClass('on');
             });
@@ -195,17 +294,24 @@
             });             
             $e.on('transitionstart webkitTransitionStart oTransitionStart', function (e){ 
               if(e.originalEvent.propertyName==='font-size'&&$e.hasClass('on')){
-                $e.html(self.getRndN(1,6)); 
-                dataStore.save($e.html()); 
+                $e.html(dice.getRndN(1,6)); 
+                store.save($e.html()); 
               } 
             });            
             $e.trigger('click');
-
+          },
+          exe: function(){ 
+            var self = this;
+            self.reset(); 
+            dataStore.start(function(){
+              alert('Store not enable','Warnning');
+            }); 
+            self.createMenu(dataStore); 
+            self.createDice(dataStore); 
             $(window).off('resize');
             $(window).on('resize',function(){
               self.exe();
             });            
-            self.exeLoading(false); 
           }
         }
         dom.exe();
