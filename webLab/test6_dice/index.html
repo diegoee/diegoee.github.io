@@ -95,11 +95,11 @@
       } 
       .button{ 
         cursor: pointer;
-        padding: 1em;
+        padding: 0.5em;
         color:#000000;
         font-size: 1em;
         border-radius: 5px;
-        width: 50%; 
+        width: 50%;  
         text-align: center;
         background-color:#FFFFFF;
         transition: all 0.15s ease-in-out;
@@ -267,7 +267,7 @@
             $('#btnReset').off('click');
             $('#btnReset').on('click',function(){
               store.reset(); 
-              self.addMsg('Delete Old Value');                        
+              self.addMsg('Delete Old Values');                        
             });
             $('#btnValue').off('click');
             $('#btnValue').on('click',function(){  
