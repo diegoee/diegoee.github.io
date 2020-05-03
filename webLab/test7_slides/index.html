@@ -6,11 +6,18 @@
     <meta name="apple-mobile-web-app-capable" content="yes" /> 
     <meta name="description" content="Web test impress.js slides" />
     <meta name="author" content="Diego Espínola" />
-    <title>Web Test7_slides</title>        
-    <link rel="stylesheet" href="style.css" /> 
+    <title>Web Test7_slides</title>          
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/css/uikit.min.css" /> 
+    <link rel="stylesheet" href="style.css"/> 
   </head>
-  <body>   
-    <div id="template1"> 
+  <body class="uk-background-muted">    
+    <a class="uk-button  uk-button-muted" uk-toggle="target: #menu"><span uk-icon="icon: grid"></span></a>
+    <div id="menu" uk-offcanvas="mode: reveal; overlay: true">
+      <div class="uk-offcanvas-bar"> 
+        <button id="btnCloseMenu" class="uk-offcanvas-close" type="button" uk-close></button>  
+      </div>
+    </div>
+    <div id="template1" class="uk-card uk-card-default uk-card-body"> 
       <h1>Lorem Ipsum</h1>
       <h2>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h2>
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris iaculis nulla tortor, sit amet mollis leo commodo vitae. Etiam aliquet sollicitudin nisi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vivamus placerat odio magna, id aliquet orci laoreet sit amet. Curabitur sit amet tempus lacus. Duis nunc arcu, vehicula in varius a, mattis ac odio.</p>
@@ -19,8 +26,10 @@
       <p>Sed a dolor magna. Etiam id ullamcorper felis, sed gravida elit. Duis a dignissim sem, mattis eleifend nisl. Maecenas elementum mauris non ante tempor, at malesuada sem elementum. Aliquam vitae dignissim enim, quis pulvinar leo. Sed at eros quis velit mollis porttitor feugiat eu elit. Sed tempor magna lacinia semper ornare.</p>
       <h4>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h4>
     </div>
-    <div id="app"></div>   
+    <div id="app"></div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit-icons.min.js"></script> 
     <script type="text/javascript" src="https://impress.js.org/js/impress.js"></script>
     <script type="text/javascript" src="main.js"></script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
