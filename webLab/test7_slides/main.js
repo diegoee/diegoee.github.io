@@ -1,23 +1,15 @@
 /*global $*/
-var app = {  
+var app = {
+  impress: undefined,  
   getRndN: function(nstart,nEnd){
     return Math.floor(Math.random()*nEnd)+nstart;
   },
-  exe: function(){  
-    function r(){
-      return app.getRndN(1,10)+'000';
-    }
-
-    $('#app').attr('data-transition-duration','500'); 
-    $('#app').attr('data-scale','1');  
-    $('#app').append('<div id="overview" class="step" data-x="5000" data-y="5000" data-z="0" data-scale="25"></div>');
-
-    $($('.step')[0]).attr('data-x',r()).attr('data-y',r()).attr('data-z',r()).addClass('slide');  
-    for (var i=0; i<3; i++){ 
-      $('#app').append($($('.step')[0]).clone().attr('data-x',r()).attr('data-y',r()).attr('data-z',r()));
-    } 
-    $($('.step')[0]).remove();  
-
+  r: function (){
+    return this.getRndN(1,10)+'000';
+  },
+  createImpressjs: function(){    
+    var s = this;
+    s.impress = impress('app');
     function checkOverview(){
       if($('#overview').hasClass('active')){
         $('.step').each(function(){
@@ -29,21 +21,58 @@ var app = {
         });
       }
     }
-    $(window).on('hashchange',function(e){
-      checkOverview();
-    });
-
-    //TODO: Crear Barra de estado y botone de continuar y retroceder
-
-    //impress
-    var imp = impress('app');
-    imp.init();     
+    s.impress.init();     
     location.hash='#/overview';
     checkOverview();
-    setInterval(function(){
-      imp.next();
-    },5000);
-
+    $(window).on('hashchange',function(e){
+      checkOverview(); 
+    });
+  },
+  createProgressBar: function(){    
+    var s = this;
+    var l = $('.step').length;     
+    $('#app').after('<progress id="barProgress" value="0" max="'+l+'"></progress>');
+    $('#app').after('<div id="status"></div>');
+    function checkStepN(){ 
+      for (var i=0; i<l; i++){
+        if($($('.step')[i]).hasClass('active')){ 
+          $('#barProgress').val(i);
+          $('#status').html((i+1)+' of '+l);
+          break;
+        }
+      } 
+    }
+    checkStepN();     
+    $(window).on('hashchange',function(e){
+      checkStepN();  
+    });  
+  },
+  createMoveBtn: function(){ 
+    var s = this;  
+    $('#app').after('<a class="btn btnNext" id="btnNext">></a>'); 
+    $('#app').after('<a class="btn btnPrev" id="btnPrev"><</a>');        
+    $('#btnNext').on('click',function(){
+      s.impress.next();
+    });         
+    $('#btnPrev').on('click',function(){
+      s.impress.prev(); 
+    });   
+  },
+  exe: function(){   
+    var s = this;
+    var nStep = 5;
+    $('#app').attr('data-transition-duration','500'); 
+    $('#app').attr('data-scale','1');  
+    $('#app').append('<div id="overview" class="step" data-x="5000" data-y="5000" data-z="0" data-scale="25"></div>');
+    var $e = $('#template1').clone(); 
+    $e.attr('id',null).addClass('step slide'); 
+    $('#template1').remove();     
+    for (var i=0; i<nStep; i++){ 
+      $('#app').append($e.clone().attr('data-x',s.r()).attr('data-y',s.r()).attr('data-z',s.r()));
+    } 
+    s.createImpressjs(); 
+    s.createProgressBar(); 
+    s.createMoveBtn(); 
   }
 }
 app.exe();

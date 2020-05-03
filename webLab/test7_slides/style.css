@@ -1,11 +1,20 @@
 @charset "UTF-8";
 @import 'https://fonts.googleapis.com/css?family=Montserrat';
+html, body{ 
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+} 
 body{
   background-color: black;
   color: white;
 }
 .slide{ 
-  width: 1024px;
+  width: 800px;
   height: 600px;
   padding: 1em; 
   border: 1px solid white;
@@ -25,4 +34,64 @@ body{
 }
 .viewSlide{
   opacity: 1;
+}
+
+progress{ 
+  width: 100%; 
+  display: block;  
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;  
+  border: 0 none;  
+  background: white;
+}  
+progress::-webkit-progress-bar {
+	background-color: black;
+}  
+progress::-webkit-progress-value {  
+  background: white;
+} 
+progress::-moz-progress-bar { 
+  background: white;
+}  
+
+#status{  
+  display: block;  
+  position: absolute;
+  top: 5px;
+  right: 5px;  
+  font-size: 10px;
+}
+
+.btn{ 
+  display: block;  
+  position: absolute;
+  top: 0;
+  height: 100%; 
+  font-size: 24px;
+  margin: 0;
+  padding: 0;
+  padding-left: 1em;
+  padding-right: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  opacity: 1;
+  z-index: 100;
+  cursor: pointer;   
+  transition: all 0.125s ease-in-out;
+ }
+ .btn:hover{  
+  text-shadow: 0px 0px 20px white; 
+ }
+ .btn:active{  
+  font-size: 20px;
+ }
+ 
+.btnNext{ 
+  right: 0; 
+}
+.btnPrev{  
+  left: 0; 
 }
