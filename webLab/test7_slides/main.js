@@ -100,22 +100,14 @@ var app = {
       checkActiveSlide(); 
     });  
   },
-  exe: function(){   
-    var s = this; 
-    var nStep = 10;
-    $('#app').attr('data-transition-duration','500'); 
-    $('#app').attr('data-scale','1');  
-    $('#app').append('<div id="overview" class="step" data-x="500" data-y="500" data-z="0" data-scale="3"></div>');
-    var $e = $('#template1').clone(); 
-    $e.attr('id',null).addClass('step slide'); 
-    $('#template1').remove();     
-    for (var i=0; i<nStep; i++){ 
-      $('#app').append($e.clone().attr('data-x',s.r()).attr('data-y',s.r()));
+  exe: function(){       
+    for (var i=0; i<$('.step').length; i++){ 
+      $($('.step')[i]).attr('data-x',this.r()).attr('data-y',this.r());
     } 
-    s.createImpressjs(); 
-    s.createProgressBar(); 
-    s.createMenu(); 
-    s.createMoveBtn(); 
+    this.createImpressjs(); 
+    this.createProgressBar(); 
+    this.createMenu(); 
+    this.createMoveBtn(); 
   }
 }
 app.exe();

@@ -16,17 +16,104 @@
       <div class="uk-offcanvas-bar"> 
         <button id="btnCloseMenu" class="uk-offcanvas-close" type="button" uk-close></button>  
       </div>
-    </div>
-    <div id="template1" class="uk-card uk-card-default uk-card-body"> 
-      <h1>Lorem Ipsum</h1>
-      <h2>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris iaculis nulla tortor, sit amet mollis leo commodo vitae. Etiam aliquet sollicitudin nisi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vivamus placerat odio magna, id aliquet orci laoreet sit amet. Curabitur sit amet tempus lacus. Duis nunc arcu, vehicula in varius a, mattis ac odio.</p>
-      <p>In vitae mollis lacus, ac lobortis diam. Fusce fringilla sit amet nisi non viverra. Donec ullamcorper elit ligula, non porta quam tristique ac. Suspendisse interdum vitae nibh ac viverra. Aliquam ac vehicula risus. Curabitur fringilla, metus in vehicula euismod, nulla lorem luctus velit, sed fermentum libero sem eu ex.</p>       
-      <h3>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h3>
-      <p>Sed a dolor magna. Etiam id ullamcorper felis, sed gravida elit. Duis a dignissim sem, mattis eleifend nisl. Maecenas elementum mauris non ante tempor, at malesuada sem elementum. Aliquam vitae dignissim enim, quis pulvinar leo. Sed at eros quis velit mollis porttitor feugiat eu elit. Sed tempor magna lacinia semper ornare.</p>
-      <h4>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h4>
-    </div>
-    <div id="app"></div>
+    </div> 
+    <div id="app" data-transition-duration="500" data-scale="3">
+      
+      <div id="overview" class="step" data-x="500" data-y="500" data-z="0" data-scale="3"></div>
+      
+      <div id="slide-01" class="uk-card uk-card-default uk-card-body step slide" data-x="0" data-y="0" data-z="0"> 
+        <h1>Lorem Ipsum</h1>
+        <h2>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris iaculis nulla tortor, sit amet mollis leo commodo vitae. Etiam aliquet sollicitudin nisi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vivamus placerat odio magna, id aliquet orci laoreet sit amet. Curabitur sit amet tempus lacus. Duis nunc arcu, vehicula in varius a, mattis ac odio.</p>
+        <h3>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h3>
+        <h4>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</h4>
+      </div>
+      
+      <div id="slide-02" class="uk-card uk-card-default uk-card-body step slide" data-x="0" data-y="0" data-z="0"> 
+        <ul uk-accordion>
+          <li>
+            <a class="uk-accordion-title" href="#">Item 1</a>
+            <div class="uk-accordion-content">
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            </div>
+          </li>
+          <li class="uk-open">
+            <a class="uk-accordion-title" href="#">Item 2</a>
+            <div class="uk-accordion-content">
+              <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor reprehenderit.</p>
+            </div>
+          </li>
+          <li>
+            <a class="uk-accordion-title" href="#">Item 3</a>
+            <div class="uk-accordion-content">
+              <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat proident.</p>
+            </div>
+          </li>
+        </ul>  
+      </div>
+
+      <div id="slide-03" class="uk-card uk-card-default uk-card-body step slide" data-x="0" data-y="0" data-z="0"> 
+        <div class="uk-animation-toggle" tabindex="0">
+          <div class="uk-animation-shake" uk-alert>
+            <a class="uk-alert-close" uk-close></a>
+            <h3>Notice</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          </div> 
+        </div>
+      </div> 
+      
+      <div id="slide-04" class="uk-card uk-card-default uk-card-body step slide" data-x="0" data-y="0" data-z="0"> 
+        <article class="uk-article">
+          <h1 class="uk-article-title"><a class="uk-link-reset" href="">Heading</a></h1>
+          <p class="uk-article-meta">Written by <a href="#">Super User</a> on 12 April 2012. Posted in <a href="#">Blog</a></p>
+          <p class="uk-text-lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <div class="uk-grid-small uk-child-width-auto" uk-grid>
+            <div>
+              <a class="uk-button uk-button-text" href="#">Read more</a>
+            </div>
+            <div>
+              <a class="uk-button uk-button-text" href="#">5 Comments</a>
+            </div>
+          </div>
+         </article>
+      </div> 
+
+      <div id="slide-05" class="uk-card uk-card-default uk-card-body step slide" data-x="0" data-y="0" data-z="0"> 
+        <ul class="uk-subnav uk-subnav-pill" uk-switcher>
+          <li><a href="#">Item</a></li>
+          <li><a href="#">Item</a></li>
+          <li><a href="#">Item</a></li>
+        </ul>        
+        <ul class="uk-switcher uk-margin">
+          <li>Hello!</li>
+          <li>Hello again!</li>
+          <li>Bazinga!</li>
+        </ul>
+      </div> 
+      
+      <div id="slide-06" class="uk-card uk-card-default uk-card-body step slide" data-x="0" data-y="0" data-z="0"> 
+        <button class="uk-button uk-button-default" uk-tooltip="Hello World">Hover</button>
+        <a class="uk-button uk-button-default" href="#modal-sections" uk-toggle>Open</a>        
+        <div id="modal-sections" uk-modal>
+          <div class="uk-modal-dialog">
+            <button class="uk-modal-close-default" type="button" uk-close></button>
+            <div class="uk-modal-header">
+              <h2 class="uk-modal-title">Modal Title</h2>
+            </div>
+            <div class="uk-modal-body">
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div class="uk-modal-footer uk-text-right">
+              <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+              <button class="uk-button uk-button-primary" type="button">Save</button>
+            </div>
+          </div>
+        </div>
+      </div> 
+
+    </div>    
+
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit-icons.min.js"></script> 
