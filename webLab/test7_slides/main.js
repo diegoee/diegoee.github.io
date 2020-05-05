@@ -9,7 +9,7 @@ var app = {
   },
   createImpressjs: function(){    
     var s = this;
-    s.impress = impress('app');
+    s.impress = impress();
     function checkOverview(){
       if($('#overview').hasClass('active')){
         $('.step').each(function(){
@@ -31,8 +31,8 @@ var app = {
   createProgressBar: function(){    
     var s = this;
     var l = $('.step').length;     
-    $('#app').after('<progress id="barProgress" value="0" max="'+(l-1)+'"></progress>');
-    $('#app').after('<div id="status"></div>');
+    $('#impress').after('<progress id="barProgress" value="0" max="'+(l-1)+'"></progress>');
+    $('#impress').after('<div id="status"></div>');
     function checkStepN(){ 
       for (var i=0; i<l; i++){
         if($($('.step')[i]).hasClass('active')){ 
@@ -49,8 +49,8 @@ var app = {
   },
   createMoveBtn: function(){ 
     var s = this;  
-    $('#app').after('<span class="btn btnNext" id="btnNext" uk-icon="chevron-right"></span>'); 
-    $('#app').after('<span class="btn btnPrev" id="btnPrev" uk-icon="chevron-left"></span>');   
+    $('#impress').after('<span class="btn btnNext" id="btnNext" uk-icon="chevron-right"></span>'); 
+    $('#impress').after('<span class="btn btnPrev" id="btnPrev" uk-icon="chevron-left"></span>');   
     
     $('#btnNext').on('click',function(){
       s.impress.next(); 
@@ -100,6 +100,13 @@ var app = {
       checkActiveSlide(); 
     });  
   },
+  isTouchEvent: function (){      
+    if ("ontouchstart" in document.documentElement) { 
+      return true;
+    }else{
+      return false;
+    }
+  },
   exe: function(){       
     for (var i=0; i<$('.step').length; i++){ 
       $($('.step')[i]).attr('data-x',this.r()).attr('data-y',this.r());
@@ -107,7 +114,9 @@ var app = {
     this.createImpressjs(); 
     this.createProgressBar(); 
     this.createMenu(); 
-    this.createMoveBtn(); 
+    if(!this.isTouchEvent()){
+      this.createMoveBtn();   
+    } 
   }
 }
 app.exe();
