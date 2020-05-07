@@ -1,5 +1,6 @@
 /*global $*/
 var app = {
+  idImpress: 'impress',
   impress: undefined,  
   getRndN: function(nstart,nEnd){
     return Math.floor(Math.random()*nEnd)+nstart;
@@ -9,19 +10,37 @@ var app = {
   },
   createImpressjs: function(){    
     var s = this;
-    s.impress = impress();
-    function checkOverview(){
+    s.impress = impress(s.idImpress);
+    function checkOverview(){ 
+      $('#startBtn').off('click');
+      $('#nextBtn').off('click');  
+      $('#prevBtn').off('click'); 
+      $('#startBtn').remove();   
+      $('#nextBtn').remove();   
+      $('#prevBtn').remove();   
       if($('#overview').hasClass('active')){
+        $('#'+s.idImpress).after('<div id="startBtn" class="uk-button uk-button-default"><span uk-icon="icon: play; ratio: 4"></span></div>');
+        $('#startBtn').on('click',function(){          
+          s.impress.next(); 
+        });
         $('.step').each(function(){
           $(this).addClass('viewSlide');
         });
-      }else{        
+      }else{   
         $('.step').each(function(){
           $(this).removeClass('viewSlide'); 
+        });         
+        $('#'+s.idImpress).after('<div id="nextBtn" class="uk-button uk-button-default"><span uk-icon="icon: chevron-right; ratio: 4"></span></div>');        
+        $('#'+s.idImpress).after('<div id="prevBtn" class="uk-button uk-button-default"><span uk-icon="icon: chevron-left; ratio: 4"></span></div>');
+        $('#nextBtn').on('click',function(){
+          s.impress.next(); 
+        });         
+        $('#prevBtn').on('click',function(){
+          s.impress.prev();
         });
       }
     }
-    s.impress.init();     
+    s.impress.init();   
     location.hash='#/overview';
     checkOverview();
     $(window).on('hashchange',function(e){
@@ -31,8 +50,8 @@ var app = {
   createProgressBar: function(){    
     var s = this;
     var l = $('.step').length;     
-    $('#impress').after('<progress id="barProgress" value="0" max="'+(l-1)+'"></progress>');
-    $('#impress').after('<div id="status"></div>');
+    $('#'+s.idImpress).after('<progress id="barProgress" value="0" max="'+(l-1)+'"></progress>');
+    $('#'+s.idImpress).after('<div id="status"></div>');
     function checkStepN(){ 
       for (var i=0; i<l; i++){
         if($($('.step')[i]).hasClass('active')){ 
@@ -46,24 +65,6 @@ var app = {
     $(window).on('hashchange',function(e){
       checkStepN();  
     });  
-  },
-  createMoveBtn: function(){ 
-    var s = this;  
-    $('#impress').after('<span class="btn btnNext" id="btnNext" uk-icon="chevron-right"></span>'); 
-    $('#impress').after('<span class="btn btnPrev" id="btnPrev" uk-icon="chevron-left"></span>');   
-    
-    $('#btnNext').on('click',function(){
-      s.impress.next(); 
-      $('.step').each(function(){
-        $(this).removeClass('viewSlide'); 
-      });
-    });         
-    $('#btnPrev').on('click',function(){
-      s.impress.prev(); 
-      $('.step').each(function(){
-        $(this).removeClass('viewSlide'); 
-      });
-    });   
   },
   createMenu: function(){ 
     var s = this;
@@ -83,8 +84,7 @@ var app = {
       var id = $(this).attr('go-id');
       $('#btnCloseMenu').trigger('click');
       s.impress.goto(id);
-    });   
-    
+    });  
     function checkActiveSlide(){
       $('#labelActiveMenu').remove();
       var label = ' <span id="labelActiveMenu" uk-icon="chevron-right"></span>'; 
@@ -99,24 +99,18 @@ var app = {
     $(window).on('hashchange',function(e){
       checkActiveSlide(); 
     });  
-  },
-  isTouchEvent: function (){      
-    if ("ontouchstart" in document.documentElement) { 
-      return true;
-    }else{
-      return false;
-    }
-  },
-  exe: function(){       
-    for (var i=0; i<$('.step').length; i++){ 
-      $($('.step')[i]).attr('data-x',this.r()).attr('data-y',this.r());
+  }, 
+  exe: function(){  
+    var n = 10; 
+    var s = this;
+    for (var i=0; i<n; i++){ 
+      $('#'+s.idImpress).append($($('.step')[0]).clone().attr('id','slide-'+(i+1)).attr('data-x',this.r()).attr('data-y',this.r()));
     } 
-    this.createImpressjs(); 
-    this.createProgressBar(); 
-    this.createMenu(); 
-    if(!this.isTouchEvent()){
-      this.createMoveBtn();   
-    } 
+    $($('.step')[0]).remove();   
+    $('#'+s.idImpress).prepend('<div id="overview" class="step" data-x='+this.r()+' data-y='+this.r()+' data-z="0" data-scale="3"></div>'); 
+    s.createImpressjs(); 
+    s.createProgressBar(); 
+    s.createMenu();
   }
 }
 app.exe();
