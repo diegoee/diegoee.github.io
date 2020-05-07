@@ -11,36 +11,42 @@ var app = {
   createImpressjs: function(){    
     var s = this;
     s.impress = impress(s.idImpress);
-    function checkOverview(){ 
-      $('#startBtn').off('click');
-      $('#nextBtn').off('click');  
-      $('#prevBtn').off('click'); 
-      $('#startBtn').remove();   
-      $('#nextBtn').remove();   
-      $('#prevBtn').remove();   
+    function checkOverview(){    
+      $('#startBtn').removeClass('uk-animation-scale-down');
+      $('#nextBtn').removeClass('uk-animation-scale-down');
+      $('#prevBtn').removeClass('uk-animation-scale-down');  
       if($('#overview').hasClass('active')){
-        $('#'+s.idImpress).after('<div id="startBtn" class="uk-button uk-button-default"><span uk-icon="icon: play; ratio: 4"></span></div>');
-        $('#startBtn').on('click',function(){          
-          s.impress.next(); 
-        });
+        $('#startBtn').removeClass('noDisplay');
+        $('#nextBtn').addClass('noDisplay');
+        $('#prevBtn').addClass('noDisplay'); 
         $('.step').each(function(){
           $(this).addClass('viewSlide');
         });
-      }else{   
+      }else{  
+        $('#startBtn').addClass('noDisplay');
+        $('#nextBtn').removeClass('noDisplay');
+        $('#prevBtn').removeClass('noDisplay');  
         $('.step').each(function(){
           $(this).removeClass('viewSlide'); 
-        });         
-        $('#'+s.idImpress).after('<div id="nextBtn" class="uk-button uk-button-default"><span uk-icon="icon: chevron-right; ratio: 4"></span></div>');        
-        $('#'+s.idImpress).after('<div id="prevBtn" class="uk-button uk-button-default"><span uk-icon="icon: chevron-left; ratio: 4"></span></div>');
-        $('#nextBtn').on('click',function(){
-          s.impress.next(); 
-        });         
-        $('#prevBtn').on('click',function(){
-          s.impress.prev();
-        });
+        }); 
       }
     }
     s.impress.init();   
+    $('#startBtn').addClass('noDisplay');
+    $('#nextBtn').addClass('noDisplay');
+    $('#prevBtn').addClass('noDisplay'); 
+    $('#startBtn').on('click',function(){          
+      s.impress.next(); 
+      $(this).addClass('uk-animation-scale-down');      
+    }); 
+    $('#nextBtn').on('click',function(){
+      s.impress.next(); 
+      $(this).addClass('uk-animation-scale-down');    
+    });         
+    $('#prevBtn').on('click',function(){
+      s.impress.prev();
+      $(this).addClass('uk-animation-scale-down');    
+    });
     location.hash='#/overview';
     checkOverview();
     $(window).on('hashchange',function(e){
