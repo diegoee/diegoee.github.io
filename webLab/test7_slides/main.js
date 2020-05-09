@@ -2,9 +2,6 @@
 var app = {
   idImpress: 'impress',
   impress: undefined,  
-  getRndN: function(nstart,nEnd){
-    return Math.floor(Math.random()*nEnd)+nstart;
-  },
   createImpressjs: function(){    
     var s = this;
     s.impress = impress(s.idImpress);
@@ -139,7 +136,7 @@ var app = {
   }, 
   exe: function(){  
     var s = this;
-
+    
     // cube!
     var pos =[
       [ 1, 1, 2,   0,   0,   0], //1
