@@ -5,23 +5,34 @@ var app = {
   getRndN: function(nstart,nEnd){
     return Math.floor(Math.random()*nEnd)+nstart;
   },
-  r: function (){
-    return this.getRndN(1,10)+'00';
-  },
   createImpressjs: function(){    
     var s = this;
     s.impress = impress(s.idImpress);
     function checkOverview(){    
       $('#startBtn').removeClass('uk-animation-scale-down');
       $('#nextBtn').removeClass('uk-animation-scale-down');
-      $('#prevBtn').removeClass('uk-animation-scale-down');  
+      $('#prevBtn').removeClass('uk-animation-scale-down');      
+      $('#overview').attr('data-rotate-x',0);
+      $('#overview').attr('data-rotate-y',0);
+
       if($('#overview').hasClass('active')){
-        $('#startBtn').removeClass('noDisplay');
+        $('#startBtn').addClass('noDisplay');
         $('#nextBtn').addClass('noDisplay');
         $('#prevBtn').addClass('noDisplay'); 
         $('.step').each(function(){
           $(this).addClass('viewSlide');
         });
+        
+        $('#overview').attr('data-rotate-x',20);
+        $('#overview').attr('data-rotate-y',20);
+        var time = parseInt($('#'+s.idImpress).attr('data-transition-duration'));
+        setTimeout(function(){ 
+          s.impress.goto('overview');
+        },time);
+        setTimeout(function(){
+          $('#startBtn').removeClass('noDisplay');
+        },time*2);
+
       }else{  
         $('#startBtn').addClass('noDisplay');
         $('#nextBtn').removeClass('noDisplay');
@@ -52,8 +63,25 @@ var app = {
 
     location.hash='#/overview';
     checkOverview();
-    $(window).on('hashchange',function(e){
+    $(window).on('hashchange',function(){
       checkOverview(); 
+    });
+
+    var realoadExecuted=false;
+    function reload(){
+      if(!realoadExecuted){
+        realoadExecuted=true; 
+        UIkit.modal('#modalReload').show();           
+      }
+    }
+    $('#modalReload').on('hidden',function(){
+      realoadExecuted=false;
+    });
+    $('#modalReloadBtn').on('click',function(){
+      location.reload();    
+    });
+    $(window).on('resize',function(){
+      reload();      
     });
   },
   createProgressBar: function(){    
@@ -131,16 +159,7 @@ var app = {
       'data-rotate-z'
     ];
     var magni = Math.max($($('.step')[0]).innerHeight(),$($('.step')[0]).innerWidth())/2;
-    var scale = 10;     
-    var max = [0,0,0];  
-    for (var i=0; i<pos.length; i++){ 
-      for (var ii=0; ii<max.length; ii++){ 
-        max[ii]=Math.max(max[ii],pos[i][ii]);
-      } 
-    }
-    for (var ii=0; ii<max.length; ii++){ 
-      max[ii]=max[ii]/2;
-    }
+    var scale = 1;     
 
     for (var i=0; i<pos.length; i++){
       for (var ii=0; ii<3; ii++){  
@@ -154,6 +173,16 @@ var app = {
       $('#'+s.idImpress).append($e);
     } 
     $($('.step')[0]).remove();   
+ 
+    var max = [0,0,0]; 
+    for (var i=0; i<pos.length; i++){ 
+      for (var ii=0; ii<max.length; ii++){ 
+        max[ii]=Math.max(max[ii],pos[i][ii]);
+      } 
+    }
+    for (var ii=0; ii<max.length; ii++){ 
+      max[ii]=max[ii]/2;
+    }
 
     $('#'+s.idImpress).prepend('<div id="overview"></div>'); 
     $('#overview').addClass('step');
@@ -163,7 +192,7 @@ var app = {
     $('#overview').attr('data-rotate-x',20);
     $('#overview').attr('data-rotate-y',20);
     $('#overview').attr('data-rotate-z',5); 
-    $('#overview').attr('data-scale',25);   
+    $('#overview').attr('data-scale',2.5*scale);   
     
     s.createImpressjs(); 
     s.createProgressBar(); 
