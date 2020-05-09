@@ -30,12 +30,14 @@ var app = {
           $(this).removeClass('viewSlide'); 
         }); 
       }
-    }
+    }   
+
+    $('#'+s.idImpress).attr('data-transition-duration',500);
     s.impress.init();   
     $('#startBtn').addClass('noDisplay');
     $('#nextBtn').addClass('noDisplay');
     $('#prevBtn').addClass('noDisplay'); 
-    $('#startBtn').on('click',function(){          
+    $('#startBtn').on('click',function(){
       s.impress.next(); 
       $(this).addClass('uk-animation-scale-down');      
     }); 
@@ -47,6 +49,7 @@ var app = {
       s.impress.prev();
       $(this).addClass('uk-animation-scale-down');    
     });
+
     location.hash='#/overview';
     checkOverview();
     $(window).on('hashchange',function(e){
@@ -107,16 +110,65 @@ var app = {
     });  
   }, 
   exe: function(){  
-    var n = 10; 
     var s = this;
-    for (var i=0; i<n; i++){ 
-      $('#'+s.idImpress).append($($('.step')[0]).clone().attr('id','slide-'+(i+1)).attr('data-x',this.r()).attr('data-y',this.r()));
+
+    // cube!
+    var pos =[
+      [ 1, 1, 2,   0,   0,   0], //1
+      [ 2, 1, 1,   0,  90,   0], //2
+      [ 1, 1, 0,   0, 180,   0], //3
+      [ 0, 1, 1,   0, 270,   0], //4
+      [ 1, 2, 1, 270,   0,   0], //5
+      [ 1, 0, 1,  90,   0,   0]  //6 
+
+    ];
+    var aPos = [
+      'data-x',
+      'data-y',
+      'data-z', 
+      'data-rotate-x',
+      'data-rotate-y',
+      'data-rotate-z'
+    ];
+    var magni = Math.max($($('.step')[0]).innerHeight(),$($('.step')[0]).innerWidth())/2;
+    var scale = 10;     
+    var max = [0,0,0];  
+    for (var i=0; i<pos.length; i++){ 
+      for (var ii=0; ii<max.length; ii++){ 
+        max[ii]=Math.max(max[ii],pos[i][ii]);
+      } 
+    }
+    for (var ii=0; ii<max.length; ii++){ 
+      max[ii]=max[ii]/2;
+    }
+
+    for (var i=0; i<pos.length; i++){
+      for (var ii=0; ii<3; ii++){  
+        pos[i][ii]=pos[i][ii]*magni*scale;
+      }  
+      var $e = $($('.step')[0]).clone().attr('id','slide-'+(i+1));
+      $e.attr('data-scale',scale); 
+      for (var ii=0; ii<aPos.length; ii++){ 
+        $e.attr(aPos[ii],pos[i][ii]);
+      } 
+      $('#'+s.idImpress).append($e);
     } 
     $($('.step')[0]).remove();   
-    $('#'+s.idImpress).prepend('<div id="overview" class="step" data-x='+this.r()+' data-y='+this.r()+' data-z="0" data-scale="3"></div>'); 
+
+    $('#'+s.idImpress).prepend('<div id="overview"></div>'); 
+    $('#overview').addClass('step');
+    $('#overview').attr('data-x',max[0]);
+    $('#overview').attr('data-y',max[1]);
+    $('#overview').attr('data-z',max[2]); 
+    $('#overview').attr('data-rotate-x',20);
+    $('#overview').attr('data-rotate-y',20);
+    $('#overview').attr('data-rotate-z',5); 
+    $('#overview').attr('data-scale',25);   
+    
     s.createImpressjs(); 
     s.createProgressBar(); 
-    s.createMenu();
+    s.createMenu();  
+
   }
 }
 app.exe();
