@@ -3,7 +3,8 @@ var mth = {
   //ATRIBUTES
   param: undefined, 
   nameLog: undefined, 
-  outputFolder: 'output', 
+  outputLog: 'outputLog', 
+  outputData: 'data', 
   ig: undefined,
   //GENERAL FUNCTIONS
   log: function(txt){
@@ -18,12 +19,12 @@ var mth = {
     mth.ig = require('./igAPI');
     mth.ig.init(user,pass);
     
-    var output = path.join(path.resolve()+'/'+mth.outputFolder);
+    var output = path.join(path.resolve()+'/'+mth.outputLog);
     if (!fs.existsSync(output)){
       fs.mkdirSync(output);
     } 
     var dateFile = (new Date()).toISOString().substring(0, 19).replace(/:|T|-/g,'_');   
-    mth.nameLog = mth.outputFolder+'/log_'+nameLog+'_'+dateFile+'.txt';
+    mth.nameLog = mth.outputLog+'/log_'+nameLog+'_'+dateFile+'.txt';
     
   },   
   exe: async function (user,pass,nameLog){ 
@@ -134,44 +135,13 @@ var mth = {
     }else{
       mth.log('Pos not created dir='+dir);
     }
-  },
-  //MTH LOGIC 
-  logicSlopeMean: function(prices){
-    var i = 0;
-    var type ='NONE';
-    for (i=0; i<prices.length; i++){
-      prices[i].timeDate = (new Date(prices[i].snapshotTimeUTC)).getTime()         
-    }
-    prices.sort(function(a, b){
-      return b.timeDate-a.timeDate
-    });
-    
-    var med = [];   
-    var time = [];
-    for (i = 0; i<prices.length; i++){
-      med.push((prices[i].closePrice.bid+prices[i].closePrice.ask)/2);  
-      time.push(prices[i].timeDate);  
-    } 
-
-    var ml = require('ml');  
-    var math = require('mathjs');
-    var reg = new ml.SimpleLinearRegression(time,med); 
-    var type = 'NONE';  
-    //ckeck SELL or BUY
-    if(reg.slope<0){
-      type ='SELL';
-    }else{
-      type ='BUY';
-    } 
-    
-    return type; 
-  },
+  }, 
   getIGData: async function(user,pass){
     mth.init(user,pass,'getData'); 
     mth.log('');
     mth.log(' --- Start: getData');
 
-    var marketName = 'Gold';
+    var marketName = 'Euro';
     var search = 'forex';
     var idMarket = undefined;
 
@@ -210,4 +180,4 @@ if(exe==='getdata'){
 }
 if(exe==='exe'){ 
   mth.exe(user,pass,namefile);
-}
+} 
