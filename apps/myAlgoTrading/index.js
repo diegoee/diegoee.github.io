@@ -1,5 +1,11 @@
+$('#terminal').css({
+  height: $('#comboContainer').innerHeight(),
+  'background-color': 'black',
+  'color': 'white'
+});
 
 
+/*
 $('body').prepend('<div id="console"></div>');
 $('body').prepend('<div id="chart"></div>'); 
 $('#chart').css({
@@ -86,3 +92,4 @@ chart.render();
 $(window).on('resize',function(){
    
 });
+*/

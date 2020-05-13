@@ -157,6 +157,7 @@ var mth = {
   }
 }; 
 
+//ej: node main.js user pass getdata
 var namefile = 'test';
 var user = undefined;
 var pass = undefined; 
