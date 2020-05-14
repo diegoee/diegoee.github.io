@@ -4,61 +4,293 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <title>Plot</title>         
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <title>Plot</title>    
+    <style>  
+      #terminal{
+        background-color: black;
+        color: white;
+        font: 0.75em sans-serif;
+        overflow: auto;
+      }
+      #terminal p{
+        margin: 0;
+        padding: 0;
+      } 
+    </style>     
   </head>
   <body> 
     <div class="col">
       <div class="row">
-        <div class="col-md-6"><div id="terminal"></div></div>
+        <div class="col-md-6">
+          <div id="terminal"></div>
+        </div>
         <div class="col-md-6" id="comboContainer">
           <div class="row">
             <div class="col-sm-6">
-              <div class="input-group">
+              <div class="input-group"> 
+                <select class="custom-select" id="selectTradeOper">
+                  <option value="BUY" selected>Buy</option>
+                  <option value="SELL">Sell</option> 
+                </select>
+              </div> 
+              <div class="input-group"> 
                 <div class="input-group-prepend">
-                  <label class="input-group-text">Market</label>
+                  <div class="input-group-text"><i class="fas fa-ban"></i></div>
                 </div>
-                <select class="custom-select">
+                <select class="custom-select" id="selectTradeStop">
+                  <option value="0" selected>0</option>
+                  <option value="10">5</option>
+                  <option value="10">10</option>
+                  <option value="10">20</option>
+                  <option value="10">50</option>
+                  <option value="10">100</option> 
                 </select>
               </div>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <label class="input-group-text">Pos</label>
+              <div class="input-group"> 
+                <div class="input-group-prepend" id="selectTradeLimi">
+                  <div class="input-group-text"><i class="fas fa-grip-lines"></i></div>
                 </div>
                 <select class="custom-select">
-                  <option selected value="1">Buy</option>
-                  <option value="2">Sell</option>
+                    <option value="0" selected>0</option>
+                    <option value="10">5</option>
+                    <option value="10">10</option>
+                    <option value="10">20</option>
+                    <option value="10">50</option>
+                    <option value="10">100</option> 
                 </select>
-              </div>      
-              <button type="button" class="btn btn-danger btn-block">Primary</button>
+              </div> 
             </div>
             <div class="col-sm-6">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <label class="input-group-text">Stop</label>
+                <div class="input-group"> 
+                  <select class="custom-select" id="selectTradeMark"> 
+                    <option value="EUR/USD" selected>EUR/USD</option> 
+                  </select>
                 </div>
-                <select class="custom-select">
-                </select>
+              <div class="input-group"> 
+                <button id="btnOn" type="button" class="btn btn-success btn-block"><i class="fas fa-play"></i></button>
+              </div> 
+              <div class="input-group"> 
+                <button id="btnFast" type="button" class="btn btn-primary btn-block" disabled><i class="fas fa-forward"></i> x1</button>
               </div>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <label class="input-group-text">Lim</label>
-                </div>
-                <select class="custom-select">
-                </select>
-              </div>
-              <button type="button" class="btn btn-primary btn-block">Primary</button> 
             </div>
           </div>           
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-12"><div id="chart"></div></div>
+        <div class="col-sm-12">
+          <div id="chart"></div>
+        </div>
       </div>
     </div>    
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script> 
-    <script src="https://code.highcharts.com/stock/highstock.js"></script>
-    <script src="index.js"></script>    
+    <script src="https://code.highcharts.com/stock/highstock.js"></script> 
+    <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+    <script>  
+      var app = {
+        data: undefined,
+        chart: undefined,
+        tempo: 0,
+        intervalPrice: undefined,
+        timestamp: undefined,
+        getData: function(){
+          var s = this;
+          s.enableBtn();
+          return new Promise(function(resolve) {
+            Highcharts.getJSON('https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/new-intraday.json', function (data){ 
+              s.addTerminal('data Loaded');
+              s.ableBtn();
+              s.data = data;
+              resolve();
+            });
+          }); 
+        },       
+        createChart: function(){
+          this.chart = Highcharts.stockChart('chart', { 
+            title: {
+              text: ''
+            }, 
+            credits: {
+              enabled: false
+            },
+            plotOptions: {
+              candlestick: {
+                color: 'red',
+                upColor: 'green'
+              }
+            },
+            rangeSelector: {
+              buttons: [{
+                type: 'minute',
+                count: 5,
+                text: '5mi'
+              },{
+                type: 'minute',
+                count: 30,
+                text: '30mi'
+              },{
+                type: 'hour',
+                count: 1,
+                text: '1h'
+              },{
+                type: 'hour',
+                count: 4,
+                text: '4h'
+              },{
+                type: 'day',
+                count: 1,
+                text: '1D'
+              },{
+                type: 'week',
+                count: 1,
+                text: '1w'
+              },{
+                type: 'month',
+                count: 1,
+                text: '1m'
+              },{
+                type: 'month',
+                count: 6,
+                text: '6m'
+              },{
+                type: 'year',
+                count: 1,
+                text: '1y'
+              },{
+                type: 'all',
+                count: 1,
+                text: 'All'
+              }],
+              selected: 2,
+              inputEnabled: false
+            }, 
+            series: [{
+              name: $('#selectTradeMark option:selected').text(),
+              type: 'candlestick',
+              data: [],
+              tooltip: {
+                valueDecimals: 2
+              }
+            }]
+          });          
+        },     
+        addTerminal: function(text){
+          var time = new Date()-this.timestamp;
+          time = (Math.floor(time/60/60/1000)<10?'0'+Math.floor(time/60/60/1000):Math.floor(time/60/60/1000))+
+          ':'+(Math.floor(time/60/1000%60)<10?'0'+Math.floor(time/60/1000%60):Math.floor(time/60/1000%60))+
+          ':'+(Math.floor(time/1000%60)<10?'0'+Math.floor(time/1000%60):Math.floor(time/1000%60));
+          $('#terminal').append('<p>('+time+') > '+text+'</p>'); 
+          var scrollSize = $('#terminal').height();
+          $('#terminal p').each(function(){
+            scrollSize = scrollSize + $(this).height();
+          })
+          $('#terminal').animate({ 
+            scrollTop: scrollSize 
+          },500); 
+        },
+        heightTerminal: function(){
+          $('#terminal').css({
+            'height': $('#comboContainer').innerHeight() 
+          }); 
+        },
+        heightChart: function(){
+          $('#chart').css({
+            'height': $(window).innerHeight() - $('#comboContainer').innerHeight() 
+          }); 
+        },
+        ableBtn: function(){  
+          $('#btnOn').prop('disabled', false);
+          $('#btnFast').prop('disabled', true);
+          $('select').prop('disabled', false); 
+        }, 
+        enableBtn: function(){   
+          $('button').prop('disabled', true);
+          $('select').prop('disabled', true); 
+        },         
+        btnBehaviour: function(fnOn,fnOff){
+          var s = this;  
+          $('#btnOn').on('click',function(){ 
+            if($(this).hasClass('btn-success')){
+              $(this).removeClass('btn-success');
+              $(this).addClass('btn-danger');
+              $(this).html('<i class="fas fa-stop"></i>');  
+              $('#btnFast').prop('disabled', false);
+              $('select').prop('disabled', true);
+              s.addTerminal('On');
+              if(typeof fnOn ==='function'){
+                fnOn();
+              }
+            }else{
+              $(this).addClass('btn-success');
+              $(this).removeClass('btn-danger');
+              $(this).html('<i class="fas fa-play"></i>');
+              $('#btnFast').prop('disabled', true);
+              $('select').prop('disabled', false); 
+              s.tempo=1;
+              $('#btnFast').html('<i class="fas fa-forward"></i> x'+s.tempo); 
+              s.addTerminal('Off');
+              if(typeof fnOff ==='function'){
+                fnOff();
+              }
+            }
+          });
+          s.tempo = 1;
+          $('#btnFast').on('click',function(){   
+            s.tempo++;
+            $(this).html('<i class="fas fa-forward"></i> x'+s.tempo); 
+            s.addTerminal('tempo x'+s.tempo);
+            if(s.tempo>4){
+              s.tempo=0;
+            }
+          });  
+        },
+        startTimeStamp: function(){
+          this.timestamp = new Date();
+        },
+        playChart: function(){ 
+          
+          chart.series[0].setData(); 
+          chart.redraw(); 
+          //TODO: continuar por aqui
+        },
+        stopChart: function(){
+          clearInterval(this.intervalPrice);
+        },
+        exe: function(){ 
+          var s = this; 
+          s.startTimeStamp();
+          s.addTerminal('start!');
+          s.enableBtn();
+          s.ableBtn();         
+          s.createChart();
+          s.getData().then(function(){ 
+            s.addTerminal(s.data.length);
+            s.data = [
+              s.data.slice(0, Math.round(s.data.length/5)-1),
+              s.data.slice(Math.round(s.data.length/5), s.data.length-1)
+            ];  
+            s.addTerminal(s.data.length);
+            s.addTerminal(s.data[0].length);
+            s.chart.series[0].setData(s.data[0]); 
+            s.chart.redraw(); 
+            window.dispatchEvent(new Event('resize'));
+            s.btnBehaviour(function(){//On
+              s.playChart();
+            },function(){//Off
+              s.stopChart();              
+            });
+          });           
+          s.heightTerminal();
+          s.heightChart();    
+          $(window).on('resize',function(){ 
+            s.heightTerminal();
+            s.heightChart();
+          });
+        }
+      }
+      app.exe();  
+    </script>   
   </body>
 </html>
