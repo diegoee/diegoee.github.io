@@ -5,6 +5,7 @@ var mth = {
   nameLog: 'log', 
   outputLog: 'outputLog', 
   outputData: 'data', 
+  credentialroot: 'C:\\Users\\alamo\\Downloads\\IGuser.json', //YOUR PAREMETER
   ig: undefined,
   //GENERAL FUNCTIONS
   log: function(txt){
@@ -17,9 +18,8 @@ var mth = {
     var fs = require('fs');
     var path = require('path');     
     mth.ig = require('./igAPI');
-
-    var credentialroot = 'C:\\Users\\alamo\\Downloads\\IGuser.json'; 
-    var userPass = JSON.parse(fs.readFileSync(credentialroot,'utf8')); 
+ 
+    var userPass = JSON.parse(fs.readFileSync(mth.credentialroot,'utf8')); 
     mth.ig.init(userPass.user,userPass.pass);
     
     var output = path.join(path.resolve()+'/'+mth.outputLog);
@@ -138,47 +138,36 @@ var mth = {
       mth.log(res);
     });     
     
-    var dates = [
-      '2020-03-30',
-      '2020-03-31',
-      '2020-04-01',
-      '2020-04-02',
-      '2020-04-03',
-      '2020-04-06',
-      '2020-04-07',
-      '2020-04-08',
-      '2020-04-09',
-      '2020-04-10',
-      '2020-04-13',
-      '2020-04-14',
-      '2020-04-15',
-      '2020-04-16',
-      '2020-04-17',
-      '2020-04-20',
-      '2020-04-21',
-      '2020-04-22',
-      '2020-04-23',
-      '2020-04-24',
-      '2020-04-27',
-      '2020-04-28',
-      '2020-04-29',
-      '2020-04-30',
-      '2020-05-01',
-      '2020-05-04',
-      '2020-05-05',
-      '2020-05-06',
-      '2020-05-07',
-      '2020-05-08',
-      '2020-05-11',
-      '2020-05-12',
-      '2020-05-13',
-      '2020-05-14',
-      '2020-05-15'
-    ]; 
-
-    for (var j in dates){
-      var n = j+1;
-      mth.log('Downloading: ('+n+'/'+dates.length+') getHisPrice');
+    dates = [];
+    var now = new Date();
+    var nOfdays = 90; 
+    for (var i=1; i<nOfdays; i++){
+      var d = new Date();
+      d.setDate(now.getDate()-i);
+      if(d.getDay()!==0&&d.getDay()!==6){ //Saturday and Sunday 
+        d = d.getFullYear()+'-'+((d.getMonth()+1)<10?'0'+(d.getMonth()+1):(d.getMonth()+1))+'-'+d.getDate();
+        dates.push(d);
+      } 
+    } 
+ 
+    var fileDateList = path.join(path.resolve()+'/'+mth.outputData+'/EURUSD_dates.json');
+    var datesFile = undefined;
+    var output = path.join(path.resolve()+'/'+mth.outputData);
+    if (!fs.existsSync(output)){
+      fs.mkdirSync(output);
+    }
+    if (fs.existsSync(fileDateList)) {
+      datesFile = JSON.parse(fs.readFileSync(fileDateList)); 
+      for (var i in datesFile){
+        dates = dates.filter(function(e){
+          return e!==datesFile[i];
+        });
+      } 
+    }    
+ 
+    var downloadedDates = [];
+    for (var j in dates){ 
+      mth.log('Downloading: ('+(parseInt(j)+1)+'/'+dates.length+') getHisPrice');
       await mth.ig.getHisPrice5minDay(idMarket,dates[j]).then(function(data){  
         var dataParse = [];
         for (var i in data){
@@ -190,23 +179,21 @@ var mth = {
           dataParse.push([time,o,h,l,c]);
         } 
         var file = path.join(path.resolve()+'/'+mth.outputData+'/EURUSD_'+dates[j]+'.json');
-        var output = path.join(path.resolve()+'/'+mth.outputData);
-        if (!fs.existsSync(output)){
-          fs.mkdirSync(output);
-        }
         try {
-          fs.unlinkSync(file); 
-          mth.log('file deleted: '+file);
-        } catch(err) {
-          mth.log('file does not exit: '+file);
+          fs.unlinkSync(file);  
+        } catch(err) { 
         }
         fs.appendFileSync(file,JSON.stringify(dataParse),'utf8'); 
-      }).catch(function(res){
-        mth.log('getHisPrice');
+        downloadedDates.push(dates[j]);
+      }).catch(function(res){ 
         mth.log(res);
       }); 
-    };
+    };  
 
+    if(downloadedDates.length!==0){
+      fs.appendFileSync(fileDateList, JSON.stringify(downloadedDates), 'utf8');
+    }
+ 
     mth.log(' --- End: getData');
   }
 }; 
@@ -214,7 +201,7 @@ var mth = {
 //ej: node main.js exe
 process.argv.forEach(function(val,index) {  
   if (index===2&&(val!==undefined||val!==null||val!=='')){ 
-    if(val==='EUR/USD'){ 
+    if(val==='data'){ 
       mth.getEuroData();
     }
     if(val==='exe'){ 

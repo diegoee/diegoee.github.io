@@ -230,28 +230,34 @@
           ];
           var dataTemp = [];
           return new Promise(function(resolve) {
-            var allin = 0; 
-            for (var i in dates){
-              $.getJSON('data/EURUSD_'+dates[i]+'.json', function (data){  
-                for (var ii=0; ii<data.length; ii++){ 
-                  dataTemp.push(data[ii]);
-                }
-                allin++;
-                if(allin>=dates.length){
-                  s.addTerminal('data Loaded');
-                  s.ableBtn();
-                  dataTemp.sort(function(a, b) {
-                    return a[0]-b[0];
-                  });
-                  s.data = dataTemp;
-                  s.chart.hideLoading();
-                  resolve();
-                }
-              }).fail(function() {
-                allin++;
-              });
-            }
-          }); 
+            var allin = 0;  
+            $.getJSON('data/EURUSD_dates.json', function (dates){ 
+              console.log(dates);
+              resolve();
+              /*
+              for (var i in dates){
+                $.getJSON('data/EURUSD_'+dates[i]+'.json', function (data){  
+                  for (var ii=0; ii<data.length; ii++){ 
+                    dataTemp.push(data[ii]);
+                  }
+                  allin++;
+                  if(allin>=dates.length){
+                    s.addTerminal('data Loaded');
+                    s.ableBtn();
+                    dataTemp.sort(function(a, b) {
+                      return a[0]-b[0];
+                    });
+                    s.data = dataTemp;
+                    s.chart.hideLoading();
+                    resolve();
+                  }
+                }).fail(function() {
+                  allin++;
+                });
+              }
+              */
+            }); 
+          });
         },       
         createChart: function(){
           var s = this;
