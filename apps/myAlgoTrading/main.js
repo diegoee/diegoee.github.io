@@ -2,7 +2,7 @@
 var mth = {
   //ATRIBUTES
   param: undefined, 
-  nameLog: undefined, 
+  nameLog: 'log', 
   outputLog: 'outputLog', 
   outputData: 'data', 
   ig: undefined,
@@ -13,22 +13,24 @@ var mth = {
     fs.appendFileSync(path.join(path.resolve()+'/'+mth.nameLog), (new Date()).toISOString().substring(0, 19).replace(/T/g,' ')+' -> '+txt+'\n', 'utf8');
     console.log(txt);
   }, 
-  init: function(user,pass,nameLog){ 
+  init: function(){ 
     var fs = require('fs');
     var path = require('path');     
     mth.ig = require('./igAPI');
-    mth.ig.init(user,pass);
+
+    var credentialroot = 'C:\\Users\\alamo\\Downloads\\IGuser.json'; 
+    var userPass = JSON.parse(fs.readFileSync(credentialroot,'utf8')); 
+    mth.ig.init(userPass.user,userPass.pass);
     
     var output = path.join(path.resolve()+'/'+mth.outputLog);
     if (!fs.existsSync(output)){
       fs.mkdirSync(output);
     } 
     var dateFile = (new Date()).toISOString().substring(0, 19).replace(/:|T|-/g,'_');   
-    mth.nameLog = mth.outputLog+'/log_'+nameLog+'_'+dateFile+'.txt';
-    
+    mth.nameLog = mth.outputLog+'/log_mth_'+dateFile+'.txt'; 
   },   
-  exe: async function (user,pass,nameLog){ 
-    mth.init(user,pass,nameLog); 
+  exe: async function (){ 
+    mth.init();
     mth.log('');
     mth.log(' --- Exe');     
 
@@ -96,7 +98,6 @@ var mth = {
     var marketName = 'EUR/USD Mini';
     var search = 'forex';
     var idMarket = undefined;
-    var spread = 0.00006; 
 
     mth.log(' - Lets open a position!!');
     await mth.ig.getMarketEpic(search,marketName).then(function(id){ 
@@ -106,42 +107,26 @@ var mth = {
       mth.log('getMarketEpic');
       mth.log(res);
     });  
-        
-    var prices = undefined;
-    var slot = 'HOUR_4';
-    var slotInterval = 4*6*7;
-    await mth.ig.getHisPrice(idMarket,slot,slotInterval).then(function(data){
-      prices=data;
-    }).catch(function(res){
-      mth.log('getHisPrice');
+ 
+    var dir = (Math.random()<0.5?'BUY':'SELL');
+    var stopLim = 30;      
+    mth.ig.createPosition(dir,idMarket,stopLim,stopLim).then(function(info){
+      if (info!==undefined){
+        mth.log('Pos created?: type='+info.type+' dealStatus='+info.dealStatus+' reason='+info.reason);  
+      }
+    }).catch(function(res){ 
+      mth.log('createPosition');
       mth.log(res);
     }); 
-
-    var dir = 'NONE';
-    var stopLim = 30;
-    if (prices.length!==0){
-      dir = mth.logicSlopeMean(prices);
-    }  
-    
-    if (dir!=='NONE'){
-      mth.ig.createPosition(dir,idMarket,stopLim,stopLim).then(function(info){
-        if (info!==undefined){
-          mth.log('Pos created?: type='+info.type+' dealStatus='+info.dealStatus+' reason='+info.reason);  
-        }
-      }).catch(function(res){ 
-        mth.log('createPosition');
-        mth.log(res);
-      });
-    }else{
-      mth.log('Pos not created dir='+dir);
-    }
   }, 
-  getIGData: async function(user,pass){
-    mth.init(user,pass,'getData'); 
+  getEuroData: async function(){
+    var fs = require('fs');
+    var path = require('path');  
+    mth.init(); 
     mth.log('');
     mth.log(' --- Start: getData');
 
-    var marketName = 'Euro';
+    var marketName = 'EUR/USD Mini';
     var search = 'forex';
     var idMarket = undefined;
 
@@ -151,34 +136,90 @@ var mth = {
     }).catch(function(res){ 
       mth.log('getMarketEpic');
       mth.log(res);
-    }); 
+    });     
+    
+    var dates = [
+      '2020-03-30',
+      '2020-03-31',
+      '2020-04-01',
+      '2020-04-02',
+      '2020-04-03',
+      '2020-04-06',
+      '2020-04-07',
+      '2020-04-08',
+      '2020-04-09',
+      '2020-04-10',
+      '2020-04-13',
+      '2020-04-14',
+      '2020-04-15',
+      '2020-04-16',
+      '2020-04-17',
+      '2020-04-20',
+      '2020-04-21',
+      '2020-04-22',
+      '2020-04-23',
+      '2020-04-24',
+      '2020-04-27',
+      '2020-04-28',
+      '2020-04-29',
+      '2020-04-30',
+      '2020-05-01',
+      '2020-05-04',
+      '2020-05-05',
+      '2020-05-06',
+      '2020-05-07',
+      '2020-05-08',
+      '2020-05-11',
+      '2020-05-12',
+      '2020-05-13',
+      '2020-05-14',
+      '2020-05-15'
+    ]; 
+
+    for (var j in dates){
+      var n = j+1;
+      mth.log('Downloading: ('+n+'/'+dates.length+') getHisPrice');
+      await mth.ig.getHisPrice5minDay(idMarket,dates[j]).then(function(data){  
+        var dataParse = [];
+        for (var i in data){
+          var time = (new Date(data[i].snapshotTime)).getTime();
+          var o = Math.round((data[i].openPrice.bid+data[i].openPrice.ask)/2*100000)/100000;
+          var h = Math.round((data[i].highPrice.bid+data[i].highPrice.ask)/2*100000)/100000;
+          var l = Math.round((data[i].lowPrice.bid+data[i].lowPrice.ask)/2*100000)/100000;
+          var c = Math.round((data[i].closePrice.bid+data[i].closePrice.ask)/2*100000)/100000;
+          dataParse.push([time,o,h,l,c]);
+        } 
+        var file = path.join(path.resolve()+'/'+mth.outputData+'/EURUSD_'+dates[j]+'.json');
+        var output = path.join(path.resolve()+'/'+mth.outputData);
+        if (!fs.existsSync(output)){
+          fs.mkdirSync(output);
+        }
+        try {
+          fs.unlinkSync(file); 
+          mth.log('file deleted: '+file);
+        } catch(err) {
+          mth.log('file does not exit: '+file);
+        }
+        fs.appendFileSync(file,JSON.stringify(dataParse),'utf8'); 
+      }).catch(function(res){
+        mth.log('getHisPrice');
+        mth.log(res);
+      }); 
+    };
 
     mth.log(' --- End: getData');
   }
 }; 
 
-//ej: node main.js user pass getdata
-var namefile = 'test';
-var user = undefined;
-var pass = undefined; 
-var exe = undefined;
-process.argv.forEach(function(val,index) { 
-  if (index===2&&(val!==undefined||val!==null||val!=='')){
-    user = val;
-  } 
-  if (index===3&&(val!==undefined||val!==null||val!=='')){
-    pass = val;
+//ej: node main.js exe
+process.argv.forEach(function(val,index) {  
+  if (index===2&&(val!==undefined||val!==null||val!=='')){ 
+    if(val==='EUR/USD'){ 
+      mth.getEuroData();
+    }
+    if(val==='exe'){ 
+      mth.exe();
+    } 
   }  
-  if (index===4&&(val!==undefined||val!==null||val!=='')){
-    exe = val;
-  }
-  if (index===5&&(val!==undefined||val!==null||val!=='')){
-    namefile = val;
-  }   
 }); 
-if(exe==='getdata'){ 
-  mth.getIGData(user,pass);
-}
-if(exe==='exe'){ 
-  mth.exe(user,pass,namefile);
-} 
+

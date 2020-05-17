@@ -207,6 +207,45 @@ var ig = {
       });
     }); 
   }, 
+  getHisPrice5minDay: function (idMarket,day){   
+    //Ej: day = 2020-05-14
+    var urlvar = idMarket+'?resolution=MINUTE_5&from='+day+'T00%3A00%3A00&to='+day+'T23%3A55%3A00&max=1&pageSize=1440&pageNumber=1';
+    var request = require('request'); 
+    return new Promise(function(resolve, reject){ 
+      ig.login(function(param){
+        request({
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8",
+            "VERSION": "3",
+            "X-IG-API-KEY": ig.key,
+            "X-SECURITY-TOKEN": param['x-security-token'],
+            "CST": param['cst']
+          },
+          url: ig.url+'/deal/prices/'+urlvar,
+          body: {
+            identifier: ig.user, /*read file*/ 
+            password: ig.pass, /*read file*/ 
+            encryptedPassword: null 
+          },
+          json: true
+        },function(error,response){ 
+          if (response.statusCode===200){  
+            if (response.body.prices.length!==0){ 
+              resolve(response.body.prices);
+            }else{ 
+              reject('No prices got it');
+            }
+          }else{ 
+            reject(response.body.errorCode);
+          }  
+        });
+      },function(){
+        return null;
+      });
+    }); 
+  }, 
   createPosition: function (type,idMarket,stop,lim){ 
     var info = {}; 
     info.type = type; 

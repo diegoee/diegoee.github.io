@@ -22,13 +22,26 @@
   <body> 
     <div class="col">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
           <div id="terminal"></div>
         </div>
-        <div class="col-md-6" id="comboContainer">
+        <div class="col-md-7" id="comboContainer">
           <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-4"> 
               <div class="input-group"> 
+                <button id="btnDeleteTerminal" type="button" class="btn btn-danger btn-block"><i class="fas fa-trash-alt"></i> <i class="fas fa-terminal"></i></button>
+              </div> 
+              <div class="input-group">  
+                <button id="btnClosePosition" type="button" class="btn btn-secondary btn-block"><i class="fas fa-times"></i> <i class="fas fa-business-time"></i></button>
+              </div> 
+              <div class="input-group">  
+              </div> 
+            </div>
+            <div class="col-sm-4">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text"><i class="fas fa-wallet"></i></div>
+                </div>  
                 <select class="custom-select" id="selectTradeOper">
                   <option value="BUY" selected>Buy</option>
                   <option value="SELL">Sell</option> 
@@ -38,35 +51,36 @@
                 <div class="input-group-prepend">
                   <div class="input-group-text"><i class="fas fa-ban"></i></div>
                 </div>
-                <select class="custom-select" id="selectTradeStop">
-                  <option value="0" selected>0</option>
-                  <option value="10">5</option>
-                  <option value="10">10</option>
-                  <option value="10">20</option>
-                  <option value="10">50</option>
-                  <option value="10">100</option> 
+                <select class="custom-select" id="selectTradeStop"> 
+                  <option value="5"  >5</option>
+                  <option value="10" selected>10</option>
+                  <option value="20" >20</option>
+                  <option value="50" >50</option>
+                  <option value="100">100</option> 
                 </select>
               </div>
               <div class="input-group"> 
-                <div class="input-group-prepend" id="selectTradeLimi">
+                <div class="input-group-prepend" >
                   <div class="input-group-text"><i class="fas fa-grip-lines"></i></div>
                 </div>
-                <select class="custom-select">
-                    <option value="0" selected>0</option>
-                    <option value="10">5</option>
-                    <option value="10">10</option>
-                    <option value="10">20</option>
-                    <option value="10">50</option>
-                    <option value="10">100</option> 
+                <select class="custom-select" id="selectTradeLimit"> 
+                  <option value="5"  >5</option>
+                  <option value="10" selected>10</option>
+                  <option value="20" >20</option>
+                  <option value="50" >50</option>
+                  <option value="100">100</option> 
                 </select>
               </div> 
             </div>
-            <div class="col-sm-6">
-                <div class="input-group"> 
-                  <select class="custom-select" id="selectTradeMark"> 
-                    <option value="EUR/USD" selected>EUR/USD</option> 
-                  </select>
+            <div class="col-sm-4">
+              <div class="input-group">  
+                <div class="input-group-prepend">
+                 <div class="input-group-text"><i class="fas fa-comments-dollar"></i></div>
                 </div>
+                <select class="custom-select" id="selectTradeMark"> 
+                  <option value="EUR/USD" selected>EUR/USD</option> 
+                </select>
+              </div>
               <div class="input-group"> 
                 <button id="btnOn" type="button" class="btn btn-success btn-block"><i class="fas fa-play"></i></button>
               </div> 
@@ -82,10 +96,10 @@
           <div id="chart"></div>
         </div>
       </div>
-    </div>    
+    </div>  
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script> 
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>  
     <script src="https://code.highcharts.com/stock/highstock.js"></script> 
     <script src="https://code.highcharts.com/stock/modules/data.js"></script>
     <script>  
@@ -95,23 +109,160 @@
         tempo: 0,
         intervalPrice: undefined,
         timestamp: undefined,
+        position:{
+          flagStart: false,
+          startTime: undefined,
+          closeTime: undefined,
+          startPrice: undefined,
+          closePrice: undefined,
+          stop: undefined,
+          limit: undefined,
+          pip: undefined,
+          spread: undefined
+        },
+        getRndInteger: function(min, max) {
+          return Math.floor(Math.random() * (max - min) ) + min;
+        },
+        exeBtnClosePosition: function(){ 
+          $('#btnClosePosition').trigger('click');  
+        }, 
+        createPosition: function(){ 
+          var s = this;
+          s.chart.series[1].setData([ ]); 
+          s.chart.series[2].setData([ ]); 
+          s.chart.series[3].setData([ ]); 
+          s.chart.redraw();
+          s.position.spread = 0.00006;
+          s.position.pip    = 0.0001;
+          s.position.flagStart  = true;
+          s.position.startTime  = s.data[0][s.data[0].length-1][0];
+          s.position.closeTime  = s.position.startTime;
+          s.position.startPrice = s.data[0][s.data[0].length-1][4]+($('#selectTradeOper').val()==='BUY'?1:-1)*s.position.spread;
+          s.position.closePrice = s.position.startPrice;
+          s.position.stop       = s.data[0][s.data[0].length-1][4]+($('#selectTradeOper').val()==='BUY'?-1:1)*s.position.pip*$('#selectTradeStop').val();
+          s.position.limit      = s.data[0][s.data[0].length-1][4]+($('#selectTradeOper').val()==='BUY'?1:-1)*s.position.pip*$('#selectTradeLimit').val();   
+          $('#btnClosePosition').one('click',function(){
+            $('#btnClosePosition').prop('disabled', true); 
+            s.position.flagStart = false; 
+            s.addTerminal('Position Closed');
+            s.addTerminal('Pips Gain: '+s.calcGain());
+          });      
+        },
+        calcGain: function(){
+          var s = this;
+          return Math.round(($('#selectTradeOper').val()==='BUY'?1:-1)*(s.position.closePrice-s.position.startPrice)/s.position.pip*100000)/100000;
+        },
+        checkPosition: function(){ 
+          var s = this;
+          s.position.stopTime = s.data[0][s.data[0].length-1][0];
+          s.position.closePrice = s.data[0][s.data[0].length-1][4];  
+          if($('#selectTradeOper').val()==='BUY'){
+            if(s.data[0][s.data[0].length-1][2]>s.position.limit){ //pass limit: high>limit
+              s.position.closePrice=s.position.limit;
+              s.addTerminal($('#selectTradeOper').val()+': Limit Prices!');  
+              s.exeBtnClosePosition(); 
+              s.exeBtnStart();
+            }
+            if(s.data[0][s.data[0].length-1][3]<s.position.stop){ //pass stop: low<stop
+              s.position.stopPrice=s.position.stop;
+              s.addTerminal($('#selectTradeOper').val()+': Stop Prices!');   
+              s.exeBtnClosePosition(); 
+              s.exeBtnStart();
+            }
+          }else{
+            if(s.data[0][s.data[0].length-1][3]<s.position.limit){ //pass limit: low<limit
+              s.position.closePrice=s.position.limit;
+              s.addTerminal($('#selectTradeOper').val()+': Limit Prices!');    
+              s.exeBtnClosePosition(); 
+              s.exeBtnStart();
+            }
+            if(s.data[0][s.data[0].length-1][2]>s.position.stop){ //pass stop: high>stop
+              s.position.stopPrice=s.position.stop;
+              s.addTerminal($('#selectTradeOper').val()+': Stop Prices!');    
+              s.exeBtnClosePosition(); 
+              s.exeBtnStart();        
+            }
+          } 
+          if(Math.random()<0.125){
+            s.addTerminal('Pips Gain: '+s.calcGain());
+          }
+        },
         getData: function(){
           var s = this;
           s.enableBtn();
+          s.chart.showLoading();
+          var dates = [
+            '2020-03-30',
+            '2020-03-31',
+            '2020-04-01',
+            '2020-04-02',
+            '2020-04-03',
+            '2020-04-06',
+            '2020-04-07',
+            '2020-04-08',
+            '2020-04-09',
+            '2020-04-10',
+            '2020-04-13',
+            '2020-04-14',
+            '2020-04-15',
+            '2020-04-16',
+            '2020-04-17',
+            '2020-04-20',
+            '2020-04-21',
+            '2020-04-22',
+            '2020-04-23',
+            '2020-04-24',
+            '2020-04-27',
+            '2020-04-28',
+            '2020-04-29',
+            '2020-04-30',
+            '2020-05-01',
+            '2020-05-04',
+            '2020-05-05',
+            '2020-05-06',
+            '2020-05-07',
+            '2020-05-08',
+            '2020-05-11',
+            '2020-05-12',
+            '2020-05-13',
+            '2020-05-14',
+            '2020-05-15'
+          ];
+          var dataTemp = [];
           return new Promise(function(resolve) {
-            Highcharts.getJSON('https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/new-intraday.json', function (data){ 
-              s.addTerminal('data Loaded');
-              s.ableBtn();
-              s.data = data;
-              resolve();
-            });
+            var allin = 0; 
+            for (var i in dates){
+              $.getJSON('data/EURUSD_'+dates[i]+'.json', function (data){  
+                for (var ii=0; ii<data.length; ii++){ 
+                  dataTemp.push(data[ii]);
+                }
+                allin++;
+                if(allin>=dates.length){
+                  s.addTerminal('data Loaded');
+                  s.ableBtn();
+                  dataTemp.sort(function(a, b) {
+                    return a[0]-b[0];
+                  });
+                  s.data = dataTemp;
+                  s.chart.hideLoading();
+                  resolve();
+                }
+              }).fail(function() {
+                allin++;
+              });
+            }
           }); 
         },       
         createChart: function(){
+          var s = this;
           this.chart = Highcharts.stockChart('chart', { 
             title: {
               text: ''
-            }, 
+            },  
+            loading: {
+              hideDuration: 500,
+              showDuration: 500
+            },
             credits: {
               enabled: false
             },
@@ -171,10 +322,42 @@
               type: 'candlestick',
               data: [],
               tooltip: {
-                valueDecimals: 2
+                valueDecimals: 4
               }
             }]
-          });          
+          });
+          s.chart.addSeries({
+            name: 'start price Position',
+            type: 'line',
+            color: 'black', 
+            data: [ 
+            ],
+            tooltip: {
+              valueDecimals: 4
+            }
+          });
+          s.chart.addSeries({
+            name: 'stop',
+            type: 'line',
+            color: 'red',
+            dashStyle: 'shortdash',
+            data: [ 
+            ],
+            tooltip: {
+              valueDecimals: 4
+            }
+          });
+          s.chart.addSeries({
+            name: 'limit',
+            type: 'line',
+            color: 'green',
+            dashStyle: 'shortdash',
+            data: [ 
+            ],
+            tooltip: {
+              valueDecimals: 4
+            }
+          });      
         },     
         addTerminal: function(text){
           var time = new Date()-this.timestamp;
@@ -201,7 +384,9 @@
           }); 
         },
         ableBtn: function(){  
-          $('#btnOn').prop('disabled', false);
+          $('#btnOn').prop('disabled', false); 
+          $('#btnDeleteTerminal').prop('disabled', false);
+          $('#btnClosePosition').prop('disabled', true);
           $('#btnFast').prop('disabled', true);
           $('select').prop('disabled', false); 
         }, 
@@ -209,7 +394,7 @@
           $('button').prop('disabled', true);
           $('select').prop('disabled', true); 
         },         
-        btnBehaviour: function(fnOn,fnOff){
+        btnBehaviour: function(){
           var s = this;  
           $('#btnOn').on('click',function(){ 
             if($(this).hasClass('btn-success')){
@@ -218,10 +403,8 @@
               $(this).html('<i class="fas fa-stop"></i>');  
               $('#btnFast').prop('disabled', false);
               $('select').prop('disabled', true);
-              s.addTerminal('On');
-              if(typeof fnOn ==='function'){
-                fnOn();
-              }
+              s.addTerminal('On');  
+              s.playChart();
             }else{
               $(this).addClass('btn-success');
               $(this).removeClass('btn-danger');
@@ -230,57 +413,88 @@
               $('select').prop('disabled', false); 
               s.tempo=1;
               $('#btnFast').html('<i class="fas fa-forward"></i> x'+s.tempo); 
-              s.addTerminal('Off');
-              if(typeof fnOff ==='function'){
-                fnOff();
-              }
+              s.addTerminal('Off'); 
+              s.stopChart();  
             }
           });
           s.tempo = 1;
           $('#btnFast').on('click',function(){   
             s.tempo++;
             $(this).html('<i class="fas fa-forward"></i> x'+s.tempo); 
-            s.addTerminal('tempo x'+s.tempo);
+            s.addTerminal('tempo x'+s.tempo); 
+            s.stopChart();  
+            s.playChart();  
             if(s.tempo>4){
               s.tempo=0;
             }
           });  
         },
-        startTimeStamp: function(){
-          this.timestamp = new Date();
+        startTerminal: function(){
+          this.timestamp = new Date(); 
+          $('#btnDeleteTerminal').on('click',function(){
+            $('#terminal').html(' ');
+          });     
         },
-        playChart: function(){ 
-          
-          chart.series[0].setData(); 
-          chart.redraw(); 
-          //TODO: continuar por aqui
+        playChart: function(){
+          var s = this;    
+          var time = 1000/s.tempo;
+          $('#btnClosePosition').prop('disabled', true);
+          if (!s.position.flagStart){
+            s.createPosition(); 
+            s.chart.series[1].setData([
+              [s.position.startTime,s.position.startPrice]
+            ]);
+            s.chart.series[2].setData([
+              [s.position.startTime,s.position.stop]
+            ]);
+            s.chart.series[3].setData([
+              [s.position.startTime,s.position.limit]
+            ]); 
+            s.chart.redraw(); 
+          } 
+          this.intervalPrice = setInterval(function (){ 
+            if(s.data[1].length===0){
+              s.exeBtnStart();
+            }else{ 
+              var point = s.data[1].shift()
+              s.data[0].push(point);       
+              s.chart.series[0].addPoint(point);
+              s.chart.series[1].addPoint([point[0],s.position.startPrice]);
+              s.chart.series[2].addPoint([point[0],s.position.stop]);
+              s.chart.series[3].addPoint([point[0],s.position.limit]); 
+              s.checkPosition(); 
+              s.chart.redraw(); 
+            }
+          },time);  
         },
         stopChart: function(){
-          clearInterval(this.intervalPrice);
-        },
+          var s = this;     
+          clearInterval(s.intervalPrice);
+          if(s.position.flagStart===true){
+            $('#btnClosePosition').prop('disabled', false); 
+          }
+        }, 
+        exeBtnStart: function(){ 
+          $('#btnOn').trigger('click');
+        },   
         exe: function(){ 
           var s = this; 
-          s.startTimeStamp();
+          s.startTerminal();
           s.addTerminal('start!');
           s.enableBtn();
-          s.ableBtn();         
-          s.createChart();
+          s.ableBtn();     
+          s.createChart();   
           s.getData().then(function(){ 
-            s.addTerminal(s.data.length);
+            var n = s.getRndInteger(1,10);  
             s.data = [
-              s.data.slice(0, Math.round(s.data.length/5)-1),
-              s.data.slice(Math.round(s.data.length/5), s.data.length-1)
+              s.data.slice(0, Math.round(s.data.length/n)-1),
+              s.data.slice(Math.round(s.data.length/n), s.data.length-1)
             ];  
-            s.addTerminal(s.data.length);
-            s.addTerminal(s.data[0].length);
             s.chart.series[0].setData(s.data[0]); 
             s.chart.redraw(); 
             window.dispatchEvent(new Event('resize'));
-            s.btnBehaviour(function(){//On
-              s.playChart();
-            },function(){//Off
-              s.stopChart();              
-            });
+            s.btnBehaviour();
+            s.exeBtnStart();
           });           
           s.heightTerminal();
           s.heightChart();    
