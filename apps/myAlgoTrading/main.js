@@ -140,7 +140,7 @@ var mth = {
     
     dates = [];
     var now = new Date();
-    var nOfdays = 90; 
+    var nOfdays = 14; 
     for (var i=1; i<nOfdays; i++){
       var d = new Date();
       d.setDate(now.getDate()-i);

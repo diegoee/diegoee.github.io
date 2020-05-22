@@ -191,71 +191,43 @@
           var s = this;
           s.enableBtn();
           s.chart.showLoading();
-          var dates = [
-            '2020-03-30',
-            '2020-03-31',
-            '2020-04-01',
-            '2020-04-02',
-            '2020-04-03',
-            '2020-04-06',
-            '2020-04-07',
-            '2020-04-08',
-            '2020-04-09',
-            '2020-04-10',
-            '2020-04-13',
-            '2020-04-14',
-            '2020-04-15',
-            '2020-04-16',
-            '2020-04-17',
-            '2020-04-20',
-            '2020-04-21',
-            '2020-04-22',
-            '2020-04-23',
-            '2020-04-24',
-            '2020-04-27',
-            '2020-04-28',
-            '2020-04-29',
-            '2020-04-30',
-            '2020-05-01',
-            '2020-05-04',
-            '2020-05-05',
-            '2020-05-06',
-            '2020-05-07',
-            '2020-05-08',
-            '2020-05-11',
-            '2020-05-12',
-            '2020-05-13',
-            '2020-05-14',
-            '2020-05-15'
-          ];
-          var dataTemp = [];
           return new Promise(function(resolve) {
             var allin = 0;  
+            var dates = [];
+            var dataTemp = [];
+            function checkOK(){
+              if(allin>=dates.length){
+                s.addTerminal('data Loaded');
+                s.ableBtn();
+                dataTemp.sort(function(a, b) {
+                  return a[0]-b[0];
+                });
+                s.data = dataTemp;
+                s.chart.hideLoading();
+                resolve();
+              }
+            }
             $.getJSON('data/EURUSD_dates.json', function (dates){ 
-              console.log(dates);
-              resolve();
-              /*
               for (var i in dates){
                 $.getJSON('data/EURUSD_'+dates[i]+'.json', function (data){  
                   for (var ii=0; ii<data.length; ii++){ 
                     dataTemp.push(data[ii]);
                   }
                   allin++;
-                  if(allin>=dates.length){
-                    s.addTerminal('data Loaded');
-                    s.ableBtn();
-                    dataTemp.sort(function(a, b) {
-                      return a[0]-b[0];
-                    });
-                    s.data = dataTemp;
-                    s.chart.hideLoading();
-                    resolve();
-                  }
+                  checkOK();                  
                 }).fail(function() {
                   allin++;
+                  checkOK();
                 });
-              }
-              */
+              } 
+            }).fail(function(){
+              var d = new Date();
+              s.data=[]; 
+              for (var i=1; i<=25; i++){ 
+                s.data.push([d.setDate(d.getDate()+1),1,1,1,1]);
+              }              
+              s.chart.hideLoading();
+              resolve();
             }); 
           });
         },       
@@ -377,7 +349,7 @@
           })
           $('#terminal').animate({ 
             scrollTop: scrollSize 
-          },500); 
+          },100); 
         },
         heightTerminal: function(){
           $('#terminal').css({
