@@ -56,8 +56,8 @@ console.log('Contamos el total de ficheros a copiar');
 var tot=[0,0,0];
 allFiles.forEach(function(f) {  
   var c1 = f.indexOf('.mp3')>0;
-  var c2 = f.indexOf('99')!==-1;
-  var c3 = f.indexOf('80')!==-1;    
+  var c2 = f.indexOf('999')!==-1;
+  var c3 = f.indexOf('888')!==-1;    
   if(c1&&!c2&&!c3){
     tot[0]++;
   }
