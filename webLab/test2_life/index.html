@@ -54,9 +54,9 @@
       </div>
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script> 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script> 
     <script type="text/javascript"> 
       (function exe(){   
         var stats = new Stats();
@@ -70,14 +70,15 @@
         requestAnimationFrame(animateMemo);
 
         function toast(text,fn){
-          M.Toast.dismissAll();
+          //M.Toast.dismissAll();
           var toastMsg = M.toast({
             html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
-            displayLength: 1500, 
+            displayLength: 5000, 
             completeCallback: fn
-          }); 
+          });            
+          $('.btnToast').off('click'); 
           $('.btnToast').on('click',function(){
-            M.Toast.dismissAll();
+            M.Toast.getInstance($(this).parent()).dismiss(); 
           }); 
         } 
         function onOffLoading(state){ 
@@ -97,8 +98,8 @@
         function plotCanvas(){ 
           onOffLoading(true);          
           canvas = new fabric.Canvas('canvas',{ 
-            width: $('#canvasContainer').innerWidth()-48, 
-            height: $('#canvasContainer').innerHeight()-48,
+            width: $('#canvasContainer').width()-48, 
+            height: $('#canvasContainer').height()-48,
             selection: false,
             preserveObjectStacking: true,             
           });  
@@ -204,15 +205,13 @@
             addPathElement(); 
           } 
 
-          var color = ['black','red', 'purple', 'blue', 'green', 'yellow', 'orange', 'brown', 'grey'];
-          var colorPos = 0;
           function restartCanvasWithPath(){
             canvas.clear();
             canvas.add(group);  
             var rect = new fabric.Rect({
               left: group.left-group.width/2 + matrixPos[path[0][0]][path[0][1]][1],
               top: group.top-group.height/2 +matrixPos[path[0][0]][path[0][1]][0], 
-              fill: color[colorPos],
+              fill: 'black',
               width: cc, 
               height: cc,
               selectable: false 
@@ -230,8 +229,7 @@
               if(pathCounter<path.length-1){
                 var rect = new fabric.Rect({
                   left: group.left-group.width/2 + matrixPos[path[pathCounter][0]][path[pathCounter][1]][1],
-                  top: group.top-group.height/2 + matrixPos[path[pathCounter][0]][path[pathCounter][1]][0],   
-                  fill: color[colorPos],
+                  top: group.top-group.height/2 + matrixPos[path[pathCounter][0]][path[pathCounter][1]][0],  
                   width: cc, 
                   height: cc,
                   selectable: false 
@@ -289,18 +287,20 @@
                   restartCanvasWithPath(); 
                 }
                 animate(); 
-              }else{
-                colorPos++;
-                if(colorPos>color.length-1){
-                  colorPos=0;
-                }
+              }else{ 
+                toast('Stop');
+                startStop = false; 
               }
             },
             'mouse:up': function(options) { 
               diffTimeMS=options.e.timeStamp-diffTimeMS; 
               if(diffTimeMS>500){
-                toast('Stop');
-                startStop = false; 
+                toast('Reset');
+                startStop = false;   
+                restartPath();
+                calPath();   
+                restartCanvasWithPath(); 
+                canvas.renderAll();   
               }
             }
           });
@@ -309,15 +309,15 @@
         
         function resize(){  
           $('#canvasContainer').innerHeight($(window).innerHeight()-50);
-          $('#canvasContainer').html('<canvas id="canvas" ></canvas>');
+          $('#canvasContainer').html('<canvas id="canvas"></canvas>');
           plotCanvas(); 
         }  
                  
-        toast('Start: Press on screen'); 
+        toast('Press on screen to Start');
+        toast('Long Press to reset');  
         resize();
         $(window).on('resize',function(){
-          window.location.reload();
-          resize();
+          window.location.reload(); 
         }); 
       })();
     </script>

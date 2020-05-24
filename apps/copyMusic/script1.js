@@ -52,12 +52,14 @@ var allFiles = [];
   }
 })(pth);
  
+var cond1 = '999';
+var cond2 = '888';
 console.log('Contamos el total de ficheros a copiar');  
 var tot=[0,0,0];
 allFiles.forEach(function(f) {  
   var c1 = f.indexOf('.mp3')>0;
-  var c2 = f.indexOf('999')!==-1;
-  var c3 = f.indexOf('888')!==-1;    
+  var c2 = f.indexOf(cond1)!==-1;
+  var c3 = f.indexOf(cond2)!==-1;    
   if(c1&&!c2&&!c3){
     tot[0]++;
   }
@@ -85,8 +87,8 @@ for(var z = 0; z<folders.length; z++){
     fEnd = folders[z]+'\\'+fEnd; 
     
     var c1 = (f.indexOf('.mp3')>0);
-    var c2 = (f.indexOf('99')!==-1);
-    var c3 = (f.indexOf('80')!==-1);
+    var c2 = (f.indexOf(cond1)!==-1);
+    var c3 = (f.indexOf(cond2)!==-1);
     
     if((z===0)&&c1&&!c2&&!c3){ 
       copyFile(f,fEnd); 

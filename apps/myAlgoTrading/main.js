@@ -119,12 +119,12 @@ var mth = {
       mth.log(res);
     }); 
   }, 
-  getEuroData: async function(){
+  getEurUsdIG: async function(){
     var fs = require('fs');
     var path = require('path');  
     mth.init(); 
     mth.log('');
-    mth.log(' --- Start: getData');
+    mth.log(' --- Start: getEurUsdIG');
 
     var marketName = 'EUR/USD Mini';
     var search = 'forex';
@@ -194,16 +194,16 @@ var mth = {
       fs.appendFileSync(fileDateList, JSON.stringify(downloadedDates), 'utf8');
     }
  
-    mth.log(' --- End: getData');
-  }
+    mth.log(' --- End');
+  } 
 }; 
 
 //ej: node main.js exe
 process.argv.forEach(function(val,index) {  
   if (index===2&&(val!==undefined||val!==null||val!=='')){ 
     if(val==='data'){ 
-      mth.getEuroData();
-    }
+      mth.getEurUsdIG();
+    } 
     if(val==='exe'){ 
       mth.exe();
     } 
