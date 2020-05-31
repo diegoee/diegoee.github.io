@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test">    
+    <title>Web Test7_threejs_sketch</title>  
+    <style> 
+      html, body{ 
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        background-color: black;
+        color: whitesmoke;
+      } 
+      #body{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      </style>   
+    </head>
+  <body>     
+    <div id="other"></div>  
+    <div id="body"></div>     
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>  
+    <script src="https://threejs.org/build/three.js"></script>
+    <script type="module">  
+      function app(){ 
+        $('#body').html(' ' );
+        var scene,camera,rendere,geometry,material,renderer = undefined;
+        
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera( 50, $(window).innerWidth()/$(window).innerHeight(), 0.1, 1000 );
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize($(window).innerWidth(),$(window).innerHeight());
+        $('#body').html(renderer.domElement); 
+
+        geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        material = new THREE.MeshBasicMaterial( { color: 0xEEEEEE} );
+        var cube = new THREE.Mesh( geometry, material ); 
+        scene.add( cube );
+        
+        material = new THREE.LineBasicMaterial( { color: 0xEEEEEE } ); 
+        var points = []; 
+        //1 side
+        points.push( new THREE.Vector3( -1, -1, -1 )); //x, y, z
+        points.push( new THREE.Vector3(  1, -1, -1 ));
+        points.push( new THREE.Vector3(  1,  1, -1 ));
+        points.push( new THREE.Vector3( -1,  1, -1 ));
+        points.push( new THREE.Vector3( -1, -1, -1 ));
+        //2 side
+        points.push( new THREE.Vector3( -1, -1, -1 )); //x, y, z
+        points.push( new THREE.Vector3(  1, -1, -1 ));
+        points.push( new THREE.Vector3(  1, -1,  1 ));
+        points.push( new THREE.Vector3( -1, -1,  1 ));
+        points.push( new THREE.Vector3( -1, -1, -1 ));
+        //3 side
+        points.push( new THREE.Vector3( -1, -1, -1 )); //x, y, z
+        points.push( new THREE.Vector3( -1,  1, -1 ));
+        points.push( new THREE.Vector3( -1,  1,  1 ));
+        points.push( new THREE.Vector3( -1, -1,  1 ));
+        points.push( new THREE.Vector3( -1, -1, -1 ));
+        //4 side
+        points.push( new THREE.Vector3(  1, -1, -1 )); //x, y, z
+        points.push( new THREE.Vector3(  1,  1, -1 ));
+        points.push( new THREE.Vector3(  1,  1,  1 ));
+        points.push( new THREE.Vector3(  1, -1,  1 ));
+        points.push( new THREE.Vector3(  1, -1, -1 ));
+        //5 side
+        points.push( new THREE.Vector3( -1,  1, -1 )); //x, y, z
+        //points.push( new THREE.Vector3( -1,  1,  1 ));
+        //points.push( new THREE.Vector3(  1,  1,  1 ));
+        //points.push( new THREE.Vector3(  1,  1, -1 ));
+        //points.push( new THREE.Vector3( -1,  1, -1 ));
+        // 6 side. Not need it
+        
+
+        geometry = new THREE.BufferGeometry().setFromPoints( points );
+        var line = new THREE.Line( geometry, material );  
+        scene.add( line );      
+ 
+        camera.position.z = 5;
+        renderer.render( scene, camera );
+
+        var animate = function () {
+          var d = 0.001;
+          requestAnimationFrame( animate );
+          cube.rotation.x += d;
+          cube.rotation.y += d;
+          line.rotation.x += d;
+          line.rotation.y += d;
+          renderer.render( scene, camera );
+        };
+        animate();
+          
+      }
+
+      app();
+      $(window).on('resize',function(){
+        app(); 
+      })
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>
