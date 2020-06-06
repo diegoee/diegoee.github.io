@@ -33,25 +33,29 @@
     <div id="other"></div>  
     <div id="body"></div>     
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>  
-    <script src="https://threejs.org/build/three.js"></script>
+    <script src="https://threejs.org/build/three.js"></script>  
     <script type="module">  
+      import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
       function app(){ 
         $('#body').html(' ' );
-        var scene,camera,rendere,geometry,material,renderer = undefined;
+        var scene, camera, renderer, geometry, material, renderer, group, mesh = undefined;
         
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera( 50, $(window).innerWidth()/$(window).innerHeight(), 0.1, 1000 );
         renderer = new THREE.WebGLRenderer();
         renderer.setSize($(window).innerWidth(),$(window).innerHeight());
-        $('#body').html(renderer.domElement); 
+        $('#body').html(renderer.domElement);  
 
-        geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        material = new THREE.MeshBasicMaterial( { color: 0xEEEEEE} );
-        var cube = new THREE.Mesh( geometry, material ); 
-        scene.add( cube );
-        
-        material = new THREE.LineBasicMaterial( { color: 0xEEEEEE } ); 
-        var points = []; 
+        //cube
+        group = new THREE.Group();
+        geometry = new THREE.BoxGeometry( 2, 2, 2 );
+        material = new THREE.MeshBasicMaterial( { color: 0xEEEEEE} ); 
+        mesh = new THREE.Mesh( geometry, material );  
+        group.add( mesh ); 
+
+        //line black
+        material = new THREE.LineBasicMaterial( { color: 0x000000 } ); 
+        var points = [];         
         //1 side
         points.push( new THREE.Vector3( -1, -1, -1 )); //x, y, z
         points.push( new THREE.Vector3(  1, -1, -1 ));
@@ -77,28 +81,100 @@
         points.push( new THREE.Vector3(  1, -1,  1 ));
         points.push( new THREE.Vector3(  1, -1, -1 ));
         //5 side
+        points.push( new THREE.Vector3(  1,  1, -1 ));
+        points.push( new THREE.Vector3( -1,  1, -1 ));
         points.push( new THREE.Vector3( -1,  1, -1 )); //x, y, z
-        //points.push( new THREE.Vector3( -1,  1,  1 ));
-        //points.push( new THREE.Vector3(  1,  1,  1 ));
-        //points.push( new THREE.Vector3(  1,  1, -1 ));
-        //points.push( new THREE.Vector3( -1,  1, -1 ));
-        // 6 side. Not need it
+        points.push( new THREE.Vector3( -1,  1,  1 ));
+        points.push( new THREE.Vector3( -1,  1,  1 ));
+        points.push( new THREE.Vector3(  1,  1,  1 ));
+        // 6 side. Not need it    
+        geometry = new THREE.BufferGeometry().setFromPoints( points );
+        mesh = new THREE.Line( geometry, material );   
+        group.add( mesh );  
+ 
+        //Black point sides
+        geometry = new THREE.CircleGeometry( 0.25, 100 );
+        material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+        // cirle n1
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=0;
+        mesh.position.y=0;
+        mesh.position.z=1.01;
+        group.add( mesh );
+        // cirle n2 
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=0.5;
+        mesh.position.y=0.5;
+        mesh.position.z=-1.01;
+        mesh.rotation.y=1*Math.PI;
+        group.add( mesh );
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-0.5;
+        mesh.position.y=-0.5;
+        mesh.position.z=-1.01;
+        mesh.rotation.y=1*Math.PI;
+        group.add( mesh );
+        // cirle n3 
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=0.5;
+        mesh.position.y=-1.01;
+        mesh.position.z=0.5;
+        mesh.rotation.x=0.5*Math.PI;
+        group.add( mesh );
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-0.5;
+        mesh.position.y=-1.01;
+        mesh.position.z=-0.5;
+        mesh.rotation.x=0.5*Math.PI;
+        group.add( mesh );        
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=0;
+        mesh.position.y=-1.01;
+        mesh.position.z=0;
+        mesh.rotation.x=0.5*Math.PI;
+        group.add( mesh );
+
+        // cirle n4 //The X axis is red. The Y axis is green. The Z axis is blue.
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=0.5;
+        mesh.position.y=1.01;
+        mesh.position.z=-0.5;
+        mesh.rotation.x=-0.5*Math.PI;
+        group.add( mesh );
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-0.5;
+        mesh.position.y=1.01;
+        mesh.position.z=-0.5;
+        mesh.rotation.x=-0.5*Math.PI;
+        group.add( mesh );        
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-0.5;
+        mesh.position.y=1.01;
+        mesh.position.z=0.5;
+        mesh.rotation.x=-0.5*Math.PI;
+        group.add( mesh );  
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=0.5;
+        mesh.position.y=1.01;
+        mesh.position.z=0.5;
+        mesh.rotation.x=-0.5*Math.PI;
+        group.add( mesh );
         
 
-        geometry = new THREE.BufferGeometry().setFromPoints( points );
-        var line = new THREE.Line( geometry, material );  
-        scene.add( line );      
- 
-        camera.position.z = 5;
+        scene.add( group );  
+        var axesHelper = new THREE.AxesHelper( 2 ); //The X axis is red. The Y axis is green. The Z axis is blue.
+        scene.add( axesHelper );  
+        var controls = new OrbitControls( camera, renderer.domElement ); 
+        camera.position.set( 0, 0, 5 ); 
+        controls.update();
         renderer.render( scene, camera );
 
         var animate = function () {
-          var d = 0.001;
+          var d = 0.0125;
           requestAnimationFrame( animate );
-          cube.rotation.x += d;
-          cube.rotation.y += d;
-          line.rotation.x += d;
-          line.rotation.y += d;
+          group.rotation.x += d;
+          group.rotation.y += d; 
+          controls.update();
           renderer.render( scene, camera );
         };
         animate();
