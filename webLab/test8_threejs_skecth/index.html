@@ -93,7 +93,7 @@
         group.add( mesh );  
  
         //Black point sides
-        geometry = new THREE.CircleGeometry( 0.25, 100 );
+        geometry = new THREE.CircleGeometry( 0.225, 100 );
         material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
         // cirle n1
         mesh = new THREE.Mesh( geometry, material );
@@ -133,7 +133,6 @@
         mesh.position.z=0;
         mesh.rotation.x=0.5*Math.PI;
         group.add( mesh );
-
         // cirle n4 //The X axis is red. The Y axis is green. The Z axis is blue.
         mesh = new THREE.Mesh( geometry, material );
         mesh.position.x=0.5;
@@ -159,22 +158,117 @@
         mesh.position.z=0.5;
         mesh.rotation.x=-0.5*Math.PI;
         group.add( mesh );
+        // cirle n5 //The X axis is red. The Y axis is green. The Z axis is blue.
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=1.01;
+        mesh.position.y=0;
+        mesh.position.z=0;
+        mesh.rotation.y=0.5*Math.PI;
+        group.add( mesh );
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=1.01;
+        mesh.position.y=0.5;
+        mesh.position.z=0.5;
+        mesh.rotation.y=0.5*Math.PI;
+        group.add( mesh );        
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=1.01;
+        mesh.position.y=-0.5;
+        mesh.position.z=0.5;
+        mesh.rotation.y=0.5*Math.PI;
+        group.add( mesh );  
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=1.01;
+        mesh.position.y=0.5;
+        mesh.position.z=-0.5;
+        mesh.rotation.y=0.5*Math.PI;
+        group.add( mesh );  
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=1.01;
+        mesh.position.y=-0.5;
+        mesh.position.z=-0.5;
+        mesh.rotation.y=0.5*Math.PI;
+        group.add( mesh );
+        // cirle n5 //The X axis is red. The Y axis is green. The Z axis is blue.
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-1.01;
+        mesh.position.y=0;
+        mesh.position.z=0.5;
+        mesh.rotation.y=-0.5*Math.PI;
+        group.add( mesh );
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-1.01;
+        mesh.position.y=0.5;
+        mesh.position.z=0.5;
+        mesh.rotation.y=-0.5*Math.PI;
+        group.add( mesh );        
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-1.01;
+        mesh.position.y=-0.5;
+        mesh.position.z=0.5;
+        mesh.rotation.y=-0.5*Math.PI;
+        group.add( mesh );  
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-1.01;
+        mesh.position.y=0.5;
+        mesh.position.z=-0.5;
+        mesh.rotation.y=-0.5*Math.PI;
+        group.add( mesh );  
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-1.01;
+        mesh.position.y=-0.5;
+        mesh.position.z=-0.5;
+        mesh.rotation.y=-0.5*Math.PI;
+        group.add( mesh );
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.x=-1.01;
+        mesh.position.y=0;
+        mesh.position.z=-0.5;
+        mesh.rotation.y=-0.5*Math.PI;
+        group.add( mesh );
         
 
         scene.add( group );  
         var axesHelper = new THREE.AxesHelper( 2 ); //The X axis is red. The Y axis is green. The Z axis is blue.
         scene.add( axesHelper );  
-        var controls = new OrbitControls( camera, renderer.domElement ); 
+        //var controls = new OrbitControls( camera, renderer.domElement ); 
+        //controls.update();
         camera.position.set( 0, 0, 5 ); 
-        controls.update();
         renderer.render( scene, camera );
 
-        var animate = function () {
-          var d = 0.0125;
+        function getRndN(nstart,nEnd){
+          return Math.floor(Math.random()*nEnd)+nstart;
+        }
+        //Camera position
+        var ang = Math.PI/2;
+        var posRot=[
+          [0,0,0], //1         
+          [2*ang,0,0], //2
+          [3*ang,0,0], //3
+          [1*ang,0,0], //4
+          [0,3*ang,0], //5
+          [0,1*ang,0]  //6
+        ];
+
+        var pos = 1;
+        $('#body').on('click',function(){ 
+          group.rotation.x = posRot[pos][0];
+          group.rotation.y = posRot[pos][1];
+          group.rotation.z = posRot[pos][2];
+          pos++;
+          if(pos>5){
+            pos=0;
+          } 
+          renderer.render( scene, camera );
+        }); 
+
+        function animate() {
+          var d = ang/30;  
           requestAnimationFrame( animate );
-          group.rotation.x += d;
-          group.rotation.y += d; 
-          controls.update();
+          group.rotation.x += d/4;
+          group.rotation.y += d/2;  
+          group.rotation.z += d/1;  
+          //controls.update();
           renderer.render( scene, camera );
         };
         animate();
