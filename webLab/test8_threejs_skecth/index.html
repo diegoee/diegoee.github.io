@@ -253,6 +253,7 @@
 
         function click(){
           $('#'+idElement).off('click'); 
+          stopWaitAnimate();
 
           //console.clear();
           //console.log(1*a90);
@@ -308,15 +309,43 @@
             }             
           }; 
           function animateZoomOut() {  
-            if(camera.position.z<=5){
+            if(camera.position.z<5){
               camera.position.z +=0.1;  
               renderer.render( scene, camera );              
               requestAnimationFrame( animateZoomOut );  
-            }            
+            }else{
+              exeWaitAnimate();
+            }   
           }; 
           animate(); 
         } 
         $('#'+idElement).on('click',click); 
+
+        var exeAnimateWait = true;
+        var timeoutAnimateWait = undefined;
+        function animateWait() { 
+          group.rotation.x += 0.0025;
+          group.rotation.y += 0.005;
+          group.rotation.z += 0.005;  
+          renderer.render( scene, camera ); 
+          if(exeAnimateWait){
+            requestAnimationFrame( animateWait ); 
+          } 
+        }; 
+
+        function exeWaitAnimate(){  
+          exeAnimateWait = true;
+          timeoutAnimateWait = setTimeout(function(){ 
+            animateWait();
+          },2000);
+        }
+
+        function stopWaitAnimate(){
+          exeAnimateWait = false;
+          clearTimeout(timeoutAnimateWait);
+        }
+
+        exeWaitAnimate();
       }
 
       dado('body');
