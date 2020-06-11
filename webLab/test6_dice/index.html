@@ -160,29 +160,7 @@
         padding: 0;
         width: 100%;
         height: 100%;
-      }   
-      #dice{ 
-        cursor: pointer;
-        position: fixed; 
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 100000;
-        display: flex;
-        align-items: center;
-        justify-content: center; 
-        color: #DDD;  
-        font-size: 0.125em; 
-        transition: font-size 1s ease-in-out, text-shadow 0.5s ease-in-out;
-      } 
-      #dice:hover{  
-        text-shadow: 0px 0px 200px #FFF;  
-      } 
-      #dice.on{  
-        font-size: 20em;
-        color: #FFF; 
-      } 
+      }    
     </style>   
     </head>
   <body>     
@@ -201,13 +179,10 @@
     </div>   
     <div id="body"></div>     
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>  
+    <script src="https://threejs.org/build/three.js"></script>  
+    <script src="js/dado.js"></script>  
     <script type="text/javascript">   
       (function app(){ 
-        var dice = {
-          getRndN: function(nstart,nEnd){
-            return Math.floor(Math.random()*nEnd)+nstart;
-          }
-        } 
         var dataStore = {
           nameVar: 'values_dice',
           values: [], 
@@ -280,38 +255,19 @@
               displayTest = displayTest+' ...'; 
               self.addMsg(displayTest);  
             });
-          },
-          createDice: function(store){ 
-            this.add('<div id="dice"></div>');
-            var $e = $('#dice'); 
-            $e.html(dice.getRndN(1,6)); 
-            store.save($e.html());
-            $e.on('click',function(){  
-              $e.toggleClass('on');
-            });
-            $e.on('transitionend webkitTransitionEnd oTransitionEnd', function (e){ 
-              if(e.originalEvent.propertyName==='font-size'&&!$e.hasClass('on')){ 
-                $e.trigger('click');
-              } 
-            });             
-            $e.on('transitionstart webkitTransitionStart oTransitionStart', function (e){ 
-              if(e.originalEvent.propertyName==='font-size'&&$e.hasClass('on')){
-                $e.html(dice.getRndN(1,6)); 
-                store.save($e.html()); 
-              } 
-            });            
-            $e.trigger('click');
-          },
+          }, 
           exe: function(){ 
             var self = this;
             self.reset(); 
             dataStore.start(function(){
               alert('Store not enable','Warnning');
             }); 
-            self.createMenu(dataStore); 
-            self.createDice(dataStore); 
+            self.createMenu(dataStore);             
+            dado.exe('body',function(data){ 
+              dataStore.save(data);
+            });
             $(window).off('resize');
-            $(window).on('resize',function(){
+            $(window).on('resize',function(){ 
               self.exe();
             });            
           }
