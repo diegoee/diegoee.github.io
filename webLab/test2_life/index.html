@@ -26,6 +26,9 @@
         top: 0;
         right: 0; 
         z-index: 100; 
+      }
+      #canvasContainer{ 
+        margin: 1em; 
       }     
     </style>
   </head>
@@ -45,14 +48,7 @@
     </div>  
     <div id="monitorFloat">  
     </div> 
-    <div class="container">
-      <div class="row">
-        <div class="col s12">
-          <div id="canvasContainer" class="card-panel hoverable">  
-          </div>
-        </div> 
-      </div>
-    </div>
+    <div id="canvasContainer"></div> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
@@ -96,10 +92,10 @@
          
         var canvas = undefined;
         function plotCanvas(){ 
-          onOffLoading(true);          
+          onOffLoading(true);           
           canvas = new fabric.Canvas('canvas',{ 
-            width: $('#canvasContainer').width()-48, 
-            height: $('#canvasContainer').height()-48,
+            width: $('#canvasContainer').innerWidth(), 
+            height: $('#canvasContainer').innerHeight(),
             selection: false,
             preserveObjectStacking: true,             
           });  
@@ -308,7 +304,7 @@
         }
         
         function resize(){  
-          $('#canvasContainer').innerHeight($(window).innerHeight()-50);
+          $('#canvasContainer').innerHeight($(window).innerHeight()-30);
           $('#canvasContainer').html('<canvas id="canvas"></canvas>');
           plotCanvas(); 
         }  
