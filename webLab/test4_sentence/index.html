@@ -119,7 +119,9 @@
         onOffLoading(true);  
         $('#inputText').on('focus',function(){ 
           $('#inputTextContainer span').attr('uk-icon','commenting');
-          $('#inputTextContainer').addClass('buzz').on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(){ 
+          $('#inputTextContainer').off('webkitAnimationEnd oanimationend msAnimationEnd animationend');
+          $('#inputTextContainer').addClass('buzz');
+          $('#inputTextContainer').on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(){ 
             $(this).removeClass('buzz'); 
           });
           $(document).on('keydown', function(e){ 
