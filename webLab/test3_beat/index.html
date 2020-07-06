@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Test3_beat</title>
+    <style> 
+      #loading{
+        background-color: rgb(255,255,255,0.85);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }     
+    </style>
+  </head>
+  <body> 
+    <div id="loading"> 
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="body"></div>  
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>   
+    <script type="text/javascript"> 
+      (function exe(){  
+
+        function toast(text,fn){
+          M.Toast.dismissAll();
+          var toastMsg = M.toast({
+            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
+            displayLength: 1500, 
+            completeCallback: fn
+          }); 
+          $('.btnToast').on('click',function(){
+            M.Toast.dismissAll();
+          }); 
+        } 
+
+        function onOffLoading(state){ 
+          if(state){
+            $('#loading').css({
+              display: 'flex'
+            });
+          }else{
+            $('#loading').css({
+              display: 'none'
+            });
+          } 
+        }        
+        
+        var intervalpointsTimeline = []; 
+        var intervaltimelineStarted = undefined; 
+        var synth = new Tone.Synth().toMaster();  
+        function plotCanvas(){     
+          var canvas = new fabric.Canvas('canvas',{ 
+            selection: false,
+            preserveObjectStacking: true,
+            width: $(window).innerWidth()-40, 
+            height: $(window).innerHeight()-46             
+          });  
+
+          var color = ['red', 'pink', 'purple', 'indigo', 'blue', 'cyan', 'teal', 'green', 'yellow', 'orange', 'brown', 'grey'];
+          var opacityOctave = [0.95,0.5,0.15];
+          var numberOctave = ['2', '3', '4'];
+          var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+          var spaceX = Math.floor(canvas.width/notes.length);
+          var spaceY = Math.floor(canvas.height/opacityOctave.length);
+          var allNotes = [];
+          var time = 8000; 
+
+           
+          var group = new fabric.Group([
+            new fabric.Rect({
+              left: 0,
+              top: canvas.height/4,
+              fill: 'black',
+              width: canvas.width,
+              height: 1
+            }),
+            new fabric.Rect({
+              left: 0,
+              top: 3*canvas.height/4,
+              fill: 'black',
+              width: canvas.width,
+              height: 1
+            }),
+            new fabric.Rect({
+              left: 0,
+              top: 2*canvas.height/4,
+              fill: 'black',
+              width: canvas.width,
+              height: 1
+            })
+          ],{ 
+            selectable: false,
+            opacity: 0.15,
+            //top: 0,
+            //left: 0,
+            //originX: 'center',
+            //originY: 'center'
+          }); 
+          canvas.clear();
+          canvas.add(group);
+          canvas.renderAll();
+
+          for(var i=0; i<notes.length; i++){
+            for(var ii=0; ii<opacityOctave.length; ii++){
+              allNotes.push({
+                x: [i*spaceX,(i+1)*spaceX-1],
+                y: [ii*spaceY,(ii+1)*spaceY-1],
+                opacity: opacityOctave[ii],
+                n: numberOctave[ii],
+                color: color[i],
+                note: notes[i],
+              });
+            } 
+          }      
+
+          function getPosAllNotes(posX,posY){
+            var pos = 0; 
+            for(var i=0; i<allNotes.length; i++){  
+              if(allNotes[i].x[0]<=posX&&allNotes[i].x[1]>posX&&allNotes[i].y[0]<=posY&&allNotes[i].y[1]>posY){
+                pos = i;
+                break;
+              }
+            } 
+            return pos;
+          }   
+
+          var diffTimeMS = 0;
+          canvas.on({ 
+            'mouse:down': function(options) { 
+              diffTimeMS=options.e.timeStamp; 
+              var posX = (options.e.type==='mousedown')?options.e.offsetX:options.e.touches[0].clientX-20;
+              var posY = (options.e.type==='mousedown')?options.e.offsetY:options.e.touches[0].clientY-20;  
+              createPointTimeline(posX,posY);
+              createCircleClick(posX,posY);
+              startTimeline();
+            },
+            'mouse:up': function(options) { 
+              diffTimeMS=options.e.timeStamp-diffTimeMS; 
+              if(diffTimeMS>1000){
+                toast('clear All!');
+                clearAllPlay();
+              }
+            }
+          });
+  
+          function clearAllPlay(){
+            for(var i = 0; i<intervalpointsTimeline.length; i++){
+              clearInterval(intervalpointsTimeline[i]);
+            }
+            clearInterval(intervaltimelineStarted); 
+            intervaltimelineStarted = undefined;
+            intervalpointsTimeline = [];  
+          }  
+
+          function createPointTimeline(posX,posY){  
+            var pos = getPosAllNotes(posX,posY); 
+
+            function playPlot(){
+              synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n,'8n');  
+
+              var circle = new fabric.Group([
+                new fabric.Circle({ 
+                  radius: 30,  
+                  opacity: allNotes[pos].opacity,
+                  fill: allNotes[pos].color,  
+                  top: 0, 
+                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2, 
+                  originX: 'center',
+                  originY: 'center' 
+                }),
+                new fabric.Text(allNotes[pos].note+allNotes[pos].n,{
+                  fontFamily: 'Comic Sans',
+                  fontSize: 30,
+                  top: 0, 
+                  left: (allNotes[pos].x[0]+allNotes[pos].x[1])/2, 
+                  originX: 'center',
+                  originY: 'center'
+                }) 
+              ],{ 
+                selectable: false, 
+                originX: 'center',
+                originY: 'center'
+              }); 
+
+              canvas.add(circle);
+              canvas.renderAll(); 
+              circle.animate({ 
+                top: canvas.height
+              },{
+                duration: time,
+                onChange: canvas.renderAll.bind(canvas),
+                onComplete: function(){ 
+                  canvas.remove(circle);      
+                },
+                easing: function(t,b,c,d){
+                  return c*t/d+b; 
+                }
+              }); 
+            }
+
+            playPlot();
+            intervalpointsTimeline.push(setInterval(playPlot,time)
+            );
+          }
+ 
+          function startTimeline(){
+            console.log('startTimeline');
+            //console.log(intervaltimelineStarted); 
+            if(intervaltimelineStarted===undefined){ 
+              clearInterval(intervaltimelineStarted);
+              intervaltimelineStarted = setInterval(function(){
+                createLineStart();
+              },time); 
+              createLineStart();
+            }
+            function createLineStart(){
+              var lineStart = new fabric.Rect({ 
+                fill: 'black', 
+                width: canvas.width-10,
+                height: 1,
+                selectable: false,
+                top: 1, 
+                left: canvas.width/2,
+                originX: 'center',
+                originY: 'center'    
+              }); 
+              lineStart.animate({  
+                top:  canvas.height 
+              },{
+                duration: time,
+                onChange: canvas.renderAll.bind(canvas),
+                onComplete: function(){ 
+                  canvas.remove(lineStart); 
+                },
+                easing: function(t,b,c,d){
+                  return c*t/d+b; 
+                }
+              }); 
+              canvas.add(lineStart);
+              canvas.renderAll(); 
+            }  
+          }
+
+          function createCircleClick(posX,posY){
+            var pos = getPosAllNotes(posX,posY);                
+            //synth.triggerAttackRelease(allNotes[pos].note+allNotes[pos].n,'8n'); 
+            var circle = new fabric.Circle({ 
+              radius: 1,  
+              opacity: allNotes[pos].opacity,
+              fill: allNotes[pos].color, 
+              selectable: false,
+              top: posY, 
+              left: posX, 
+              originX: 'center',
+              originY: 'center' 
+            });
+            canvas.add(circle);
+            canvas.renderAll(); 
+            circle.animate({ 
+              radius: 750, 
+              opacity: 0
+            },{
+              duration: 750,
+              onChange: canvas.renderAll.bind(canvas),
+              onComplete: function(){ 
+                canvas.remove(circle);                    
+              },
+              easing: fabric.util.ease.easeInQuad
+            });
+          }
+
+        }
+
+        function resize(){  
+          onOffLoading(true);
+          toast('Welcome!',function(){
+            $('#body').html('<canvas id="canvas"></canvas>'); 
+            $('#canvas').css({ 
+              'margin': '20px',
+              'border': 'solid 1px',
+              'border-color': 'rgba(0, 0, 0, 0.25)' 
+            });
+            for(var i = 0; i<intervalpointsTimeline.length; i++){
+              clearInterval(intervalpointsTimeline[i]);
+            }
+            clearInterval(intervaltimelineStarted);
+            plotCanvas(); 
+            onOffLoading(false);
+          });
+        }         
+        resize();
+        $(window).on('resize',resize);   
+      })();
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>

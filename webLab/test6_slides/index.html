@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Web Test6_slides</title>          
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/css/uikit.min.css" />  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/css/reveal.min.css" /> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/css/theme/black.min.css" /> 
+    <link rel="stylesheet" href="style.css"/> 
+  </head>
+  <body>      
+    <div id="menuBtn" uk-toggle="target: #menu"><span uk-icon="icon: menu; ratio: 2"></span></div> 
+    <div id="menu" uk-offcanvas="mode: reveal; overlay: true">
+      <div class="uk-offcanvas-bar"> 
+        <button id="btnCloseMenu" class="uk-offcanvas-close" type="button" uk-close></button>  
+        <h1 class="uk-heading-divider">Menu</h1>
+        <ul class="uk-list uk-list-divider"></ul>
+      </div>
+    </div>  
+    <div class="reveal">
+      <div class="slides">
+        <section>Horizontal Slide 1</section>
+        <section>
+          <section>Vertical Slide 2 1</section>
+          <section>Vertical Slide 2 2</section>
+        </section>
+        <section>Horizontal Slide 3</section>
+        <section>Horizontal Slide 4</section>
+        <section>
+          <section>Vertical Slide 5 1</section>
+          <section>Vertical Slide 5 2</section>
+        </section>
+        <section>Horizontal Slide 6</section>
+      </div>
+    </div> 
+    <div id="template">
+      <div class="uk-card uk-card-default uk-card-body step slide">
+        <div uk-grid>
+          <div class="uk-width-1-6 uk-text-left"></div>
+          <div class="uk-width-2-3 uk-text-center"><h1>Lorem Ipsum</h1></div>
+          <div class="uk-width-1-6 uk-text-right"></div>
+        </div>
+        <div class="uk-placeholder">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>
+        <div class="uk-animation-toggle" tabindex="0">
+          <div class="uk-animation-shake" uk-alert>
+            <a class="uk-alert-close" uk-close></a>
+            <h3>Notice</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          </div> 
+        </div>
+        <hr class="uk-divider-icon">
+        <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-bottom" uk-tooltip="Hello World">Hover</button>
+      </div>
+    </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.4.0/dist/js/uikit-icons.min.js"></script> 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/js/reveal.min.js"></script> 
+    <script type="text/javascript" src="main.js"></script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>
