@@ -1,31 +1,78 @@
-/*global $*/
+/*global $ Swiper*/ 
 var app = {   
+  swiper: undefined,
+  setHash: function(hash){
+    window.location.hash=hash;
+  },
+  getHash: function(){
+    return window.location.hash.slice(1);
+  },
   createMenu: function(){ 
-    var $e = $('.reveal section');
-    var l = $e.length;
-    $('#menu ul').append('<li><button do-slide="overview" class="uk-button uk-button-text uk-button-small uk-text-meta active"><span uk-icon="home"></span> Overview</button></li>');  
-    for (var i=0; i<l; i++){ 
-      $('#menu ul').append('<li><button class="uk-button uk-button-text uk-button-small uk-text-meta"><span uk-icon="file-text"></span> Slide '+i+'</button></li>');
-    } 
+    var s = this;
+    var $e = $('.swiper-wrapper .swiper-slide'); 
+    for (var i=0; i<$e.length; i++){ 
+      $('#menu ul').append('<li><button class="uk-button uk-button-text uk-button-small uk-text-meta" data-hash="'+$($e[i]).attr('data-hash')+'"><span uk-icon="file-text"></span>Slide '+(i+1)+'</button></li>'); 
+    }    
+    
     $('#menu ul button').on('click',function(){
-      var s = $(this).attr('go-slide');
-      if(s==='overview'){
-
-      }else{
-
-      }
-      $('#btnCloseMenu').trigger('click'); 
+      s.setHash($(this).attr('data-hash'));
+      $('#btnCloseMenu').trigger('click');
+      s.checkActiveSlideInMenu(); 
     }); 
+    s.checkActiveSlideInMenu();  
+  },
+  checkActiveSlideInMenu: function (){ 
+    var s =this;
     $('#labelActiveMenu').remove();
-    $($('#menu ul li')[0]).prepend(' <span id="labelActiveMenu" uk-icon="chevron-right"></span>');         
+    var $btn = $('#menu ul button');
+    for(var i=0; i<$btn.length; i++){ 
+      if($($('#menu ul li button')[i]).attr('data-hash')===s.getHash()){
+        $($('#menu ul li button')[i]).prepend(' <span id="labelActiveMenu" uk-icon="chevron-right"></span>'); 
+        break;
+      }
+    } 
+  },  
+  resize: function(){
+    $('#app').innerHeight($(window).innerHeight());
   }, 
   exe: function(){  
-    var s = this;
-    s.createMenu();  
-    Reveal.initialize().then(function(){ 
-       
+    var s = this; 
+    s.createMenu();
+    s.swiper = new Swiper('.swiper-container', { 
+      direction: 'horizontal',
+      loop: false,
+      hashNavigation: {
+        replaceState: true
+      },
+      effect: 'cube',
+      grabCursor: true,
+      cubeEffect: {
+        shadow: true,
+        slideShadows: true,
+        shadowOffset: 20,
+        shadowScale: 0.94,
+      },      
+      keyboard: {
+        enabled: true,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        type: 'fraction'
+      },  
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      }  
+    });
+    s.swiper.slideTo(0, 100, null); 
+    $(window).on('hashchange',function(){ 
+      s.swiper.slideTo(parseInt(s.getHash())-1, 100, null);
+      s.checkActiveSlideInMenu();
     }); 
-    Reveal.toggleOverview();
+    s.resize();
+    $(window).on('resize',function(){ 
+      s.resize();
+    }); 
   }
 }
 app.exe();
