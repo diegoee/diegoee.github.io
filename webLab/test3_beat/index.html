@@ -204,10 +204,20 @@
             $('.app-slot div').removeClass('push1');
             $('.app-slot div').removeClass('push2');
           }
-          function RandomFill(){
+          function randomFill(){
             reset();
-            $('.app-slot').each(function(){
-              
+            $('.app-slot div').each(function(){ 
+              $(this).removeClass('push1');
+              $(this).removeClass('push2'); 
+              if(Math.random()>0.5){ 
+                $(this).addClass('push1');
+              }else{ 
+                $(this).addClass('push2'); 
+              }
+              if(Math.random()>0.5){  
+                $(this).removeClass('push1');
+                $(this).removeClass('push2'); 
+              } 
             });
           }
           $('#btnReset').on('click',function(){ 
@@ -215,7 +225,7 @@
             clearInterval(s.interPlayState);
             s.interPlayState=undefined;
           });
-          $('#btnTempo').val(120);
+          $('#btnTempo').val(120); //Start Value
           $('#btnTempo').on('change',function(){   
             if(s.interPlayState!==undefined){
               $('#btnExe').trigger('click');  
@@ -226,7 +236,7 @@
             if(s.interPlayState!==undefined){
               $('#btnExe').trigger('click');  
             }
-            RandomFill();
+            randomFill();
             s.toast('Random slot filled'); 
           });  
         },
