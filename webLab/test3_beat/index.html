@@ -88,7 +88,13 @@
         display: flex;
         justify-content: center;
         align-items: center; 
-      }    
+      }  
+      .play{   
+        opacity: 0.5;
+      }       
+      .on{   
+        opacity: 1;
+      } 
     </style>
   </head>
   <body> 
@@ -119,8 +125,12 @@
           </div> 
         </div>
       </li>  
-      <li><a id="btnTempo" class="waves-effect waves-teal btn-flat sidenav-close"><i class="material-icons">timer</i>Tempo</a></li> 
+      <li><a class="subheader"><i class="material-icons">timer</i>Tempo (Bpm)</a></li>  
+      <div class="container range-field">
+        <input id="btnTempo" type="range" id="test5" min="60" max="180" />
+      </div> 
       <li><a id="btnRnd" class="waves-effect waves-teal btn-flat sidenav-close"><i class="material-icons">format_align_center</i>Random</a></li> 
+      <li><a id="btnReset" class="waves-effect waves-teal btn-flat sidenav-close"><i class="material-icons">delete_sweep</i>reset</a></li> 
       <li><div class="divider"></div></li>
       <li><a class="subheader">Data</a></li> 
       <li><a id="btnLoad" class="waves-effect waves-teal btn-flat sidenav-close"><i class="material-icons">file_upload</i>Load</a></li>
@@ -133,6 +143,9 @@
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>-->  
     <script>       
       var app = {
+        nSlot: 16,
+        intruments: ['Snare','Bass','hit-hats','Ride','Crash'],
+        sounds: [],
         toast: function (text,fn){
           M.Toast.dismissAll();
           var toastMsg = M.toast({
@@ -156,15 +169,15 @@
           } 
         },   
         plotScenario: function(){
+          var s = this;
           $('#body').html(' ');
           var $e = $('<div class="app-instrument">');
           $e.append('<div class="app-name"></div>');
-          for (var i=0; i<16; i++){
+          for (var i=0; i<s.nSlot; i++){
             $e.append('<div class="app-slot"><div></div></div>');
-          } 
-          var names = ['Snare','Bass','hit-hats','Ride','Crash'];
-          for (var i in names){
-            $e.find('.app-name').html('<div class="flow-text">'+names[i]+'</div>');
+          }  
+          for (var i in s.intruments){
+            $e.find('.app-name').html('<div class="flow-text">'+s.intruments[i]+'</div>');
             $('#body').append($e.clone());
           }
           delete $e; 
@@ -181,25 +194,85 @@
               $(this).removeClass('push2');
               $(this).addClass('push2');
             }
-          });
-
-
-
-          var w = $('#body').innerWidth();
-          var h = $('#body').innerHeight();          
+          });          
         }, 
+        setBtnMenu: function(){ 
+          var s = this;
+          function reset(){
+            $('.app-slot').removeClass('play');
+            $('.app-slot').removeClass('on');
+            $('.app-slot div').removeClass('push1');
+            $('.app-slot div').removeClass('push2');
+          }
+          function RandomFill(){
+            reset();
+            $('.app-slot').each(function(){
+              
+            });
+          }
+          $('#btnReset').on('click',function(){ 
+            reset();
+            clearInterval(s.interPlayState);
+            s.interPlayState=undefined;
+          });
+          $('#btnTempo').val(120);
+          $('#btnTempo').on('change',function(){   
+            if(s.interPlayState!==undefined){
+              $('#btnExe').trigger('click');  
+            }
+            s.toast($('#btnTempo').val()+' Bpm'); 
+          });  
+          $('#btnRnd').on('click',function(){   
+            if(s.interPlayState!==undefined){
+              $('#btnExe').trigger('click');  
+            }
+            RandomFill();
+            s.toast('Random slot filled'); 
+          });  
+        },
         setBtnExe: function(){ 
+          var s = this;
           $('#btnExe').on('click',function(){
             if($(this).hasClass('green')){
               $(this).removeClass('green');
               $(this).addClass('red');
               $(this).html('<i class="material-icons">stop</i>');
+              s.interPlay();
+              s.toast('Start!'); 
             }else{ 
               $(this).removeClass('red');
               $(this).addClass('green');
               $(this).html('<i class="material-icons">play_arrow</i>');
+              s.interPlay();
+              s.toast('Stop');
             }
           });
+        },
+        interPlayState: undefined,
+        interPlay: function(){
+          var s = this;
+          var ms = 60000/parseInt($('#btnTempo').val());
+          if(s.interPlayState===undefined){
+            var i = 0;
+            $('.app-slot').addClass('play');
+            function play(){
+              $('.app-slot').removeClass('on');
+              $('.app-instrument').each(function(){
+                $($(this).find('.app-slot')[i]).addClass('on');
+              });
+              i++;
+              if(i>=s.nSlot){
+                i = 0;
+              }
+            }
+            play();
+            s.interPlayState = setInterval(play,ms); 
+          }else{
+            $('.app-slot').removeClass('play');
+            $('.app-slot').removeClass('on');
+            clearInterval(s.interPlayState);
+            s.interPlayState=undefined;
+          }
         },
         resize: function(){ 
         },
@@ -208,12 +281,14 @@
           s.onOffLoading(true); 
           $('.sidenav').sidenav();
           s.setBtnExe();
+          s.setBtnMenu();
           s.plotScenario();
           s.resize();
           $(window).on('resize',function(){
             s.resize();
           });  
           s.onOffLoading(false);
+          $('#btnExe').trigger('click'); 
         }
       } 
       app.exe(); 
