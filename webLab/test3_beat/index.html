@@ -90,7 +90,7 @@
         align-items: center; 
       }  
       .play{   
-        opacity: 0.5;
+        opacity: 0.6;
       }       
       .on{   
         opacity: 1;
@@ -133,19 +133,31 @@
       <li><a id="btnReset" class="waves-effect waves-teal btn-flat sidenav-close"><i class="material-icons">delete_sweep</i>reset</a></li> 
       <li><div class="divider"></div></li>
       <li><a class="subheader">Data</a></li> 
-      <li><a id="btnLoad" class="waves-effect waves-teal btn-flat sidenav-close"><i class="material-icons">file_upload</i>Load</a></li>
-      <li><a id="btnSave" class="waves-effect waves-teal btn-flat sidenav-close"><i class="material-icons">file_download</i>Save</a></li>
+      <li><a id="btnLoad" class="waves-effect waves-teal btn-flat sidenav-close disabled"><i class="material-icons">file_upload</i>Load</a></li>
+      <li><a id="btnSave" class="waves-effect waves-teal btn-flat sidenav-close disabled"><i class="material-icons">file_download</i>Save</a></li>
     </ul>
     <div id="body" class="teal lighten-5">
     </div>  
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>           
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>-->  
-    <script>       
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>  
+    <script>   
       var app = {
         nSlot: 16,
-        intruments: ['Snare','Bass','hit-hats','Ride','Crash'],
-        sounds: [],
+        intruments: ['Kick','Snare','hit-hats','Ride','Splash'],
+        sounds: [[
+            'mp3/Drums_Kick_01.mp3',
+            'mp3/Drums_Snare_01.mp3',
+            'mp3/Drums_Hi_Hat_01.mp3',
+            'mp3/Drums_Ride_01.mp3',
+            'mp3/Drums_Splash_01.mp3'
+          ],[
+            'mp3/Drums_Kick_02.mp3',
+            'mp3/Drums_Snare_02.mp3',
+            'mp3/Drums_Hi_Hat_02.mp3',
+            'mp3/Drums_Ride_02.mp3',
+            'mp3/Drums_Splash_02.mp3'          
+        ]],
         toast: function (text,fn){
           M.Toast.dismissAll();
           var toastMsg = M.toast({
@@ -199,6 +211,7 @@
         setBtnMenu: function(){ 
           var s = this;
           function reset(){
+            $('#btnTempo').val(120); //Start Value
             $('.app-slot').removeClass('play');
             $('.app-slot').removeClass('on');
             $('.app-slot div').removeClass('push1');
@@ -206,6 +219,10 @@
           }
           function randomFill(){
             reset();
+            function getRndN(nstart,nEnd){
+              return Math.floor(Math.random()*nEnd)+nstart;
+            }
+            $('#btnTempo').val(getRndN(60,180))
             $('.app-slot div').each(function(){ 
               $(this).removeClass('push1');
               $(this).removeClass('push2'); 
@@ -237,7 +254,7 @@
               $('#btnExe').trigger('click');  
             }
             randomFill();
-            s.toast('Random slot filled'); 
+            s.toast('Random slot filled: '+$('#btnTempo').val()+' Bpm'); 
           });  
         },
         setBtnExe: function(){ 
@@ -270,7 +287,17 @@
               $('.app-instrument').each(function(){
                 $($(this).find('.app-slot')[i]).addClass('on');
               });
-              i++;
+              i++;  
+
+              $('.app-slot.play.on').each(function(i,e){ 
+                if($(this).children().hasClass('push1')){
+                  s.playSound(s.sounds[0][i]);
+                }
+                if($(this).children().hasClass('push2')){
+                  s.playSound(s.sounds[1][i]);
+                } 
+              });
+
               if(i>=s.nSlot){
                 i = 0;
               }
@@ -284,7 +311,12 @@
             s.interPlayState=undefined;
           }
         },
-        resize: function(){ 
+        playSound: function(root){ 
+          console.log('play: '+root);
+          new Tone.Player({
+            url: root,
+            autostart: true,
+          }).toMaster(); 
         },
         exe: function(){
           var s = this;
@@ -292,13 +324,9 @@
           $('.sidenav').sidenav();
           s.setBtnExe();
           s.setBtnMenu();
-          s.plotScenario();
-          s.resize();
-          $(window).on('resize',function(){
-            s.resize();
-          });  
-          s.onOffLoading(false);
-          $('#btnExe').trigger('click'); 
+          s.plotScenario(); 
+          s.onOffLoading(false);  
+          //$('#btnExe').trigger('click'); 
         }
       } 
       app.exe(); 
