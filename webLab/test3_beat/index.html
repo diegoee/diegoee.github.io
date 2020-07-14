@@ -237,22 +237,22 @@
               } 
             });
           }
-          $('#btnReset').on('click',function(){ 
-            reset();
-            clearInterval(s.interPlayState);
-            s.interPlayState=undefined;
-          });
-          $('#btnTempo').val(120); //Start Value
-          $('#btnTempo').on('change',function(){   
+          function clickExe(){
             if(s.interPlayState!==undefined){
               $('#btnExe').trigger('click');  
             }
+          }
+          $('#btnReset').on('click',function(){ 
+            clickExe();
+            reset();
+          });
+          $('#btnTempo').val(120); //Start Value
+          $('#btnTempo').on('change',function(){             
+            clickExe();
             s.toast($('#btnTempo').val()+' Bpm'); 
           });  
           $('#btnRnd').on('click',function(){   
-            if(s.interPlayState!==undefined){
-              $('#btnExe').trigger('click');  
-            }
+            clickExe();
             randomFill();
             s.toast('Random slot filled: '+$('#btnTempo').val()+' Bpm'); 
           });  
