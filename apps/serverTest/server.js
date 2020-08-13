@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 console.log('server.js: Start');
 
 //ATRIBUTES 
-var dataServer = JSON.parse(fs.readFileSync(__dirname +'/keytoken.txt', 'utf8')); 
+var dataServer = JSON.parse(fs.readFileSync(__dirname +'/serverAssets/keytoken.txt','utf8')); 
 
 //INIT SERVER
 app.use('/node_modules', express.static(__dirname +'/node_modules'));
@@ -25,23 +25,21 @@ app.use(bodyParser.json({
 })); 
 
 //AUX FN SERVER 
-function checkAuthToken(req,res,fnOk){
+function checkAuthToken(req,fnOk,fnError){
   var token = req.headers['authorization'];
-  if(!token){
-    res.status(401).send({
-      error: "Es necesario el token de autenticación"
-    })
+  var desc = undefined;
+  if(!token){ 
+    desc = 'Es necesario el token de autenticación'; 
+    fnError(desc);
     return;
   }
   jwt.verify(token,dataServer.keytoken,function(err,username){
-    if (err) {
-      console.log('server.js: checkAuthToken Error '+username);
-      res.status(401).send({
-        error: 'Token inválido: '+token
-      });
+    if (err) { 
+      desc = 'checkAuthToken Error in user: '+username+', Token inválido: '+token; 
+      fnError(desc);
     }else{
       //Function OK
-      fnOk(); 
+      fnOk();  
     }
   }); 
 }
@@ -69,17 +67,15 @@ app.post('/login',function(req, res){
 });
 
 //ACCOUNT MANAGEMENT
-app.get('/index', function (req, res) { 
+app.get('/', function (req, res) { 
   console.log('server.js: /index.html called');
-  checkAuthToken(req,res,function(){   
+  checkAuthToken(req,function(){   
     res.sendFile(__dirname+'/www/index.html');  
+  },function(desc){   
+    console.log(desc);
+    res.status(401).sendFile(__dirname+'/www/index.html');
   });    
 }); 
-
-app.get('/', function(req,res){ 
-  console.log('server.js: /login.html called');
-  res.sendFile(__dirname+'/www/login.html'); 
-});
 
 //ACTION
 var statusLog = undefined;
@@ -101,12 +97,6 @@ app.post('/calData', function(req,res){
       });     
     } 
   }); 
-});
-app.get('/getStatusLog', function(req,res){  
-  //console.log('server.js: /getStatusLog called');
-  checkAuthToken(req,res,function(){   
-    res.send(statusLog);  
-  });
 });
 
 var port = 8080;

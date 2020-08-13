@@ -1,0 +1,18 @@
+{
+  "name": "servertest",
+  "productName": "Server Test",
+  "version": "1.0.0",
+  "author": "diegoee",
+  "license": "ISC",
+  "description": "server testing...",
+  "main": "server.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "express": "^4.16.4",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.5.1",
+    "jsdom": "^15.2.0",
+    "jsonwebtoken": "^8.5.0",
+    "request": "^2.88.0"
+  }
+}
