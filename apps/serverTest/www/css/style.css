@@ -1,7 +1,4 @@
-body,html{
-  height:100%;
-}
-body{
+ body{
   background: #1f1f1f;
   color: #d4d4d4;
 }
@@ -12,7 +9,14 @@ html{
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-#body{ 
-  position: relative, 
-}
+}  
+#login, #body{      
+  display: none; 
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+} 

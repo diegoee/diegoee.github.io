@@ -8,8 +8,11 @@
   "main": "server.js",
   "dependencies": {
     "axios": "^0.19.2",
+    "bootstrap": "^4.5.2",
+    "popper.js": "^1.14.3",
     "express": "^4.16.4",
     "font-awesome": "^4.7.0",
+    "node-snackbar": "^0.1.15",
     "jquery": "^3.5.1",
     "jsdom": "^15.2.0",
     "jsonwebtoken": "^8.5.0",

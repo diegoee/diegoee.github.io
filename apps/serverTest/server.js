@@ -26,17 +26,18 @@ app.use(bodyParser.json({
 
 //AUX FN SERVER 
 function checkAuthToken(req,fnOk,fnError){
-  var token = req.headers['authorization'];
-  var desc = undefined;
+  var token = req.headers['authorization']; 
   if(!token){ 
-    desc = 'Es necesario el token de autenticación'; 
-    fnError(desc);
+    var desc = 'Error: Es necesario el token de autenticación'; 
+    console.log(desc);
+    fnError();
     return;
   }
   jwt.verify(token,dataServer.keytoken,function(err,username){
-    if (err) { 
-      desc = 'checkAuthToken Error in user: '+username+', Token inválido: '+token; 
-      fnError(desc);
+    if (err){ 
+      var desc = 'Error: checkAuthToken Error in user: '+username+', Token inválido: '+token; 
+      console.log(desc);
+      fnError();
     }else{
       //Function OK
       fnOk();  
@@ -48,14 +49,14 @@ function createToken(username,key){
     username: username
   };  
   var token = jwt.sign(tokenData,key,{
-     expiresIn: 60*60*6 //expires in 6 hours
+     expiresIn: 60*5 //expires in 5min
   });  
   return token;  
-}
+} 
 
 //EXE SERVER 
 app.post('/login',function(req, res){  
-  console.log('server.js: /loginAction called');
+  console.log('server.js: /login called');
   var username = req.body.username;
   var password = req.body.password;  
   if(!(username===dataServer.username&&password===dataServer.password)){
@@ -68,36 +69,19 @@ app.post('/login',function(req, res){
 
 //ACCOUNT MANAGEMENT
 app.get('/', function (req, res) { 
-  console.log('server.js: /index.html called');
-  checkAuthToken(req,function(){   
-    res.sendFile(__dirname+'/www/index.html');  
-  },function(desc){   
-    console.log(desc);
-    res.status(401).sendFile(__dirname+'/www/index.html');
-  });    
-}); 
+  console.log('server.js: /index.html called');  
+  res.sendFile(__dirname+'/www/index.html');   
+});  
 
-//ACTION
-var statusLog = undefined;
-app.post('/calData', function(req,res){  
-  console.log('server.js: /calData called');
-  checkAuthToken(req,res,function(){
-    var arg = req.body.path;  
-    if(arg!==undefined){    
-      statusLog = arg;
-      var data = undefined;  
-      require('./appPortfolio').exe(function(log){
-        statusLog=statusLog+'<br>'+log; 
-      },arg).then(function(data){  
-        console.log('calData sent');
-        res.send(data);  
-      }).catch(function(e){  
-        console.log('server.js: Error in appPortfolio.js');
-        console.log(e);     
-      });     
-    } 
-  }); 
-});
+//ACCOUNT MANAGEMENT
+app.post('/checktoken', function (req, res) { 
+  console.log('server.js: /checktoken called');  
+  checkAuthToken(req,function(){
+    res.send(true);
+  },function(){
+    res.send(false);
+  });  
+}); 
 
 var port = 8080;
 process.argv.forEach(function(val,index) {  
@@ -112,6 +96,3 @@ console.log('server.js: Port read '+port);
 app.listen(port, function(){
   console.log('server.js: Listen on port -> '+port);
 });
-
-
- 
