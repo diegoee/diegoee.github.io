@@ -18,16 +18,16 @@ var app = {
       s.setHash($(this).attr('data-hash'));
       $('#btnCloseMenu').trigger('click');
       s.checkActiveSlideInMenu(); 
-    }); 
+    });  
     s.checkActiveSlideInMenu();  
   },
   checkActiveSlideInMenu: function (){ 
-    var s =this;
+    var s = this;
     $('#labelActiveMenu').remove();
     var $btn = $('#menu ul button');
     for(var i=0; i<$btn.length; i++){ 
       if($($('#menu ul li button')[i]).attr('data-hash')===s.getHash()){
-        $($('#menu ul li button')[i]).prepend(' <span id="labelActiveMenu" uk-icon="chevron-right"></span>'); 
+        $($('#menu ul li button')[i]).prepend('<span id="labelActiveMenu" uk-icon="chevron-right"></span>'); 
         break;
       }
     } 
@@ -37,7 +37,8 @@ var app = {
   }, 
   exe: function(){  
     var s = this; 
-    s.createMenu();
+    
+     
     s.swiper = new Swiper('.swiper-container', { 
       direction: 'horizontal',
       loop: false,
@@ -62,8 +63,14 @@ var app = {
       navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
+      },
+      on: {
+        slideChangeTransitionEnd: function () { 
+          s.checkActiveSlideInMenu();
+        },
       }  
     });
+    s.createMenu();
     s.swiper.slideTo(0, 100, null); 
     $(window).on('hashchange',function(){ 
       s.swiper.slideTo(parseInt(s.getHash())-1, 100, null);
