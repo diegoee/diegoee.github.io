@@ -1,6 +1,6 @@
 @echo off 
 cls
-echo myTrading: uninstall ...
+echo uninstall ...
 rmdir /S /Q node_modules  
 rmdir /S /Q output   
 rmdir /S /Q outputLog   

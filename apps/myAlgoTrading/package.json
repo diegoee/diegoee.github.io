@@ -2,14 +2,38 @@
   "name": "myalgotrading",
   "productName": "Algotrading: Diego E.E.",
   "version": "1.0.0",
-  "author": "Diego E.E.",
-  "repository": {
-    "type": "",
-    "url": ""
-  },
   "license": "ISC",
+  "author": "Diego E.E.",
+  "main": "main.js",
+  "scripts": {
+    "electron": "electron .",
+    "electronBuilder": "electron-builder"
+  },
+  "build": {
+    "appId": "com.diegoee.myalgotrading",
+    "win": {
+      "target": "portable",
+      "icon": "www/icons/ic_launcher.ico"
+    }
+  },
   "dependencies": {
     "express": "^4.16.4",
+    "bootstrap": "^4.0.0",
+    "convert-excel-to-json": "^1.6.1",
+    "datatables.net-dt": "^1.10.20",
+    "electron-promise-ipc": "^1.6.0",
+    "font-awesome": "^4.7.0",
+    "highcharts": "^7.2.0",
+    "jquery": "^3.4.1",
+    "jsdom": "^15.2.0",
+    "moment": "^2.24.0",
+    "node-snackbar": "^0.1.15",
+    "popper.js": "^1.14.3",
+    "progress": "^2.0.3",
     "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "electron": "^4.2.0",
+    "electron-builder": "^22.1.0"
   }
 }

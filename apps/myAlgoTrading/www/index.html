@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.css"> 
+    <link rel="stylesheet" type="text/css" href="../node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../node_modules/node-snackbar/dist/snackbar.css">
+    <title>My training trading</title>    
+    <style>  
+      #terminal{
+        background-color: black;
+        color: white;
+        font: 0.75em sans-serif;
+        overflow: auto;
+        border-radius: 5px;
+      }
+      #terminal p{
+        margin: 0;
+        padding: 0;
+      } 
+    </style>     
+  </head>
+  <body> 
+    <div class="col"> 
+      <div class="row" row='01'>
+        <div class="col-md-5">
+          <div id="terminal"></div>
+        </div>
+        <div class="col-md-7" id="comboContainer">
+          <div class="row">
+            <div class="col-4"> 
+              <div class="input-group"> 
+                <button id="btnRefresh" type="button" class="btn btn-dark btn-block"><i class="fas fa-trash-alt"></i> <i class="fa fa-refresh"></i></button>
+              </div>  
+              <div class="input-group"> 
+                <button id="btnDebug" type="button" class="btn btn-dark btn-block"><i class="fa fa-bug"></i></button>
+              </div>
+              <div class="input-group"> 
+                <button id="btnDeleteTerminal" type="button" class="btn btn-danger btn-block"><i class="fa fa-trash"></i> <i class="fa fa-terminal"></i></button>
+              </div> 
+            </div>
+            <div class="col-4"> 
+              <div class="input-group"> 
+                <button id="btnRandomData" type="button" class="btn btn-dark btn-block"><i class="fa fa-random"></i></button>
+              </div> 
+              <div class="input-group"> 
+                <button id="btnStartPos" type="button" class="btn btn-success btn-block"><i class="fa fa-play"></i> <i class="fa fa-chart-line"></i></button>
+              </div> 
+            </div>
+            <div class="col-4">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text"><i class="fa fa-exchange"></i></div>
+                </div>  
+                <select class="custom-select" id="selectTradeOper">
+                  <option value="BUY" selected>Buy</option>
+                  <option value="SELL">Sell</option> 
+                </select>
+              </div> 
+              <div class="input-group"> 
+                <div class="input-group-prepend">
+                  <div class="input-group-text"><i class="fa fa-ban"></i></div>
+                </div>
+                <select class="custom-select" id="selectTradeStop"> 
+                  <option value="5"  >5</option>
+                  <option value="10" selected>10</option>
+                  <option value="20" >20</option>
+                  <option value="50" >50</option>
+                  <option value="100">100</option> 
+                </select>
+              </div>
+              <div class="input-group"> 
+                <div class="input-group-prepend" >
+                  <div class="input-group-text"><i class="fa fa-window-minimize"></i></div>
+                </div>
+                <select class="custom-select" id="selectTradeLimit"> 
+                  <option value="5"  >5</option>
+                  <option value="10" selected>10</option>
+                  <option value="20" >20</option>
+                  <option value="50" >50</option>
+                  <option value="100">100</option> 
+                </select>
+              </div> 
+            </div>
+          </div>           
+        </div>
+      </div> 
+      <div class="row" row='02'>
+        <div class="col-12">
+          <div class="nav flex-column nav-pills"> 
+            <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Init</a> 
+            <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Result</a>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+              <div class="row">
+                <div class="col-12" id="chartInit">
+                  Init
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+              <div class="row">
+                <div class="col-12" id="chartResult">
+                  Result
+                </div>
+              </div> 
+            </div> 
+          </div>
+        </div>
+      </div> 
+    </div>  
+    <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Loading...</h5>
+          </div>
+          <div class="modal-body"> 
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>  
+    <script type="text/javascript" >
+      try{
+        window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.js');
+      }catch(error){
+        console.error(error);
+      }
+    </script> 
+    <script type="text/javascript" src="../node_modules/popper.js/dist/umd/popper.js"></script> 
+    <script type="text/javascript" src="../node_modules/bootstrap/dist/js/bootstrap.js"></script> 
+    <script type="text/javascript" src="../node_modules/moment/moment.js"></script> 
+    <script type="text/javascript" src="../node_modules/highcharts/highstock.js"></script> 
+    <script type="text/javascript" >
+      try{
+        window.Highcharts = require('../node_modules/highcharts/highstock.js');
+      }catch(error){
+        console.error(error);
+      }
+    </script> 
+    <script type="text/javascript" src="../node_modules/node-snackbar/dist/snackbar.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>    
+  </body>
+</html>

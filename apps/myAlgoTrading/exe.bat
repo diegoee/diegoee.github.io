@@ -1,0 +1,3 @@
+echo Starting electron ...
+call npm run electron  
+
