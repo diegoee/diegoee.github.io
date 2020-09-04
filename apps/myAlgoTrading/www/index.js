@@ -1,3 +1,5 @@
+const { chart } = require('highcharts');
+
 var ipcRenderer = require('electron').ipcRenderer;
 var dm = {
   data: undefined,   
@@ -7,7 +9,7 @@ var dm = {
     s.data = undefined;
     function listener(event, arg){
       if(arg!==null){    
-        s.data=arg; 
+        s.data=arg;  
         fnSuccess();
       }else{
         fnFail();
@@ -111,6 +113,8 @@ var app = {
         s.hideLoadingModal();
         Snackbar.show({text: 'Data Loaded'}); 
         s.addTerminal('Data Loaded');
+        s.createInitCharts();
+        s.onOffBtnPositionData(true);
       },function(){
         s.hideLoadingModal();
         Snackbar.show({text: 'Data error'}); 
@@ -121,18 +125,170 @@ var app = {
   },   
   exeBtnRandomData: function(){ 
     $('#btnRandomData').trigger('click');
+  },  
+  setBtnPositionData: function(){
+    var s = this;    
+    s.onOffBtnPositionData(false);    
+  }, 
+  onOffBtnPositionData: function(on){
+    var s = this;  
+    if(on){ 
+      $('#btnPosData').prop('disabled', false);
+      $('select').prop('disabled', false); 
+    }else{ 
+      $('#btnPosData').prop('disabled', true);
+      $('select').prop('disabled', true); 
+    }
+  },    
+  createHighStock: function(id,zoom){
+    var selector = 0;
+    var title = 'All';
+    var units = [
+      ['minute',[1,5]],
+      ['hour',[1]],
+      ['day',[1]], 
+      ['month',[1]]
+    ];
+
+    if(zoom==='mi'){
+      selector=5;
+      title = '5% Data';
+      //units = [units[0]];  
+    }else if(zoom==='h'){
+      selector=4;
+      title = '15% Data';
+      //units = [units[1]];  
+    }else if(zoom==='d'){
+      selector=3;
+      title = '45% Data';
+      //units = [units[2]];  
+    }else if(zoom==='mo'){
+      selector=2
+      title = 'All Data';
+      //units = [units[3]];  
+    }
+
+    var chart = Highcharts.stockChart(id, { 
+      subtitle: {
+        text: title
+      },   
+      credits: {
+        enabled: false
+      },
+      plotOptions: {
+        candlestick: {
+          color: 'red',
+          upColor: 'green'
+        }
+      },
+      navigator: { 
+        enabled: false
+      },
+      scrollbar: {
+        enabled: false
+      },
+      rangeSelector: {
+        enabled: false,
+        buttons: [{
+          type: 'all',
+          text: 'All'
+        },{
+          type: 'month',
+          count: 1,
+          text: '1m'
+        },{
+          type: 'day',
+          count: 1,
+          text: '1d'
+        },{
+          type: 'hour',
+          count: 1,
+          text: '1h'
+        },{
+          type: 'minute',
+          count: 5,
+          text: '5min'
+        }],
+        selected: selector,
+        inputEnabled: false
+      }, 
+      series: [{ 
+        type: 'candlestick',
+        data: dm.data, 
+        dataGrouping: {
+          units: units
+        },
+        tooltip: {
+          valueDecimals: 4
+        }
+      }]
+    }); 
+ 
+    if(zoom==='mi'){
+      chart.xAxis[0].setExtremes(dm.data[Math.floor(dm.data.length-1-dm.data.length*0.05)][0], dm.data[dm.data.length-1][0], true);
+    }else if(zoom==='h'){ 
+      chart.xAxis[0].setExtremes(dm.data[Math.floor(dm.data.length-1-dm.data.length*0.15)][0], dm.data[dm.data.length-1][0], true);
+    }else if(zoom==='d'){ 
+      chart.xAxis[0].setExtremes(dm.data[Math.floor(dm.data.length-1-dm.data.length*0.45)][0], dm.data[dm.data.length-1][0], true);
+    }  
+    return chart;
+  },
+  createInitCharts: function(){ 
+    var s = this;
+    $('#chartResult').html('<div class="col-12" >Push <button type="button" class="btn btn-success btn-sm" disabled><i class="fa fa-play"></i> <i class="fa fa-chart-line"></i></button> to simulate ...</div>');
+    $('#chartInit').html(' ');
+    $('#chartInit').append('<div class="col-6" id="chartInit01" ></div>');
+    $('#chartInit').append('<div class="col-6" id="chartInit02" ></div>');
+    $('#chartInit').append('<div class="col-6" id="chartInit03" ></div>');
+    $('#chartInit').append('<div class="col-6" id="chartInit04" ></div>');
+    s.createHighStock('chartInit01','mo');
+    s.createHighStock('chartInit02','d');
+    s.createHighStock('chartInit03','h');
+    s.createHighStock('chartInit04','mi');  
+    s.resize();  
+  },
+  createResultCharts: function(){
+    $('#chartResult').html('<div class="col-12" >Push Start button to simulate ...</div>');
+    $('#chartResult').append('<div class="col-6" id="chartResult01" style="height: 50%;"></div>');
+    $('#chartResult').append('<div class="col-6" id="chartResult02" style="height: 50%;"></div>');
+    $('#chartResult').append('<div class="col-6" id="chartResult03" style="height: 50%;"></div>');
+    $('#chartResult').append('<div class="col-6" id="chartResult04" style="height: 50%;"></div>');
+    s.createHighStock('chartResult01','months');
+    s.createHighStock('chartResult02','days');
+    s.createHighStock('chartResult03','hours');
+    s.createHighStock('chartResult04','mins');  
+    s.resize();
   },
   resize: function(){ 
     var s = this; 
-    $('#terminal').css({
-      'height': $('#comboContainer').innerHeight() 
-    }); 
-    $(window).off('resize'); 
-    $(window).on('resize',function(){  
+    function size(){
       $('#terminal').css({
         'height': $('#comboContainer').innerHeight() 
-      });  
-    }); 
+      }); 
+      $('#chartInit').css({
+        'height': $(window).innerHeight()-$('.row[row="01"]').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight()
+      });
+      $('#chartInit div').css({
+        'height': Math.floor(($('#chartInit').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight())/2) 
+      });
+      $('#chartResult').css({
+        'height': $(window).innerHeight()-$('.row[row="01"]').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight()
+      });
+      $('#chartResult div').css({
+        'height': Math.floor(($('#chartResult').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight())/2) 
+      });
+    }
+    size();
+    $(window).off('resize'); 
+    $(window).on('resize',size); 
+    var event;
+    if(typeof(Event) === 'function') { //CHROME
+          event = new Event('resize');
+    }else{ // IE
+      event = window.document.createEvent('UIEvents'); 
+      event.initUIEvent('resize', true, false, window, 0);  
+    }
+    window.dispatchEvent(event);
   },
   exe: function(){ 
     var s = this;      
@@ -142,162 +298,10 @@ var app = {
     s.setBtnRefresh();   
     s.setBtnDebug(); 
     s.setBtnRandomData();
+    s.setBtnPositionData(); 
     s.setLoadingModal();
     s.resize();    
     s.exeBtnRandomData();   
   }
 }
-app.exe();  
-
-function createChart(){
-  var s = this;
-  s.chart = Highcharts.stockChart('chart', { 
-    title: {
-      text: ''
-    },  
-    loading: {
-      hideDuration: 500,
-      showDuration: 500
-    },
-    credits: {
-      enabled: false
-    },
-    plotOptions: {
-      candlestick: {
-        color: 'red',
-        upColor: 'green'
-      }
-    },
-    rangeSelector: {
-      buttons: [{
-        type: 'all',
-        count: 1,
-        text: 'All'
-      },{
-        type: 'year',
-        count: 1,
-        text: '1y'
-      },{
-        type: 'month',
-        count: 6,
-        text: '6m'
-      },{
-        type: 'month',
-        count: 1,
-        text: '1m'
-      },{
-        type: 'week',
-        count: 1,
-        text: '1w'
-      },{
-        type: 'day',
-        count: 1,
-        text: '1D'
-      },{
-        type: 'hour',
-        count: 4,
-        text: '4h'
-      },{
-        type: 'hour',
-        count: 1,
-        text: '1h'
-      },{
-        type: 'minute',
-        count: 30,
-        text: '30mi'
-      },{
-        type: 'minute',
-        count: 5,
-        text: '5mi'
-      }],
-      selected: 0,
-      inputEnabled: false
-    }, 
-    series: [{
-      name: $('#selectTradeMark option:selected').text(),
-      type: 'candlestick',
-      data: [],
-      tooltip: {
-        valueDecimals: 4
-      }
-    }]
-  });
-}
-
-function setBtnPlayChart(){ 
-  var s = this;    
-  $('#btnOn').prop('disabled', false);
-  $('#btnFast').prop('disabled', true); 
-  var s = this;  
-  $('#btnOn').on('click',function(){ 
-    if($(this).hasClass('btn-success')){
-      $(this).removeClass('btn-success');
-      $(this).addClass('btn-danger');
-      $(this).html('<i class="fas fa-stop"></i> <i class="fas fa-chart-line"></i>'); 
-      $('#btnFast').prop('disabled', false);   
-      s.addTerminal('On:  PlayChart');  
-      s.exeStartChart();
-    }else{
-      $(this).addClass('btn-success');
-      $(this).removeClass('btn-danger');
-      $(this).html('<i class="fas fa-play"></i> <i class="fas fa-chart-line"></i>'); 
-      $('#btnFast').prop('disabled', true); 
-      s.tempo=1;
-      $('#btnFast').html('<i class="fas fa-forward"></i> x'+s.tempo); 
-      s.addTerminal('Off: PlayChart'); 
-      s.exeStopChart();  
-    }
-  });
-  s.tempo = 1;
-  $('#btnFast').on('click',function(){   
-    s.tempo++;
-    $(this).html('<i class="fas fa-forward"></i> x'+s.tempo); 
-    s.addTerminal('tempo x'+s.tempo); 
-    s.exeStopChart();  
-    s.exeStartChart();  
-    if(s.tempo>4){
-      s.tempo=0;
-    }
-  });   
-}
-
-function exeStartChart(){ 
-    var s = this;  
-    var time = 1000/s.tempo;  
-    $('#selectDate').prop('disabled', true);  
-    $('#selectTradeMark').prop('disabled', true);  
-    this.intervalChart = setInterval(function (){ 
-      if(s.data[1].length===0){
-        s.exeBtnPlayChart();
-      }else{ 
-        var point = s.data[1].shift()
-        s.data[0].push(point);       
-        s.chart.series[0].addPoint(point);
-        s.chart.redraw(); 
-      }
-    },time);   
-}
-
-function setDataOnChart(){
-    var s = this;
-    s.exeStopChart();
-    for (var i=5; i>0 ;i--){
-      $('#selectDate').append('<option value="20200'+i+'">20200'+i+'</option>');
-    }
-    $('#selectDate').on('change',function(){
-      var yyyymm = $('#selectDate').val();
-      s.addTerminal('date: '+yyyymm);   
-      s.getData(yyyymm).then(function(){ 
-        var n = 10; //s.getRndInteger(1,10);  
-        s.data = [
-          s.data.slice(0, Math.round(s.data.length/n)-1),
-          s.data.slice(Math.round(s.data.length/n), s.data.length-1)
-        ];  
-        s.chart.series[0].setData([]);
-        s.chart.series[0].setData(s.data[0]);   
-        s.chart.redraw(); 
-        s.resize(); 
-      });  
-    });
-    s.exeBtnData();
-} 
+app.exe();   
