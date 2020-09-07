@@ -71,9 +71,9 @@ app.on('ready', function() {
     }
   }
 
-  reload(); 
+  reload();  
   devTools();
-
+  
   mainWindow.on('closed', function() { 
     mainWindow = null;
   });   
@@ -85,14 +85,14 @@ app.on('ready', function() {
   ipcMain.on('request03',function(event,arg){
     if(arg){  
       lastValue = Math.floor((Math.random() * Math.floor(data.length*0.85)) + Math.floor(data.length*0.15));
-      var firstValue = Math.floor(lastValue-Math.floor(data.length*0.15)); 
+      var firstValue = Math.floor(lastValue-Math.floor(data.length*0.15));    
       event.sender.send('replyRequest03',data.slice(firstValue, lastValue)); 
     }
   }); 
   ipcMain.on('request04',function(event,arg){
     if(arg){ 
       var info = data[lastValue];
-      if(lastValue<data.length){
+      if(lastValue<data.length){         
         info = data[lastValue];
         lastValue++; 
       }else{

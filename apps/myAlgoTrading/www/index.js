@@ -1,5 +1,3 @@
-const { chart } = require('highcharts');
-
 var ipcRenderer = require('electron').ipcRenderer;
 var dm = {
   data: undefined,   
@@ -8,7 +6,7 @@ var dm = {
     ipcRenderer.send('request03', true);
     s.data = undefined;
     function listener(event, arg){
-      if(arg!==null){    
+      if(arg!==null||!info.end){    
         s.data=arg;  
         fnSuccess();
       }else{
@@ -19,7 +17,7 @@ var dm = {
   },
   getNext: function(fnSuccess,fnFail){
     var s = this;
-    ipcRenderer.send('request04', null);  
+    ipcRenderer.send('request04', true);  
     function listener(event, arg){
       if(arg!==null){ 
         s.data.push(arg);
@@ -31,7 +29,8 @@ var dm = {
     ipcRenderer.once('replyRequest04',listener);
   }   
 }
-var app = {   
+var app = {  
+  //Terminal 
   timestampTerminal: undefined,
   startTerminal: function(){
     var s = this;
@@ -56,6 +55,7 @@ var app = {
       scrollTop: scrollSize 
     },100); 
   }, 
+  //Modal Loading
   exeModal: false, 
   showLoadingModal: function(){ 
     var s = this;
@@ -78,6 +78,7 @@ var app = {
       }
     });
   },
+  //button
   disableAllButton: function(){
     $('button').prop('disabled', true);
     $('select').prop('disabled', true);  
@@ -123,12 +124,27 @@ var app = {
 
     }); 
   },   
-  exeBtnRandomData: function(){ 
-    $('#btnRandomData').trigger('click');
-  },  
   setBtnPositionData: function(){
     var s = this;    
     s.onOffBtnPositionData(false);    
+    $('#btnPosData').on('click',function(){ 
+      s.onOffBtnPositionData(true); 
+      s.showLoadingModal();    
+      Snackbar.show({text: 'Simulating ...'});  
+      s.addTerminal('Simulating ...'); 
+      var pos = {
+        dir: $('#selectTradeOper').val(),
+        i: dm.data.length-1,
+        start: dm.data[dm.data.length-1][4],
+        stop:  Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt($('#selectTradeStop').val())*($('#selectTradeOper').val()=='BUY'?-1:1))*10000)/10000,
+        lim:   Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt( $('#selectTradeLim').val())*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000
+      } 
+      s.createResultCharts(pos).then(function(){ 
+        s.hideLoadingModal(); 
+        Snackbar.show({text: 'Simulation ends'});  
+        s.addTerminal('Simulation ends');  
+      }); 
+    }); 
   }, 
   onOffBtnPositionData: function(on){
     var s = this;  
@@ -139,7 +155,8 @@ var app = {
       $('#btnPosData').prop('disabled', true);
       $('select').prop('disabled', true); 
     }
-  },    
+  },     
+  //charts   
   createHighStock: function(id,zoom){
     var selector = 0;
     var title = 'All';
@@ -180,7 +197,7 @@ var app = {
           color: 'red',
           upColor: 'green'
         }
-      },
+      },  
       navigator: { 
         enabled: false
       },
@@ -233,6 +250,45 @@ var app = {
     }  
     return chart;
   },
+  createHighStockWithPos: function(id,zoom,pos){
+    var s = this;
+    var chart = s.createHighStock(id,zoom);
+    var limA = [];
+    var stopA = [];
+    for (var i=pos.i; i<dm.data.length; i++){
+      limA.push([dm.data[i][0],pos.lim]);
+      stopA.push([dm.data[i][0],pos.stop]);
+    } 
+    chart.addSeries({
+      name: 'Stop',
+      color: '#CA0000',
+      data: stopA,
+      tooltip: {
+        valueDecimals: 4
+      }
+    });
+    chart.addSeries({
+      name: 'Limit',
+      color: '#00CA28',
+      data: limA,
+      tooltip: {
+        valueDecimals: 4
+      }
+    }); 
+    chart.addSeries({
+      name: 'Start',
+      color: '#000',
+      data: [[dm.data[pos.i][0],pos.start]],
+      marker: {  
+        radius: 4
+      },
+      tooltip: {
+        valueDecimals: 4
+      }
+    });
+    //chart.update();
+    return chart;
+  },
   createInitCharts: function(){ 
     var s = this;
     $('#chartResult').html('<div class="col-12" >Push <button type="button" class="btn btn-success btn-sm" disabled><i class="fa fa-play"></i> <i class="fa fa-chart-line"></i></button> to simulate ...</div>');
@@ -247,18 +303,35 @@ var app = {
     s.createHighStock('chartInit04','mi');  
     s.resize();  
   },
-  createResultCharts: function(){
-    $('#chartResult').html('<div class="col-12" >Push Start button to simulate ...</div>');
-    $('#chartResult').append('<div class="col-6" id="chartResult01" style="height: 50%;"></div>');
-    $('#chartResult').append('<div class="col-6" id="chartResult02" style="height: 50%;"></div>');
-    $('#chartResult').append('<div class="col-6" id="chartResult03" style="height: 50%;"></div>');
-    $('#chartResult').append('<div class="col-6" id="chartResult04" style="height: 50%;"></div>');
-    s.createHighStock('chartResult01','months');
-    s.createHighStock('chartResult02','days');
-    s.createHighStock('chartResult03','hours');
-    s.createHighStock('chartResult04','mins');  
-    s.resize();
+  createResultCharts: function(pos){
+    var s = this;    
+    $('#chartResult').html(' ');
+    $('#chartResult').append('<div class="col-6" id="chartResult01"></div>');
+    $('#chartResult').append('<div class="col-6" id="chartResult02"></div>');
+    $('#chartResult').append('<div class="col-6" id="chartResult03"></div>');
+    $('#chartResult').append('<div class="col-6" id="chartResult04"></div>');
+    console.log(pos);
+    return new Promise(function(resolve,reject){
+      var n = 0;
+      function getData(){
+        dm.getNext(function(){
+          n++;
+          if(n<5000){
+            getData();
+          }else{ 
+            s.createHighStockWithPos('chartResult01','mo',pos);
+            s.createHighStockWithPos('chartResult02','d',pos);
+            s.createHighStockWithPos('chartResult03','h',pos);
+            s.createHighStockWithPos('chartResult04','mi',pos);  
+            s.resize();
+            resolve();
+          }
+        });
+      } 
+      getData(); 
+    })
   },
+  //exe app
   resize: function(){ 
     var s = this; 
     function size(){
@@ -300,8 +373,17 @@ var app = {
     s.setBtnRandomData();
     s.setBtnPositionData(); 
     s.setLoadingModal();
-    s.resize();    
-    s.exeBtnRandomData();   
+    s.resize();     
+    
+    //*DEV ****
+    $('#btnDebug').trigger('click');
+    $('#btnRandomData').trigger('click');
+    setTimeout(function(){
+      $('#btnPosData').trigger('click');
+      $($('.nav-pills .nav-link')[1]).trigger('click');
+      s.resize();
+    },12000);
+    //********/
   }
 }
 app.exe();   
