@@ -29,6 +29,7 @@ var dm = {
     ipcRenderer.once('replyRequest04',listener);
   }   
 }
+
 var app = {  
   //Terminal 
   timestampTerminal: undefined,
@@ -69,6 +70,8 @@ var app = {
     var s = this;
     s.exeModal = true; 
     $('#loadingModal').modal('hide');
+    $('.modal-backdrop.fade').remove();
+
   },
   setLoadingModal: function(){
     var s = this;
@@ -81,7 +84,8 @@ var app = {
   //button
   disableAllButton: function(){
     $('button').prop('disabled', true);
-    $('select').prop('disabled', true);  
+    $('select').prop('disabled', true); 
+    $('input').prop('disabled', true);  
     $('#btnDeleteTerminal').prop('disabled', false);
     $('#btnRefresh').prop('disabled', false);
     $('#btnDebug').prop('disabled', false);
@@ -114,7 +118,7 @@ var app = {
         s.hideLoadingModal();
         Snackbar.show({text: 'Data Loaded'}); 
         s.addTerminal('Data Loaded');
-        s.createInitCharts();
+        s.createChart();
         s.onOffBtnPositionData(true);
       },function(){
         s.hideLoadingModal();
@@ -123,23 +127,31 @@ var app = {
       });
 
     }); 
-  },   
+  },  
+  setInputSpread: function(){ 
+    $('[data-toggle="tooltip"]').tooltip(); 
+    $('#inputSpread').val(0.00006); 
+  }, 
+  getSpread: function(){
+    return parseFloat($('#inputSpread').val());
+  },
   setBtnPositionData: function(){
     var s = this;    
     s.onOffBtnPositionData(false);    
     $('#btnPosData').on('click',function(){ 
-      s.onOffBtnPositionData(true); 
+      //$('#btnRandomData').prop('disabled', false);
+      s.onOffBtnPositionData(false); 
       s.showLoadingModal();    
       Snackbar.show({text: 'Simulating ...'});  
       s.addTerminal('Simulating ...'); 
       var pos = {
         dir: $('#selectTradeOper').val(),
         i: dm.data.length-1,
-        start: dm.data[dm.data.length-1][4],
+        init: Math.round((dm.data[dm.data.length-1][4]+s.getSpread()*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000,
         stop:  Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt($('#selectTradeStop').val())*($('#selectTradeOper').val()=='BUY'?-1:1))*10000)/10000,
         lim:   Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt( $('#selectTradeLim').val())*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000
       } 
-      s.createResultCharts(pos).then(function(){ 
+      s.createChartResult(pos).then(function(){ 
         s.hideLoadingModal(); 
         Snackbar.show({text: 'Simulation ends'});  
         s.addTerminal('Simulation ends');  
@@ -150,44 +162,21 @@ var app = {
     var s = this;  
     if(on){ 
       $('#btnPosData').prop('disabled', false);
-      $('select').prop('disabled', false); 
+      $('select').prop('disabled', false);  
+      $('input').prop('disabled', false);  
     }else{ 
       $('#btnPosData').prop('disabled', true);
-      $('select').prop('disabled', true); 
+      $('select').prop('disabled', true);  
+      $('input').prop('disabled', true);  
     }
   },     
   //charts   
-  createHighStock: function(id,zoom){
-    var selector = 0;
-    var title = 'All';
-    var units = [
-      ['minute',[1,5]],
-      ['hour',[1]],
-      ['day',[1]], 
-      ['month',[1]]
-    ];
-
-    if(zoom==='mi'){
-      selector=5;
-      title = '5% Data';
-      //units = [units[0]];  
-    }else if(zoom==='h'){
-      selector=4;
-      title = '15% Data';
-      //units = [units[1]];  
-    }else if(zoom==='d'){
-      selector=3;
-      title = '45% Data';
-      //units = [units[2]];  
-    }else if(zoom==='mo'){
-      selector=2
-      title = 'All Data';
-      //units = [units[3]];  
-    }
-
+  createChart: function(){ 
+    var id = 'chart';
+    $('#'+id).html(' ');    
     var chart = Highcharts.stockChart(id, { 
       subtitle: {
-        text: title
+        text: 'EUR/USD'
       },   
       credits: {
         enabled: false
@@ -199,16 +188,21 @@ var app = {
         }
       },  
       navigator: { 
-        enabled: false
+        enabled: true,
+        color: 'black'
       },
       scrollbar: {
-        enabled: false
+        enabled: true
       },
       rangeSelector: {
-        enabled: false,
+        enabled: true,
         buttons: [{
           type: 'all',
           text: 'All'
+        },{
+          type: 'month',
+          count: 6,
+          text: '6m'
         },{
           type: 'month',
           count: 1,
@@ -221,108 +215,85 @@ var app = {
           type: 'hour',
           count: 1,
           text: '1h'
-        },{
-          type: 'minute',
-          count: 5,
-          text: '5min'
         }],
-        selected: selector,
+        selected: 0,
         inputEnabled: false
       }, 
       series: [{ 
         type: 'candlestick',
         data: dm.data, 
         dataGrouping: {
-          units: units
+          units: [
+            ['minute',[1,5]],
+            ['hour',[1]],
+            ['day',[1]], 
+            ['month',[1]]
+          ]
         },
         tooltip: {
-          valueDecimals: 4
+          valueDecimals: 5
         }
       }]
     }); 
  
-    if(zoom==='mi'){
-      chart.xAxis[0].setExtremes(dm.data[Math.floor(dm.data.length-1-dm.data.length*0.05)][0], dm.data[dm.data.length-1][0], true);
-    }else if(zoom==='h'){ 
-      chart.xAxis[0].setExtremes(dm.data[Math.floor(dm.data.length-1-dm.data.length*0.15)][0], dm.data[dm.data.length-1][0], true);
-    }else if(zoom==='d'){ 
-      chart.xAxis[0].setExtremes(dm.data[Math.floor(dm.data.length-1-dm.data.length*0.45)][0], dm.data[dm.data.length-1][0], true);
-    }  
-    return chart;
-  },
-  createHighStockWithPos: function(id,zoom,pos){
-    var s = this;
-    var chart = s.createHighStock(id,zoom);
-    var limA = [];
-    var stopA = [];
-    for (var i=pos.i; i<dm.data.length; i++){
-      limA.push([dm.data[i][0],pos.lim]);
-      stopA.push([dm.data[i][0],pos.stop]);
-    } 
-    chart.addSeries({
-      name: 'Stop',
-      color: '#CA0000',
-      data: stopA,
-      tooltip: {
-        valueDecimals: 4
-      }
-    });
-    chart.addSeries({
-      name: 'Limit',
-      color: '#00CA28',
-      data: limA,
-      tooltip: {
-        valueDecimals: 4
-      }
-    }); 
-    chart.addSeries({
-      name: 'Start',
-      color: '#000',
-      data: [[dm.data[pos.i][0],pos.start]],
-      marker: {  
-        radius: 4
-      },
-      tooltip: {
-        valueDecimals: 4
-      }
-    });
-    //chart.update();
-    return chart;
-  },
-  createInitCharts: function(){ 
-    var s = this;
-    $('#chartResult').html('<div class="col-12" >Push <button type="button" class="btn btn-success btn-sm" disabled><i class="fa fa-play"></i> <i class="fa fa-chart-line"></i></button> to simulate ...</div>');
-    $('#chartInit').html(' ');
-    $('#chartInit').append('<div class="col-6" id="chartInit01" ></div>');
-    $('#chartInit').append('<div class="col-6" id="chartInit02" ></div>');
-    $('#chartInit').append('<div class="col-6" id="chartInit03" ></div>');
-    $('#chartInit').append('<div class="col-6" id="chartInit04" ></div>');
-    s.createHighStock('chartInit01','mo');
-    s.createHighStock('chartInit02','d');
-    s.createHighStock('chartInit03','h');
-    s.createHighStock('chartInit04','mi');  
-    s.resize();  
-  },
-  createResultCharts: function(pos){
-    var s = this;    
-    $('#chartResult').html(' ');
-    $('#chartResult').append('<div class="col-6" id="chartResult01"></div>');
-    $('#chartResult').append('<div class="col-6" id="chartResult02"></div>');
-    $('#chartResult').append('<div class="col-6" id="chartResult03"></div>');
-    $('#chartResult').append('<div class="col-6" id="chartResult04"></div>');
-    console.log(pos);
+    var xAxis = [dm.data[Math.floor(dm.data.length-1-dm.data.length*0.15)][0], dm.data[dm.data.length-1][0]];
+    chart.xAxis[0].setExtremes(xAxis[0], xAxis[1], true);  
+    return [chart, xAxis];
+  }, 
+  createChartResult: function(pos){
+    var s = this;      
+    var xAxis = s.createChart()[1];
     return new Promise(function(resolve,reject){
       var n = 0;
       function getData(){
         dm.getNext(function(){
           n++;
-          if(n<5000){
+          //x,open,high,low,close
+          var cond1 = (pos.dir==='BUY')&&((pos.stop<dm.data[dm.data.length-1][3])&&(pos.lim>dm.data[dm.data.length-1][2]));
+          var cond2 = (pos.dir!=='BUY')&&((pos.stop>dm.data[dm.data.length-1][2])&&(pos.lim<dm.data[dm.data.length-1][3]));
+          if(cond1||cond2||n<5000){
             getData();
-          }else{ 
-            s.createHighStockWithPos('chartResult01','mo',pos);
-            s.createHighStockWithPos('chartResult02','d',pos);
-            s.createHighStockWithPos('chartResult03','h',pos);
-            s.createHighStockWithPos('chartResult04','mi',pos);  
+          }else{   
+            var chart = s.createChart()[0]; 
+            chart.xAxis[0].setExtremes(xAxis[0], xAxis[1], true); 
+            var limA = [];
+            var stopA = [];
+            for (var i=pos.i; i<dm.data.length; i++){
+              limA.push([dm.data[i][0],pos.lim]);
+              stopA.push([dm.data[i][0],pos.stop]);
+            } 
+            chart.addSeries({
+              name: 'Stop',
+              color: '#CA0000',
+              data: stopA,
+              dashStyle: 'shortdot',
+              tooltip: {
+                valueDecimals: 4
+              }
+            });
+            chart.addSeries({
+              name: 'Limit',
+              color: '#00CA28',
+              data: limA,
+              dashStyle: 'shortdot',
+              tooltip: {
+                valueDecimals: 4
+              }
+            }); 
+            chart.addSeries({
+              name: 'Init',
+              color: 'black',
+              data: [[dm.data[pos.i][0],pos.init]],
+              marker: {  
+                radius: 4, 
+                symbol: 'cross'
+              },
+              tooltip: {
+                valueDecimals: 4
+              }
+            });  
+             
+            s.calStadPos(pos);
             s.resize();
             resolve();
           }
@@ -331,6 +302,28 @@ var app = {
       getData(); 
     })
   },
+  //Pos cal
+  calStadPos: function(pos){
+    var s = this;
+	  var gain = 0;
+	
+    var cond1 = (pos.dir==='BUY')&&(pos.stop<dm.data[dm.data.length-1][3]);
+    var cond2 = (pos.dir==='BUY')&&(pos.lim<dm.data[dm.data.length-1][2]);
+    var cond3 = (pos.dir!=='BUY')&&(pos.stop>dm.data[dm.data.length-1][2]);
+    var cond4 = (pos.dir!=='BUY')&&(pos.lim<dm.data[dm.data.length-1][3]);
+	
+	if(cond1){
+		gain = -1*Math.round(((pos.init-pos.stop)*10000)/10)+'pis';
+	}else if(cond2){
+		gain = +1*Math.round(((pos.lim-pos.init)*10000)/10)+'pis';
+	}else if(cond3){
+		gain = +1*Math.round(((pos.init-pos.lim)*10000)/10)+'pis';
+	}else if(cond4){
+		gain = -1*Math.round(((pos.stop-pos.init)*10000)/10)+'pis';
+	}	
+    
+	s.addTerminal('Pos:'+pos.dir+', start:'+pos.init+', lim:'+pos.lim+', stop:'+pos.stop+' -> G/L:(aprox.) '+gain); 
+  },
   //exe app
   resize: function(){ 
     var s = this; 
@@ -338,17 +331,8 @@ var app = {
       $('#terminal').css({
         'height': $('#comboContainer').innerHeight() 
       }); 
-      $('#chartInit').css({
-        'height': $(window).innerHeight()-$('.row[row="01"]').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight()
-      });
-      $('#chartInit div').css({
-        'height': Math.floor(($('#chartInit').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight())/2) 
-      });
-      $('#chartResult').css({
-        'height': $(window).innerHeight()-$('.row[row="01"]').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight()
-      });
-      $('#chartResult div').css({
-        'height': Math.floor(($('#chartResult').innerHeight()-$($('.row[row="02"] div')[0]).innerHeight())/2) 
+      $('#chart').css({
+        'height': $(window).innerHeight()-$('.row[row="01"]').innerHeight()
       });
     }
     size();
@@ -372,18 +356,55 @@ var app = {
     s.setBtnDebug(); 
     s.setBtnRandomData();
     s.setBtnPositionData(); 
+    s.setInputSpread();   
     s.setLoadingModal();
     s.resize();     
     
-    //*DEV ****
+    //* DEV **** 
     $('#btnDebug').trigger('click');
-    $('#btnRandomData').trigger('click');
-    setTimeout(function(){
-      $('#btnPosData').trigger('click');
-      $($('.nav-pills .nav-link')[1]).trigger('click');
-      s.resize();
-    },12000);
+    var time = 0;
+    var incT = 60000; 
+    function incTime(){
+      time=time+incT;
+    }
+
+    function comboValues(oper,stop,lim){
+      $('#selectTradeOper option').removeAttr('selected');
+      $('#selectTradeStop option').removeAttr('selected');
+      $('#selectTradeLim option').removeAttr('selected');
+      $($('#selectTradeOper option')[oper]).attr('selected',true);
+      $($('#selectTradeStop option')[stop]).attr('selected',true);
+      $($('#selectTradeLim option')[lim]).attr('selected',true);
+      s.addTerminal('ComboValue -> Dir: '+$('#selectTradeOper option').val()+', Stop:'+$('#selectTradeStop option').val()+', Lim:'+$('#selectTradeLim option').val());
+    }
+
+    function test(n,oper,stop,lim){
+      if(time===0){
+        time = 100;
+      }
+      setTimeout(function(){
+        $('#btnRandomData').trigger('click'); 
+        s.addTerminal(' --- '+n+'º Simulation');
+        comboValues(oper,stop,lim);
+        setTimeout(function(){
+          $('#btnPosData').trigger('click');
+          s.resize(); 
+        },5000);
+      },time);
+      if(time===100){
+        time = 0;
+      }
+      incTime();
+    } 
+    
+    s.addTerminal(' *** Simulation (incTime: '+incT+') ***'); 
+    test(1,0,1,1);  
+    test(2,1,1,1);
+    test(3,0,0,0);   
+    test(4,1,0,0); 
+
     //********/
+
   }
 }
 app.exe();   

@@ -24,12 +24,12 @@
   <body> 
     <div class="col"> 
       <div class="row" row='01'>
-        <div class="col-md-5 ">
+        <div class="col-md-6 ">
           <div id="terminal"></div>
         </div>
-        <div class="col-md-7" id="comboContainer">
+        <div class="col-md-6" id="comboContainer">
           <div class="row">
-            <div class="col-4">  
+            <div class="col-3">  
               <div class="input-group"> 
                 <button id="btnRefresh" type="button" class="btn btn-dark btn-block"><i class="fas fa-trash-alt"></i> <i class="fa fa-refresh"></i></button>
               </div>   
@@ -40,14 +40,20 @@
                 <button id="btnDeleteTerminal" type="button" class="btn btn-danger btn-block"><i class="fa fa-trash"></i> <i class="fa fa-terminal"></i></button>
               </div>  
             </div>
-            <div class="col-4"> 
+            <div class="col-5"> 
               <div class="input-group"> 
-                <button id="btnRandomData" type="button" class="btn btn-dark btn-block"><i class="fa fa-random"></i></button>
+                <button id="btnRandomData" type="button" class="btn btn-dark btn-block"><i class="fa fa-random"></i> <i class="fa fa-bar-chart"></i></button>
               </div> 
               <div class="input-group"> 
-                <button id="btnPosData" type="button" class="btn btn-success btn-block"><i class="fa fa-play"></i> <i class="fa fa-chart-line"></i></button>
+                <button id="btnPosData" type="button" class="btn btn-success btn-block"><i class="fa fa-play"></i> <i class="fa fa-bar-chart"></i></button>
               </div> 
-            </div>
+              <div class="input-group" data-toggle="tooltip" data-placement="top" title="Spread">
+                <div class="input-group-prepend">
+                  <div class="input-group-text"><i class="fa fa-eur"></i></div>
+                </div>  
+                <input id="inputSpread" type="text" class="form-control">  
+              </div>
+            </div>            
             <div class="col-4">
               <div class="input-group">
                 <div class="input-group-prepend">
@@ -88,29 +94,13 @@
       </div> 
       <div class="row" row='02'>
         <div class="col-12">
-          <div class="nav flex-column nav-pills"> 
-            <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Init</a> 
-            <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Result</a>
-          </div>
-        </div>
-        <div class="col-12">
-          <div class="tab-content">
-            <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-              <div class="row" id="chartInit">
-                <div class="col-12" >
-                  ...
-                </div>
-              </div>
+          <div class="row pl-3 pr-3" id="chart"> 
+            <div class=" container pt-3">
+              Push <button type="button" class="btn btn-dark btn-sm" disabled><i class="fa fa-random"></i> <i class="fa fa-bar-chart"></i></button> to get random data to start ... 
+              <br>Then, pushing <button type="button" class="btn btn-success btn-sm" disabled><i class="fa fa-play"></i> <i class="fa fa-bar-chart"></i></button>, you will get a simulation position.
             </div>
-            <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-              <div class="row" id="chartResult">
-                <div class="col-12" >
-                  ...
-                </div>
-              </div> 
-            </div> 
           </div>
-        </div>
+        </div> 
       </div> 
     </div>  
     <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">

@@ -1,9 +1,7 @@
 var electron = require('electron');
 var path = require('path');
 var url = require('url');
-var fs = require('fs');
-var moment = require('moment');
-const { min } = require('moment');
+var fs = require('fs'); 
 
 var app = electron.app;
 var BrowserWindow = electron.BrowserWindow;
@@ -53,7 +51,7 @@ app.on('ready', function() {
     minWidth: 400,
     height: 800,    
     minHeight: 700, 
-    backgroundColor: '#ced4da'
+    backgroundColor: '#ced4da' 
   }); 
 
   function reload(){
@@ -72,13 +70,14 @@ app.on('ready', function() {
   }
 
   reload();  
-  devTools();
   
   mainWindow.on('closed', function() { 
     mainWindow = null;
-  });   
-     
-  Menu.setApplicationMenu(null);   
+  });         
+
+  Menu.setApplicationMenu(null);  
+  mainWindow.maximize();
+  
 
   ipcMain.on('request01',reload);
   ipcMain.on('request02',devTools);
