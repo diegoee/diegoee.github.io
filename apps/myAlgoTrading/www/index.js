@@ -248,10 +248,9 @@ var app = {
       function getData(){
         dm.getNext(function(){
           n++;
-          //x,open,high,low,close
-          var cond1 = (pos.dir==='BUY')&&((pos.stop<dm.data[dm.data.length-1][3])&&(pos.lim>dm.data[dm.data.length-1][2]));
-          var cond2 = (pos.dir!=='BUY')&&((pos.stop>dm.data[dm.data.length-1][2])&&(pos.lim<dm.data[dm.data.length-1][3]));
-          if(cond1||cond2||n<5000){
+          [cond1,cond2,cond3,cond4] = s.closePos(pos);
+
+          if(cond1||cond2||cond3||cond4||n<25000){
             getData();
           }else{   
             var chart = s.createChart()[0]; 
@@ -303,26 +302,30 @@ var app = {
     })
   },
   //Pos cal
+  closePos: function(pos){  
+    //x,open,high,low,close 
+    var c1 = (pos.dir==='BUY')&&(pos.stop>dm.data[dm.data.length-1][3]);
+    var c2 = (pos.dir==='BUY')&&(pos.lim<dm.data[dm.data.length-1][2]);
+    var c3 = (pos.dir!=='BUY')&&(pos.stop<dm.data[dm.data.length-1][2]);
+    var c4 = (pos.dir!=='BUY')&&(pos.lim>dm.data[dm.data.length-1][3]);
+    return [c1,c2,c3,c4];
+  },
   calStadPos: function(pos){
     var s = this;
-	  var gain = 0;
+    var gain = 0;    
+    [cond1,cond2,cond3,cond4] = s.closePos(pos); 
 	
-    var cond1 = (pos.dir==='BUY')&&(pos.stop<dm.data[dm.data.length-1][3]);
-    var cond2 = (pos.dir==='BUY')&&(pos.lim<dm.data[dm.data.length-1][2]);
-    var cond3 = (pos.dir!=='BUY')&&(pos.stop>dm.data[dm.data.length-1][2]);
-    var cond4 = (pos.dir!=='BUY')&&(pos.lim<dm.data[dm.data.length-1][3]);
-	
-	if(cond1){
-		gain = -1*Math.round(((pos.init-pos.stop)*10000)/10)+'pis';
-	}else if(cond2){
-		gain = +1*Math.round(((pos.lim-pos.init)*10000)/10)+'pis';
-	}else if(cond3){
-		gain = +1*Math.round(((pos.init-pos.lim)*10000)/10)+'pis';
-	}else if(cond4){
-		gain = -1*Math.round(((pos.stop-pos.init)*10000)/10)+'pis';
-	}	
-    
-	s.addTerminal('Pos:'+pos.dir+', start:'+pos.init+', lim:'+pos.lim+', stop:'+pos.stop+' -> G/L:(aprox.) '+gain); 
+    if(cond1){
+      gain = -1*Math.round(((pos.init-pos.stop)*10000)/10)+'pis';
+    }else if(cond2){
+      gain = +1*Math.round(((pos.lim-pos.init)*10000)/10)+'pis';
+    }else if(cond3){
+      gain = +1*Math.round(((pos.init-pos.lim)*10000)/10)+'pis';
+    }else if(cond4){
+      gain = -1*Math.round(((pos.stop-pos.init)*10000)/10)+'pis';
+    }	
+      
+    s.addTerminal('Pos:'+pos.dir+', start:'+pos.init+', lim:'+pos.lim+', stop:'+pos.stop+' -> G/L:(aprox.) '+gain); 
   },
   //exe app
   resize: function(){ 
@@ -360,10 +363,10 @@ var app = {
     s.setLoadingModal();
     s.resize();     
     
-    //* DEV **** 
-    $('#btnDebug').trigger('click');
-    var time = 0;
-    var incT = 60000; 
+    /* DEV **** 
+    //$('#btnDebug').trigger('click');
+    var time = 0; 
+    var incT = 120000; 
     function incTime(){
       time=time+incT;
     }
@@ -375,7 +378,7 @@ var app = {
       $($('#selectTradeOper option')[oper]).attr('selected',true);
       $($('#selectTradeStop option')[stop]).attr('selected',true);
       $($('#selectTradeLim option')[lim]).attr('selected',true);
-      s.addTerminal('ComboValue -> Dir: '+$('#selectTradeOper option').val()+', Stop:'+$('#selectTradeStop option').val()+', Lim:'+$('#selectTradeLim option').val());
+      s.addTerminal('ComboValue -> Dir: '+$('#selectTradeOper').val()+', Stop:'+$('#selectTradeStop').val()+', Lim:'+$('#selectTradeLim').val());
     }
 
     function test(n,oper,stop,lim){
@@ -399,9 +402,9 @@ var app = {
     
     s.addTerminal(' *** Simulation (incTime: '+incT+') ***'); 
     test(1,0,1,1);  
-    test(2,1,1,1);
-    test(3,0,0,0);   
-    test(4,1,0,0); 
+    //test(2,1,1,1);
+    //test(3,0,0,0);   
+    //test(4,1,0,0); 
 
     //********/
 
