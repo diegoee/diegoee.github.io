@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Test4_businessModelCanvas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" rel="stylesheet"> 
+    <style>
+    </style>
+  </head>
+  <body>  
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Business Model Canvas: <span class="">My Business</span></span> 
+        <ul class="nav justify-content-end">
+          <li class="nav-item ms-1 me-5"><button type="button" class="btn btn-outline-dark" id="idBtnPrint"><i class="fas fa-download"></i></button></li>  
+          <li class="nav-item ms-1 me-1"><button type="button" class="btn btn-outline-dark" id="idBtnDelete"><i class="fas fa-trash"></i></button>   </li>
+        </ul>  
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row p-1">
+        <div class="col border border-dark p-1 m-1 rounded">
+          <p class="fs-5">Key partners <i class="fas fa-handshake"></i></p>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="col ">
+          <div class="col border border-dark p-1 m-1 rounded">
+            <p class="fs-5">Key activities <i class="fas fa-hiking"></i></p>
+            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+              <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="col border border-dark p-1 m-1 rounded">
+            <p class="fs-5">Key resources <i class="fas fa-key"></i></i></p>
+            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+              <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+        <div class="col border border-dark p-1 m-1 rounded">
+          <p class="fs-5">Value propositions <i class="fas fa-medal"></i></p>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="col ">
+          <div class="col border border-dark p-1 m-1 rounded">
+            <p class="fs-5">Customer relationship <i class="fas fa-link"></i></p>
+            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+              <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="col border border-dark p-1 m-1 rounded">
+            <p class="fs-5">Channels <i class="fas fa-network-wired"></i></p> 
+            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+              <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+        <div class="col border border-dark p-1 m-1 rounded">
+          <p class="fs-5">Customer Segments <i class="fas fa-users"></i></p> 
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+      </div>
+      <div class="row p-1"> 
+        <div class="col border border-dark p-1 m-1 rounded">
+          <p class="fs-5">Cost structure <i class="fas fa-donate"></i></p>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="col border border-dark p-1 m-1 rounded">
+          <p class="fs-5">Revanue Streams <i class="fas fa-coins"></i></p>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+      </div>
+    </div> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>    
+    <script type="text/javascript">
+      /*global $, window, setTimeout, clearTimeout, Promise*/      
+      var app = { 
+        delete: function(){
+          $('#idBtnDelete').on('click',function(){
+            $('.alert').each(function(){
+              $(this).children('button').trigger('click');
+            });
+          });
+        },
+        print: function(){
+          $('#idBtnPrint').on('click',function(){ 
+            alert('pending to create print function'); 
+          });
+        },
+        init: function(){
+          console.log('Web Test4_businessModelCanvas init');
+          this.delete();
+          this.print();
+        }      
+      };
+      app.init();
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>
