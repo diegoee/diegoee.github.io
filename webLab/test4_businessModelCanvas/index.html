@@ -6,37 +6,54 @@
     <title>Web Test4_businessModelCanvas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" rel="stylesheet"> 
-    <style>
+    <style>  
     </style>
   </head>
   <body>  
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav id='menu' class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Business Model Canvas: <span class="">My Business</span></span> 
+        <span class="navbar-brand">Business Model Canvas: 
+          <span id="nameCanvas" class="fw-bold">My Business</span> 
+          <button id="idBtnNameCanvas" class="btn btn-outline-dark">
+            <i class="fas fa-edit"></i>
+          </button>
+        </span> 
         <ul class="nav justify-content-end">
           <li class="nav-item ms-1 me-5"><button type="button" class="btn btn-outline-dark" id="idBtnPrint"><i class="fas fa-download"></i></button></li>  
           <li class="nav-item ms-1 me-1"><button type="button" class="btn btn-outline-dark" id="idBtnDelete"><i class="fas fa-trash"></i></button>   </li>
         </ul>  
       </div>
-    </nav>
-    <div class="container">
-      <div class="row p-1">
-        <div class="col border border-dark p-1 m-1 rounded">
+    </nav> 
+    <div class="m-1 ps-3 pe-3">
+      <div class="row">
+        <div class="col-2 mb-1 border border-dark rounded overflow-auto size1 canvas">
           <p class="fs-5">Key partners <i class="fas fa-handshake"></i></p>
           <div class="alert alert-dark alert-dismissible fade show" role="alert">
             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
         </div>
-        <div class="col ">
-          <div class="col border border-dark p-1 m-1 rounded">
+        <div class="col-3 mb-1">
+          <div class="col-sm-12 mb-1 border border-dark rounded overflow-auto size2 canvas">
             <p class="fs-5">Key activities <i class="fas fa-hiking"></i></p>
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
               <strong>Holy guacamole!</strong> You should check in on some of those fields below.
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           </div>
-          <div class="col border border-dark p-1 m-1 rounded">
+          <div class="col-12 border border-dark rounded overflow-auto size2 canvas">
             <p class="fs-5">Key resources <i class="fas fa-key"></i></i></p>
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
               <strong>Holy guacamole!</strong> You should check in on some of those fields below.
@@ -44,22 +61,22 @@
             </div>
           </div>
         </div>
-        <div class="col border border-dark p-1 m-1 rounded">
+        <div class="col-2 mb-1 border border-dark rounded overflow-auto size1 canvas">
           <p class="fs-5">Value propositions <i class="fas fa-medal"></i></p>
           <div class="alert alert-dark alert-dismissible fade show" role="alert">
             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         </div>
-        <div class="col ">
-          <div class="col border border-dark p-1 m-1 rounded">
+        <div class="col-3 mb-1 ">
+          <div class="col-sm-12 mb-1 border border-dark rounded overflow-auto size2 canvas">
             <p class="fs-5">Customer relationship <i class="fas fa-link"></i></p>
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
               <strong>Holy guacamole!</strong> You should check in on some of those fields below.
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           </div>
-          <div class="col border border-dark p-1 m-1 rounded">
+          <div class="col-12 border border-dark rounded overflow-auto size2 canvas">
             <p class="fs-5">Channels <i class="fas fa-network-wired"></i></p> 
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
               <strong>Holy guacamole!</strong> You should check in on some of those fields below.
@@ -67,7 +84,7 @@
             </div>
           </div>
         </div>
-        <div class="col border border-dark p-1 m-1 rounded">
+        <div class="col-2 mb-1 border border-dark rounded overflow-auto size1 canvas">
           <p class="fs-5">Customer Segments <i class="fas fa-users"></i></p> 
           <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
@@ -79,15 +96,15 @@
           </div>
         </div>
       </div>
-      <div class="row p-1"> 
-        <div class="col border border-dark p-1 m-1 rounded">
+      <div class="row"> 
+        <div class="col-6  border border-dark rounded overflow-auto size3 canvas">
           <p class="fs-5">Cost structure <i class="fas fa-donate"></i></p>
           <div class="alert alert-dark alert-dismissible fade show" role="alert">
             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         </div>
-        <div class="col border border-dark p-1 m-1 rounded">
+        <div class="col-6 border border-dark rounded overflow-auto size3 canvas">
           <p class="fs-5">Revanue Streams <i class="fas fa-coins"></i></p>
           <div class="alert alert-dark alert-dismissible fade show" role="alert">
             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
@@ -96,27 +113,147 @@
         </div>
       </div>
     </div> 
+    <!-- Modal -->
+    <div class="modal fade" id="modal" tabindex="-1" maria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3 displayGroup">
+              <label class="form-label">Delete all note?</label> 
+            </div> 
+            <div class="mb-3 displayGroup">
+              <label class="form-label">Business Name</label>
+              <input type="text" class="form-control" id="inputNameCanvas" placeholder="My Business">
+            </div> 
+            <div class="input-group displayGroup">
+              <select class="form-select" id="inputNoteColor"> 
+                <option value="alert-dark" selected>Black</option>
+                <option value="alert-danger">Red</option>
+                <option value="alert-success">Green</option>
+              </select>
+              <span class="input-group-text">Color</span>
+            </div>  
+            <div class="input-group displayGroup">
+              <span class="input-group-text">Add note</span>
+              <textarea class="form-control" aria-label="With textarea" id="inputNoteText"></textarea>
+            </div> 
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger"  data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" id="idBtnAgree">Ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>    
     <script type="text/javascript">
       /*global $, window, setTimeout, clearTimeout, Promise*/      
       var app = { 
-        delete: function(){
-          $('#idBtnDelete').on('click',function(){
-            $('.alert').each(function(){
-              $(this).children('button').trigger('click');
+        modal: undefined,  
+        calcHeight: function(){
+          var h = $(window).height()-$('#menu').innerHeight()-15; 
+          $('.size1').height(Math.floor(3*h/4));  
+          $('.size2').height(Math.floor(3*h/4*1/2)-3);
+          $('.size3').height(Math.floor(1*h/4)); 
+        },
+        resize: function(){
+          $(window).on('resize',function(){ 
+            app.calcHeight();
+          }); 
+        }, 
+        createModal: function(){
+          app.modal = new bootstrap.Modal(document.getElementById('modal'),{
+            keyboard: false,
+            backdrop: 'static'
+          });
+          $('#modal').on('hidden.bs.modal', function(){ 
+            $('#idBtnAgree').off('click'); 
+            $('#modalLabel').html(' ');
+            $('.displayGroup').css({
+              display: 'none'
             });
           });
         },
-        print: function(){
-          $('#idBtnPrint').on('click',function(){ 
-            alert('pending to create print function'); 
-          });
+        selectModalType: function(type,elem){
+          $('#idBtnAgree').off('click'); 
+          if(type==='nameCanvas'){
+            $('#modalLabel').html('Canvas name');
+            $('.displayGroup').css({
+              display: 'none'
+            });
+            $($('.displayGroup')[1]).css({
+              display: 'block'
+            });
+            app.modal.show();
+            $('#idBtnAgree').on('click',function(){
+              $('#nameCanvas').html($('#inputNameCanvas').val());
+              app.modal.hide();
+            });
+          }
+          if(type==='deleteCanvas'){
+            $('#modalLabel').html('Reset');
+            $('.displayGroup').css({
+              display: 'none'
+            });
+            $($('.displayGroup')[0]).css({
+              display: 'block'
+            });
+            app.modal.show();
+            $('#idBtnAgree').on('click',function(){
+              app.modal.hide();
+              $('.alert').each(function(){
+                $(this).children('button').trigger('click');
+              });
+            });  
+          }
+          if(type==='addNote'){ 
+            $('.displayGroup').css({
+              display: 'none'
+            });
+            $($('.displayGroup')[2]).css({
+              display: 'none'
+            });
+            $($('.displayGroup')[3]).css({
+              display: 'none'
+            });
+            $('#idBtnAgree').on('click',function(){
+              app.modal.hide();
+              $('.alert').each(function(){
+                $(this).children('button').trigger('click');
+              });
+            }); 
+          } 
+          if(type==='printCanvas'){             
+            alert('pending to create print function');
+          }          
+        },
+        createAddNoteBtn: function(){
+
         },
         init: function(){
           console.log('Web Test4_businessModelCanvas init');
-          this.delete();
-          this.print();
+          this.createModal();
+          this.createAddNoteBtn();
+          $('#idBtnDelete').on('click',function(){
+            app.selectModalType('deleteCanvas');
+          });
+          $('#idBtnPrint').on('click',function(){ 
+            app.selectModalType('printCanvas');  
+          });
+          $('#idBtnNameCanvas').on('click',function(){ 
+            app.selectModalType('nameCanvas'); 
+          }); 
+          $('#idBtnAddNote').on('click',function(){ 
+            app.selectModalType('addNote',this); 
+          });    
+          this.calcHeight();   
+          this.resize();     
+          //$($('button')[1]).trigger('click');
         }      
       };
       app.init();
