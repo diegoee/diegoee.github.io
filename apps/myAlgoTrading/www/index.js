@@ -3,34 +3,32 @@ var dm = {
   data: undefined,   
   getStart: function(fnSuccess,fnFail){
     var s = this;
-    ipcRenderer.send('request03', true);
-    s.data = undefined;
-    function listener(event, arg){
+    ipcRenderer.send('request01', true);
+    s.data = undefined; 
+    ipcRenderer.once('replyRequest01',function(event, arg){
       if(arg!==null||!info.end){    
         s.data=arg;  
         fnSuccess();
       }else{
         fnFail();
       } 
-    } 
-    ipcRenderer.once('replyRequest03',listener); 
+    }); 
   },
-  getNext: function(fnSuccess,fnFail){
+  getSimulation: function(fnSuccess,fnFail,requestData){
     var s = this;
-    ipcRenderer.send('request04', true);  
+    ipcRenderer.send('request02', requestData);  
     function listener(event, arg){
       if(arg!==null){ 
-        s.data.push(arg);
+        s.data=arg.data;
         fnSuccess();
       }else{
         fnFail();
       } 
     }
-    ipcRenderer.once('replyRequest04',listener);
+    ipcRenderer.once('replyRequest02',listener);
   }   
 }
-
-var app = {  
+var action = {
   //Terminal 
   timestampTerminal: undefined,
   startTerminal: function(){
@@ -71,7 +69,6 @@ var app = {
     s.exeModal = true; 
     $('#loadingModal').modal('hide');
     $('.modal-backdrop.fade').remove();
-
   },
   setLoadingModal: function(){
     var s = this;
@@ -81,100 +78,55 @@ var app = {
       }
     });
   },
-  //button
-  disableAllButton: function(){
-    $('button').prop('disabled', true);
-    $('select').prop('disabled', true); 
-    $('input').prop('disabled', true);  
-    $('#btnDeleteTerminal').prop('disabled', false);
-    $('#btnRefresh').prop('disabled', false);
-    $('#btnDebug').prop('disabled', false);
-  }, 
-  setBtnRefresh: function(){
+  //General Event
+  resize: function(){ 
     var s = this; 
-    $('#btnRefresh').off('click');
-    $('#btnRefresh').on('click',function(){ 
-      Snackbar.show({text: 'Reload App'});   
-      s.showLoadingModal();
-      ipcRenderer.send('request01', null);    
-    });
-  },
-  setBtnDebug: function(){
-    var s = this; 
-    $('#btnDebug').off('click');
-    $('#btnDebug').on('click',function(){  
-      Snackbar.show({text: 'Open/close DevTools'}); 
-      s.addTerminal('Open/close DevTools'); 
-      ipcRenderer.send('request02', null);    
-    });
-  },   
-  setBtnRandomData: function(){
-    var s = this;  
-    $('#btnRandomData').prop('disabled', false);
-    $('#btnRandomData').on('click',function(){ 
-      s.showLoadingModal();    
-      Snackbar.show({text: 'Loading Data ...'}); 
-      dm.getStart(function(){
-        s.hideLoadingModal();
-        Snackbar.show({text: 'Data Loaded'}); 
-        s.addTerminal('Data Loaded');
-        s.createChart();
-        s.onOffBtnPositionData(true);
-      },function(){
-        s.hideLoadingModal();
-        Snackbar.show({text: 'Data error'}); 
-        s.addTerminal('Data error');
-      });
-
-    }); 
-  },  
-  setInputSpread: function(){ 
-    $('[data-toggle="tooltip"]').tooltip(); 
-    $('#inputSpread').val(0.00006); 
-  }, 
-  getSpread: function(){
-    return parseFloat($('#inputSpread').val());
-  },
-  setBtnPositionData: function(){
-    var s = this;    
-    s.onOffBtnPositionData(false);    
-    $('#btnPosData').on('click',function(){ 
-      //$('#btnRandomData').prop('disabled', false);
-      s.onOffBtnPositionData(false); 
-      s.showLoadingModal();    
-      Snackbar.show({text: 'Simulating ...'});  
-      s.addTerminal('Simulating ...'); 
-      var pos = {
-        dir: $('#selectTradeOper').val(),
-        i: dm.data.length-1,
-        init: Math.round((dm.data[dm.data.length-1][4]+s.getSpread()*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000,
-        stop:  Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt($('#selectTradeStop').val())*($('#selectTradeOper').val()=='BUY'?-1:1))*10000)/10000,
-        lim:   Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt( $('#selectTradeLim').val())*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000
-      } 
-      s.createChartResult(pos).then(function(){ 
-        s.hideLoadingModal(); 
-        Snackbar.show({text: 'Simulation ends'});  
-        s.addTerminal('Simulation ends');  
+    function size(){
+      $('#terminal').css({
+        'height': $(window).innerHeight()*1/5
       }); 
-    }); 
-  }, 
-  onOffBtnPositionData: function(on){
-    var s = this;  
-    if(on){ 
-      $('#btnPosData').prop('disabled', false);
-      $('select').prop('disabled', false);  
-      $('input').prop('disabled', false);  
-    }else{ 
-      $('#btnPosData').prop('disabled', true);
-      $('select').prop('disabled', true);  
-      $('input').prop('disabled', true);  
+      $('#chart').css({
+        'height': $(window).innerHeight()-$('#terminal').innerHeight()
+      });
     }
-  },     
-  //charts   
-  createChart: function(){ 
-    var id = 'chart';
+    size();
+    $(window).off('resize'); 
+    $(window).on('resize',size); 
+    var event;
+    if(typeof(Event) === 'function') { //CHROME
+          event = new Event('resize');
+    }else{ // IE
+      event = window.document.createEvent('UIEvents'); 
+      event.initUIEvent('resize', true, false, window, 0);  
+    }
+    window.dispatchEvent(event);
+  },
+  init: function(){ 
+    this.startTerminal(); 
+    this.addTerminal('start App!'); 
+    this.setLoadingModal(); 
+    this.resize(); 
+  }
+}    
+
+
+var app = {  
+  //charts 
+  chart:  undefined, 
+  createChart: function(id){ 
+    var s = this; 
     $('#'+id).html(' ');    
-    var chart = Highcharts.stockChart(id, { 
+    var chart = Highcharts.stockChart(id,{ 
+      chart: {
+        zoomType: 'xy',
+        events: {
+          click: function (event) { 
+            if(s.pos.on===true){
+              action.addTerminal('x:'+event.xAxis[0].value +' y:'+event.yAxis[0].value);      
+            }         
+          }
+        }
+      },
       subtitle: {
         text: 'EUR/USD'
       },   
@@ -199,6 +151,14 @@ var app = {
         buttons: [{
           type: 'all',
           text: 'All'
+        },{
+          type: 'year',
+          count: 3,
+          text: '3y'
+        },{
+          type: 'year',
+          count: 1,
+          text: '1y'
         },{
           type: 'month',
           count: 6,
@@ -234,134 +194,51 @@ var app = {
           valueDecimals: 5
         }
       }]
+    });   
+    return chart;
+  },
+  //postion 
+  pos: {
+    on: false,
+    buySell: undefined
+  },
+  createPos: function(){
+    var s = this;  
+    var btnBuy =  '<button type="button" class="btn btn-success btn-sm btnTerminal" value="buy"><i class="fa fa-bar-chart"></i> Buy</button>';
+    var btnSell = '<button type="button" class="btn btn-danger  btn-sm btnTerminal" value="sell"><i class="fa fa-bar-chart"></i> Sell</button>';
+    action.addTerminal('Open Position: '+btnBuy+' '+btnSell);
+    $('.btnTerminal').off('click'); 
+    $('.btnTerminal').on('click',function(){ 
+      s.pos.on=true;
+      s.pos.buySell=$(this).attr('value');
+      action.addTerminal($(this).attr('value')+ ' (Reload to reset)'); 
+      $('button').remove(); 
+      action.addTerminal('Now set Stop and limit and press <button type="button" class="btn btn-secondary btn-sm btnTerminal"><i class="fa fa-play"></i> Go!</button>');     
+      $('.btnTerminal').off('click');
+      $('.btnTerminal').on('click',function(){ 
+        action.addTerminal('Go!'); 
+        s.pos.on=false;
+        $('button').remove();     
+      });  
     }); 
- 
-    var xAxis = [dm.data[Math.floor(dm.data.length-1-dm.data.length*0.15)][0], dm.data[dm.data.length-1][0]];
-    chart.xAxis[0].setExtremes(xAxis[0], xAxis[1], true);  
-    return [chart, xAxis];
-  }, 
-  createChartResult: function(pos){
-    var s = this;      
-    var xAxis = s.createChart()[1];
-    return new Promise(function(resolve,reject){
-      var n = 0;
-      function getData(){
-        dm.getNext(function(){
-          n++;
-          [cond1,cond2,cond3,cond4] = s.closePos(pos);
-
-          if(cond1||cond2||cond3||cond4||n<25000){
-            getData();
-          }else{   
-            var chart = s.createChart()[0]; 
-            chart.xAxis[0].setExtremes(xAxis[0], xAxis[1], true); 
-            var limA = [];
-            var stopA = [];
-            for (var i=pos.i; i<dm.data.length; i++){
-              limA.push([dm.data[i][0],pos.lim]);
-              stopA.push([dm.data[i][0],pos.stop]);
-            } 
-            chart.addSeries({
-              name: 'Stop',
-              color: '#CA0000',
-              data: stopA,
-              dashStyle: 'shortdot',
-              tooltip: {
-                valueDecimals: 4
-              }
-            });
-            chart.addSeries({
-              name: 'Limit',
-              color: '#00CA28',
-              data: limA,
-              dashStyle: 'shortdot',
-              tooltip: {
-                valueDecimals: 4
-              }
-            }); 
-            chart.addSeries({
-              name: 'Init',
-              color: 'black',
-              data: [[dm.data[pos.i][0],pos.init]],
-              marker: {  
-                radius: 4, 
-                symbol: 'cross'
-              },
-              tooltip: {
-                valueDecimals: 4
-              }
-            });  
-             
-            s.calStadPos(pos);
-            s.resize();
-            resolve();
-          }
-        });
-      } 
-      getData(); 
-    })
   },
-  //Pos cal
-  closePos: function(pos){  
-    //x,open,high,low,close 
-    var c1 = (pos.dir==='BUY')&&(pos.stop>dm.data[dm.data.length-1][3]);
-    var c2 = (pos.dir==='BUY')&&(pos.lim<dm.data[dm.data.length-1][2]);
-    var c3 = (pos.dir!=='BUY')&&(pos.stop<dm.data[dm.data.length-1][2]);
-    var c4 = (pos.dir!=='BUY')&&(pos.lim>dm.data[dm.data.length-1][3]);
-    return [c1,c2,c3,c4];
-  },
-  calStadPos: function(pos){
-    var s = this;
-    var gain = 0;    
-    [cond1,cond2,cond3,cond4] = s.closePos(pos); 
-	
-    if(cond1){
-      gain = -1*Math.round(((pos.init-pos.stop)*10000)/10)+'pis';
-    }else if(cond2){
-      gain = +1*Math.round(((pos.lim-pos.init)*10000)/10)+'pis';
-    }else if(cond3){
-      gain = +1*Math.round(((pos.init-pos.lim)*10000)/10)+'pis';
-    }else if(cond4){
-      gain = -1*Math.round(((pos.stop-pos.init)*10000)/10)+'pis';
-    }	
-      
-    s.addTerminal('Pos:'+pos.dir+', start:'+pos.init+', lim:'+pos.lim+', stop:'+pos.stop+' -> G/L:(aprox.) '+gain); 
-  },
-  //exe app
-  resize: function(){ 
-    var s = this; 
-    function size(){
-      $('#terminal').css({
-        'height': $('#comboContainer').innerHeight() 
-      }); 
-      $('#chart').css({
-        'height': $(window).innerHeight()-$('.row[row="01"]').innerHeight()
-      });
-    }
-    size();
-    $(window).off('resize'); 
-    $(window).on('resize',size); 
-    var event;
-    if(typeof(Event) === 'function') { //CHROME
-          event = new Event('resize');
-    }else{ // IE
-      event = window.document.createEvent('UIEvents'); 
-      event.initUIEvent('resize', true, false, window, 0);  
-    }
-    window.dispatchEvent(event);
-  },
+  //exe
   exe: function(){ 
-    var s = this;      
-    s.startTerminal(); 
-    s.addTerminal('start!'); 
-    s.disableAllButton();  
-    s.setBtnRefresh();   
-    s.setBtnDebug(); 
-    s.setBtnRandomData();
-    s.setBtnPositionData(); 
-    s.setInputSpread();   
-    s.setLoadingModal();
-    s.resize();     
+    var s = this;     
+    action.showLoadingModal();    
+    Snackbar.show({text: 'Loading Data ...'});
+    dm.getStart(function(){
+      action.hideLoadingModal();
+      Snackbar.show({text: 'Data Loaded'}); 
+      action.addTerminal('Data Loaded');
+      s.chart = s.createChart('chart'); 
+      s.createPos();
+    },function(){
+      action.hideLoadingModal();
+      Snackbar.show({text: 'Data error'}); 
+      action.addTerminal('Data error');
+    });
+    
     
     /* DEV **** 
     //$('#btnDebug').trigger('click');
@@ -410,4 +287,53 @@ var app = {
 
   }
 }
+
+action.init();
 app.exe();   
+
+/*
+
+setBtnPositionData: function(){
+  var s = this;    
+  s.onOffBtnPositionData(false);    
+  $('#btnPosData').on('click',function(){ 
+    //$('#btnRandomData').prop('disabled', false);
+    s.onOffBtnPositionData(false); 
+    s.showLoadingModal();    
+    Snackbar.show({text: 'Simulating ...'});  
+    s.addTerminal('Simulating ...'); 
+    var pos = {
+      dir: $('#selectTradeOper').val(),
+      i: dm.data.length-1,
+      init: Math.round((dm.data[dm.data.length-1][4]+s.getSpread()*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000,
+      stop:  Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt($('#selectTradeStop').val())*($('#selectTradeOper').val()=='BUY'?-1:1))*10000)/10000,
+      lim:   Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt( $('#selectTradeLim').val())*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000
+    } 
+    s.createChartResult(pos).then(function(){ 
+      s.hideLoadingModal(); 
+      Snackbar.show({text: 'Simulation ends'});  
+      s.addTerminal('Simulation ends');  
+    }); 
+  }); 
+},
+
+
+calStadPos: function(pos){
+    var s = this;
+    var gain = 0;    
+    [cond1,cond2,cond3,cond4] = s.closePos(pos); 
+	
+    if(cond1){
+      gain = -1*Math.round(((pos.init-pos.stop)*10000)/10)+'pis';
+    }else if(cond2){
+      gain = +1*Math.round(((pos.lim-pos.init)*10000)/10)+'pis';
+    }else if(cond3){
+      gain = +1*Math.round(((pos.init-pos.lim)*10000)/10)+'pis';
+    }else if(cond4){
+      gain = -1*Math.round(((pos.stop-pos.init)*10000)/10)+'pis';
+    }	
+      
+    s.addTerminal('Pos:'+pos.dir+', start:'+pos.init+', lim:'+pos.lim+', stop:'+pos.stop+' -> G/L:(aprox.) '+gain); 
+  },
+
+*/

@@ -13,7 +13,7 @@
         color: white;
         font: 0.75em sans-serif;
         overflow: auto;
-        border-radius: 5px;
+        border-radius: 5px; 
       }
       #terminal p{
         margin: 0;
@@ -23,84 +23,16 @@
   </head>
   <body> 
     <div class="col"> 
-      <div class="row" row='01'>
-        <div class="col-md-6 ">
-          <div id="terminal"></div>
-        </div>
-        <div class="col-md-6" id="comboContainer">
-          <div class="row">
-            <div class="col-3">  
-              <div class="input-group"> 
-                <button id="btnRefresh" type="button" class="btn btn-dark btn-block"><i class="fas fa-trash-alt"></i> <i class="fa fa-refresh"></i></button>
-              </div>   
-              <div class="input-group"> 
-                <button id="btnDebug" type="button" class="btn btn-dark btn-block"><i class="fa fa-bug"></i></button>
-              </div>   
-              <div class="input-group"> 
-                <button id="btnDeleteTerminal" type="button" class="btn btn-danger btn-block"><i class="fa fa-trash"></i> <i class="fa fa-terminal"></i></button>
-              </div>  
-            </div>
-            <div class="col-5"> 
-              <div class="input-group"> 
-                <button id="btnRandomData" type="button" class="btn btn-dark btn-block"><i class="fa fa-random"></i> <i class="fa fa-bar-chart"></i></button>
-              </div> 
-              <div class="input-group"> 
-                <button id="btnPosData" type="button" class="btn btn-success btn-block"><i class="fa fa-play"></i> <i class="fa fa-bar-chart"></i></button>
-              </div> 
-              <div class="input-group" data-toggle="tooltip" data-placement="top" title="Spread">
-                <div class="input-group-prepend">
-                  <div class="input-group-text"><i class="fa fa-eur"></i></div>
-                </div>  
-                <input id="inputSpread" type="text" class="form-control">  
-              </div>
-            </div>            
-            <div class="col-4">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <div class="input-group-text"><i class="fa fa-exchange"></i></div>
-                </div>  
-                <select class="custom-select" id="selectTradeOper">
-                  <option value="BUY" selected>Buy</option>
-                  <option value="SELL">Sell</option> 
-                </select>
-              </div> 
-              <div class="input-group"> 
-                <div class="input-group-prepend">
-                  <div class="input-group-text"><i class="fa fa-ban"></i></div>
-                </div>
-                <select class="custom-select" id="selectTradeStop"> 
-                  <option value="5"  >5</option>
-                  <option value="10" selected>10</option>
-                  <option value="20" >20</option>
-                  <option value="50" >50</option>
-                  <option value="100">100</option> 
-                </select>
-              </div>
-              <div class="input-group"> 
-                <div class="input-group-prepend" >
-                  <div class="input-group-text"><i class="fa fa-window-minimize"></i></div>
-                </div>
-                <select class="custom-select" id="selectTradeLim"> 
-                  <option value="5"  >5</option>
-                  <option value="10" selected>10</option>
-                  <option value="20" >20</option>
-                  <option value="50" >50</option>
-                  <option value="100">100</option> 
-                </select>
-              </div> 
-            </div>
-          </div>           
-        </div>
-      </div> 
-      <div class="row" row='02'>
+      <div class="row">
         <div class="col-12">
-          <div class="row pl-3 pr-3" id="chart"> 
-            <div class=" container pt-3">
-              Push <button type="button" class="btn btn-dark btn-sm" disabled><i class="fa fa-random"></i> <i class="fa fa-bar-chart"></i></button> to get random data to start ... 
-              <br>Then, pushing <button type="button" class="btn btn-success btn-sm" disabled><i class="fa fa-play"></i> <i class="fa fa-bar-chart"></i></button>, you will get a simulation position.
-            </div>
+          <div class="row" id="chart">            
           </div>
         </div> 
+      </div> 
+      <div class="row">
+        <div class="col-12">
+          <div id="terminal"></div>
+        </div>       
       </div> 
     </div>  
     <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">

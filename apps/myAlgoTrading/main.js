@@ -6,6 +6,7 @@ var fs = require('fs');
 var app = electron.app;
 var BrowserWindow = electron.BrowserWindow;
 var Menu = electron.Menu;  
+var dialog  = electron.dialog ;  
 var ipcMain = electron.ipcMain;  
 
 var data  = [];
@@ -68,27 +69,44 @@ app.on('ready', function() {
       mainWindow.webContents.openDevTools(); 
     }
   }
-
-  reload();  
   
   mainWindow.on('closed', function() { 
     mainWindow = null;
   });         
 
-  Menu.setApplicationMenu(null);  
+  Menu.setApplicationMenu(null);
+  var menu = Menu.buildFromTemplate([{
+        label: 'Menu',
+        submenu: [{
+          label:'DevTools',
+          click: devTools
+        },{
+          label:'Reload',
+          click: reload
+        },{
+          type:'separator'
+        },{
+          label:'Exit',
+          click: function(){
+            app.quit();
+          }
+        }]
+  }]);
+  Menu.setApplicationMenu(menu);  
+  
+  //Init
+  reload();  
+  //devTools();
   mainWindow.maximize();
   
-
-  ipcMain.on('request01',reload);
-  ipcMain.on('request02',devTools);
-  ipcMain.on('request03',function(event,arg){
+  ipcMain.on('request01',function(event,arg){
     if(arg){  
-      lastValue = Math.floor((Math.random() * Math.floor(data.length*0.85)) + Math.floor(data.length*0.15));
-      var firstValue = Math.floor(lastValue-Math.floor(data.length*0.15));    
-      event.sender.send('replyRequest03',data.slice(firstValue, lastValue)); 
+      lastValue = Math.floor((Math.random() * Math.floor(data.length)) + 0); 
+      lastValue = 10000;
+      event.sender.send('replyRequest01',data.slice(0, lastValue)); 
     }
   }); 
-  ipcMain.on('request04',function(event,arg){
+  ipcMain.on('request02',function(event,arg){
     if(arg){ 
       var info = data[lastValue];
       if(lastValue<data.length){         
@@ -97,7 +115,7 @@ app.on('ready', function() {
       }else{
         info.end=true
       }
-      event.sender.send('replyRequest04',info); 
+      event.sender.send('replyRequest02',info); 
     }
   });
 
