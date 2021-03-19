@@ -19,7 +19,6 @@ var dm = {
     ipcRenderer.send('request02', requestData);  
     function listener(event, arg){
       if(arg!==null){ 
-        s.data=arg.data;
         fnSuccess();
       }else{
         fnFail();
@@ -40,12 +39,17 @@ var action = {
       s.addTerminal('Terminal Restored'); 
     });     
   },
-  addTerminal: function(text){
+  addTerminal: function(text,removeclass){
     var time = new Date()-this.timestampTerminal;
     time = (Math.floor(time/60/60/1000)<10?'0'+Math.floor(time/60/60/1000):Math.floor(time/60/60/1000))+
     ':'+(Math.floor(time/60/1000%60)<10?'0'+Math.floor(time/60/1000%60):Math.floor(time/60/1000%60))+
     ':'+(Math.floor(time/1000%60)<10?'0'+Math.floor(time/1000%60):Math.floor(time/1000%60));
-    $('#terminal').append('<p>('+time+') > '+text+'</p>'); 
+    var cl = '';
+    if (removeclass===true){
+      cl = 'removeTerminalIntro';
+    }
+    $('.removeTerminalIntro').remove();
+    $('#terminal').append('<p class="'+cl+'">('+time+') > '+text+'</p>'); 
     var scrollSize = $('#terminal').height();
     $('#terminal p').each(function(){
       scrollSize = scrollSize + $(this).height();
@@ -107,8 +111,7 @@ var action = {
     this.setLoadingModal(); 
     this.resize(); 
   }
-}    
-
+} 
 
 var app = {  
   //charts 
@@ -120,10 +123,35 @@ var app = {
       chart: {
         zoomType: 'xy',
         events: {
-          click: function (event) { 
-            if(s.pos.on===true){
-              action.addTerminal('x:'+event.xAxis[0].value +' y:'+event.yAxis[0].value);      
-            }         
+          click: function (event) {  
+            if(
+              (s.pos.on===true&&s.pos.buySell==='buy'&&s.pos.openprice>event.yAxis[0].value)||
+              (s.pos.on===true&&s.pos.buySell==='sell'&&s.pos.openprice<event.yAxis[0].value)
+            ){  
+              s.pos.stprice=Math.round(event.yAxis[0].value*10000)/10000;
+              chart.yAxis[0].removePlotLine('stop');
+              action.addTerminal('Stop price: '+s.pos.stprice,true);
+              chart.yAxis[0].addPlotLine({
+                value: event.yAxis[0].value,
+                color: 'red',
+                width: 2,
+                id: 'stop'
+              });
+            }
+            if(
+              (s.pos.on===true&&s.pos.buySell==='buy'&&s.pos.openpriceSpread<event.yAxis[0].value)||
+              (s.pos.on===true&&s.pos.buySell==='sell'&&s.pos.openpriceSpread>event.yAxis[0].value)
+            ){
+              s.pos.liprice=Math.round(event.yAxis[0].value*10000)/10000;
+              chart.yAxis[0].removePlotLine('limit');
+              action.addTerminal('Limit price: '+s.pos.liprice,true);
+              chart.yAxis[0].addPlotLine({
+                value: event.yAxis[0].value,
+                color: 'green',
+                width: 2,
+                id: 'limit'
+              }); 
+            }           
           }
         }
       },
@@ -200,140 +228,101 @@ var app = {
   //postion 
   pos: {
     on: false,
-    buySell: undefined
+    buySell: undefined,
+    openprice: undefined,
+    spread: 0.00006,   
+    openpriceSpread: undefined,
+    stprice: undefined, 
+    liprice: undefined,
+    stpricept: undefined, 
+    lipricept: undefined,
   },
-  createPos: function(){
-    var s = this;  
-    var btnBuy =  '<button type="button" class="btn btn-success btn-sm btnTerminal" value="buy"><i class="fa fa-bar-chart"></i> Buy</button>';
-    var btnSell = '<button type="button" class="btn btn-danger  btn-sm btnTerminal" value="sell"><i class="fa fa-bar-chart"></i> Sell</button>';
-    action.addTerminal('Open Position: '+btnBuy+' '+btnSell);
-    $('.btnTerminal').off('click'); 
-    $('.btnTerminal').on('click',function(){ 
-      s.pos.on=true;
-      s.pos.buySell=$(this).attr('value');
-      action.addTerminal($(this).attr('value')+ ' (Reload to reset)'); 
-      $('button').remove(); 
-      action.addTerminal('Now set Stop and limit and press <button type="button" class="btn btn-secondary btn-sm btnTerminal"><i class="fa fa-play"></i> Go!</button>');     
-      $('.btnTerminal').off('click');
-      $('.btnTerminal').on('click',function(){ 
-        action.addTerminal('Go!'); 
-        s.pos.on=false;
-        $('button').remove();     
-      });  
-    }); 
+  calPos: function(pos){
+    if(pos.buySell==='buy'){
+      pos.openpriceSpread = Math.round((pos.openprice+pos.spread)*10000)/10000; 
+      pos.stpricept = Math.round((pos.openpriceSpread-pos.stprice)*100000)/10;
+      pos.lipricept = Math.round((pos.liprice-pos.openpriceSpread)*100000)/10;
+    }
+    if(pos.buySell==='sell'){
+      pos.openpriceSpread = Math.round((pos.openprice-pos.spread)*10000)/10000;  
+      pos.lipricept = Math.round((pos.openpriceSpread-pos.liprice)*100000)/10;
+      pos.stpricept = Math.round((pos.stprice-pos.openpriceSpread)*100000)/10;
+    }
+    return pos;
   },
   //exe
   exe: function(){ 
-    var s = this;     
-    action.showLoadingModal();    
-    Snackbar.show({text: 'Loading Data ...'});
+    var s = this;   
+    console.log('showLoadingModal');
+    console.log(action.exeModal);
+    action.showLoadingModal();  
+    console.log(action.exeModal);  
+    Snackbar.show({text: 'Loading Data ...'});    
     dm.getStart(function(){
+      console.log('hideLoadingModal');
+      console.log(action.exeModal);
       action.hideLoadingModal();
+      console.log(action.exeModal);
       Snackbar.show({text: 'Data Loaded'}); 
       action.addTerminal('Data Loaded');
       s.chart = s.createChart('chart'); 
-      s.createPos();
+      var btnBuy  = '<button type="button" class="btn btn-success btn-sm btnTerminal" value="buy"><i class="fa fa-bar-chart"></i> Buy</button>';
+      var btnSell = '<button type="button" class="btn btn-danger  btn-sm btnTerminal" value="sell"><i class="fa fa-bar-chart"></i> Sell</button>';
+      action.addTerminal('Open Position: '+btnBuy+' '+btnSell);
+      $('.btnTerminal').off('click'); 
+      $('.btnTerminal').on('click',function(){ 
+        s.pos.on=true;
+        s.pos.buySell=$(this).attr('value'); 
+        s.pos.openprice=Math.round(dm.data[dm.data.length-1][4]*10000)/10000;  
+        s.pos = s.calPos(s.pos);
+        s.chart.yAxis[0].addPlotLine({
+          value: s.pos.openprice,
+          color: 'grey',
+          width: 1,
+          id: 'open'
+        }); 
+        s.chart.yAxis[0].addPlotLine({
+          value: s.pos.openpriceSpread,
+          color: 'black',
+          width: 1,
+          id: 'openSpread'
+        });
+        action.addTerminal($(this).attr('value')+ ' (Reload to reset)'); 
+        $('button').remove();  
+        action.addTerminal('Now set Stop and limit and press <button type="button" class="btn btn-secondary btn-sm btnTerminal"><i class="fa fa-play"></i> Go!</button>');     
+        $('.btnTerminal').off('click');
+        $('.btnTerminal').on('click',function(){ 
+        action.addTerminal('Go!'); 
+        s.pos = s.calPos(s.pos);
+        action.addTerminal('Resumen posición: '+s.pos.buySell);         
+        action.addTerminal(' * Open: '+s.pos.openprice);             
+        action.addTerminal(' * Open: '+s.pos.openpriceSpread+' ('+(s.pos.buySell==='buy'?'+':'-')+'spread='+s.pos.spread+')');     
+        action.addTerminal(' * Stp: '+s.pos.stprice+' -> pt: '+s.pos.stpricept);        
+        action.addTerminal(' * Lim: '+s.pos.liprice+' -> pt: '+s.pos.lipricept);  
+        s.pos.on=false;
+        $('button').remove(); 
+        console.log('showLoadingModal');
+        console.log(action.exeModal);
+        action.showLoadingModal();  
+        console.log(action.exeModal);   
+        dm.getSimulation(function(){
+          action.hideLoadingModal();
+          Snackbar.show({text: 'Data Simulation Loaded'}); 
+          action.addTerminal('Data Simulation Loaded'); 
+        },function(){
+          action.hideLoadingModal();
+          Snackbar.show({text: 'Data Simulation error'}); 
+          action.addTerminal('Data Simulation error');
+        },s.pos);   
+        });  
+      }); 
     },function(){
       action.hideLoadingModal();
-      Snackbar.show({text: 'Data error'}); 
-      action.addTerminal('Data error');
+      Snackbar.show({text: 'Getting Data error'}); 
+      action.addTerminal('Getting Data error');
     });
-    
-    
-    /* DEV **** 
-    //$('#btnDebug').trigger('click');
-    var time = 0; 
-    var incT = 120000; 
-    function incTime(){
-      time=time+incT;
-    }
-
-    function comboValues(oper,stop,lim){
-      $('#selectTradeOper option').removeAttr('selected');
-      $('#selectTradeStop option').removeAttr('selected');
-      $('#selectTradeLim option').removeAttr('selected');
-      $($('#selectTradeOper option')[oper]).attr('selected',true);
-      $($('#selectTradeStop option')[stop]).attr('selected',true);
-      $($('#selectTradeLim option')[lim]).attr('selected',true);
-      s.addTerminal('ComboValue -> Dir: '+$('#selectTradeOper').val()+', Stop:'+$('#selectTradeStop').val()+', Lim:'+$('#selectTradeLim').val());
-    }
-
-    function test(n,oper,stop,lim){
-      if(time===0){
-        time = 100;
-      }
-      setTimeout(function(){
-        $('#btnRandomData').trigger('click'); 
-        s.addTerminal(' --- '+n+'º Simulation');
-        comboValues(oper,stop,lim);
-        setTimeout(function(){
-          $('#btnPosData').trigger('click');
-          s.resize(); 
-        },5000);
-      },time);
-      if(time===100){
-        time = 0;
-      }
-      incTime();
-    } 
-    
-    s.addTerminal(' *** Simulation (incTime: '+incT+') ***'); 
-    test(1,0,1,1);  
-    //test(2,1,1,1);
-    //test(3,0,0,0);   
-    //test(4,1,0,0); 
-
-    //********/
-
   }
 }
 
 action.init();
 app.exe();   
-
-/*
-
-setBtnPositionData: function(){
-  var s = this;    
-  s.onOffBtnPositionData(false);    
-  $('#btnPosData').on('click',function(){ 
-    //$('#btnRandomData').prop('disabled', false);
-    s.onOffBtnPositionData(false); 
-    s.showLoadingModal();    
-    Snackbar.show({text: 'Simulating ...'});  
-    s.addTerminal('Simulating ...'); 
-    var pos = {
-      dir: $('#selectTradeOper').val(),
-      i: dm.data.length-1,
-      init: Math.round((dm.data[dm.data.length-1][4]+s.getSpread()*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000,
-      stop:  Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt($('#selectTradeStop').val())*($('#selectTradeOper').val()=='BUY'?-1:1))*10000)/10000,
-      lim:   Math.round((dm.data[dm.data.length-1][4]+0.001*parseInt( $('#selectTradeLim').val())*($('#selectTradeOper').val()=='BUY'?1:-1))*10000)/10000
-    } 
-    s.createChartResult(pos).then(function(){ 
-      s.hideLoadingModal(); 
-      Snackbar.show({text: 'Simulation ends'});  
-      s.addTerminal('Simulation ends');  
-    }); 
-  }); 
-},
-
-
-calStadPos: function(pos){
-    var s = this;
-    var gain = 0;    
-    [cond1,cond2,cond3,cond4] = s.closePos(pos); 
-	
-    if(cond1){
-      gain = -1*Math.round(((pos.init-pos.stop)*10000)/10)+'pis';
-    }else if(cond2){
-      gain = +1*Math.round(((pos.lim-pos.init)*10000)/10)+'pis';
-    }else if(cond3){
-      gain = +1*Math.round(((pos.init-pos.lim)*10000)/10)+'pis';
-    }else if(cond4){
-      gain = -1*Math.round(((pos.stop-pos.init)*10000)/10)+'pis';
-    }	
-      
-    s.addTerminal('Pos:'+pos.dir+', start:'+pos.init+', lim:'+pos.lim+', stop:'+pos.stop+' -> G/L:(aprox.) '+gain); 
-  },
-
-*/

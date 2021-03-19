@@ -107,15 +107,10 @@ app.on('ready', function() {
     }
   }); 
   ipcMain.on('request02',function(event,arg){
-    if(arg){ 
-      var info = data[lastValue];
-      if(lastValue<data.length){         
-        info = data[lastValue];
-        lastValue++; 
-      }else{
-        info.end=true
-      }
-      event.sender.send('replyRequest02',info); 
+    if(arg){
+      setTimeout(function(){ 
+        event.sender.send('replyRequest02',null); 
+      },5000);
     }
   });
 
