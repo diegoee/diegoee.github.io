@@ -6,7 +6,7 @@ var dm = {
     ipcRenderer.send('request01', true);
     s.data = undefined; 
     ipcRenderer.once('replyRequest01',function(event, arg){
-      if(arg!==null||!info.end){    
+      if(arg!==null||arg!==undefined){    
         s.data=arg;  
         fnSuccess();
       }else{
@@ -59,7 +59,7 @@ var action = {
     },100); 
   }, 
   //Modal Loading
-  exeModal: false, 
+  exeModal: true, 
   showLoadingModal: function(){ 
     var s = this;
     s.exeModal = false; 
@@ -71,8 +71,7 @@ var action = {
   hideLoadingModal: function(){
     var s = this;
     s.exeModal = true; 
-    $('#loadingModal').modal('hide');
-    $('.modal-backdrop.fade').remove();
+    $('#loadingModal').modal('hide'); 
   },
   setLoadingModal: function(){
     var s = this;
@@ -82,6 +81,16 @@ var action = {
       }
     });
   },
+  //Btn2Terminal
+  addReloadBtn2Terminal: function (){
+    action.addTerminal('');
+    action.addTerminal('<button type="button" class="btn btn-secondary  btn-sm btnTerminal" value="sell"><i class="fa fa-reload"></i> Reload</button>');
+    action.addTerminal('');
+    $('.btnTerminal').off('click');
+    $('.btnTerminal').on('click',function(){ 
+      ipcRenderer.send('request03', null);
+    });
+  }, 
   //General Event
   resize: function(){ 
     var s = this; 
@@ -225,6 +234,9 @@ var app = {
     });   
     return chart;
   },
+  plotChartResult: function(){
+
+  },
   //postion 
   pos: {
     on: false,
@@ -252,17 +264,12 @@ var app = {
   },
   //exe
   exe: function(){ 
-    var s = this;   
-    console.log('showLoadingModal');
-    console.log(action.exeModal);
-    action.showLoadingModal();  
-    console.log(action.exeModal);  
-    Snackbar.show({text: 'Loading Data ...'});    
+    var s = this;  
+
+    action.showLoadingModal();   
+    Snackbar.show({text: 'Loading Data ...'});
     dm.getStart(function(){
-      console.log('hideLoadingModal');
-      console.log(action.exeModal);
       action.hideLoadingModal();
-      console.log(action.exeModal);
       Snackbar.show({text: 'Data Loaded'}); 
       action.addTerminal('Data Loaded');
       s.chart = s.createChart('chart'); 
@@ -300,26 +307,29 @@ var app = {
         action.addTerminal(' * Stp: '+s.pos.stprice+' -> pt: '+s.pos.stpricept);        
         action.addTerminal(' * Lim: '+s.pos.liprice+' -> pt: '+s.pos.lipricept);  
         s.pos.on=false;
-        $('button').remove(); 
-        console.log('showLoadingModal');
-        console.log(action.exeModal);
+        $('button').remove();  
+
         action.showLoadingModal();  
-        console.log(action.exeModal);   
-        dm.getSimulation(function(){
+        Snackbar.show({text: 'Getting simulation position ...'}); 
+        dm.getSimulation(function(res){
           action.hideLoadingModal();
           Snackbar.show({text: 'Data Simulation Loaded'}); 
           action.addTerminal('Data Simulation Loaded'); 
+          s.plotChartResult(res);
+          action.addReloadBtn2Terminal();
         },function(){
           action.hideLoadingModal();
           Snackbar.show({text: 'Data Simulation error'}); 
           action.addTerminal('Data Simulation error');
+          action.addReloadBtn2Terminal();
         },s.pos);   
         });  
       }); 
     },function(){
       action.hideLoadingModal();
       Snackbar.show({text: 'Getting Data error'}); 
-      action.addTerminal('Getting Data error');
+      action.addTerminal('Getting Data error');      
+      action.addReloadBtn2Terminal();
     });
   }
 }

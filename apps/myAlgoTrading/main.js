@@ -6,11 +6,11 @@ var fs = require('fs');
 var app = electron.app;
 var BrowserWindow = electron.BrowserWindow;
 var Menu = electron.Menu;  
-var dialog  = electron.dialog ;  
 var ipcMain = electron.ipcMain;  
 
 var data  = [];
 var lastValue = 0;
+var pos = undefined;
 function loadData(){
   var files = [];
   fs.readdirSync('data').forEach(function(file){
@@ -40,6 +40,26 @@ function loadData(){
 }   
 loadData();
 
+lastValue = 10000;
+pos = { 
+    buySell: 'sell',
+    liprice: 1.0508,
+    lipricept: 44,
+    on: false,
+    openprice: 1.0553,
+    openpriceSpread: 1.0552,
+    spread: 0.00006,
+    stprice: 1.0626,
+    stpricept: 74 
+  };
+//arg: data, lastValue, pos
+function calcSimulation(){
+  console.log('Start calcSimulation');
+  console.log('End calcSimulation');
+}
+calcSimulation();
+
+/*
 app.on('window-all-closed', function() { 
   if(process.platform !='darwin') {
     app.quit();
@@ -106,14 +126,15 @@ app.on('ready', function() {
       event.sender.send('replyRequest01',data.slice(0, lastValue)); 
     }
   }); 
-  ipcMain.on('request02',function(event,arg){
+  ipcMain.on('request02',function(event,arg){ 
     if(arg){
       setTimeout(function(){ 
         event.sender.send('replyRequest02',null); 
       },5000);
     }
   });
+  ipcMain.on('request03',reload); 
 
 });  
-
+*/
  
