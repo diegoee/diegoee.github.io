@@ -18,7 +18,7 @@ var dm = {
     var s = this;
     ipcRenderer.send('request02', requestData);  
     function listener(event, arg){
-      if(arg!==null){ 
+      if(arg!==null||arg!==undefined){  
         fnSuccess();
       }else{
         fnFail();
@@ -234,8 +234,8 @@ var app = {
     });   
     return chart;
   },
-  plotChartResult: function(){
-
+  plotChartResult: function(res){
+    console.log(res);
   },
   //postion 
   pos: {
@@ -251,12 +251,12 @@ var app = {
   },
   calPos: function(pos){
     if(pos.buySell==='buy'){
-      pos.openpriceSpread = Math.round((pos.openprice+pos.spread)*10000)/10000; 
+      pos.openpriceSpread = Math.round((pos.openprice+pos.spread)*100000)/10000; 
       pos.stpricept = Math.round((pos.openpriceSpread-pos.stprice)*100000)/10;
       pos.lipricept = Math.round((pos.liprice-pos.openpriceSpread)*100000)/10;
     }
     if(pos.buySell==='sell'){
-      pos.openpriceSpread = Math.round((pos.openprice-pos.spread)*10000)/10000;  
+      pos.openpriceSpread = Math.round((pos.openprice-pos.spread)*100000)/10000;  
       pos.lipricept = Math.round((pos.openpriceSpread-pos.liprice)*100000)/10;
       pos.stpricept = Math.round((pos.stprice-pos.openpriceSpread)*100000)/10;
     }
