@@ -1,0 +1,33 @@
+{
+  "name": "mylaptopapp",
+  "productName": "Laptop_App",
+  "version": "1.0.0",
+  "license": "ISC",
+  "author": "Diego E.E.",
+  "main": "main.js",
+  "scripts": {
+    "electron": "electron .",
+    "electronBuilder": "electron-builder"
+  },
+  "build": {
+    "appId": "com.diegoee.myalgotrading",
+    "win": {
+      "target": "portable",
+      "icon": "www/icons/ic_launcher.ico"
+    }
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "bootstrap": "^4.5.2",
+    "electron-promise-ipc": "^1.6.0",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.4.1",
+    "moment": "^2.24.0",
+    "node-snackbar": "^0.1.15",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "electron": "^4.2.0",
+    "electron-builder": "^22.1.0"
+  }
+}
