@@ -75,12 +75,6 @@ var app = {
       event.initUIEvent('resize', true, false, window, 0);  
     }
     window.dispatchEvent(event);
-  },
-  init: function(){ 
-    this.startTerminal(); 
-    this.addTerminal('start App!'); 
-    this.setLoadingModal(); 
-    this.resize(); 
   }, 
   info: undefined,   
   getStart: function(fnSuccess,fnFail){
@@ -98,7 +92,10 @@ var app = {
   }, 
   exe: function(){ 
     var s = this; 
-    s.init();
+    s.startTerminal(); 
+    s.addTerminal('start App!'); 
+    s.setLoadingModal(); 
+    s.resize();
     s.showLoadingModal();   
     Snackbar.show({text: 'Getting Data ...'});
     s.getStart(function(){
@@ -111,13 +108,8 @@ var app = {
       s.addTerminal('Laptop Name : '+s.info.user); 
       s.addTerminal('User Name : '+s.info.hostname);   
       s.addTerminal('Temp folder laptop: '+s.info.tmpDir);  
-      s.addTerminal(' ');       
-      var ss = s.info.timeon%60;
-      var mm = Math.floor((s.info.timeon/60)%60);;
-      var hh = Math.floor(s.info.timeon/60/60);
-      var time = hh+':'+mm+':'+ss;
-      var e = '<div class="jumbotron"><p class="lead">Time latop on</p><hr class="my-4"><h1 class="">'+time+'</h1></div>'; 
-      $('#info').html(e);  
+      s.addTerminal(' '); 
+      $('#info').html('<div class="jumbotron"><p class="lead">Time latop on</p><hr class="my-4"><h1 class="">'+s.info.timeonStr+'</h1></div>');  
     },function(){
       s.hideLoadingModal();
       Snackbar.show({text: 'Getting Data error'}); 

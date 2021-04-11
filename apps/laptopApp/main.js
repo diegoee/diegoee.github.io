@@ -1,10 +1,5 @@
-var electron = require('electron');
-var path = require('path');
-var url = require('url');
-var os = require('os'); 
- 
- 
 function calcInfo(){
+  var os = require('os');  
   var info = {}
   console.log('Start calcInfo');
   info.cpus = [];
@@ -19,10 +14,23 @@ function calcInfo(){
   info.user = os.userInfo().username; 
   info.tmpDir = os.tmpdir(); 
   info.timeon = os.uptime();   
-  console.log('End calcInfo');
+  info.timeonStr = 'HH:mm:ss'; 
+  
+  var ss = info.timeon%60;
+  var mm = Math.floor((info.timeon/60)%60);
+  var hh = Math.floor((info.timeon/60/60)%24);
+  var dd = Math.floor(info.timeon/60/60/24);
+  info.timeonStr = dd+'d '+hh+':'+mm+':'+ss;
+  
+  console.log('End calcInfo'); 
   return info;
 }  
+//calcInfo();
  
+var electron = require('electron');
+var path = require('path');
+var url = require('url');
+
 electron.app.on('window-all-closed', function() { 
   if(process.platform!=='darwin') {
     electron.app.quit();
