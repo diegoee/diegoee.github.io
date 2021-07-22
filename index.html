@@ -132,9 +132,68 @@
         width: 100%;
         height: 100%;
       } 
+      #loading.loading{ 
+        position: absolute;
+        top:0;
+        left:0;  
+        z-index: -1;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(128, 128, 128, 0.25);
+        cursor: pointer;        
+        display: flex;
+        align-items: center;  
+        justify-content: center;
+      }
+      #loading.loading.on{  
+        z-index: 1;
+        opacity: 1;
+      }
+      #loading.loading.off{ 
+        z-index: -1;
+        opacity: 0;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+
+        position: relative;
+        margin: 100px auto;
+      }
+      .double-bounce1, .double-bounce2 {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #333;
+        opacity: 0.6;
+        position: absolute;
+        top: 0;
+        left: 0;
+        
+        -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+        animation: sk-bounce 2.0s infinite ease-in-out;
+      }
+      .double-bounce2 {
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+      }
+      @-webkit-keyframes sk-bounce {
+        0%, 100% { -webkit-transform: scale(0.0) }
+        50% { -webkit-transform: scale(1.0) }
+      }
+      @keyframes sk-bounce {
+        0%, 100% { 
+          transform: scale(0.0);
+          -webkit-transform: scale(0.0);
+        } 50% { 
+          transform: scale(1.0);
+          -webkit-transform: scale(1.0);
+        }
+      }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"> 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">  
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>   
   </head>
   <body>
     <div id="particles-js"></div>
@@ -146,7 +205,11 @@
       <details open>
         <summary>Porfolio:</summary>
         <div class="divDetail">
-          <p><a href="https://github.com/diegoee/androidDice" target="_blank">Dado (Dice)</a>.&nbsp;<a href="https://play.google.com/store/apps/details?id=com.deeapp.dice" target="_blank">(Play Store)</a></p>
+          <p>
+            <a href="https://github.com/diegoee/androidDice" target="_blank">Dado (Dice)</a>.
+            <a href="https://play.google.com/store/apps/details?id=com.deeapp.dice" target="_blank">(Play Store)</a>
+            <a href="#" id="linkApp01">(Web version)</a>
+          </p>
           <p><a href="https://github.com/diegoee/rndGame" target="_blank">RndGame</a>.&nbsp;<a href="https://play.google.com/store/apps/details?id=com.diegoee.rndgame1" target="_blank">(Play Store)</a></p>
           <p><a href="https://github.com/diegoee/smartCardFamocoDevice" target="_blank">Smart Card Reader</a></p>
         </div>
@@ -168,6 +231,12 @@
         </p>
       </div>
     </footer> 
+    <div id="loading" class="loading">
+      <div class="spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+    </div>
     <script>
       (function app(){        
         var setUp = {
@@ -279,7 +348,11 @@
       })();
       (function getFolder(){
         Array.prototype.unique=function(a){
-          return function(){return this.filter(a)}}(function(a,b,c){return c.indexOf(a,b+1)<0
+          return function(){
+             return this.filter(a)
+            }
+        }(function(a,b,c){
+          return c.indexOf(a,b+1)<0
         });
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -290,27 +363,73 @@
         };
         xhttp.open('GET', 'https://api.github.com/repos/diegoee/diegoee.github.io/commits', true);
         xhttp.send();
-        var getTree = function getTree(res){
+        function getTree(res){
           var xhttp = new XMLHttpRequest();
           xhttp.onreadystatechange = function() {
-              if (this.readyState == 4 && this.status == 200) {
-                var res = JSON.parse(this.responseText).tree;
-                var a = [];
-                for(var i=0; i<res.length; i++){
-                  if ((res[i].path.indexOf('webLab/')!==-1)){
-                    var aux = res[i].path.split('/');
-                    a.push(aux[1]);
-                  }
+            if (this.readyState == 4 && this.status == 200) {
+              var res = JSON.parse(this.responseText).tree;
+              var a = [];
+              for(var i=0; i<res.length; i++){
+                if ((res[i].path.indexOf('webLab/')!==-1)){
+                  var aux = res[i].path.split('/');
+                  a.push(aux[1]);
                 }
-                a=a.unique();
-                for(var i=0; i<a.length; i++){
-                  document.getElementById('myWebLabDiv').innerHTML +='<p><a href="/webLab/'+a[i]+'" target="_blank">'+a[i]+'</a></p>';
-                };
-             }
+              }
+              a=a.unique();
+              for(var i=0; i<a.length; i++){
+                document.getElementById('myWebLabDiv').innerHTML +='<p><a href="/webLab/'+a[i]+'" target="_blank">'+a[i]+'</a></p>';
+              };
+            }
           };
           xhttp.open('GET','https://api.github.com/repos/diegoee/diegoee.github.io/git/trees/'+res+'?recursive=1', true);
           xhttp.send();
         };
+      })();
+      (function webapp(){
+        function activeloading(){
+          var e = document.getElementById('loading');
+          if (e.classList.contains('on')) {
+            e.classList.remove('on'); 
+            e.classList.add('off'); 
+          } else{
+            e.classList.remove('off'); 
+            e.classList.add('on'); 
+          }
+        } 
+        document.getElementById('loading').addEventListener('click', function(){ 
+          activeloading(); 
+        },false); 
+        document.getElementById('linkApp01').addEventListener('click', function(){ 
+          activeloading();
+          var xhttp01 = new XMLHttpRequest();
+          xhttp01.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              var res01 = this.responseText;
+              var res02 = undefined;
+              var xhttp02 = new XMLHttpRequest();
+              xhttp02.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                  res02 = this.responseText;
+                  res02 = res02.substr(169);  
+                  console.clear();
+                  res01=res01.replace('src="node_modules/jquery/dist/jquery.min.js"', 'src="https://code.jquery.com/jquery-3.2.1.min.js"');
+                  res01=res01.replace('src="node_modules/three/build/three.min.js"', 'src="https://threejs.org/build/three.js"'); 
+                  res01=res01.replace('<script src="dado.js">','<script type="text/javascript">'+res02);
+                  console.log(res01);
+                  var newWin = window.open('', '_blank');
+                  newWin.document.write(res01);
+                  newWin.document.close();
+                  newWin.focus();
+                  activeloading(); 
+                }
+              };
+              xhttp02.open('GET', 'https://raw.githubusercontent.com/diegoee/androidDice/main/app/src/main/assets/www/dado.js', true);
+              xhttp02.send();  
+            }
+          };
+          xhttp01.open('GET', 'https://raw.githubusercontent.com/diegoee/androidDice/main/app/src/main/assets/www/index.html', true);
+          xhttp01.send();
+        }, false);  
       })();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
