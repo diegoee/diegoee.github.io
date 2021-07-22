@@ -20,6 +20,10 @@
         html{
           font-size: 0.75em;
         }
+        #modelCanvas{  
+          width: 1048px;
+          margin: 2px 5px; 
+        }
       } 
     </style>
   </head>
@@ -33,12 +37,12 @@
           </button>
         </span> 
         <ul class="nav justify-content-end">
-          <li class="nav-item ms-1 me-5"><button type="button" class="btn btn-outline-dark" id="idBtnPrint"><i class="fas fa-download"></i></button></li>  
+          <li class="nav-item ms-1 me-5"><button type="button" class="btn btn-outline-dark" id="idBtnPrint"><i class="fas fa-print"></i></button></li>  
           <li class="nav-item ms-1 me-1"><button type="button" class="btn btn-outline-dark" id="idBtnDelete"><i class="fas fa-trash"></i></button>   </li>
         </ul>  
       </div>
     </nav> 
-    <div class="m-1 ps-3 pe-3">
+    <div id="modelCanvas" class="m-1 ps-3 pe-3">
       <div class="row">
         <div class="col-2 mb-1 border border-dark rounded overflow-auto size1 canvas position-relative">
           <span class="btn badge rounded-pill bg-light text-dark position-absolute top-0 end-0 m-1 btnAddNote"><i class="fas fa-plus"></i></span>
@@ -172,8 +176,11 @@
       /*global $, window, setTimeout, clearTimeout, Promise*/      
       var app = { 
         modal: undefined,  
-        calcHeight: function(){
-          var h = $(window).height()-$('#menu').innerHeight()-15; 
+        calcHeight: function(he){
+          var h = $(window).height()-$('#menu').innerHeight()-15;
+          if (he!==undefined){
+            h=he;
+          } 
           $('.size1').height(Math.floor(3*h/4));  
           $('.size2').height(Math.floor(3*h/4*1/2)-3);
           $('.size3').height(Math.floor(1*h/4)); 
@@ -257,10 +264,12 @@
           var backup={};
           backup.title=document.title;  
           //preprint
-          document.title='https://diegoee.github.io/webLab/test4_businessModelCanvas';    
+          document.title='https://diegoee.github.io/webLab/test4_businessModelCanvas';   
+          app.calcHeight(640); 
           window.print();    
           //restore            
           document.title=backup.title;  
+          app.calcHeight();
         },
         init: function(){
           console.log('Web Test4_businessModelCanvas init');
