@@ -19,6 +19,7 @@
         font-family: myFirstFont,sans-serif;
         background-color: white;
         color: black;
+        -webkit-tap-highlight-color: transparent;
       }
       header{
         -webkit-touch-callout: none;
@@ -136,28 +137,29 @@
         position: absolute;
         top:0;
         left:0;  
-        z-index: -1;
-        opacity: 0;
         width: 100%;
         height: 100%;
         background-color: rgb(128, 128, 128, 0.25);
-        cursor: pointer;        
-        display: flex;
+        cursor: pointer;   
         align-items: center;  
         justify-content: center;
+        display: none;
+        z-index: -1;
+        opacity: 0;
       }
       #loading.loading.on{  
+        display: flex;
         z-index: 1;
         opacity: 1;
       }
       #loading.loading.off{ 
+        display: none;
         z-index: -1;
         opacity: 0;
       }
       .spinner {
         width: 40px;
         height: 40px;
-
         position: relative;
         margin: 100px auto;
       }
