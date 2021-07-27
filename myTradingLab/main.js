@@ -5,7 +5,14 @@ var fs = require('fs');
 
 function readData2Plot(){
   var list = []; 
-  var directoryPath = path.join(__dirname, 'dataResult');  
+  var directoryPath = path.join(__dirname, 'dataResult'); 
+  electron.dialog.showMessageBox(null,{
+    type: 'info',  
+    title: 'Alert',
+    message: 'Text',
+    detail: directoryPath,  
+  });
+
   console.log('readData2Plot exe');
   fs.readdirSync(directoryPath).forEach(function (file) {
     console.log(file);

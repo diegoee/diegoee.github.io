@@ -243,6 +243,12 @@
                   title: {
                     text: ' '
                   }, 
+                  credits: {
+                      enabled: false
+                  },
+                  chart: { 
+                    zoomType: 'x'
+                  },
                   series: [{
                     type: 'candlestick',
                     name: plotData,
@@ -285,6 +291,7 @@
             s.addTerminal('List data loaded'); 
             s.setDataList();
             Snackbar.show({text: 'List data loaded'});  
+            $('#plotBtn').trigger('click');
           },function(){
             s.hideLoadingModal(); 
             s.addTerminal('Getting Data error');  
