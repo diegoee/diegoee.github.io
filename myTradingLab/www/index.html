@@ -193,8 +193,10 @@
           var s = this; 
           $('#selectData').html(' ');
           $.each(s.listData,function(i,e){
+            var namefile = e.split('\\');
+            namefile = namefile[namefile.length-1];
             if(i===0){
-              $('#selectData').append('<option value="'+e+'" selected>'+e+'</option>');
+              $('#selectData').append('<option value="'+e+'" selected>'+namefile+'</option>');
             }else{
               $('#selectData').append('<option value="'+e+'">'+e+'</option>');
             } 
@@ -208,7 +210,7 @@
         },
         readPlotData: function(file,fnSuccess,fnFail){
           $.ajax({
-            url: "../dataResult/"+file, 
+            url: file, 
             success: function (data){
               data = JSON.parse(data);
               fnSuccess(data);
@@ -233,7 +235,9 @@
           var plotData = $('#selectData').val();          
           s.showLoadingModal();
           $('#chart').html(' ');
-          s.readPlotData(plotData,function(data){
+          s.readPlotData(plotData,function(data){ 
+            var namefile = plotData.split('\\');
+            namefile = namefile[namefile.length-1];
             try{
               if(plotType===1){ //Candlestick 
                 Highcharts.stockChart('chart', { 
@@ -251,7 +255,7 @@
                   },
                   series: [{
                     type: 'candlestick',
-                    name: plotData,
+                    name: namefile,
                     data: data.data,
                     dataGrouping: {
                       units: [

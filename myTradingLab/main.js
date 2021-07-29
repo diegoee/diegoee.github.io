@@ -2,21 +2,29 @@ var electron = require('electron');
 var path = require('path');
 var url = require('url');
 var fs = require('fs');
+var folderData = 'dataResult';
 
 function readData2Plot(){
   var list = []; 
-  var directoryPath = path.join(__dirname, 'dataResult'); 
+  var directoryPath = undefined; 
+  if(process.env.PORTABLE_EXECUTABLE_DIR){
+    directoryPath = path.join(process.env.PORTABLE_EXECUTABLE_DIR,folderData);
+  }else{ 
+    directoryPath = path.join(__dirname, folderData); 	
+  }   
+  /*
   electron.dialog.showMessageBox(null,{
     type: 'info',  
     title: 'Alert',
-    message: 'Text',
+    message: 'directoryPath',
     detail: directoryPath,  
   });
+  */     
 
   console.log('readData2Plot exe');
   fs.readdirSync(directoryPath).forEach(function (file) {
     console.log(file);
-    list.push(file);
+    list.push(path.join(directoryPath,file));
   }); 
   return list;
 }    
