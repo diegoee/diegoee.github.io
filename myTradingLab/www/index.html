@@ -212,8 +212,12 @@
           $.ajax({
             url: file, 
             success: function (data){
-              data = JSON.parse(data);
-              fnSuccess(data);
+              try{
+                data = JSON.parse(data);
+                fnSuccess(data);
+              }catch(e){
+                fnFail();
+              } 
             },
             error: function (){
               fnFail();
