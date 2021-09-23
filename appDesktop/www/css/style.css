@@ -1,0 +1,12 @@
+
+#terminal{
+  background-color: black;
+  color: white;
+  font: 0.75em sans-serif;
+  overflow: auto;
+  border-radius: 5px; 
+}
+#terminal p{
+  margin: 0;
+  padding: 0;
+}
