@@ -184,7 +184,6 @@ require([
       $('footer').remove();
       $('.border').remove();
       $('.modal').modal('hide');
-      $('#myCarousel').remove();
       $('#printBtn').remove();
 
       var i;
