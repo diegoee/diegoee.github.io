@@ -426,3 +426,11 @@ a.aNav:active{
     padding: 0;
   } 
 }
+
+.slick-prev:before, .slick-next:before{
+  color: #555f66 !important;
+  background-color: #fff !important;
+}
+.slick-slide img {
+  display: inline-block; 
+}

@@ -3,18 +3,23 @@ require.config({
   baseUrl: 'js',
   paths: {
     jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min',
-    bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min'
+    bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min',
+    slick: 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min'
   },
   shim: {
     bootstrap : {
       deps : ['jquery']
-    }
+    }, 
+    slick : {
+      deps : ['jquery']
+    }  
   }
 });
 
 require([
   'jquery',
-  'bootstrap'
+  'bootstrap',
+  'slick'
   ],
   function(
     $
@@ -83,6 +88,17 @@ require([
         $('#language1').on('click',App.translate);
         $('#language2').on('click',App.translate);
 
+        $('.slick').slick({
+          dots: true,
+          infinite: true,
+          speed: 300, 
+          slidesToShow: 2,
+          centerMode: true,
+          variableWidth: true,
+          autoplay: true,
+          autoplaySpeed: 3000,
+        });
+
         App.exeTranslate = false;
         App.activeSpinner(false);
 
@@ -93,7 +109,10 @@ require([
       $(window).on('hashchange', App.checkHash);
 
       window.beforeprint=App.beforeprint;
-      window.afterprint=App.afterprint; 
+      window.afterprint=App.afterprint;  
+      //setTimeout(function(){
+      //  $('#myNavbar a[href="#portfolio"]').trigger('click');
+      //},1000);
     },
     exeTranslate: false,
     beforeprint: function beforeprint(){
