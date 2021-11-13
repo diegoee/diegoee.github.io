@@ -163,9 +163,20 @@
           });  
         },
         play: function(endFn){ 
+          intro = 0;
+          if(app.playIntro){
+            intro = 2;
+          } 
           app.playMusicSheet = new ABCJS.TimingCallbacks(app.musicSheet[0], {
             qpm: app.bpm,
-            beatCallback: function(a){
+            extraMeasuresAtBeginning: intro,
+            beatCallback: function(a,b,c,d){ 
+              if(d.top!==undefined){
+                $('.abcjs-time-signature').removeClass('currentNote');
+
+              }else{ 
+                $('.abcjs-time-signature').addClass('currentNote');
+              }
               if(app.playBack){
                 if(app.timeSigSel==='2/4'&&a%2===0){  
                   app.synth.triggerAttackRelease('A5','16n');
@@ -217,7 +228,7 @@
       var web = { 
         bpm: 60,
         level: 0,
-        playIntro: false,
+        playIntro: true,
         playBack: true,
         playCursor: true,
         toast: function (data){
@@ -279,7 +290,7 @@
             web.toast('Play BackGround Beat: '+(web.playBack?'ON':'OFF'));
             syncAppValue();
           }); 
-          //$('#playIntro').attr('disabled',false);
+          $('#playIntro').attr('disabled',false);
           $('#playIntro').attr('checked',web.playIntro); 
           $('#playIntro').on('change',function(){   
             if($(this).is(":checked")){
