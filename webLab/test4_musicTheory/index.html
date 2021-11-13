@@ -46,12 +46,14 @@
     <div id="main" class="grey lighten-5"></div>  
     <!-- Modal Structure -->
     <div id="modalMenu" class="modal">
-      <div class="modal-footer grey lighten-3">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat"><i class="material-icons">close</i></a>
+      <div class="modal-header grey lighten-3">
+        <div class="row prow">  
+          <div class="col s10 left-align"><h5>Menu</h5></div>
+          <div class="col s2 right-align"><a href="#!" class="modal-close waves-effect waves-green btn-flat"><i class="material-icons">close</i></a></div> 
+        </div>
       </div>
       <div class="modal-content"> 
-        <div class="row prow">
-          <div class="col s12"><h5>Menu</h5></div>
+        <div class="row prow"> 
           <div class="input-field col 12 m6">
             <select id="levelSelect"> 
               <option value="0" selected>Easy</option>
@@ -87,7 +89,11 @@
             <input type="range" id="tempoBar" min="40" max="150"/>
           </p>
         </div> 
-      </div> 
+      </div>  
+      <div class="modal-footer grey lighten-3">
+        <div class="row prow">  
+        </div>
+      </div>
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
