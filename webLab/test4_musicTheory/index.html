@@ -29,27 +29,38 @@
   </head>
   <body>
     <div id="version"></div> 
-    <div class="fixed-action-btn direction-top" style="bottom: 45px; right: 24px;">
-      <a id="createBtn" class="btn-floating btn-large waves-effect waves-light blue hoverable"><i class="material-icons">refresh</i></a>
+    <div class="fixed-action-btn direction-top" style="left: 24px;">
+      <a id="createBtn" class="btn-floating btn-large waves-effect waves-light blue hoverable">
+        <i class="material-icons">refresh</i>
+      </a>
     </div> 
+    <div class="fixed-action-btn direction-top" >
+      <a id="playBtn" class="btn-floating btn-large waves-effect waves-light hoverable" disabled>
+        <i class="material-icons">play_arrow</i>
+      </a>
+    </div>
     <div id="header" class="grey lighten-3 ">
       <div class="row prow">
-        <div class="col s6">
-          <a href="#modalMenu" class="waves-effect waves-light btn-flat modal-trigger"><i class="material-icons">menu</i></a>       
-        </div>
-        <div class="col s6 center-align">
-          <a id="playBtn" class="waves-effect waves-light btn green" disabled><i class="material-icons">play_arrow</i></a> 
+        <div class="col s12">
+          <a href="#modalMenu" class="waves-effect waves-light btn-flat modal-trigger">
+            <i class="material-icons">menu</i>
+          </a>       
         </div> 
-      </div>
-       
+      </div> 
     </div>
     <div id="main" class="grey lighten-5"></div>  
     <!-- Modal Structure -->
     <div id="modalMenu" class="modal">
       <div class="modal-header grey lighten-3">
         <div class="row prow">  
-          <div class="col s10 left-align"><h5>Menu</h5></div>
-          <div class="col s2 right-align"><a href="#!" class="modal-close waves-effect waves-green btn-flat"><i class="material-icons">close</i></a></div> 
+          <div class="col s10 left-align">
+            <h5>Menu</h5>
+          </div>
+          <div class="col s2 right-align">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">
+              <i class="material-icons">close</i>
+            </a>
+          </div> 
         </div>
       </div>
       <div class="modal-content"> 
@@ -266,7 +277,7 @@
         init: function (){ 
           web.resize();
           $(window).on('resize',web.resize); 
-          $('#createBtn i').on('click',function(){ 
+          $('#createBtn').on('click',function(){ 
             web.resize(); 
             web.resetMain();
             web.btnToPlay();
@@ -274,6 +285,7 @@
           }); 
           $('.modal').modal();
           $('select').formSelect();
+          $('.fixed-action-btn').floatingActionButton();
 
           $('#tempoBar').val(web.bpm);
           $('#tempoBarValue').html($('#tempoBar').val()); 
