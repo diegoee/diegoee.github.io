@@ -209,6 +209,7 @@
         }, 
         stop: function(){ 
           $('.abcjs-note').removeClass('currentNote');
+          $('.abcjs-time-signature').removeClass('currentNote'); 
           try{
             app.playMusicSheet.stop();
           }catch(e){
