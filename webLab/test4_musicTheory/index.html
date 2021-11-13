@@ -172,8 +172,7 @@
             extraMeasuresAtBeginning: intro,
             beatCallback: function(a,b,c,d){ 
               if(d.top!==undefined){
-                $('.abcjs-time-signature').removeClass('currentNote');
-
+                $('.abcjs-time-signature').removeClass('currentNote'); 
               }else{ 
                 $('.abcjs-time-signature').addClass('currentNote');
               }
@@ -184,6 +183,8 @@
                   app.synth.triggerAttackRelease('A5','16n');
                 }else if(app.timeSigSel==='4/4'&&a%4===0){ 
                   app.synth.triggerAttackRelease('A5','16n');
+                }else if(app.timeSigSel==='6/8'&&a%2===0){ 
+                  app.synth.triggerAttackRelease('A5','16n');
                 }else{ 
                   app.synth.triggerAttackRelease('A4','16n');
                 } 
@@ -191,6 +192,8 @@
             },
             eventCallback: function(e){ 
               if(e===null){ 
+                $('.abcjs-time-signature').removeClass('currentNote');
+                $('.abcjs-note').removeClass('currentNote');
                 if(typeof endFn==='function'){
                   endFn();
                 }
