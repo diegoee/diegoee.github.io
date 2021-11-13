@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test"> 
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Test4_musicTheory</title>
+    <style>  
+      .prow{
+        padding-top: 5px;
+        padding-bottom: 5px;
+        margin-bottom: 0px;
+      }
+      #version{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        right: 0;
+        font-size: 0.75em;
+      } 
+      .currentNote{
+        color: #2196F3;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="version"></div> 
+    <div class="fixed-action-btn direction-top" style="bottom: 45px; right: 24px;">
+      <a id="createBtn" class="btn-floating btn-large waves-effect waves-light blue hoverable"><i class="material-icons">refresh</i></a>
+    </div> 
+    <div id="header" class="grey lighten-3 ">
+      <div class="row prow">
+        <div class="col s6">
+          <a href="#modalMenu" class="waves-effect waves-light btn-flat modal-trigger"><i class="material-icons">menu</i></a>       
+        </div>
+        <div class="col s6 center-align">
+          <a id="playBtn" class="waves-effect waves-light btn green" disabled><i class="material-icons">play_arrow</i></a> 
+        </div> 
+      </div>
+       
+    </div>
+    <div id="main" class="grey lighten-5"></div>  
+    <!-- Modal Structure -->
+    <div id="modalMenu" class="modal">
+      <div class="modal-footer grey lighten-3">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat"><i class="material-icons">close</i></a>
+      </div>
+      <div class="modal-content"> 
+        <div class="row prow">
+          <div class="col s12"><h5>Menu</h5></div>
+          <div class="input-field col 12 m6">
+            <select id="levelSelect"> 
+              <option value="0" selected>Easy</option>
+              <option value="1">Medium</option>
+              <option value="2">Hard</option>
+            </select>
+            <label>Level</label>
+          </div>
+          <div class="col s12 m6">   
+            <p>
+              <label>
+                <input id="playIntro" type="checkbox" class="filled-in" checked="checked" disabled/>
+                <span>Play Intro</span>
+              </label>
+            </p> 
+            <p>
+              <label> 
+                <input id="playBeats" type="checkbox" class="filled-in" checked="checked" disabled />
+                <span>Play background beat</span>
+              </label>
+            </p>
+            <p>
+              <label> 
+                <input id="playCursor" type="checkbox" class="filled-in" checked="checked" disabled />
+                <span>Display Cursor</span>
+              </label>
+            </p> 
+          </div>  
+        </div> 
+        <div class="col s12">
+          <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
+          <p class="range-field">
+            <input type="range" id="tempoBar" min="40" max="150"/>
+          </p>
+        </div> 
+      </div> 
+    </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/dist/abcjs-basic-min.js"></script>   
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>          
+    <script type="text/javascript">
+    /*global $, M, Materialize, window, setTimeout, clearTimeout, Promise, Tone, Vex*/
+    (function exe(){
+      var abcjs=window.ABCJS;
+      //versión
+      $('#version').html('v1.0.0');
+      //app
+      var app = {  
+        notes: [
+          ['C',  'D',   'E', 'F', 'G', 'A', 'B', 'c'],
+          ['A,', 'B,',  'C', 'D', 'E', 'F', 'G', 'A', 'B','c', 'd', 'e', 'f'],
+          ['G,', 'A,', 'B,', 'C', 'D', 'E', 'F', 'G', 'A', 'B','c', 'd', 'e', 'f', 'g', 'a', 'b'],
+        ],
+        timeSig: ['2/4', '3/4', '4/4', '6/8'],
+        timeSigSel: undefined,
+        level: 0,
+        bpm: 40,
+        musicSheet: undefined,
+        playMusicSheet: undefined,
+        synth: undefined,
+        playBack: false,
+        playIntro: false,
+        playCursor: false,
+        rndValue: function(arr){  
+          var rndN = '';
+          if(Array.isArray(arr)){
+            //Math.floor(Math.random()*10)+1;  // returns a random integer from 1 to 10
+            rndN = Math.floor(Math.random()*(arr.length));
+            rndN=arr[rndN];
+          }
+          return rndN;
+        }, 
+        rndMusic: function(ts){  
+          var level = this.level; 
+          var song='';//'A8|BBAA|BBA2|BBA2|BBA2|BBA2|BBA2\nBBA2|BBA2|BBA2';  
+          var len=12; 
+          var line=6; 
+          for(var i=0; i<len; i++){
+            if(i%line===0&&i!==0){
+              song=song+'\n'; 
+            }
+            if(ts==='2/4'){
+              song=song+this.rndValue(this.notes[level])+'4 '+this.rndValue(this.notes[level])+'4|';
+            }
+            if(ts==='3/4'){
+              song = song+this.rndValue(this.notes[level])+'2 '+this.rndValue(this.notes[level])+'2 '+this.rndValue(this.notes[level])+'2|';
+            }
+            if(ts==='4/4'){
+              song = song+this.rndValue(this.notes[level])+'2 '+this.rndValue(this.notes[level])+'2 '+this.rndValue(this.notes[level])+'2 '+this.rndValue(this.notes[level])+'2|';
+            }
+            if(ts==='6/8'){
+              song = song+this.rndValue(this.notes[level])+'1'+this.rndValue(this.notes[level])+'1'+
+              this.rndValue(this.notes[level])+'1 '+this.rndValue(this.notes[level])+'1'+
+              this.rndValue(this.notes[level])+'1'+this.rndValue(this.notes[level])+'1|';
+            }               
+          }            
+          return song;
+        },
+        createMusicSheet: function(){ 
+          var abc ='X:1\nK:C\n';
+          this.timeSigSel=this.rndValue(this.timeSig);
+          abc=abc+'M:'+this.timeSigSel+'\n';
+          abc=abc+this.rndMusic(this.timeSigSel,this.level);  
+          console.log(abc);
+          this.musicSheet = abcjs.renderAbc("main",abc,{ 
+            add_classes: true,
+            responsive: "resize" 
+          });  
+        },
+        play: function(endFn){ 
+          app.playMusicSheet = new ABCJS.TimingCallbacks(app.musicSheet[0], {
+            qpm: app.bpm,
+            beatCallback: function(a){
+              if(app.playBack){
+                if(app.timeSigSel==='2/4'&&a%2===0){  
+                  app.synth.triggerAttackRelease('A5','16n');
+                }else if(app.timeSigSel==='3/4'&&a%3===0){ 
+                  app.synth.triggerAttackRelease('A5','16n');
+                }else if(app.timeSigSel==='4/4'&&a%4===0){ 
+                  app.synth.triggerAttackRelease('A5','16n');
+                }else{ 
+                  app.synth.triggerAttackRelease('A4','16n');
+                } 
+              }
+            },
+            eventCallback: function(e){ 
+              if(e===null){ 
+                if(typeof endFn==='function'){
+                  endFn();
+                }
+              }else{ 
+                if(app.playCursor){
+                  $('.abcjs-note').removeClass('currentNote');
+                  $(e.elements[0][0]).addClass('currentNote');
+                } 
+              }
+            }
+          });
+          app.playMusicSheet.start(); 
+        }, 
+        stop: function(){ 
+          $('.abcjs-note').removeClass('currentNote');
+          try{
+            app.playMusicSheet.stop();
+          }catch(e){
+            
+          }
+        }, 
+        init: function (bpm,level,playIntro,playBack,playCursor){  
+          this.synth = new Tone.Synth().toMaster();  
+          this.bpm=bpm; 
+          this.level=level; 
+          this.playIntro=playIntro; 
+          this.playBack=playBack;
+          this.playCursor=playCursor;
+          console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBack: '+this.playBack+', PlayCursor: '+this.playCursor);
+          app.stop(); 
+          this.createMusicSheet(); 
+        }
+      }; 
+      //actionWeb  
+      var web = { 
+        bpm: 60,
+        level: 0,
+        playIntro: false,
+        playBack: true,
+        playCursor: true,
+        toast: function (data){
+          M.Toast.dismissAll();
+          M.toast({
+            html: data
+          }, 5000);
+        }, 
+        resize: function(){  
+          $('#main').innerHeight($(window).innerHeight()-$('#header').innerHeight()-20);  
+        },
+        btnToPlay: function(){ 
+          $('#playBtn').removeClass('red'); 
+          $('#playBtn').addClass('green');
+          $('#playBtn').html('<i class="material-icons">play_arrow</i>');
+        },
+        btnToStop: function(){
+          $('#playBtn').removeClass('green'); 
+          $('#playBtn').addClass('red');
+          $('#playBtn').html('<i class="material-icons">stop</i>'); 
+        },
+        resetMain: function(){
+          $('#main').html(' ');
+        },
+        init: function (){ 
+          web.resize();
+          $(window).on('resize',web.resize); 
+          $('#createBtn i').on('click',function(){ 
+            web.resize(); 
+            web.resetMain();
+            web.btnToPlay();
+            exeApp();
+          }); 
+          $('.modal').modal();
+          $('select').formSelect();
+
+          $('#tempoBar').val(web.bpm);
+          $('#tempoBarValue').html($('#tempoBar').val()); 
+          $('#tempoBar').on('change',function(){ 
+            $('#tempoBarValue').html($('#tempoBar').val()); 
+            web.bpm=parseInt($('#tempoBar').val());
+            syncAppValue();
+          });
+ 
+          $('#levelSelect').on('change',function(){   
+            web.level=parseInt($('#levelSelect').val());
+            web.toast('Level: '+$( "#levelSelect option:selected" ).text());
+            syncAppValue();
+          }); 
+          
+          $('#playBeats').attr('disabled',false); 
+          $('#playBeats').attr('checked',web.playBack); 
+          $('#playBeats').on('change',function(){   
+            if($(this).is(":checked")){
+              web.playBack=true;
+            }else{ 
+              web.playBack=false;
+            }
+            web.toast('Play BackGround Beat: '+(web.playBack?'ON':'OFF'));
+            syncAppValue();
+          }); 
+          //$('#playIntro').attr('disabled',false);
+          $('#playIntro').attr('checked',web.playIntro); 
+          $('#playIntro').on('change',function(){   
+            if($(this).is(":checked")){
+              web.playIntro=true;
+            }else{ 
+              web.playIntro=false;
+            }
+            web.toast('Play intro: '+(web.playIntro?'ON':'OFF'));
+            syncAppValue();
+          });
+
+          $('#playCursor').attr('disabled',false);
+          $('#playCursor').attr('checked',web.playCursor); 
+          $('#playCursor').on('change',function(){   
+            if($(this).is(":checked")){
+              web.playCursor=true;
+            }else{ 
+              web.playCursor=false;
+            }
+            web.toast('Play with Cursor: '+(web.playCursor?'ON':'OFF'));
+            syncAppValue();
+          });
+
+          $('#playBtn').attr('disabled',false);
+          $('#playBtn').val(web.playBack);
+          $('#playBtn').on('click',function(){  
+            if($(this).text()==='play_arrow'){
+              web.btnToStop();
+              app.play(function endFn(){ 
+                web.btnToPlay();
+              });
+            }else{
+              web.btnToPlay();
+              app.stop();
+            } 
+          });  
+          function syncAppValue(){ 
+            app.bpm=web.bpm; 
+            app.level=web.level; 
+            app.playIntro=web.playIntro; 
+            app.playBack=web.playBack;
+            app.playCursor=web.playCursor;
+          }
+          function exeApp(){   
+            syncAppValue();         
+            app.init(web.bpm,web.level,web.playIntro,web.playBack,web.playCursor);            
+          }
+          web.resetMain();
+          exeApp();
+          web.btnToPlay();
+          web.toast('Start App');
+          //$($('a')[1]).find('i').trigger('click');
+        }        
+      } 
+      web.init();
+    })();
+    </script>
+    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>
