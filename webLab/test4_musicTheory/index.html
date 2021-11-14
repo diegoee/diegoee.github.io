@@ -122,7 +122,7 @@
           ['C',  'D',   'E', 'F', 'G', 'A', 'B', 'c'],
           ['A,', 'B,',  'C', 'D', 'E', 'F', 'G', 'A', 'B','c', 'd', 'e', 'f'],
           ['G,', 'A,', 'B,', 'C', 'D', 'E', 'F', 'G', 'A', 'B','c', 'd', 'e', 'f', 'g', 'a', 'b'],
-        ],
+        ], 
         timeSig: ['2/4', '3/4', '4/4', '6/8'],
         timeSigSel: undefined,
         level: 0,
@@ -133,6 +133,17 @@
         playBack: false,
         playIntro: false,
         playCursor: false,
+        translateNote: function(note){
+          var notesTranslator = [ 
+            ['C,','D,','E,','F,','G,', 'A,','B,','C', 'D', 'E', 'F', 'G',  'A', 'B', 'c', 'd', 'e', 'f', 'g',  'a', 'b'],
+            ['Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si'],
+          ];
+          var res = notesTranslator[0].findIndex(function(e){
+            return e===note;
+          }); 
+          res = notesTranslator[0][res] +' - '+notesTranslator[1][res]; 
+          return res;
+        },
         rndValue: function(arr){  
           var rndN = '';
           if(Array.isArray(arr)){
@@ -168,7 +179,7 @@
           }          
           return song;
         },
-        createMusicSheet: function(){ 
+        createMusicSheet: function(clickFn){ 
           var abc =''
           abc =abc+'X:1\nK:C\n';
           this.timeSigSel=this.rndValue(this.timeSig);
@@ -177,7 +188,12 @@
           console.log(abc);
           this.musicSheet = abcjs.renderAbc("main",abc,{ 
             add_classes: true,
-            responsive: "resize" 
+            responsive: "resize",
+            clickListener: function(e){
+              if(typeof clickFn==='function'){
+                clickFn(e);
+              }
+            } 
           });  
         },
         play: function(endFn){ 
@@ -234,11 +250,11 @@
             
           }
         }, 
-        init: function (){  
+        init: function (clickFn){  
           this.synth = new Tone.Synth().toMaster();  
           console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBack: '+this.playBack+', PlayCursor: '+this.playCursor);
           app.stop(); 
-          this.createMusicSheet(); 
+          this.createMusicSheet(clickFn); 
         }
       }; 
       //actionWeb  
@@ -247,13 +263,7 @@
         level: 0,
         playIntro: true,
         playBack: true,
-        playCursor: true, 
-        display: function (data){
-          M.Toast.dismissAll();
-          M.toast({
-            html: data
-          }, 5000);
-        }, 
+        playCursor: true,  
         toast: function (data){
           M.Toast.dismissAll();
           M.toast({
@@ -360,7 +370,9 @@
           }
           function exeApp(){   
             syncAppValue();         
-            app.init();            
+            app.init(function clickFn(a){ 
+              web.toast(app.translateNote(a.pitches[0].name))             
+            });            
           }
           web.resetMain();
           exeApp();
