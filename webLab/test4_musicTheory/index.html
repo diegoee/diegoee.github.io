@@ -19,7 +19,7 @@
         margin: 0;
         padding: 0;
         top: 0;
-        right: 0;
+        right: 5px;
         font-size: 0.75em;
       } 
       .currentNote{
@@ -91,6 +91,12 @@
                 <input id="playCursor" type="checkbox" class="filled-in" checked="checked" disabled />
                 <span>Display Cursor</span>
               </label>
+            </p>
+            <p>
+              <label> 
+                <input id="showNote" type="checkbox" class="filled-in" checked="checked" disabled />
+                <span>Show notes on play</span>
+              </label>
             </p> 
           </div>  
         </div> 
@@ -123,7 +129,7 @@
           ['A,', 'B,',  'C', 'D', 'E', 'F', 'G', 'A', 'B','c', 'd', 'e', 'f'],
           ['G,', 'A,', 'B,', 'C', 'D', 'E', 'F', 'G', 'A', 'B','c', 'd', 'e', 'f', 'g', 'a', 'b'],
         ],
-        timeSig: ['2/4', '3/4', '4/4', '6/8'],
+        timeSig: ['2/4', '3/4', '4/4'],//['2/4', '3/4', '4/4', '6/8'],
         timeSigSel: undefined,
         level: 0,
         bpm: 40,
@@ -144,9 +150,9 @@
         }, 
         rndMusic: function(ts){  
           var level = this.level; 
-          var song='';//'A8|BBAA|BBA2|BBA2|BBA2|BBA2|BBA2\nBBA2|BBA2|BBA2';  
-          var len=12; 
-          var line=6; 
+          var song='';  
+          var len=2*6; 
+          var line=6;   
           for(var i=0; i<len; i++){
             if(i%line===0&&i!==0){
               song=song+'\n'; 
@@ -165,11 +171,12 @@
               this.rndValue(this.notes[level])+'1 '+this.rndValue(this.notes[level])+'1'+
               this.rndValue(this.notes[level])+'1'+this.rndValue(this.notes[level])+'1|';
             }               
-          }            
+          }          
           return song;
         },
         createMusicSheet: function(){ 
-          var abc ='X:1\nK:C\n';
+          var abc =''
+          abc =abc+'X:1\nK:C\n';
           this.timeSigSel=this.rndValue(this.timeSig);
           abc=abc+'M:'+this.timeSigSel+'\n';
           abc=abc+this.rndMusic(this.timeSigSel,this.level);  
@@ -218,7 +225,7 @@
                 if(app.playCursor){
                   $('.abcjs-note').removeClass('currentNote');
                   $(e.elements[0][0]).addClass('currentNote');
-                } 
+                }
               }
             }
           });
@@ -233,13 +240,8 @@
             
           }
         }, 
-        init: function (bpm,level,playIntro,playBack,playCursor){  
+        init: function (){  
           this.synth = new Tone.Synth().toMaster();  
-          this.bpm=bpm; 
-          this.level=level; 
-          this.playIntro=playIntro; 
-          this.playBack=playBack;
-          this.playCursor=playCursor;
           console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBack: '+this.playBack+', PlayCursor: '+this.playCursor);
           app.stop(); 
           this.createMusicSheet(); 
@@ -251,7 +253,13 @@
         level: 0,
         playIntro: true,
         playBack: true,
-        playCursor: true,
+        playCursor: true, 
+        display: function (data){
+          M.Toast.dismissAll();
+          M.toast({
+            html: data
+          }, 5000);
+        }, 
         toast: function (data){
           M.Toast.dismissAll();
           M.toast({
@@ -334,7 +342,7 @@
             }
             web.toast('Play with Cursor: '+(web.playCursor?'ON':'OFF'));
             syncAppValue();
-          });
+          }); 
 
           $('#playBtn').attr('disabled',false);
           $('#playBtn').val(web.playBack);
@@ -358,7 +366,7 @@
           }
           function exeApp(){   
             syncAppValue();         
-            app.init(web.bpm,web.level,web.playIntro,web.playBack,web.playCursor);            
+            app.init();            
           }
           web.resetMain();
           exeApp();
