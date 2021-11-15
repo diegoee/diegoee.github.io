@@ -3,10 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Web test"> 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="description" content="Web test">  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/css/uikit.min.css" />
     <title>Web Test4_musicTheory</title>
     <style>  
       .prow{
@@ -22,96 +21,94 @@
         right: 5px;
         font-size: 0.75em;
       } 
+      #header{
+        background-color: #EEE;
+      }
       .currentNote{
         color: #2196F3;
+      }
+      .colorPlay,.colorPlay:active,.colorPlay:hover{
+        background-color: green;
+      }
+      .colorStop,.colorStop:active,.colorStop:hover{
+        background-color: red;
+      }  
+      #playBtn{
+        position: absolute; 
+        bottom: 0;
+        right: 5px;  
+        z-index: 1; 
+        border-radius: 5px;
+      }
+      #createBtn{
+        position: absolute; 
+        bottom: 0;
+        left: 5px; 
+        z-index: 1; 
+        border-radius: 5px;
+      }
+      #main{
+        color: #333;         
       }
     </style>
   </head>
   <body>
-    <div id="version"></div> 
-    <div class="fixed-action-btn direction-top" style="left: 24px;">
-      <a id="createBtn" class="btn-floating btn-large waves-effect waves-light blue hoverable">
-        <i class="material-icons">refresh</i>
-      </a>
-    </div> 
-    <div class="fixed-action-btn direction-top" >
-      <a id="playBtn" class="btn-floating btn-large waves-effect waves-light hoverable" disabled>
-        <i class="material-icons">play_arrow</i>
-      </a>
+    <div id="version"></div>  
+    <button id="createBtn" class="uk-button uk-button-primary uk-margin"><span uk-icon="refresh"></span></button> 
+    <button id="playBtn"   class="uk-button uk-button-primary uk-margin colorPlay"><span uk-icon="play"></span></button> 
+    <div id="header" class=""> 
+      <button class="uk-button uk-button-default uk-button-small" uk-toggle="target: #modalMenu"><span uk-icon="menu"></span></button>        
     </div>
-    <div id="header" class="grey lighten-3 ">
-      <div class="row prow">
-        <div class="col s12">
-          <a href="#modalMenu" class="waves-effect waves-light btn-flat modal-trigger">
-            <i class="material-icons">menu</i>
-          </a>       
-        </div> 
-      </div> 
-    </div>
-    <div id="main" class="grey lighten-5"></div>  
-    <!-- Modal Structure -->
-    <div id="modalMenu" class="modal">
-      <div class="modal-header grey lighten-3">
-        <div class="row prow">  
-          <div class="col s10 left-align">
-            <h5>Menu</h5>
+    <div id="main" class=></div>     
+    <div id="modalMenu" uk-modal>
+      <div class="uk-modal-dialog">
+          <button class="uk-modal-close-default" type="button" uk-close></button>
+          <div class="uk-modal-header"> 
+              <h2 class="uk-modal-title">Menú</h2>
           </div>
-          <div class="col s2 right-align">
-            <a href="#!" class="modal-close waves-effect waves-green btn-flat">
-              <i class="material-icons">close</i>
-            </a>
+          <div class="uk-modal-body" uk-overflow-auto> 
+            <div uk-grid>
+              <div>
+                <label>Level</label>
+                <select id="levelSelect" class="uk-select"> 
+                <option value="0" selected>Easy</option>
+                <option value="1">Medium</option>
+                <option value="2">Hard</option>
+                </select>
+              </div>
+              <div>
+                <p> 
+                  <input id="playIntro" type="checkbox" class="filled-in" checked="checked" disabled/>
+                  <span>Play Intro</span> 
+                </p> 
+                <p> 
+                  <input id="playBeats" type="checkbox" class="filled-in" checked="checked" disabled />
+                  <span>Play background beat</span> 
+                </p>
+                <p> 
+                  <input id="playCursor" type="checkbox" class="filled-in" checked="checked" disabled />
+                  <span>Display Cursor</span> 
+                </p> 
+              </div>
+            </div>
+            <div>  
+              <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
+              <div class="uk-margin">
+                <input class="uk-range" type="range" value="60" id="tempoBar" min="40" max="150" step="1">
+              </div>  
+            </div> 
           </div> 
-        </div>
-      </div>
-      <div class="modal-content"> 
-        <div class="row prow"> 
-          <div class="input-field col 12 m6">
-            <select id="levelSelect"> 
-              <option value="0" selected>Easy</option>
-              <option value="1">Medium</option>
-              <option value="2">Hard</option>
-            </select>
-            <label>Level</label>
+          <div class="uk-modal-footer uk-text-right"> 
           </div>
-          <div class="col s12 m6">   
-            <p>
-              <label>
-                <input id="playIntro" type="checkbox" class="filled-in" checked="checked" disabled/>
-                <span>Play Intro</span>
-              </label>
-            </p> 
-            <p>
-              <label> 
-                <input id="playBeats" type="checkbox" class="filled-in" checked="checked" disabled />
-                <span>Play background beat</span>
-              </label>
-            </p>
-            <p>
-              <label> 
-                <input id="playCursor" type="checkbox" class="filled-in" checked="checked" disabled />
-                <span>Display Cursor</span>
-              </label>
-            </p> 
-          </div>  
-        </div> 
-        <div class="col s12">
-          <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
-          <p class="range-field">
-            <input type="range" id="tempoBar" min="40" max="150"/>
-          </p>
-        </div> 
-      </div>  
-      <div class="modal-footer grey lighten-3">
-        <div class="row prow">  
-        </div>
       </div>
     </div>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit-icons.min.js"></script>   
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/dist/abcjs-basic-min.js"></script>   
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>          
     <script type="text/javascript">
-    /*global $, M, Materialize, window, setTimeout, clearTimeout, Promise, Tone, Vex*/
+    /*global $, UIkit, window, setTimeout, clearTimeout, Promise, Tone, ABCJS*/
     (function exe(){
       var abcjs=window.ABCJS;
       //versión
@@ -263,42 +260,36 @@
         level: 0,
         playIntro: true,
         playBack: true,
-        playCursor: true,  
+        playCursor: true,
+        currentToast: undefined,  
         toast: function (data){
-          M.Toast.dismissAll();
-          M.toast({
-            html: data
-          }, 5000);
+          if(this.currentToast!==undefined){
+            this.currentToast.close(true);
+          }
+          this.currentToast = UIkit.notification({
+              message: data,
+              status: 'primary',
+              pos: 'top-right',
+              timeout: 5000
+          }); 
         }, 
         resize: function(){  
           $('#main').innerHeight($(window).innerHeight()-$('#header').innerHeight()-20);  
+        }, 
+        btnToPlay: function(){  
+          $('#playBtn').removeClass("colorStop");
+          $('#playBtn').addClass("colorPlay");
+          $($('#playBtn').find('span')).attr('uk-icon','play'); 
         },
-        btnToPlay: function(){ 
-          $('#playBtn').removeClass('red'); 
-          $('#playBtn').addClass('green');
-          $('#playBtn').html('<i class="material-icons">play_arrow</i>');
-        },
-        btnToStop: function(){
-          $('#playBtn').removeClass('green'); 
-          $('#playBtn').addClass('red');
-          $('#playBtn').html('<i class="material-icons">stop</i>'); 
+        btnToStop: function(){  
+          $('#playBtn').removeClass("colorPlay");
+          $('#playBtn').addClass("colorStop"); 
+          $($('#playBtn').find('span')).attr('uk-icon','ban');
         },
         resetMain: function(){
           $('#main').html(' ');
         },
         init: function (){ 
-          web.resize();
-          $(window).on('resize',web.resize); 
-          $('#createBtn').on('click',function(){ 
-            web.resize(); 
-            web.resetMain();
-            web.btnToPlay();
-            exeApp();
-          }); 
-          $('.modal').modal();
-          $('select').formSelect();
-          $('.fixed-action-btn').floatingActionButton();
-
           $('#tempoBar').val(web.bpm);
           $('#tempoBarValue').html($('#tempoBar').val()); 
           $('#tempoBar').on('change',function(){ 
@@ -322,7 +313,7 @@
               web.playBack=false;
             }
             web.toast('Play BackGround Beat: '+(web.playBack?'ON':'OFF'));
-            syncAppValue();
+            syncAppValue(); 
           }); 
           $('#playIntro').attr('disabled',false);
           $('#playIntro').attr('checked',web.playIntro); 
@@ -333,7 +324,7 @@
               web.playIntro=false;
             }
             web.toast('Play intro: '+(web.playIntro?'ON':'OFF'));
-            syncAppValue();
+            syncAppValue(); 
           });
 
           $('#playCursor').attr('disabled',false);
@@ -345,22 +336,31 @@
               web.playCursor=false;
             }
             web.toast('Play with Cursor: '+(web.playCursor?'ON':'OFF'));
-            syncAppValue();
+            syncAppValue(); 
           }); 
 
           $('#playBtn').attr('disabled',false);
           $('#playBtn').val(web.playBack);
           $('#playBtn').on('click',function(){  
-            if($(this).text()==='play_arrow'){
+            if($(this).hasClass("colorPlay")){
               web.btnToStop();
               app.play(function endFn(){ 
                 web.btnToPlay();
               });
-            }else{
+            }else{             
               web.btnToPlay();
               app.stop();
             } 
+          });   
+ 
+          $(window).on('resize',web.resize); 
+          $('#createBtn').on('click',function(){   
+            web.resetMain();
+            web.btnToPlay();
+            exeApp();
+            web.resize();
           });  
+
           function syncAppValue(){ 
             app.bpm=web.bpm; 
             app.level=web.level; 
@@ -374,11 +374,14 @@
               web.toast(app.translateNote(a.pitches[0].name))             
             });            
           }
-          web.resetMain();
+          web.resetMain(); 
           exeApp();
+          web.resize();
           web.btnToPlay();
           web.toast('Start App');
-          //$($('a')[1]).find('i').trigger('click');
+          //setTimeout(function(){
+          //  $($('button')[0]).trigger('click');
+          //},1000);
         }        
       } 
       web.init();
