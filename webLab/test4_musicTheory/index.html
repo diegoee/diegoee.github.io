@@ -8,11 +8,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/css/uikit.min.css" />
     <title>Web Test4_musicTheory</title>
     <style>  
-      .prow{
-        padding-top: 5px;
-        padding-bottom: 5px;
-        margin-bottom: 0px;
-      }
       #version{
         position: absolute;
         margin: 0;
@@ -50,6 +45,9 @@
       #main{
         color: #333;         
       }
+      .uk-notification-close {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -57,7 +55,7 @@
     <button id="createBtn" class="uk-button uk-button-primary uk-margin"><span uk-icon="refresh"></span></button> 
     <button id="playBtn"   class="uk-button uk-button-primary uk-margin colorPlay"><span uk-icon="play"></span></button> 
     <div id="header" class=""> 
-      <button class="uk-button uk-button-default uk-button-small" uk-toggle="target: #modalMenu"><span uk-icon="menu"></span></button>        
+      <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu"><span uk-icon="menu"></span></button>        
     </div>
     <div id="main" class=></div>     
     <div id="modalMenu" uk-modal>
@@ -91,7 +89,7 @@
                 </p> 
               </div>
             </div>
-            <div>  
+            <div class="uk-margin">  
               <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
               <div class="uk-margin">
                 <input class="uk-range" type="range" value="60" id="tempoBar" min="40" max="150" step="1">
@@ -270,7 +268,7 @@
               message: data,
               status: 'primary',
               pos: 'top-right',
-              timeout: 5000
+              timeout: 50000
           }); 
         }, 
         resize: function(){  
