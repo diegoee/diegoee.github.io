@@ -64,7 +64,13 @@
           <div class="uk-modal-header"> 
               <h2 class="uk-modal-title">Menú</h2>
           </div>
-          <div class="uk-modal-body" uk-overflow-auto> 
+          <div class="uk-modal-body" uk-overflow-auto>  
+            <div class="uk-margin">
+              <label>Play Mode</label>
+              <select id="ModeSelect" class="uk-select"> 
+              <option value="rndMode" selected>Random Notes practice</option>
+              </select>
+            </div>           
             <div uk-grid>
               <div>
                 <label>Level</label>
@@ -128,15 +134,28 @@
         playBack: false,
         playIntro: false,
         playCursor: false,
-        translateNote: function(note){
+        songs:[
+          {id: 'song0',file: 'bluebossa.abc',       title:'', abcFile:''},
+          {id: 'song1',file: 'pinkPantherTheme.abc',title:'', abcFile:''},
+        ],
+        translateNote: function(note,type){
           var notesTranslator = [ 
-            ['C,','D,','E,','F,','G,', 'A,','B,','C', 'D', 'E', 'F', 'G',  'A', 'B', 'c', 'd', 'e', 'f', 'g',  'a', 'b'],
-            ['Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si'],
+            ['C,','D,','E,','F,','G,', 'A,','B,','C', 'D', 'E', 'F', 'G',  'A', 'B', 'c', 'd', 'e', 'f', 'g',  'a', 'b'],  //ABC Anotation
+            ['Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si'], //Latin text
+            ['C3','D3','E3','F3','G3', 'A3','B3','C4','D4','E4','F4','G4', 'A4','B4','C5','D5','E5','F5','G5', 'A5', 'B5'],//Tonejs
           ];
           var res = notesTranslator[0].findIndex(function(e){
             return e===note;
           }); 
-          res = notesTranslator[0][res] +' - '+notesTranslator[1][res]; 
+
+          //type=1 mode text
+          if(type===1){
+            res = notesTranslator[0][res] +' - '+notesTranslator[1][res]; 
+          //type=dafult mode tonejs
+          }else{
+            res = notesTranslator[2][res];
+          }
+          
           return res;
         },
         rndValue: function(arr){  
@@ -179,14 +198,16 @@
           abc =abc+'X:1\nK:C\n';
           this.timeSigSel=this.rndValue(this.timeSig);
           abc=abc+'M:'+this.timeSigSel+'\n';
-          abc=abc+this.rndMusic(this.timeSigSel,this.level);  
-          console.log(abc);
+          abc=abc+this.rndMusic(this.timeSigSel,this.level);
           this.musicSheet = abcjs.renderAbc("main",abc,{ 
             add_classes: true,
             responsive: "resize",
             clickListener: function(e){
+              var note = app.translateNote(e.pitches[0].name);
+              app.synth.triggerAttackRelease(note,'8n');
+              var noteText = app.translateNote(e.pitches[0].name,1);
               if(typeof clickFn==='function'){
-                clickFn(e);
+                clickFn(noteText);
               }
             } 
           });  
@@ -268,7 +289,7 @@
               message: data,
               status: 'primary',
               pos: 'top-right',
-              timeout: 50000
+              timeout: 4000
           }); 
         }, 
         resize: function(){  
@@ -287,21 +308,26 @@
         resetMain: function(){
           $('#main').html(' ');
         },
-        init: function (){ 
+        syncInputElements: function(){
+
+        },
+        initInputElements:function(){
           $('#tempoBar').val(web.bpm);
           $('#tempoBarValue').html($('#tempoBar').val()); 
           $('#tempoBar').on('change',function(){ 
             $('#tempoBarValue').html($('#tempoBar').val()); 
             web.bpm=parseInt($('#tempoBar').val());
-            syncAppValue();
+            web.syncAppValue();
+            web.syncInputElements();
           });
- 
+
           $('#levelSelect').on('change',function(){   
             web.level=parseInt($('#levelSelect').val());
             web.toast('Level: '+$( "#levelSelect option:selected" ).text());
-            syncAppValue();
+            web.syncAppValue();
+            web.syncInputElements();
           }); 
-          
+
           $('#playBeats').attr('disabled',false); 
           $('#playBeats').attr('checked',web.playBack); 
           $('#playBeats').on('change',function(){   
@@ -311,8 +337,10 @@
               web.playBack=false;
             }
             web.toast('Play BackGround Beat: '+(web.playBack?'ON':'OFF'));
-            syncAppValue(); 
-          }); 
+            web.syncAppValue();
+            web.syncInputElements();
+          });
+
           $('#playIntro').attr('disabled',false);
           $('#playIntro').attr('checked',web.playIntro); 
           $('#playIntro').on('change',function(){   
@@ -322,7 +350,8 @@
               web.playIntro=false;
             }
             web.toast('Play intro: '+(web.playIntro?'ON':'OFF'));
-            syncAppValue(); 
+            web.syncAppValue();
+            web.syncInputElements();
           });
 
           $('#playCursor').attr('disabled',false);
@@ -334,7 +363,8 @@
               web.playCursor=false;
             }
             web.toast('Play with Cursor: '+(web.playCursor?'ON':'OFF'));
-            syncAppValue(); 
+            web.syncAppValue();
+            web.syncInputElements();
           }); 
 
           $('#playBtn').attr('disabled',false);
@@ -349,31 +379,33 @@
               web.btnToPlay();
               app.stop();
             } 
-          });   
- 
-          $(window).on('resize',web.resize); 
+          });
+
           $('#createBtn').on('click',function(){   
             web.resetMain();
             web.btnToPlay();
-            exeApp();
+            web.exeApp();
             web.resize();
-          });  
-
-          function syncAppValue(){ 
-            app.bpm=web.bpm; 
-            app.level=web.level; 
-            app.playIntro=web.playIntro; 
-            app.playBack=web.playBack;
-            app.playCursor=web.playCursor;
-          }
-          function exeApp(){   
-            syncAppValue();         
-            app.init(function clickFn(a){ 
-              web.toast(app.translateNote(a.pitches[0].name))             
-            });            
-          }
+          });
+        },
+        syncAppValue: function(){ 
+          app.bpm=web.bpm; 
+          app.level=web.level; 
+          app.playIntro=web.playIntro; 
+          app.playBack=web.playBack;
+          app.playCursor=web.playCursor;
+        },
+        exeApp: function(){
+          web.syncAppValue();         
+          app.init(function clickFn(noteText){ 
+            web.toast(noteText);             
+          });
+        },
+        init: function (){  
+          $(window).on('resize',web.resize); 
+          web.initInputElements();  
           web.resetMain(); 
-          exeApp();
+          web.exeApp();
           web.resize();
           web.btnToPlay();
           web.toast('Start App');
