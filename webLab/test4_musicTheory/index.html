@@ -67,8 +67,8 @@
           <div class="uk-modal-body" uk-overflow-auto>  
             <div class="uk-margin">
               <label>Play Mode</label>
-              <select id="ModeSelect" class="uk-select"> 
-              <option value="rndMode" selected>Random Notes practice</option>
+              <select id="modeSelect" class="uk-select"> 
+              <option value="rndMode" selected>Random notes to practice</option>
               </select>
             </div>           
             <div uk-grid>
@@ -134,9 +134,9 @@
         playBack: false,
         playIntro: false,
         playCursor: false,
-        songs:[
-          {id: 'song0',file: 'bluebossa.abc',       title:'', abcFile:''},
-          {id: 'song1',file: 'pinkPantherTheme.abc',title:'', abcFile:''},
+        mode: 'rndMode',
+        songs:[ 
+          //{id: 'song1',file: 'pinkPantherTheme.abc', title:'Pink Panther Theme', abc:''},
         ],
         translateNote: function(note,type){
           var notesTranslator = [ 
@@ -195,10 +195,18 @@
         },
         createMusicSheet: function(clickFn){ 
           var abc =''
-          abc =abc+'X:1\nK:C\n';
-          this.timeSigSel=this.rndValue(this.timeSig);
-          abc=abc+'M:'+this.timeSigSel+'\n';
-          abc=abc+this.rndMusic(this.timeSigSel,this.level);
+          if(app.mode==='rndMode'){
+            abc =abc+'X:1\nK:C\n';
+            this.timeSigSel=this.rndValue(this.timeSig);
+            abc=abc+'M:'+this.timeSigSel+'\n';
+            abc=abc+this.rndMusic(this.timeSigSel,this.level);
+          }else{
+            var i=0;
+            i = app.songs.findIndex(function(e){
+              return e.id==app.mode;
+            }); 
+            abc=app.songs[i].abc;            
+          }
           this.musicSheet = abcjs.renderAbc("main",abc,{ 
             add_classes: true,
             responsive: "resize",
@@ -280,7 +288,8 @@
         playIntro: true,
         playBack: true,
         playCursor: true,
-        currentToast: undefined,  
+        currentToast: undefined,
+        mode: 'rndMode', 
         toast: function (data){
           if(this.currentToast!==undefined){
             this.currentToast.close(true);
@@ -308,9 +317,6 @@
         resetMain: function(){
           $('#main').html(' ');
         },
-        syncInputElements: function(){
-
-        },
         initInputElements:function(){
           $('#tempoBar').val(web.bpm);
           $('#tempoBarValue').html($('#tempoBar').val()); 
@@ -318,14 +324,12 @@
             $('#tempoBarValue').html($('#tempoBar').val()); 
             web.bpm=parseInt($('#tempoBar').val());
             web.syncAppValue();
-            web.syncInputElements();
           });
 
           $('#levelSelect').on('change',function(){   
             web.level=parseInt($('#levelSelect').val());
             web.toast('Level: '+$( "#levelSelect option:selected" ).text());
             web.syncAppValue();
-            web.syncInputElements();
           }); 
 
           $('#playBeats').attr('disabled',false); 
@@ -338,7 +342,6 @@
             }
             web.toast('Play BackGround Beat: '+(web.playBack?'ON':'OFF'));
             web.syncAppValue();
-            web.syncInputElements();
           });
 
           $('#playIntro').attr('disabled',false);
@@ -351,7 +354,6 @@
             }
             web.toast('Play intro: '+(web.playIntro?'ON':'OFF'));
             web.syncAppValue();
-            web.syncInputElements();
           });
 
           $('#playCursor').attr('disabled',false);
@@ -364,7 +366,6 @@
             }
             web.toast('Play with Cursor: '+(web.playCursor?'ON':'OFF'));
             web.syncAppValue();
-            web.syncInputElements();
           }); 
 
           $('#playBtn').attr('disabled',false);
@@ -387,6 +388,35 @@
             web.exeApp();
             web.resize();
           });
+  
+          /*
+          var urlBase='https://diegoee.github.io/webLab/test4_musicTheory';
+          $.each(app.songs,function(i,e){ 
+            var pos=i;
+            $.ajax({
+              url: urlBase+'/'+e.file,
+              method: 'GET',
+              complete: function(res){
+                app.songs[pos].abc=res.responseText;
+              }
+            }); 
+          });
+          $.each(app.songs,function(i,e){  
+            $('#modeSelect').append('<option value="'+app.songs[i].id+'">'+app.songs[i].title+'</option>'); 
+          });
+
+          web.mode = $('#modeSelect').val();
+          $('#modeSelect').on('change',function(){   
+            web.mode = $('#modeSelect').val();
+            if(web.mode!=='rndMode'){
+              web.toast('Song: '+$( "#modeSelect option:selected" ).text());
+            }else{
+              web.toast($( "#modeSelect option:selected" ).text());
+            } 
+            web.syncAppValue(); 
+            web.exeApp();
+          });
+          */
         },
         syncAppValue: function(){ 
           app.bpm=web.bpm; 
@@ -394,12 +424,13 @@
           app.playIntro=web.playIntro; 
           app.playBack=web.playBack;
           app.playCursor=web.playCursor;
+          app.mode=web.mode;
         },
         exeApp: function(){
           web.syncAppValue();         
           app.init(function clickFn(noteText){ 
             web.toast(noteText);             
-          });
+          },$('#modeSelect').val());
         },
         init: function (){  
           $(window).on('resize',web.resize); 
