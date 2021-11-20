@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Web test">  
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/css/uikit.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/css/uikit.min.css" /> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/abcjs-audio.css" />
     <title>Web Test4_musicTheory</title>
     <style>  
       #version{
@@ -27,18 +28,11 @@
       }
       .colorStop,.colorStop:active,.colorStop:hover{
         background-color: red;
-      }  
-      #playBtn{
-        position: absolute; 
-        bottom: 0;
-        right: 5px;  
-        z-index: 1; 
-        border-radius: 5px;
-      }
+      }   
       #createBtn{
         position: absolute; 
         bottom: 0;
-        left: 5px; 
+        right: 5px;
         z-index: 1; 
         border-radius: 5px;
       }
@@ -52,10 +46,10 @@
   </head>
   <body>
     <div id="version"></div>  
-    <button id="createBtn" class="uk-button uk-button-primary uk-margin"><span uk-icon="refresh"></span></button> 
-    <button id="playBtn"   class="uk-button uk-button-primary uk-margin colorPlay"><span uk-icon="play"></span></button> 
+    <button id="createBtn" class="uk-button uk-button-primary uk-margin"><span uk-icon="refresh"></span></button>  
     <div id="header" class=""> 
-      <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu"><span uk-icon="menu"></span></button>        
+      <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu"><span uk-icon="menu"></span></button>
+      <div class="uk-padding-small uk-padding-remove-bottom"><div id="control" class=></div></div>   
     </div>
     <div id="main" class=></div>     
     <div id="modalMenu" uk-modal>
@@ -88,6 +82,10 @@
                 <p> 
                   <input id="playBeats" type="checkbox" class="filled-in" checked="checked" disabled />
                   <span>Play background beat</span> 
+                </p>
+                <p> 
+                  <input id="playNotes" type="checkbox" class="filled-in" checked="checked" disabled />
+                  <span>Play notes</span> 
                 </p>
                 <p> 
                   <input id="playCursor" type="checkbox" class="filled-in" checked="checked" disabled />
@@ -129,11 +127,12 @@
         level: 0,
         bpm: 40,
         musicSheet: undefined,
-        playMusicSheet: undefined,
+        playMusicSheet: [undefined,undefined],
         synth: undefined,
         playBack: false,
         playIntro: false,
         playCursor: false,
+        playNotes: false,
         mode: 'rndMode',
         songs:[ 
           //{id: 'song1',file: 'pinkPantherTheme.abc', title:'Pink Panther Theme', abc:''},
@@ -170,7 +169,7 @@
         rndMusic: function(ts){  
           var level = this.level; 
           var song='';  
-          var len=2*6; 
+          var len=2*1; 
           var line=6;   
           for(var i=0; i<len; i++){
             if(i%line===0&&i!==0){
@@ -197,9 +196,10 @@
           var abc =''
           if(app.mode==='rndMode'){
             abc =abc+'X:1\nK:C\n';
-            this.timeSigSel=this.rndValue(this.timeSig);
-            abc=abc+'M:'+this.timeSigSel+'\n';
-            abc=abc+this.rndMusic(this.timeSigSel,this.level);
+            abc =abc+'Q: 1/4='+app.bpm+'\n'; 
+            app.timeSigSel=app.rndValue(app.timeSig);
+            abc=abc+'M:'+app.timeSigSel+'\n';
+            abc=abc+app.rndMusic(app.timeSigSel,app.level);
           }else{
             var i=0;
             i = app.songs.findIndex(function(e){
@@ -207,7 +207,7 @@
             }); 
             abc=app.songs[i].abc;            
           }
-          this.musicSheet = abcjs.renderAbc("main",abc,{ 
+          app.musicSheet = abcjs.renderAbc("main",abc,{ 
             add_classes: true,
             responsive: "resize",
             clickListener: function(e){
@@ -220,74 +220,160 @@
             } 
           });  
         },
-        play: function(endFn){ 
+        play: function(endFn){   
+          /*
           intro = 0;
           if(app.playIntro){
             intro = 2;
-          } 
-          app.playMusicSheet = new ABCJS.TimingCallbacks(app.musicSheet[0], {
-            qpm: app.bpm,
-            extraMeasuresAtBeginning: intro,
-            beatCallback: function(a,b,c,d){ 
-              if(d.top!==undefined){
-                $('.abcjs-time-signature').removeClass('currentNote'); 
-              }else{ 
-                $('.abcjs-time-signature').addClass('currentNote');
-              }
-              if(app.playBack){
-                if(app.timeSigSel==='2/4'&&a%2===0){  
-                  app.synth.triggerAttackRelease('A5','16n');
-                }else if(app.timeSigSel==='3/4'&&a%3===0){ 
-                  app.synth.triggerAttackRelease('A5','16n');
-                }else if(app.timeSigSel==='4/4'&&a%4===0){ 
-                  app.synth.triggerAttackRelease('A5','16n');
-                }else if(app.timeSigSel==='6/8'&&a%2===0){ 
+          }  
+          app.playMusicSheet[0] = new ABCJS.synth.CreateSynth(); 
+          app.playMusicSheet[0].init({
+            visualObj: app.musicSheet[0]
+          }).then(function (results){
+            app.playMusicSheet[0].prime().then(function(){ 
+              app.playMusicSheet[1] = new ABCJS.TimingCallbacks(app.musicSheet[0], {
+                qpm: app.bpm,
+                extraMeasuresAtBeginning: intro,
+                beatCallback: function(a,b,c,d){  
+                  console.log(d);
+                  if(d.top!==undefined){
+                    if(!app.isPlaying){
+                      app.isPlaying=true;
+                      app.playMusicSheet[0].start();
+                    }
+                    $('.abcjs-time-signature').removeClass('currentNote'); 
+                  }else{ 
+                    $('.abcjs-time-signature').addClass('currentNote'); 
+                  }
+                  if(app.playBack){
+                    if(app.timeSigSel==='2/4'&&a%2===0){  
+                      app.synth.triggerAttackRelease('A5','16n');
+                    }else if(app.timeSigSel==='3/4'&&a%3===0){ 
+                      app.synth.triggerAttackRelease('A5','16n');
+                    }else if(app.timeSigSel==='4/4'&&a%4===0){ 
+                      app.synth.triggerAttackRelease('A5','16n');
+                    }else if(app.timeSigSel==='6/8'&&a%2===0){ 
+                      app.synth.triggerAttackRelease('A5','16n');
+                    }else{ 
+                      app.synth.triggerAttackRelease('A4','16n');
+                    } 
+                  }  
+                },
+                eventCallback: function(e){ 
+                  if(e===null){ 
+                    $('.abcjs-time-signature').removeClass('currentNote');
+                    $('.abcjs-note').removeClass('currentNote');
+                    if(typeof endFn==='function'){
+                      endFn();
+                    } 
+                  }else{ 
+                    if(app.playCursor){
+                      if(app.timeSigSel==='6/8'&&0===0){
+
+                      }else{
+                        $('.abcjs-note').removeClass('currentNote');
+                        $(e.elements[0][0]).addClass('currentNote');
+                      } 
+                    }
+                  }
+                }
+              });
+              app.playMusicSheet[1].start();            
+            });
+          }).catch(function (reason) {
+            console.log(reason)
+          }); 
+          */
+        }, 
+        stop: function(){ 
+          $('.abcjs-note').removeClass('currentNote');
+          $('.abcjs-time-signature').removeClass('currentNote'); 
+          app.isPlaying=false;
+          try{
+            app.playMusicSheet[0].pause();
+            app.playMusicSheet[0].restart();
+            app.playMusicSheet[1].stop();
+          }catch(e){
+            
+          }
+        }, 
+        init: function (clickFn,endLoadFn){  
+          this.synth = new Tone.Synth().toMaster();  
+          console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBack: '+this.playBack+', PlayCursor: '+this.playCursor);
+          app.stop(); 
+          this.createMusicSheet(clickFn); 
+
+          var subBeat=1;
+          var beat=1;
+          if(app.timeSigSel==='2/4'){  
+            beat=2;
+          }else if(app.timeSigSel==='3/4'){ 
+            beat=3;
+          }else if(app.timeSigSel==='4/4'){ 
+            beat=4;
+          }else 
+          if(app.timeSigSel==='6/8'){ 
+            subBeat=3;
+            beat=2;
+          }
+          app.playMusicSheet[0] = new ABCJS.synth.SynthController();
+          app.playMusicSheet[0].load("#control", {
+            beatSubdivisions: subBeat,
+            onStart: function() {  
+              $('.abcjs-time-signature').removeClass('currentNote');
+              $('.abcjs-note').removeClass('currentNote');
+            },
+            onFinished: function() {  
+              $('.abcjs-time-signature').removeClass('currentNote');
+              $('.abcjs-note').removeClass('currentNote');
+            },
+            onBeat: function(beatNumber) { 
+              if(app.playBack){ 
+                if(beatNumber%beat===0){ 
                   app.synth.triggerAttackRelease('A5','16n');
                 }else{ 
                   app.synth.triggerAttackRelease('A4','16n');
                 } 
               }
             },
-            eventCallback: function(e){ 
-              if(e===null){ 
-                $('.abcjs-time-signature').removeClass('currentNote');
-                $('.abcjs-note').removeClass('currentNote');
-                if(typeof endFn==='function'){
-                  endFn();
-                }
-              }else{ 
-                if(app.playCursor){
-                  $('.abcjs-note').removeClass('currentNote');
-                  $(e.elements[0][0]).addClass('currentNote');
-                }
-              }
+            onEvent: function(event) {          
+              $('.abcjs-note').removeClass('currentNote');
+              $(event.elements[0][0]).addClass('currentNote');
             }
+          },{
+            displayRestart: true, 
+            displayPlay: true, 
+            displayProgress: true
           });
-          app.playMusicSheet.start(); 
-        }, 
-        stop: function(){ 
-          $('.abcjs-note').removeClass('currentNote');
-          $('.abcjs-time-signature').removeClass('currentNote'); 
-          try{
-            app.playMusicSheet.stop();
-          }catch(e){
-            
-          }
-        }, 
-        init: function (clickFn){  
-          this.synth = new Tone.Synth().toMaster();  
-          console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBack: '+this.playBack+', PlayCursor: '+this.playCursor);
-          app.stop(); 
-          this.createMusicSheet(clickFn); 
+
+          app.playMusicSheet[1] = new ABCJS.synth.CreateSynth(); 
+          app.playMusicSheet[1].init({
+            visualObj: app.musicSheet[0]
+          }).then(function (results){
+            app.playMusicSheet[0].setTune( app.musicSheet[0],false,{ 
+              soundFontVolumeMultiplier: (app.playNotes?'1':'0') //'0' sound off
+            }).then(function (response) {
+              console.log("Audio successfully loaded.");
+              if(typeof endLoadFn==='function'){
+                endLoadFn();
+              }
+            }).catch(function (error) {
+              console.warn("Audio problem:", error);
+            });
+          }).catch(function (reason) {
+            console.log(reason);
+          }); 
+
         }
       }; 
       //actionWeb  
       var web = { 
         bpm: 60,
         level: 0,
-        playIntro: true,
+        playIntro: false,
         playBack: true,
         playCursor: true,
+        playNotes: false,        
         currentToast: undefined,
         mode: 'rndMode', 
         toast: function (data){
@@ -303,16 +389,6 @@
         }, 
         resize: function(){  
           $('#main').innerHeight($(window).innerHeight()-$('#header').innerHeight()-20);  
-        }, 
-        btnToPlay: function(){  
-          $('#playBtn').removeClass("colorStop");
-          $('#playBtn').addClass("colorPlay");
-          $($('#playBtn').find('span')).attr('uk-icon','play'); 
-        },
-        btnToStop: function(){  
-          $('#playBtn').removeClass("colorPlay");
-          $('#playBtn').addClass("colorStop"); 
-          $($('#playBtn').find('span')).attr('uk-icon','ban');
         },
         resetMain: function(){
           $('#main').html(' ');
@@ -324,6 +400,7 @@
             $('#tempoBarValue').html($('#tempoBar').val()); 
             web.bpm=parseInt($('#tempoBar').val());
             web.syncAppValue();
+            web.exeApp();
           });
 
           $('#levelSelect').on('change',function(){   
@@ -344,7 +421,7 @@
             web.syncAppValue();
           });
 
-          $('#playIntro').attr('disabled',false);
+          $('#playIntro').attr('disabled',true);
           $('#playIntro').attr('checked',web.playIntro); 
           $('#playIntro').on('change',function(){   
             if($(this).is(":checked")){
@@ -368,23 +445,20 @@
             web.syncAppValue();
           }); 
 
-          $('#playBtn').attr('disabled',false);
-          $('#playBtn').val(web.playBack);
-          $('#playBtn').on('click',function(){  
-            if($(this).hasClass("colorPlay")){
-              web.btnToStop();
-              app.play(function endFn(){ 
-                web.btnToPlay();
-              });
-            }else{             
-              web.btnToPlay();
-              app.stop();
-            } 
-          });
+          $('#playNotes').attr('disabled',false);
+          $('#playNotes').attr('checked',web.playNotes); 
+          $('#playNotes').on('change',function(){   
+            if($(this).is(":checked")){
+              web.playNotes=true;
+            }else{               
+              web.playNotes=false;
+            }
+            web.toast('Play notes: '+(web.playNotes?'ON':'OFF'));
+            web.syncAppValue();
+          }); 
 
           $('#createBtn').on('click',function(){   
             web.resetMain();
-            web.btnToPlay();
             web.exeApp();
             web.resize();
           });
@@ -423,14 +497,17 @@
           app.level=web.level; 
           app.playIntro=web.playIntro; 
           app.playBack=web.playBack;
-          app.playCursor=web.playCursor;
+          app.playCursor=web.playCursor;playNotes
+          app.playNotes=web.playNotes;
           app.mode=web.mode;
         },
         exeApp: function(){
           web.syncAppValue();         
           app.init(function clickFn(noteText){ 
             web.toast(noteText);             
-          },$('#modeSelect').val());
+          },function end(){ 
+            web.toast('Start App: Song loaded');             
+          });
         },
         init: function (){  
           $(window).on('resize',web.resize); 
@@ -438,11 +515,7 @@
           web.resetMain(); 
           web.exeApp();
           web.resize();
-          web.btnToPlay();
           web.toast('Start App');
-          //setTimeout(function(){
-          //  $($('button')[0]).trigger('click');
-          //},1000);
         }        
       } 
       web.init();
