@@ -30,7 +30,7 @@
         background-color: red;
       }   
       #createBtn{
-        position: absolute; 
+        position: fixed; 
         bottom: 0;
         right: 5px;
         z-index: 1; 
@@ -75,23 +75,10 @@
                 </select>
               </div>
               <div>
-                <p> 
-                  <input id="playIntro" type="checkbox" class="filled-in" checked="checked" disabled/>
-                  <span>Play Intro</span> 
-                </p> 
-                <p> 
-                  <input id="playBeats" type="checkbox" class="filled-in" checked="checked" disabled />
-                  <span>Play background beat</span> 
-                </p>
-                <p> 
-                  <input id="playNotes" type="checkbox" class="filled-in" checked="checked" disabled />
-                  <span>Play notes</span> 
-                </p>
-                <p> 
-                  <input id="playCursor" type="checkbox" class="filled-in" checked="checked" disabled />
-                  <span>Display Cursor</span> 
-                </p> 
-              </div>
+                <label>Actions</label>
+                <select id="actionSelect" class="uk-select">  
+                </select>
+              </div> 
             </div>
             <div class="uk-margin">  
               <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
@@ -135,7 +122,9 @@
         playNotes: false,
         mode: 'rndMode',
         songs:[ 
-          //{id: 'song1',file: 'pinkPantherTheme.abc', title:'Pink Panther Theme', abc:''},
+          {id: 'song1', title:'Ode To Joy (Intro) - Beethoven', abc:'X:1\nT:Ode To Joy (Intro)\nC:Beethoven\nL:1/4\nM:4/4\nQ:120\nK:C\nEEFG | GFED | CCDE | E DD2 |\nEEFG | GFED | CCDE | D CC2 |'},
+          {id: 'song2', title:'Greensleeves - Traditional', abc:'X:1\nT:Greensleeves\nC:Traditional (Attrib. to Henry VIII)\nS:MySheetMusic.com (What Child Is This?)\nZ:ABC by Thornton Rose, December 2001\nN:Original score in C.\nR:Jig\nM:6/8\nL:1/8\nK:G\nA | "Am"c2 d "D7"e>fe | "G"d2 B "Em"G>AB | "F"c2 A A>^GA |\n"E"B2 ^G E2 A | "Am"c2 d "D7"e>fe | "G"d2 B "Em"G>AB |\n"F"c>BA "E7"^G>FG | "Am"A3 A3 || "C"g3 g>fe | "Bm"d2 B "Em"G>AB |\n"Am"c2 A "F"A>^GA | "E"B2 ^G E3 | "C"g3 g>fe | "G"d2 B "Em"G>AB |\n"F"c>BA "E7"^G>FG | "Am"A3 A2 |]'},
+          {id: 'song3', title:'Autumn Leaves', abc:'X: 1\nT: Autumn Leaves\nR: barndance\nM: 4/4\nL: 1/8\nK: Gmin\n|:G2 A2 B2|"Cm7"f2-fe/d/ e4-|"F7"e2 F2 G2 A2|"Bbmaj7"e2-ed/^c/ d4-|\n"Ebmaj7"d3f e3d|"Am7b5"c8-|"D7"c2 A2 c3B|"Gm" G8|\nz2 G2 A2 B2|"cm7"f2-fe/d/ e4-|"F7"e3g f3e|"Bbmaj7"e2-ed//^c/ d4|\n"Ebmaj7"d3f e3d|"Am7b5"c8-|"D7"c2 A2 c3B|"Gm"G8-|G2 z2 c3B||\n|:"Am7b5"BA A5-|"D7"A4 G3A|"Gm"B8-|B5 f2|\n"Cm7"e3d c4-|"F7"c3g f3e|"Bbmaj7"ed-d5-|"Ebmaj7"d4 ^c2 d2|\n[1"Am7b5"ee-e2 g3^f|"D7"d4-d^cde|"Gm"d8- "C9"|"Fm7"d4 "Bb7"G4|\n"Ebmaj7"c5 B2|"Am7b5"A4 "D7#5"B2 D2|"Gm"G8|"G7" z8:||\n[2"Am7b5"ee-e2 g3^f|"D7"d5 ga|"Gm"ba g4 "C9"f2|"Fm7"d5 "Bb7"G2|\n"Ebmaj7"c5 B2|"Am7b5"A4 "D7#5"B2 ^F2|"Gm"A2 A5-|A8||'},
         ],
         translateNote: function(note,type){
           var notesTranslator = [ 
@@ -169,7 +158,7 @@
         rndMusic: function(ts){  
           var level = this.level; 
           var song='';  
-          var len=2*1; 
+          var len=2*6; 
           var line=6;   
           for(var i=0; i<len; i++){
             if(i%line===0&&i!==0){
@@ -219,72 +208,7 @@
               }
             } 
           });  
-        },
-        play: function(endFn){   
-          /*
-          intro = 0;
-          if(app.playIntro){
-            intro = 2;
-          }  
-          app.playMusicSheet[0] = new ABCJS.synth.CreateSynth(); 
-          app.playMusicSheet[0].init({
-            visualObj: app.musicSheet[0]
-          }).then(function (results){
-            app.playMusicSheet[0].prime().then(function(){ 
-              app.playMusicSheet[1] = new ABCJS.TimingCallbacks(app.musicSheet[0], {
-                qpm: app.bpm,
-                extraMeasuresAtBeginning: intro,
-                beatCallback: function(a,b,c,d){  
-                  console.log(d);
-                  if(d.top!==undefined){
-                    if(!app.isPlaying){
-                      app.isPlaying=true;
-                      app.playMusicSheet[0].start();
-                    }
-                    $('.abcjs-time-signature').removeClass('currentNote'); 
-                  }else{ 
-                    $('.abcjs-time-signature').addClass('currentNote'); 
-                  }
-                  if(app.playBack){
-                    if(app.timeSigSel==='2/4'&&a%2===0){  
-                      app.synth.triggerAttackRelease('A5','16n');
-                    }else if(app.timeSigSel==='3/4'&&a%3===0){ 
-                      app.synth.triggerAttackRelease('A5','16n');
-                    }else if(app.timeSigSel==='4/4'&&a%4===0){ 
-                      app.synth.triggerAttackRelease('A5','16n');
-                    }else if(app.timeSigSel==='6/8'&&a%2===0){ 
-                      app.synth.triggerAttackRelease('A5','16n');
-                    }else{ 
-                      app.synth.triggerAttackRelease('A4','16n');
-                    } 
-                  }  
-                },
-                eventCallback: function(e){ 
-                  if(e===null){ 
-                    $('.abcjs-time-signature').removeClass('currentNote');
-                    $('.abcjs-note').removeClass('currentNote');
-                    if(typeof endFn==='function'){
-                      endFn();
-                    } 
-                  }else{ 
-                    if(app.playCursor){
-                      if(app.timeSigSel==='6/8'&&0===0){
-
-                      }else{
-                        $('.abcjs-note').removeClass('currentNote');
-                        $(e.elements[0][0]).addClass('currentNote');
-                      } 
-                    }
-                  }
-                }
-              });
-              app.playMusicSheet[1].start();            
-            });
-          }).catch(function (reason) {
-            console.log(reason)
-          }); 
-          */
-        }, 
+        },       
         stop: function(){ 
           $('.abcjs-note').removeClass('currentNote');
           $('.abcjs-time-signature').removeClass('currentNote'); 
@@ -297,9 +221,9 @@
             
           }
         }, 
-        init: function (clickFn,endLoadFn){  
+        init: function (clickFn){  
           this.synth = new Tone.Synth().toMaster();  
-          console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBack: '+this.playBack+', PlayCursor: '+this.playCursor);
+          console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBeats: '+this.playBack+', PlayCursor: '+this.playCursor+', PlayNotes: '+this.playNotes);
           app.stop(); 
           this.createMusicSheet(clickFn); 
 
@@ -316,47 +240,65 @@
             subBeat=3;
             beat=2;
           }
+          var intro = 0;
+          if(app.playIntro){
+            intro = 2;
+          } 
           app.playMusicSheet[0] = new ABCJS.synth.SynthController();
           app.playMusicSheet[0].load("#control", {
             beatSubdivisions: subBeat,
-            onStart: function() {  
+            extraMeasuresAtBeginning: intro,
+            onStart: function() {    
+              $('.abcjs-note').removeClass('currentNote');
+              $('.abcjs-time-signature').removeClass('currentNote');
+              $('.abcjs-time-signature').addClass('currentNote');
+            },
+            onFinished: function() {    
               $('.abcjs-time-signature').removeClass('currentNote');
               $('.abcjs-note').removeClass('currentNote');
             },
-            onFinished: function() {  
-              $('.abcjs-time-signature').removeClass('currentNote');
-              $('.abcjs-note').removeClass('currentNote');
-            },
-            onBeat: function(beatNumber) { 
-              if(app.playBack){ 
+            onBeat: function(beatNumber) {  
+              //console.log(beatNumber);
+              function metro(){
                 if(beatNumber%beat===0){ 
                   app.synth.triggerAttackRelease('A5','16n');
                 }else{ 
                   app.synth.triggerAttackRelease('A4','16n');
+                }
+              }
+              if(beatNumber<beat*subBeat*intro){ 
+                metro(); 
+              }else{ 
+                if(app.playBack){ 
+                  metro();
                 } 
               }
             },
-            onEvent: function(event) {          
-              $('.abcjs-note').removeClass('currentNote');
-              $(event.elements[0][0]).addClass('currentNote');
+            onEvent: function(event) {   
+              $('.abcjs-time-signature').removeClass('currentNote');
+              if(app.playCursor){        
+                $('.abcjs-note').removeClass('currentNote');
+                try{
+                  $(event.elements[0][0]).addClass('currentNote');
+                }catch(e){
+                  console.error(e);
+                }
+              }
             }
           },{
             displayRestart: true, 
             displayPlay: true, 
-            displayProgress: true
+            displayProgress: true 
           });
-
+ 
           app.playMusicSheet[1] = new ABCJS.synth.CreateSynth(); 
-          app.playMusicSheet[1].init({
+          app.playMusicSheet[1].init({  
             visualObj: app.musicSheet[0]
           }).then(function (results){
             app.playMusicSheet[0].setTune( app.musicSheet[0],false,{ 
               soundFontVolumeMultiplier: (app.playNotes?'1':'0') //'0' sound off
             }).then(function (response) {
               console.log("Audio successfully loaded.");
-              if(typeof endLoadFn==='function'){
-                endLoadFn();
-              }
             }).catch(function (error) {
               console.warn("Audio problem:", error);
             });
@@ -370,7 +312,7 @@
       var web = { 
         bpm: 60,
         level: 0,
-        playIntro: false,
+        playIntro: true,
         playBack: true,
         playCursor: true,
         playNotes: false,        
@@ -409,53 +351,35 @@
             web.syncAppValue();
           }); 
 
-          $('#playBeats').attr('disabled',false); 
-          $('#playBeats').attr('checked',web.playBack); 
-          $('#playBeats').on('change',function(){   
-            if($(this).is(":checked")){
-              web.playBack=true;
-            }else{ 
-              web.playBack=false;
-            }
-            web.toast('Play BackGround Beat: '+(web.playBack?'ON':'OFF'));
+          $('#actionSelect').html(' '); 
+          $('#actionSelect').append('<option value="00" selected>Play Intro - Play beat  - Display Cursor</option>');
+          $('#actionSelect').append('<option value="01"         >Play Intro - Play beat </option>');
+          $('#actionSelect').append('<option value="02"         >Play Intro - Display Cursor </option>');
+          $('#actionSelect').append('<option value="03"         >Play Intro</option>');
+          $('#actionSelect').append('<option value="04"         >Play beat  - Play Notes - Display Cursor</option>');
+          $('#actionSelect').append('<option value="05"         >Play beat  - Play Notes</option>');
+          $('#actionSelect').append('<option value="06"         >Play beat  - Display Cursor</option>');
+          $('#actionSelect').append('<option value="07"         >Play beat</option>'); 
+          $('#actionSelect').append('<option value="08"         >Play Notes - Display Cursor</option>');
+          $('#actionSelect').append('<option value="09"         >Play Notes</option>'); 
+          $('#actionSelect').append('<option value="10"         >Display Cursor</option>');           
+          $('#actionSelect').on('change',function(){   
+            var value=$('#actionSelect').val();
+            if(value==='00'){ web.playIntro=true;  web.playBack=true;  web.playCursor=true;  web.playNotes=false; } 
+            if(value==='01'){ web.playIntro=true;  web.playBack=true;  web.playCursor=false; web.playNotes=false; }
+            if(value==='02'){ web.playIntro=true;  web.playBack=false; web.playCursor=true;  web.playNotes=false; }
+            if(value==='03'){ web.playIntro=true;  web.playBack=false; web.playCursor=false; web.playNotes=false; }
+            if(value==='04'){ web.playIntro=false; web.playBack=true;  web.playCursor=true;  web.playNotes=true;  }
+            if(value==='05'){ web.playIntro=false; web.playBack=true;  web.playCursor=false; web.playNotes=true;  }
+            if(value==='06'){ web.playIntro=false; web.playBack=true;  web.playCursor=true;  web.playNotes=false; }
+            if(value==='07'){ web.playIntro=false; web.playBack=true;  web.playCursor=false; web.playNotes=false; }
+            if(value==='08'){ web.playIntro=false; web.playBack=false; web.playCursor=true;  web.playNotes=true;  }
+            if(value==='09'){ web.playIntro=false; web.playBack=false; web.playCursor=false; web.playNotes=true;  }
+            if(value==='10'){ web.playIntro=false; web.playBack=false; web.playCursor=true;  web.playNotes=false; }
+            web.toast($( "#actionSelect option:selected" ).text());
             web.syncAppValue();
-          });
-
-          $('#playIntro').attr('disabled',true);
-          $('#playIntro').attr('checked',web.playIntro); 
-          $('#playIntro').on('change',function(){   
-            if($(this).is(":checked")){
-              web.playIntro=true;
-            }else{ 
-              web.playIntro=false;
-            }
-            web.toast('Play intro: '+(web.playIntro?'ON':'OFF'));
-            web.syncAppValue();
-          });
-
-          $('#playCursor').attr('disabled',false);
-          $('#playCursor').attr('checked',web.playCursor); 
-          $('#playCursor').on('change',function(){   
-            if($(this).is(":checked")){
-              web.playCursor=true;
-            }else{ 
-              web.playCursor=false;
-            }
-            web.toast('Play with Cursor: '+(web.playCursor?'ON':'OFF'));
-            web.syncAppValue();
-          }); 
-
-          $('#playNotes').attr('disabled',false);
-          $('#playNotes').attr('checked',web.playNotes); 
-          $('#playNotes').on('change',function(){   
-            if($(this).is(":checked")){
-              web.playNotes=true;
-            }else{               
-              web.playNotes=false;
-            }
-            web.toast('Play notes: '+(web.playNotes?'ON':'OFF'));
-            web.syncAppValue();
-          }); 
+            web.exeApp();
+          });           
 
           $('#createBtn').on('click',function(){   
             web.resetMain();
@@ -463,18 +387,6 @@
             web.resize();
           });
   
-          /*
-          var urlBase='https://diegoee.github.io/webLab/test4_musicTheory';
-          $.each(app.songs,function(i,e){ 
-            var pos=i;
-            $.ajax({
-              url: urlBase+'/'+e.file,
-              method: 'GET',
-              complete: function(res){
-                app.songs[pos].abc=res.responseText;
-              }
-            }); 
-          });
           $.each(app.songs,function(i,e){  
             $('#modeSelect').append('<option value="'+app.songs[i].id+'">'+app.songs[i].title+'</option>'); 
           });
@@ -489,15 +401,14 @@
             } 
             web.syncAppValue(); 
             web.exeApp();
-          });
-          */
+          }); 
         },
         syncAppValue: function(){ 
           app.bpm=web.bpm; 
           app.level=web.level; 
           app.playIntro=web.playIntro; 
           app.playBack=web.playBack;
-          app.playCursor=web.playCursor;playNotes
+          app.playCursor=web.playCursor;
           app.playNotes=web.playNotes;
           app.mode=web.mode;
         },
@@ -505,8 +416,6 @@
           web.syncAppValue();         
           app.init(function clickFn(noteText){ 
             web.toast(noteText);             
-          },function end(){ 
-            web.toast('Start App: Song loaded');             
           });
         },
         init: function (){  
@@ -515,7 +424,19 @@
           web.resetMain(); 
           web.exeApp();
           web.resize();
-          web.toast('Start App');
+          web.toast('Start App');          
+          /*
+          setTimeout(function(){
+            //$($('button')[1]).trigger('click');
+            $('#actionSelect').val('08');  
+            $('#modeSelect').val('song1');  
+            $('#actionSelect').trigger('change'); 
+            $('#modeSelect').trigger('change');  
+            setTimeout(function(){
+              $('.abcjs-midi-start').trigger('click');
+            },1000);
+          },1000);
+          */
         }        
       } 
       web.init();
