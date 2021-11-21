@@ -122,9 +122,10 @@
         playNotes: false,
         mode: 'rndMode',
         songs:[ 
-          {id: 'song1', title:'Ode To Joy (Intro) - Beethoven', abc:'X:1\nT:Ode To Joy (Intro)\nC:Beethoven\nL:1/4\nM:4/4\nQ:120\nK:C\nEEFG | GFED | CCDE | E DD2 |\nEEFG | GFED | CCDE | D CC2 |'},
-          {id: 'song2', title:'Greensleeves - Traditional', abc:'X:1\nT:Greensleeves\nC:Traditional (Attrib. to Henry VIII)\nS:MySheetMusic.com (What Child Is This?)\nZ:ABC by Thornton Rose, December 2001\nN:Original score in C.\nR:Jig\nM:6/8\nL:1/8\nK:G\nA | "Am"c2 d "D7"e>fe | "G"d2 B "Em"G>AB | "F"c2 A A>^GA |\n"E"B2 ^G E2 A | "Am"c2 d "D7"e>fe | "G"d2 B "Em"G>AB |\n"F"c>BA "E7"^G>FG | "Am"A3 A3 || "C"g3 g>fe | "Bm"d2 B "Em"G>AB |\n"Am"c2 A "F"A>^GA | "E"B2 ^G E3 | "C"g3 g>fe | "G"d2 B "Em"G>AB |\n"F"c>BA "E7"^G>FG | "Am"A3 A2 |]'},
-          {id: 'song3', title:'Autumn Leaves', abc:'X: 1\nT: Autumn Leaves\nR: barndance\nM: 4/4\nL: 1/8\nK: Gmin\n|:G2 A2 B2|"Cm7"f2-fe/d/ e4-|"F7"e2 F2 G2 A2|"Bbmaj7"e2-ed/^c/ d4-|\n"Ebmaj7"d3f e3d|"Am7b5"c8-|"D7"c2 A2 c3B|"Gm" G8|\nz2 G2 A2 B2|"cm7"f2-fe/d/ e4-|"F7"e3g f3e|"Bbmaj7"e2-ed//^c/ d4|\n"Ebmaj7"d3f e3d|"Am7b5"c8-|"D7"c2 A2 c3B|"Gm"G8-|G2 z2 c3B||\n|:"Am7b5"BA A5-|"D7"A4 G3A|"Gm"B8-|B5 f2|\n"Cm7"e3d c4-|"F7"c3g f3e|"Bbmaj7"ed-d5-|"Ebmaj7"d4 ^c2 d2|\n[1"Am7b5"ee-e2 g3^f|"D7"d4-d^cde|"Gm"d8- "C9"|"Fm7"d4 "Bb7"G4|\n"Ebmaj7"c5 B2|"Am7b5"A4 "D7#5"B2 D2|"Gm"G8|"G7" z8:||\n[2"Am7b5"ee-e2 g3^f|"D7"d5 ga|"Gm"ba g4 "C9"f2|"Fm7"d5 "Bb7"G2|\n"Ebmaj7"c5 B2|"Am7b5"A4 "D7#5"B2 ^F2|"Gm"A2 A5-|A8||'},
+          {id: 'song1', title:'Ode To Joy (Intro) - Beethoven', abc:'X:1\nT:Ode To Joy (Intro)\nC:Beethoven\nL:1/4\nM:4/4\nQ:120\nK:c\nEEFG|GFED|CCDE|EDD2|\nEEFG|GFED|CCDE|DCC2|]'},
+          {id: 'song2', title:'Greensleeves', abc:'X:1\nT:Greensleeves\nR:Air\nC:Trad. 16C\nO:England\nM:3/4\nL:1/8\nQ:1/4=120\nK:Em\nE2|"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,4E2|\n"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G3FE2|"B"^D3^C^D2|"Em"E6-|E4z2|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,6|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|"B"^D3^C^D2|"Em"E6-|E4|]\n'},
+          {id: 'song3', title:'Minuetto - Adaptado de James Hook', abc:'X:1\nT:MINUETTO\nC:Adaptado de un minueto de James Hook\nL:1/4\nM:3/4\nQ:80\nK:C\nz2c|FFA|(AG)c|GG_B|(_BA)c|\nFFF|AAA|(A_B)G|F2c|FFG|(AG)c|\nGG_B|(_BA)c|FFF|ccc|(A_B)G|F2z|]\n'},
+          {id: 'song4', title:'Aria - Friedrich Gluck', abc:'X:1\nT:ARIA\nC:Friedrich Gluck\nL:1/4\nM:3/4\nQ:80\nK:C\nz2C|A2A|(AG)A|_B2G|E2C|F2F|\n(FEF)|(G3|G)zG|G2G|(GA_B)|c3|D2G|\nF2F|(GFG)|(A3|A)zA|(AG)G|(GA_B)|\nc2c|(c_B)A|F2F|(A2G)|(F3|F)z|]'},
         ],
         translateNote: function(note,type){
           var notesTranslator = [ 
@@ -132,18 +133,18 @@
             ['Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si'], //Latin text
             ['C3','D3','E3','F3','G3', 'A3','B3','C4','D4','E4','F4','G4', 'A4','B4','C5','D5','E5','F5','G5', 'A5', 'B5'],//Tonejs
           ];
+          var noteSearch=note.replace('_', '').replace('^', '');
           var res = notesTranslator[0].findIndex(function(e){
-            return e===note;
+            return e===noteSearch;
           }); 
-
+          var alt = (note.indexOf('^')!==-1)?'#':(note.indexOf('_')!==-1)?'b':'';
           //type=1 mode text
           if(type===1){
-            res = notesTranslator[0][res] +' - '+notesTranslator[1][res]; 
+            res = notesTranslator[0][res]+alt+' - '+notesTranslator[1][res]+alt; 
           //type=dafult mode tonejs
-          }else{
-            res = notesTranslator[2][res];
-          }
-          
+          }else{ 
+            res = notesTranslator[2][res][0]+alt+notesTranslator[2][res][1]; 
+          }          
           return res;
         },
         rndValue: function(arr){  
@@ -193,7 +194,12 @@
             var i=0;
             i = app.songs.findIndex(function(e){
               return e.id==app.mode;
-            }); 
+            });  
+            app.timeSigSel='';
+            app.timeSigSel=app.timeSigSel+(app.songs[i].abc.indexOf('M:2/4')!==-1?'2/4':'');
+            app.timeSigSel=app.timeSigSel+(app.songs[i].abc.indexOf('M:3/4')!==-1?'3/4':'');
+            app.timeSigSel=app.timeSigSel+(app.songs[i].abc.indexOf('M:4/4')!==-1?'4/4':'');
+            app.timeSigSel=app.timeSigSel+(app.songs[i].abc.indexOf('M:6/8')!==-1?'6/8':''); 
             abc=app.songs[i].abc;            
           }
           app.musicSheet = abcjs.renderAbc("main",abc,{ 
@@ -250,6 +256,7 @@
             extraMeasuresAtBeginning: intro,
             onStart: function() {    
               $('.abcjs-note').removeClass('currentNote');
+              $('.abcjs-rest').removeClass('currentNote'); 
               $('.abcjs-time-signature').removeClass('currentNote');
               $('.abcjs-time-signature').addClass('currentNote');
             },
@@ -278,6 +285,7 @@
               $('.abcjs-time-signature').removeClass('currentNote');
               if(app.playCursor){        
                 $('.abcjs-note').removeClass('currentNote');
+                $('.abcjs-rest').removeClass('currentNote');
                 try{
                   $(event.elements[0][0]).addClass('currentNote');
                 }catch(e){
@@ -425,18 +433,16 @@
           web.exeApp();
           web.resize();
           web.toast('Start App');          
-          /*
-          setTimeout(function(){
+          //setTimeout(function(){
             //$($('button')[1]).trigger('click');
-            $('#actionSelect').val('08');  
-            $('#modeSelect').val('song1');  
-            $('#actionSelect').trigger('change'); 
-            $('#modeSelect').trigger('change');  
-            setTimeout(function(){
-              $('.abcjs-midi-start').trigger('click');
-            },1000);
-          },1000);
-          */
+            //$('#actionSelect').val('08');  
+            //$('#modeSelect').val('song3');  
+            //$('#actionSelect').trigger('change'); 
+            //$('#modeSelect').trigger('change');  
+            //setTimeout(function(){
+              //$('.abcjs-midi-start').trigger('click');
+            //},1000);
+          //},1000);
         }        
       } 
       web.init();
