@@ -124,7 +124,7 @@
         songs:[ 
           {id: 'song1', title:'Ode To Joy (Intro) - Beethoven', abc:'X:1\nT:Ode To Joy (Intro)\nC:Beethoven\nL:1/4\nM:4/4\nQ:120\nK:c\nEEFG|GFED|CCDE|EDD2|\nEEFG|GFED|CCDE|DCC2|]'},
           {id: 'song2', title:'Greensleeves', abc:'X:1\nT:Greensleeves\nR:Air\nC:Trad. 16C\nO:England\nM:3/4\nL:1/8\nQ:1/4=120\nK:Em\nE2|"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,4E2|\n"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G3FE2|"B"^D3^C^D2|"Em"E6-|E4z2|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,6|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|"B"^D3^C^D2|"Em"E6-|E4|]\n'},
-          {id: 'song3', title:'Minuetto - Adaptado de James Hook', abc:'X:1\nT:MINUETTO\nC:Adaptado de un minueto de James Hook\nL:1/4\nM:3/4\nQ:80\nK:C\nz2c|FFA|(AG)c|GG_B|(_BA)c|\nFFF|AAA|(A_B)G|F2c|FFG|(AG)c|\nGG_B|(_BA)c|FFF|ccc|(A_B)G|F2z|]\n'},
+          {id: 'song3', title:'Minuetto - Adaptado de James Hook', abc:'X:1\nT:MINUETTO\nC:Adaptado de un minueto de James Hook\nL:1/4\nM:3/4\nQ:80\nK:C\nz2c|FFA|(AG)c|GG_B|(_BA)c|\nFFF|AAA|(A_B)G|F2c|FFA|(AG)c|\nGG_B|(_BA)c|FFF|ccc|(A_B)G|F2z|]\n'},
           {id: 'song4', title:'Aria - Friedrich Gluck', abc:'X:1\nT:ARIA\nC:Friedrich Gluck\nL:1/4\nM:3/4\nQ:80\nK:C\nz2C|A2A|(AG)A|_B2G|E2C|F2F|\n(FEF)|(G3|G)zG|G2G|(GA_B)|c3|D2G|\nF2F|(GFG)|(A3|A)zA|(AG)G|(GA_B)|\nc2c|(c_B)A|F2F|(A2G)|(F3|F)z|]'},
         ],
         translateNote: function(note,type){
@@ -433,16 +433,18 @@
           web.exeApp();
           web.resize();
           web.toast('Start App');          
-          //setTimeout(function(){
+          /*
+          setTimeout(function(){
             //$($('button')[1]).trigger('click');
-            //$('#actionSelect').val('08');  
-            //$('#modeSelect').val('song3');  
-            //$('#actionSelect').trigger('change'); 
-            //$('#modeSelect').trigger('change');  
-            //setTimeout(function(){
-              //$('.abcjs-midi-start').trigger('click');
-            //},1000);
-          //},1000);
+            $('#actionSelect').val('08');  
+            $('#modeSelect').val('song3');  
+            $('#actionSelect').trigger('change'); 
+            $('#modeSelect').trigger('change');  
+            setTimeout(function(){
+              $('.abcjs-midi-start').trigger('click');
+            },1000);
+          },1000);
+          */
         }        
       } 
       web.init();
