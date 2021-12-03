@@ -32,9 +32,23 @@
       #createBtn{
         position: fixed; 
         bottom: 0;
+        left: 5px;
+        z-index: 1; 
+        border-radius: 5px;
+      } 
+      #playBtn{
+        position: fixed; 
+        bottom: 0;
         right: 5px;
         z-index: 1; 
         border-radius: 5px;
+        color: #fff;
+      } 
+      #playBtn.play{
+        background-color: green;
+      }       
+      #playBtn.stop{
+        background-color: #f0506e; 
       }
       #main{
         color: #333;         
@@ -46,7 +60,8 @@
   </head>
   <body>
     <div id="version"></div>  
-    <button id="createBtn" class="uk-button uk-button-primary uk-margin"><span uk-icon="refresh"></span></button>  
+    <button id="createBtn" class="uk-button uk-button-primary uk-margin"><span uk-icon="refresh"></span></button> 
+    <button id="playBtn" class="uk-button uk-button-default uk-margin play"><span uk-icon="play-circle"></span></button>  
     <div id="header" class=""> 
       <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu"><span uk-icon="menu"></span></button>
       <div class="uk-padding-small uk-padding-remove-bottom"><div id="control" class=></div></div>   
@@ -101,7 +116,7 @@
     (function exe(){
       var abcjs=window.ABCJS;
       //versión
-      $('#version').html('v1.0.0');
+      $('#version').html('v1.1.0');
       //app
       var app = {  
         notes: [
@@ -126,24 +141,44 @@
           {id: 'song2', title:'Greensleeves', abc:'X:1\nT:Greensleeves\nR:Air\nC:Trad. 16C\nO:England\nM:3/4\nL:1/8\nQ:1/4=120\nK:Em\nE2|"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,4E2|\n"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G3FE2|"B"^D3^C^D2|"Em"E6-|E4z2|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,6|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|"B"^D3^C^D2|"Em"E6-|E4|]\n'},
           {id: 'song3', title:'Minuetto - Adaptado de James Hook', abc:'X:1\nT:MINUETTO\nC:Adaptado de un minueto de James Hook\nL:1/4\nM:3/4\nQ:80\nK:C\nz2c|FFA|(AG)c|GG_B|(_BA)c|\nFFF|AAA|(A_B)G|F2c|FFA|(AG)c|\nGG_B|(_BA)c|FFF|ccc|(A_B)G|F2z|]\n'},
           {id: 'song4', title:'Aria - Friedrich Gluck', abc:'X:1\nT:ARIA\nC:Friedrich Gluck\nL:1/4\nM:3/4\nQ:80\nK:C\nz2C|A2A|(AG)A|_B2G|E2C|F2F|\n(FEF)|(G3|G)zG|G2G|(GA_B)|c3|D2G|\nF2F|(GFG)|(A3|A)zA|(AG)G|(GA_B)|\nc2c|(c_B)A|F2F|(A2G)|(F3|F)z|]'},
+          {id: 'song5', title:'Test - Diego E.', abc:'X:1\nT:Test\nC:Diego E.\nL:1/4\nM:2/4\nQ:80\nK:Bm\n_F^F|=FF|F2|f2|f\'2|'},
         ],
-        translateNote: function(note,type){
-          var notesTranslator = [ 
-            ['C,','D,','E,','F,','G,', 'A,','B,','C', 'D', 'E', 'F', 'G',  'A', 'B', 'c', 'd', 'e', 'f', 'g',  'a', 'b'],  //ABC Anotation
-            ['Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi','Fa','Sol','La','Si'], //Latin text
-            ['C3','D3','E3','F3','G3', 'A3','B3','C4','D4','E4','F4','G4', 'A4','B4','C5','D5','E5','F5','G5', 'A5', 'B5'],//Tonejs
-          ];
-          var noteSearch=note.replace('_', '').replace('^', '');
-          var res = notesTranslator[0].findIndex(function(e){
-            return e===noteSearch;
-          }); 
-          var alt = (note.indexOf('^')!==-1)?'#':(note.indexOf('_')!==-1)?'b':'';
-          //type=1 mode text
-          if(type===1){
-            res = notesTranslator[0][res]+alt+' - '+notesTranslator[1][res]+alt; 
-          //type=dafult mode tonejs
-          }else{ 
-            res = notesTranslator[2][res][0]+alt+notesTranslator[2][res][1]; 
+        translateNote: function(noteName,pitch,type){ 
+          var notesPitchTranslator = [ 
+            [ 48,    49,  50,   51,  52,  53,  54,     55,    56, 57,    58, 59 ],  
+            [  3,     3,   3,    3,   3,   3,    3,     3,     3,   3,    3,  3 ],
+            ['C',  'C#', 'D', 'D#', 'E', 'F',  'F#',  'G',  'G#', 'A', 'A#', 'B'],
+            ['Do','Do#','Re','Re#','Mi','Fa', 'Fa#','Sol','sol#','La','La#','Si'],
+            ['C',  'Db', 'D', 'Eb', 'E', 'F',  'Gb',  'G',  'Ab', 'A', 'Bb', 'B'],
+            ['Do','Reb','Re','Mib','Mi','Fa','Solb','Sol', 'Lab','La','Sib','Si'],
+          ]; 
+          var l = notesPitchTranslator[0].length;
+          for (var i=0;i<4;i++){
+            for (var ii=0;ii<l;ii++){
+              notesPitchTranslator[0].push(notesPitchTranslator[0][notesPitchTranslator[0].length-1]+1);
+              notesPitchTranslator[1].push(4+i);
+              notesPitchTranslator[2].push(notesPitchTranslator[2][ii]);
+              notesPitchTranslator[3].push(notesPitchTranslator[3][ii]);
+              notesPitchTranslator[4].push(notesPitchTranslator[4][ii]);
+              notesPitchTranslator[5].push(notesPitchTranslator[5][ii]);
+            }
+          }  
+          var res = notesPitchTranslator[0].findIndex(function(e){
+            return e===pitch;
+          });   
+          res = notesPitchTranslator[2][res]+notesPitchTranslator[1][res]; 
+ 
+          if(type===1){ //type=1 mode text  
+            res = notesPitchTranslator[0].findIndex(function(e){
+              return e===pitch;
+            });       
+            if(noteName.indexOf('_')!==-1) { //bemol 
+              res = notesPitchTranslator[4][res]+' - '+notesPitchTranslator[5][res]; 
+            }else if(noteName.indexOf('^')!==-1) { //sostenido 
+              res = notesPitchTranslator[2][res]+' - '+notesPitchTranslator[3][res];
+            }else{ 
+              res = notesPitchTranslator[2][res]+' - '+notesPitchTranslator[3][res];
+            }             
           }          
           return res;
         },
@@ -206,12 +241,12 @@
             add_classes: true,
             responsive: "resize",
             clickListener: function(e){
-              var note = app.translateNote(e.pitches[0].name);
-              app.synth.triggerAttackRelease(note,'8n');
-              var noteText = app.translateNote(e.pitches[0].name,1);
+              var noteText = app.translateNote(e.pitches[0].name,e.midiPitches[0].pitch,1);  
               if(typeof clickFn==='function'){
                 clickFn(noteText);
-              }
+              } 
+              var note = app.translateNote(e.pitches[0].name,e.midiPitches[0].pitch,0);
+              app.synth.triggerAttackRelease(note,'8n');
             } 
           });  
         },       
@@ -227,7 +262,7 @@
             
           }
         }, 
-        init: function (clickFn){  
+        init: function (clickFn,endFn,finishPlayFn){  
           this.synth = new Tone.Synth().toMaster();  
           console.log('Bpm: '+this.bpm+', Level: '+this.level+', Play Intro: '+this.playIntro+', PlayBeats: '+this.playBack+', PlayCursor: '+this.playCursor+', PlayNotes: '+this.playNotes);
           app.stop(); 
@@ -262,10 +297,12 @@
             },
             onFinished: function() {    
               $('.abcjs-time-signature').removeClass('currentNote');
-              $('.abcjs-note').removeClass('currentNote');
+              $('.abcjs-note').removeClass('currentNote'); 
+              if(typeof finishPlayFn==='function'){
+                finishPlayFn();
+              }
             },
-            onBeat: function(beatNumber) {  
-              //console.log(beatNumber);
+            onBeat: function(beatNumber) {   
               function metro(){
                 if(beatNumber%beat===0){ 
                   app.synth.triggerAttackRelease('A5','16n');
@@ -281,7 +318,7 @@
                 } 
               }
             },
-            onEvent: function(event) {   
+            onEvent: function(event) {  
               $('.abcjs-time-signature').removeClass('currentNote');
               if(app.playCursor){        
                 $('.abcjs-note').removeClass('currentNote');
@@ -307,6 +344,9 @@
               soundFontVolumeMultiplier: (app.playNotes?'1':'0') //'0' sound off
             }).then(function (response) {
               console.log("Audio successfully loaded.");
+              if(typeof endFn==='function'){
+                endFn();
+              }
             }).catch(function (error) {
               console.warn("Audio problem:", error);
             });
@@ -342,6 +382,7 @@
         },
         resetMain: function(){
           $('#main').html(' ');
+          web.resetPlayBtn();
         },
         initInputElements:function(){
           $('#tempoBar').val(web.bpm);
@@ -350,26 +391,27 @@
             $('#tempoBarValue').html($('#tempoBar').val()); 
             web.bpm=parseInt($('#tempoBar').val());
             web.syncAppValue();
-            web.exeApp();
+            web.exeApp(); 
+            web.resetPlayBtn();
           });
 
           $('#levelSelect').on('change',function(){   
             web.level=parseInt($('#levelSelect').val());
             web.toast('Level: '+$( "#levelSelect option:selected" ).text());
-            web.syncAppValue();
+            web.syncAppValue(); 
           }); 
 
           $('#actionSelect').html(' '); 
           $('#actionSelect').append('<option value="00" selected>Play Intro - Play beat  - Display Cursor</option>');
-          $('#actionSelect').append('<option value="01"         >Play Intro - Play beat </option>');
+          //$('#actionSelect').append('<option value="01"         >Play Intro - Play beat </option>');
           $('#actionSelect').append('<option value="02"         >Play Intro - Display Cursor </option>');
-          $('#actionSelect').append('<option value="03"         >Play Intro</option>');
-          $('#actionSelect').append('<option value="04"         >Play beat  - Play Notes - Display Cursor</option>');
-          $('#actionSelect').append('<option value="05"         >Play beat  - Play Notes</option>');
-          $('#actionSelect').append('<option value="06"         >Play beat  - Display Cursor</option>');
-          $('#actionSelect').append('<option value="07"         >Play beat</option>'); 
+          //$('#actionSelect').append('<option value="03"         >Play Intro</option>');
+          //$('#actionSelect').append('<option value="04"         >Play beat  - Play Notes - Display Cursor</option>');
+          //$('#actionSelect').append('<option value="05"         >Play beat  - Play Notes</option>');
+          //$('#actionSelect').append('<option value="06"         >Play beat  - Display Cursor</option>');
+          //$('#actionSelect').append('<option value="07"         >Play beat</option>'); 
           $('#actionSelect').append('<option value="08"         >Play Notes - Display Cursor</option>');
-          $('#actionSelect').append('<option value="09"         >Play Notes</option>'); 
+          //$('#actionSelect').append('<option value="09"         >Play Notes</option>'); 
           $('#actionSelect').append('<option value="10"         >Display Cursor</option>');           
           $('#actionSelect').on('change',function(){   
             var value=$('#actionSelect').val();
@@ -394,6 +436,11 @@
             web.exeApp();
             web.resize();
           });
+
+          web.resetPlayBtn();
+          $('#playBtn').on('click',function(){
+            $('.abcjs-midi-start').trigger('click');
+          });
   
           $.each(app.songs,function(i,e){  
             $('#modeSelect').append('<option value="'+app.songs[i].id+'">'+app.songs[i].title+'</option>'); 
@@ -409,7 +456,28 @@
             } 
             web.syncAppValue(); 
             web.exeApp();
+            web.resetPlayBtn();
           }); 
+        },
+        resetPlayBtn: function(){ 
+          var $e = $('#playBtn');
+          $e.removeClass('stop');
+          $e.addClass('play');
+          $e.html('<span uk-icon="play-circle"></span>'); 
+        },
+        endLoadSongFn: function(){
+          $('.abcjs-midi-start').on('click',function(){  
+            var $e = $('#playBtn');
+            if($e.hasClass('play')){
+              $e.removeClass('play');
+              $e.addClass('stop');
+              $e.html('<span uk-icon="ban"></span>'); 
+            }else{ 
+              $e.removeClass('stop');
+              $e.addClass('play');
+              $e.html('<span uk-icon="play-circle"></span>'); 
+            };        
+          });   
         },
         syncAppValue: function(){ 
           app.bpm=web.bpm; 
@@ -424,6 +492,10 @@
           web.syncAppValue();         
           app.init(function clickFn(noteText){ 
             web.toast(noteText);             
+          },function endFn(){ 
+            web.endLoadSongFn();             
+          },function finishPlayFn(){ 
+            web.resetPlayBtn();             
           });
         },
         init: function (){  
@@ -432,19 +504,19 @@
           web.resetMain(); 
           web.exeApp();
           web.resize();
-          web.toast('Start App');          
-          /*
+          web.toast('Start App');  
           setTimeout(function(){
             //$($('button')[1]).trigger('click');
-            $('#actionSelect').val('08');  
-            $('#modeSelect').val('song3');  
-            $('#actionSelect').trigger('change'); 
-            $('#modeSelect').trigger('change');  
+            //$('#actionSelect').val('08');  
+            //$('#modeSelect').val('song2');  
+            //$('#actionSelect').trigger('change'); 
             setTimeout(function(){
-              $('.abcjs-midi-start').trigger('click');
+              //$('#modeSelect').trigger('change'); 
+              setTimeout(function(){ 
+                //$('#playBtn').trigger('click'); 
+              },1000); 
             },1000);
-          },1000);
-          */
+          },1000);          
         }        
       } 
       web.init();
