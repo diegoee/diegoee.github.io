@@ -43,30 +43,37 @@
         z-index: 1; 
         border-radius: 5px;
         color: #fff;
-      } 
+      }  
       #playBtn.play{
         background-color: green;
       }       
       #playBtn.stop{
         background-color: #f0506e; 
-      }
+      } 
       #main{
         color: #333;         
       }
       .uk-notification-close {
         display: block;
       }
+      .center{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      } 
     </style>
   </head>
   <body>
     <div id="version"></div>  
-    <button id="createBtn" class="uk-button uk-button-primary uk-margin"><span uk-icon="refresh"></span></button> 
-    <button id="playBtn" class="uk-button uk-button-default uk-margin play"><span uk-icon="play-circle"></span></button>  
+    <button id="createBtn" class="uk-button uk-button-primary uk-margin" disabled><span uk-icon="refresh"></span></button> 
+    <button id="playBtn" class="uk-button uk-button-primary uk-margin play" disabled><span uk-icon="play-circle"></span></button>  
     <div id="header" class=""> 
-      <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu"><span uk-icon="menu"></span></button>
+      <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu" disabled><span uk-icon="menu"></span></button>
       <div class="uk-padding-small uk-padding-remove-bottom"><div id="control" class=></div></div>   
     </div>
-    <div id="main" class=></div>     
+    <div id="main" class="center"> 
+      <div uk-spinner="ratio: 6"></div> 
+    </div>     
     <div id="modalMenu" uk-modal>
       <div class="uk-modal-dialog">
           <button class="uk-modal-close-default" type="button" uk-close></button>
@@ -136,13 +143,113 @@
         playCursor: false,
         playNotes: false,
         mode: 'rndMode',
+        songsListUrl: [],
         songs:[ 
-          {id: 'song1', title:'Ode To Joy (Intro) - Beethoven', abc:'X:1\nT:Ode To Joy (Intro)\nC:Beethoven\nL:1/4\nM:4/4\nQ:120\nK:c\nEEFG|GFED|CCDE|EDD2|\nEEFG|GFED|CCDE|DCC2|]'},
-          {id: 'song2', title:'Greensleeves', abc:'X:1\nT:Greensleeves\nR:Air\nC:Trad. 16C\nO:England\nM:3/4\nL:1/8\nQ:1/4=120\nK:Em\nE2|"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,4E2|\n"Em"G4A2|"G"B3cB2|"D"A4F2|"Bm"D3EF2|"Em"G3FE2|"B"^D3^C^D2|"Em"E6-|E4z2|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|E3^DE2|"B"F4^D2|B,6|\n"G"d6|d3^cB2|"D"A4F2|D3EF2|"Em"G4E2|"B"^D3^C^D2|"Em"E6-|E4|]\n'},
-          {id: 'song3', title:'Minuetto - Adaptado de James Hook', abc:'X:1\nT:MINUETTO\nC:Adaptado de un minueto de James Hook\nL:1/4\nM:3/4\nQ:80\nK:C\nz2c|FFA|(AG)c|GG_B|(_BA)c|\nFFF|AAA|(A_B)G|F2c|FFA|(AG)c|\nGG_B|(_BA)c|FFF|ccc|(A_B)G|F2z|]\n'},
-          {id: 'song4', title:'Aria - Friedrich Gluck', abc:'X:1\nT:ARIA\nC:Friedrich Gluck\nL:1/4\nM:3/4\nQ:80\nK:C\nz2C|A2A|(AG)A|_B2G|E2C|F2F|\n(FEF)|(G3|G)zG|G2G|(GA_B)|c3|D2G|\nF2F|(GFG)|(A3|A)zA|(AG)G|(GA_B)|\nc2c|(c_B)A|F2F|(A2G)|(F3|F)z|]'},
-          {id: 'song5', title:'Test - Diego E.', abc:'X:1\nT:Test\nC:Diego E.\nL:1/4\nM:2/4\nQ:80\nK:Bm\n_F^F|=FF|F2|f2|f\'2|'},
+          {id: 'songT', title:'Test - Diego E.', abc:'X:1\nT:Test\nC:Diego E.\nL:1/4\nM:2/4\nQ:80\nK:Bm\n_F^F|=FF|F2|f2|f\'2|'},          
         ],
+        setTitleSongs: function(){
+          for(var i=0; i<app.songs.length; i++){
+            var t = app.songs[i].abc.substring(app.songs[i].abc.indexOf('T:'), app.songs[i].abc.length);
+            t = t.substring(2, t.indexOf('\n'));
+            var a = app.songs[i].abc.substring(app.songs[i].abc.indexOf('C:'), app.songs[i].abc.length);
+            a = a.substring(2, a.indexOf('\n'));
+            if(a===''){
+              app.songs[i].title = t;
+            }else{
+              app.songs[i].title = t+' - '+a;
+            }
+            console.log(app.songs[i].title);
+          }
+        },
+        getSongsFromUrls: function(){
+          return new Promise(function(resolve, reject){ 
+            console.log(app.songsListUrl); 
+            var pos=0; 
+            for(var i=0; i<app.songsListUrl.length; i++){
+              $.ajax({
+                url: app.songsListUrl[i], 
+                type: 'GET',
+                success: function(res){  
+                  app.songs.push({
+                    id: 'song'+pos,
+                    title: undefined,
+                    abc: res
+                  });
+                  pos++; 
+                  if(pos===app.songsListUrl.length){ 
+                    app.setTitleSongs();
+                    resolve();
+                  }
+                },
+                error: function(){
+                  reject("Error GET: "+app.songsListUrl[i]);
+                }
+              }); 
+            } 
+          });
+        },
+        getUrlSongsInGithub: function(){
+          return new Promise(function(resolve, reject){ 
+            $.ajax({
+              url: 'https://api.github.com/repos/diegoee/diegoee.github.io/commits', 
+              type: 'GET',
+              success: function(res){ 
+                res = res[0].sha;   
+                $.ajax({
+                  url: 'https://api.github.com/repos/diegoee/diegoee.github.io/git/trees/'+res, 
+                  type: 'GET',
+                  success: function(res){  
+                    res=res.tree;  
+                    for(var i=0; i<res.length; i++){
+                      if (res[i].path===('webLab')){ 
+                        break;
+                      }
+                    }   
+                    res = res[i].sha; 
+                    $.ajax({
+                      url: 'https://api.github.com/repos/diegoee/diegoee.github.io/git/trees/'+res, 
+                      type: 'GET',
+                      success: function(res){  
+                        res=res.tree;  
+                        for(var i=0; i<res.length; i++){
+                          if (res[i].path===('test4_musicTheory')){ 
+                            break;
+                          }
+                        }   
+                        res = res[i].sha; 
+                        $.ajax({
+                          url: 'https://api.github.com/repos/diegoee/diegoee.github.io/git/trees/'+res, 
+                          type: 'GET',
+                          success: function(res){  
+                            res=res.tree; 
+                            for(var i=0; i<res.length; i++){
+                              if (res[i].path.indexOf('.abc')!==-1){  
+                                app.songsListUrl.push('https://diegoee.github.io/webLab/test4_musicTheory/'+res[i].path); 
+                              }
+                            }   
+                            resolve(); 
+                          },
+                          error: function(){
+                            reject("Error with level 3: https://api.github.com");
+                          }
+                        });
+                      },
+                      error: function(){
+                        reject("Error with level 2: https://api.github.com");
+                      }
+                    }); 
+                  },
+                  error: function(){
+                    reject("Error with level 1: https://api.github.com");
+                  }
+                }); 
+              },
+              error: function(){
+                reject("Error with level 0: https://api.github.com");
+              } 
+            });  
+          });
+        },
         translateNote: function(noteName,pitch,type){ 
           var notesPitchTranslator = [ 
             [ 48,    49,  50,   51,  52,  53,  54,     55,    56, 57,    58, 59 ],  
@@ -383,6 +490,7 @@
         resetMain: function(){
           $('#main').html(' ');
           web.resetPlayBtn();
+          $('button').attr('disabled',false);
         },
         initInputElements:function(){
           $('#tempoBar').val(web.bpm);
@@ -428,7 +536,8 @@
             if(value==='10'){ web.playIntro=false; web.playBack=false; web.playCursor=true;  web.playNotes=false; }
             web.toast($( "#actionSelect option:selected" ).text());
             web.syncAppValue();
-            web.exeApp();
+            web.exeApp(); 
+            web.resetPlayBtn();
           });           
 
           $('#createBtn').on('click',function(){   
@@ -500,23 +609,29 @@
         },
         init: function (){  
           $(window).on('resize',web.resize); 
-          web.initInputElements();  
-          web.resetMain(); 
-          web.exeApp();
           web.resize();
-          web.toast('Start App');  
-          setTimeout(function(){
-            //$($('button')[1]).trigger('click');
-            //$('#actionSelect').val('08');  
-            //$('#modeSelect').val('song2');  
-            //$('#actionSelect').trigger('change'); 
+          app.getUrlSongsInGithub().then(function() {
+            return app.getSongsFromUrls();
+          }).then(function() { 
+            web.initInputElements();  
+            web.resetMain(); 
+            web.exeApp();
+            web.toast('Start App');  
             setTimeout(function(){
-              //$('#modeSelect').trigger('change'); 
-              setTimeout(function(){ 
-                //$('#playBtn').trigger('click'); 
-              },1000); 
+              //$($('button')[1]).trigger('click');
+              //$('#actionSelect').val('08');  
+              //$('#modeSelect').val('song1');  
+              //$('#actionSelect').trigger('change'); 
+              setTimeout(function(){
+                //$('#modeSelect').trigger('change'); 
+                setTimeout(function(){ 
+                  //$('#playBtn').trigger('click'); 
+                },1000); 
+              },1000);
             },1000);
-          },1000);          
+          }).catch(function(reason) {
+            console.error(reason);
+          });       
         }        
       } 
       web.init();
