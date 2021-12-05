@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
     <title>Web Test4_businessModelCanvas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" rel="stylesheet" type="text/css">  
     <style> 
       @media print{
@@ -25,6 +25,10 @@
           margin: 2px 5px; 
         }
       } 
+      .btnAddNote{
+        top: 5px;
+        right: 10px;
+      }
     </style>
   </head>
   <body>  
@@ -38,19 +42,21 @@
         </span> 
         <ul class="nav justify-content-end">
           <li class="nav-item ms-1 me-5"><button type="button" class="btn btn-outline-dark" id="idBtnPrint"><i class="fas fa-print"></i></button></li>  
-          <li class="nav-item ms-1 me-1"><button type="button" class="btn btn-outline-dark" id="idBtnDelete"><i class="fas fa-trash"></i></button>   </li>
+          <li class="nav-item ms-1 me-1"><button type="button" class="btn btn-outline-dark" id="idBtnDelete"><i class="fas fa-trash"></i></button></li>
         </ul>  
       </div>
     </nav> 
     <div id="modelCanvas" class="m-1 ps-3 pe-3">
       <div class="row">
         <div class="col-2 mb-1 border border-dark rounded overflow-auto size1 canvas position-relative">
-          <span class="btn badge rounded-pill bg-light text-dark position-absolute top-0 end-0 m-1 btnAddNote"><i class="fas fa-plus"></i></span>
+          <span class="btn badge rounded-pill bg-light text-dark position-absolute m-1 btnAddNote"><i class="fas fa-plus"></i></span>
           <p class="fs-5">Key partners <i class="fas fa-handshake"></i></p>
           <div class="alert alert-dark alert-dismissible fade show" role="alert">
             Who are your key partners/suppliers?<br>
             What are the motivations for the partnerships? 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div> 
         </div>
         <div class="col-3 mb-1">
@@ -60,7 +66,9 @@
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
               What key activities does your value proposition require?<br>
               What activities are important the most in distribution channels, customer relationships, revenue stream…? 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
           </div>
           <div class="col-12 ps-2 pe-2 border border-dark rounded overflow-auto size2 canvas position-relative">
@@ -69,7 +77,9 @@
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
               What key resources does your value proposition require?<br>
               What resources are important the most in distribution channels, customer relationships, revenue stream…?
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
           </div>
         </div>
@@ -79,7 +89,9 @@
           <div class="alert alert-success alert-dismissible fade show" role="alert">
             What core value do you deliver to the customer?<br>
             Which customer needs are you satisfying?
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
         </div>
         <div class="col-3 mb-1">
@@ -89,7 +101,9 @@
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
               What relationship that the target customer expects you to establish?<br>
               How can you integrate that into your business in terms of cost and format?
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
           </div>
           <div class="col-12 ps-2 pe-2 border border-dark rounded overflow-auto size2 canvas position-relative">
@@ -98,7 +112,9 @@
             <div class="alert alert-dark alert-dismissible fade show" role="alert"> 
               Through which channels that your customers want to be reached?<br>
               Which channels work best? How much do they cost? How can they be integrated into your and your customers’ routines?
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
           </div>
         </div>
@@ -108,7 +124,9 @@
           <div class="alert alert-danger alert-dismissible fade show" role="alert">
             Which classes are you creating values for?<br>
             Who is your most important customer?
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div> 
         </div>
       </div>
@@ -119,7 +137,9 @@
           <div class="alert alert-dark alert-dismissible fade show" role="alert">
             What are the most cost in your business?<br>
             Which key resources/ activities are most expensive? 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
         </div>
         <div class="col-6 border border-dark rounded overflow-auto size3 canvas position-relative">
@@ -129,7 +149,9 @@
             For what value are your customers willing to pay?<br>
             What and how do they recently pay? How would they prefer to pay?<br>
             How much does every revenue stream contribute to the overall revenues?
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
         </div>
       </div>
@@ -140,7 +162,9 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="modalLabel">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
           <div class="modal-body">
             <div class="mb-3 displayGroup">
@@ -150,32 +174,36 @@
               <label class="form-label">Business Name</label>
               <input type="text" class="form-control" id="inputNameCanvas" placeholder="My Business">
             </div> 
-            <div class="input-group displayGroup">
-              <select class="form-select" id="inputNoteColor"> 
-                <option value="alert-dark" selected>Black</option>
-                <option value="alert-danger">Red</option>
-                <option value="alert-success">Green</option>
-              </select>
-              <span class="input-group-text">Color</span>
-            </div>  
-            <div class="input-group displayGroup">
-              <span class="input-group-text">Add note</span>
-              <textarea class="form-control" aria-label="With textarea" id="inputNoteText"></textarea>
-            </div> 
-          </div>
+            <div class="form-row">
+              <div class="col-md-12 mb-3">
+                <div class="input-group displayGroup">
+                  <span class="input-group-text">Color</span>
+                  <select class="form-select" id="inputNoteColor"> 
+                    <option value="alert-dark" selected>Black</option>
+                    <option value="alert-danger">Red</option>
+                    <option value="alert-success">Green</option>
+                  </select>
+                </div>  
+              </div> 
+              <div class="col-md-12 mb-3">
+              <div class="input-group displayGroup">
+                <span class="input-group-text">Add note</span>
+                <textarea class="form-control" aria-label="With textarea" id="inputNoteText"></textarea>
+              </div> 
+            </div>
+          </div> 
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger"  data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Close</button>
             <button type="button" class="btn btn-success" id="idBtnAgree">Ok</button>
           </div>
         </div>
       </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>  
     <script type="text/javascript">
       /*global $, window, setTimeout, clearTimeout, Promise*/      
-      var app = { 
-        modal: undefined,  
+      var app = {   
         calcHeight: function(he){
           var h = $(window).height()-$('#menu').innerHeight()-15;
           if (he!==undefined){
@@ -190,11 +218,16 @@
             app.calcHeight();
           }); 
         }, 
-        createModal: function(){
-          app.modal = new bootstrap.Modal(document.getElementById('modal'),{
+        showModal: function(){
+           $('#modal').modal({
             keyboard: false,
             backdrop: 'static'
-          });
+          }); 
+        },
+        hideModal: function(){
+          $('#modal').modal('hide');
+        },
+        createModal: function(){  
           $('#modal').on('hidden.bs.modal', function(){ 
             $('#idBtnAgree').off('click'); 
             $('#modalLabel').html(' ');
@@ -217,10 +250,10 @@
               display: 'block'
             });
             $('#inputNameCanvas').val($('#nameCanvas').text());
-            app.modal.show();
+            app.showModal();
             $('#idBtnAgree').on('click',function(){
               $('#nameCanvas').html($('#inputNameCanvas').val());
-              app.modal.hide();
+              app.hideModal();
             });
           }
           if(type==='deleteCanvas'){
@@ -231,9 +264,9 @@
             $($('.displayGroup')[0]).css({
               display: 'block'
             });
-            app.modal.show();
+            app.showModal();
             $('#idBtnAgree').on('click',function(){
-              app.modal.hide();
+              app.hideModal();
               $('.alert').each(function(){
                 $(this).children('button').trigger('click');
               });
@@ -250,10 +283,10 @@
               display: 'flex'
             });
             $('#modalLabel').html('Add Note to '+$(elem).children('P').text());
-            app.modal.show();
+            app.showModal();
             $('#idBtnAgree').on('click',function(){
-              app.modal.hide();
-              $(elem).append('<div class="alert '+$('#inputNoteColor').val()+' alert-dismissible fade show" role="alert">'+$('#inputNoteText').val()+'<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+              app.hideModal();
+              $(elem).append('<div class="alert '+$('#inputNoteColor').val()+' alert-dismissible fade show" role="alert">'+$('#inputNoteText').val()+'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             });  
           } 
           if(type==='printCanvas'){             

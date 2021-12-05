@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Web test">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">  
+    <meta name="description" content="Web test"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/snackbarjs/1.1.0/snackbar.min.css">  
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <title>Web Test2_life</title>
     <style> 
@@ -20,48 +19,107 @@
         display: flex;
         align-items: center;
         justify-content: center;
-      } 
-      #monitorFloat{ 
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px; 
+        position: relative;
+        margin: 100px auto;
+      }
+
+      .double-bounce1, .double-bounce2 {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #333;
+        opacity: 0.6;
         position: absolute;
         top: 0;
-        right: 0; 
-        z-index: 100; 
+        left: 0;        
+        -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+        animation: sk-bounce 2.0s infinite ease-in-out;
       }
+
+      .double-bounce2 {
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+      }
+
+      @-webkit-keyframes sk-bounce {
+        0%, 100% { -webkit-transform: scale(0.0) }
+        50% { -webkit-transform: scale(1.0) }
+      }
+
+      @keyframes sk-bounce {
+        0%, 100% { 
+          transform: scale(0.0);
+          -webkit-transform: scale(0.0);
+        } 50% { 
+          transform: scale(1.0);
+          -webkit-transform: scale(1.0);
+        }
+      } 
+
       #canvasContainer{ 
         margin: 1em; 
-      }     
+      }
+
+      .snackbar {
+        background-color: #323232;
+        color: #FFFFFF;
+        font-size: 24px;
+        border-radius: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        height: 0;
+        -moz-transition: -moz-transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s, padding 0s linear 0.2s, height 0s linear 0.2s;
+        -webkit-transition: -webkit-transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s, padding 0s linear 0.2s, height 0s linear 0.2s;
+        transition: transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s, padding 0s linear 0.2s, height 0s linear 0.2s;
+        -moz-transform: translateY(200%);
+        -webkit-transform: translateY(200%);
+        transform: translateY(200%);
+      }
+      .snackbar.snackbar-opened {
+        padding: 14px 15px;
+        margin-bottom: 20px;
+        height: auto;
+        -moz-transition: -moz-transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s;
+        -webkit-transition: -webkit-transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s;
+        transition: transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s, height 0s linear 0.2s;
+        -moz-transform: none;
+        -webkit-transform: none;
+        transform: none;
+      }
+      .snackbar.toast {
+        border-radius: 20px;
+      } 
     </style>
   </head>
   <body> 
     <div id="loading"> 
-      <div class="preloader-wrapper big active">
-        <div class="spinner-layer spinner-blue-only">
-          <div class="circle-clipper left">
-            <div class="circle"></div>
-          </div><div class="gap-patch">
-            <div class="circle"></div>
-          </div><div class="circle-clipper right">
-            <div class="circle"></div>
-          </div>
-        </div>
+      <div class="spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
       </div>
     </div>   
-    <div id="canvasContainer"></div> 
+    <div id="canvasContainer"></div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/snackbarjs/1.1.0/snackbar.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>  
     <script type="text/javascript"> 
-      (function exe(){   
-        function toast(text,fn){
-          //M.Toast.dismissAll();
-          var toastMsg = M.toast({
-            html: '<span>'+text+'</span><button class="btnToast btn-flat toast-action">Close</button>', // btn-flat toast-action
-            displayLength: 5000, 
-            completeCallback: fn
-          });            
-          $('.btnToast').off('click'); 
-          $('.btnToast').on('click',function(){
-            M.Toast.getInstance($(this).parent()).dismiss(); 
+      //(function exe(){    
+    
+        function toast(text,fn){  
+          $.snackbar({
+            content: text, // text of the snackbar
+            style: "toast", // add a custom class to your snackbar
+            timeout: 3000, // time in milliseconds after the snackbar autohides, 0 is disabled
+            htmlAllowed: true, // allows HTML as content value
+            onClose: function(){
+              if(typeof fn ==='function'){
+                fn();
+              }
+             } // callback called when the snackbar gets closed.
           }); 
         } 
         function onOffLoading(state){ 
@@ -292,18 +350,21 @@
         }
         
         function resize(){  
-          $('#canvasContainer').innerHeight($(window).innerHeight()-30);
+          $('#canvasContainer').innerHeight($(window).innerHeight()-35);
           $('#canvasContainer').html('<canvas id="canvas"></canvas>');
           plotCanvas(); 
         }  
                  
-        toast('Press on screen to Start');
-        toast('Long Press to reset');  
         resize();
         $(window).on('resize',function(){
           window.location.reload(); 
         }); 
-      })();
+        
+        setTimeout(function(){
+          toast('Press on screen to Start');
+          toast('Long Press to reset');  
+        },500); 
+      //})();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
   </body>
