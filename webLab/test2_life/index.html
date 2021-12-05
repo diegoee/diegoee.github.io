@@ -65,10 +65,10 @@
         margin: 1em; 
       }
 
-      .snackbar {
+      .snackbar{
         background-color: #323232;
         color: #FFFFFF;
-        font-size: 24px;
+        font-size: 1.25em;
         border-radius: 2px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
         height: 0;
@@ -77,11 +77,18 @@
         transition: transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s, padding 0s linear 0.2s, height 0s linear 0.2s;
         -moz-transform: translateY(200%);
         -webkit-transform: translateY(200%);
-        transform: translateY(200%);
+        transform: translateY(200%); 
+        margin: 5px;
+      } 
+      @media (max-width: 767px){
+        #snackbar-container .snackbar {
+            min-width: calc(100% - 40px);
+        }
       }
+      
       .snackbar.snackbar-opened {
         padding: 14px 15px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         height: auto;
         -moz-transition: -moz-transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s;
         -webkit-transition: -webkit-transform 0.2s ease-in-out, opacity 0.2s ease-in, height 0s linear 0.2s;
@@ -90,7 +97,7 @@
         -webkit-transform: none;
         transform: none;
       }
-      .snackbar.toast {
+      .snackbar.toast {  
         border-radius: 20px;
       } 
     </style>
@@ -362,7 +369,7 @@
         
         setTimeout(function(){
           toast('Press on screen to Start');
-          toast('Long Press to reset');  
+          toast('Long Press to reset');   
         },500); 
       //})();
     </script>
