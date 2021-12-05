@@ -152,8 +152,8 @@
             var t = app.songs[i].abc.substring(app.songs[i].abc.indexOf('T:'), app.songs[i].abc.length);
             t = t.substring(2, t.indexOf('\n'));
             var a = app.songs[i].abc.substring(app.songs[i].abc.indexOf('C:'), app.songs[i].abc.length);
-            a = a.substring(2, a.indexOf('\n'));
-            if(a===''){
+            a = a.substring(2, a.indexOf('\n')); 
+            if(a==='1'){
               app.songs[i].title = t;
             }else{
               app.songs[i].title = t+' - '+a;
