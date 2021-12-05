@@ -157,13 +157,11 @@
               app.songs[i].title = t;
             }else{
               app.songs[i].title = t+' - '+a;
-            }
-            console.log(app.songs[i].title);
+            } 
           }
         },
         getSongsFromUrls: function(){
-          return new Promise(function(resolve, reject){ 
-            console.log(app.songsListUrl); 
+          return new Promise(function(resolve, reject){  
             var pos=0; 
             for(var i=0; i<app.songsListUrl.length; i++){
               $.ajax({
