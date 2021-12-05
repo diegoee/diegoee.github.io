@@ -1,13 +1,13 @@
 X:1
-T:ARIA
-C:Friedrich Gluck
-L:1/4
-M:3/4
-Q:80
-K:C
-z2C|A2A|(AG)A|_B2G|E2C|F2F|
-(FEF)|(G3|G)zG|G2G|(GA_B)|c3|D2G|
-F2F|(GFG)|(A3|A)zA|(AG)G|(GA_B)|
-c2c|(c_B)A|F2F|(A2G)|(F3|F)z|]
+T:Summertime
+S:Jack Tuttle
+Z:Nigel Gatherer
+M:4/4
+L:1/8
+K:Bb
+{^c}dB | {^c}d- d7- | d2 cB cdB{^F}G- | G D3- D4- | D4 {^c}(3d2=c2B2 |
+{^B}c- c7- | c2 BG Bc B2 | {^G}A- A7- | A2 (3G,BD GABc |
+ {^c}d- d7- | d2 cB cdB{^c}G- | G D3- D4- | D8 |
+F2 DF G B3 | {c}_d c3- cBGF | {^F}G- G7- | G6 |]
 
           
