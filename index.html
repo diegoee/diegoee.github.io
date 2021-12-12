@@ -212,12 +212,10 @@
             <a href="https://github.com/diegoee/androidDice" target="_blank">Dado (Dice)</a>.
             <a href="https://play.google.com/store/apps/details?id=com.deeapp.dice" target="_blank">(Play Store)</a>
             <a href="#" id="linkApp01">(Web version)</a>
-          </p>
-          <p><a href="https://github.com/diegoee/rndGame" target="_blank">Alea App</a>.&nbsp;<a href="https://play.google.com/store/apps/details?id=com.diegoee.rndgame1" target="_blank">(Play Store)</a></p>
-          <p><a href="https://github.com/diegoee/smartCardFamocoDevice" target="_blank">Smart Card Reader</a></p>
+          </p> 
         </div>
       </details>
-      <details close>
+      <details open>
         <summary>Web Experiments:</summary>
         <div id="myWebLabDiv" class="divDetail"></div>
       </details>
@@ -233,13 +231,7 @@
           <a href="https://es.linkedin.com/in/diegoespinolaespigares" target="_blank"><i class="fab fa-linkedin fa-lg"></i></a>
         </p>
       </div>
-    </footer> 
-    <div id="loading" class="loading">
-      <div class="spinner">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
-      </div>
-    </div>
+    </footer>  
     <script>
       (function app(){        
         var setUp = {
@@ -388,22 +380,8 @@
           xhttp.send();
         };
       })();
-      (function webapp(){
-        function activeloading(){
-          var e = document.getElementById('loading');
-          if (e.classList.contains('on')) {
-            e.classList.remove('on'); 
-            e.classList.add('off'); 
-          } else{
-            e.classList.remove('off'); 
-            e.classList.add('on'); 
-          }
-        } 
-        document.getElementById('loading').addEventListener('click', function(){ 
-          activeloading(); 
-        },false); 
-        document.getElementById('linkApp01').addEventListener('click', function(){ 
-          activeloading();
+      (function webapp(){  
+        document.getElementById('linkApp01').addEventListener('click', function(){  
           var xhttp01 = new XMLHttpRequest();
           xhttp01.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -422,8 +400,7 @@
                   var newWin = window.open('', '_blank');
                   newWin.document.write(res01);
                   newWin.document.close();
-                  newWin.focus();
-                  activeloading(); 
+                  newWin.focus();  
                 }
               };
               xhttp02.open('GET', 'https://raw.githubusercontent.com/diegoee/androidDice/main/app/src/main/assets/www/dado.js', true);
@@ -432,7 +409,7 @@
           };
           xhttp01.open('GET', 'https://raw.githubusercontent.com/diegoee/androidDice/main/app/src/main/assets/www/index.html', true);
           xhttp01.send();
-        }, false);  
+        },false);  
       })();
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
