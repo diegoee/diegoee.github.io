@@ -80,34 +80,39 @@
           <div class="uk-modal-header"> 
               <h2 class="uk-modal-title">Menú</h2>
           </div>
-          <div class="uk-modal-body" uk-overflow-auto>  
+          <div class="uk-modal-body" uk-overflow-auto> 
             <div class="uk-margin">
-              <label>Play Mode</label>
+              <label>Mode</label>
               <select id="modeSelect" class="uk-select"> 
               <option value="rndMode" selected>Random notes to practice</option>
+              <option value="playMode" selected>Play song</option>
               </select>
-            </div>           
-            <div uk-grid>
-              <div>
-                <label>Level</label>
-                <select id="levelSelect" class="uk-select"> 
-                <option value="0" selected>Easy</option>
-                <option value="1">Medium</option>
-                <option value="2">Hard</option>
-                </select>
-              </div>
-              <div>
-                <label>Actions</label>
-                <select id="actionSelect" class="uk-select">  
-                </select>
-              </div> 
             </div>
+            <div class="uk-margin">
+              <label>Play Mode</label>
+              <select id="playSelect" class="uk-select">  
+              </select>
+            </div>  
             <div class="uk-margin">  
               <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
               <div class="uk-margin">
                 <input class="uk-range" type="range" value="60" id="tempoBar" min="40" max="150" step="1">
               </div>  
-            </div> 
+            </div>
+            
+            <div class="uk-margin"> 
+              <label>Level</label>
+              <select id="levelSelect" class="uk-select" disabled> 
+              <option value="0" selected>Easy</option>
+              <option value="1">Medium</option>
+              <option value="2">Hard</option>
+              </select>
+            </div>
+            <div class="uk-margin"> 
+              <label>Songs</label>
+              <select id="songsSelect" class="uk-select" disabled>  
+              </select>
+            </div>  
           </div> 
           <div class="uk-modal-footer uk-text-right"> 
           </div>
@@ -143,6 +148,7 @@
         playCursor: false,
         playNotes: false,
         mode: 'rndMode',
+        song: 'songT',
         songsListUrl: [],
         songs:[ 
           {id: 'songT', title:'Test - Diego E.', abc:'X:1\nT:Test\nC:Diego E.\nL:1/4\nM:2/4\nQ:80\nK:Bm\n_F^F|=FF|F2|f2|f\'2|'},          
@@ -342,8 +348,8 @@
           }else{
             var i=0;
             i = app.songs.findIndex(function(e){
-              return e.id==app.mode;
-            });  
+              return e.id==app.song;
+            });   
             app.timeSigSel='';
             app.timeSigSel=app.timeSigSel+(app.songs[i].abc.indexOf('M:2/4')!==-1?'2/4':'');
             app.timeSigSel=app.timeSigSel+(app.songs[i].abc.indexOf('M:3/4')!==-1?'3/4':'');
@@ -480,6 +486,7 @@
         playNotes: false,        
         currentToast: undefined,
         mode: 'rndMode', 
+        song: 'songT', 
         toast: function (data){
           if(this.currentToast!==undefined){
             this.currentToast.close(true);
@@ -499,37 +506,46 @@
           web.resetPlayBtn();
           $('button').attr('disabled',false);
         },
-        initInputElements:function(){
-          $('#tempoBar').val(web.bpm);
-          $('#tempoBarValue').html($('#tempoBar').val()); 
-          $('#tempoBar').on('change',function(){ 
-            $('#tempoBarValue').html($('#tempoBar').val()); 
-            web.bpm=parseInt($('#tempoBar').val());
-            web.syncAppValue();
+        initInputElements:function(){   
+          $('#modeSelect').val(web.mode); 
+          web.mode = $('#modeSelect').val();
+          $('#modeSelect').on('change',function(){   
+            web.mode = $('#modeSelect').val(); 
+            web.toast($( "#modeSelect option:selected" ).text());
+            if (web.mode==='rndMode'){
+              $('#levelSelect').prop('disabled',false);
+              $('#levelSelect').parent().removeAttr('style');
+              $('#songsSelect').prop('disabled',true); 
+              $('#songsSelect').parent().css({
+                display: 'none'
+              });
+            }else{
+              $('#songsSelect').prop('disabled',false);
+              $('#songsSelect').parent().removeAttr('style');
+              $('#levelSelect').prop('disabled',true); 
+              $('#levelSelect').parent().css({
+                display: 'none'
+              });
+            } 
             web.exeApp(); 
-            web.resetPlayBtn();
           });
+          $('#modeSelect').trigger('change');
 
-          $('#levelSelect').on('change',function(){   
-            web.level=parseInt($('#levelSelect').val());
-            web.toast('Level: '+$( "#levelSelect option:selected" ).text());
-            web.syncAppValue(); 
-          }); 
-
-          $('#actionSelect').html(' '); 
-          $('#actionSelect').append('<option value="00" selected>Play Intro - Play beat  - Display Cursor</option>');
-          //$('#actionSelect').append('<option value="01"         >Play Intro - Play beat </option>');
-          $('#actionSelect').append('<option value="02"         >Play Intro - Display Cursor </option>');
-          //$('#actionSelect').append('<option value="03"         >Play Intro</option>');
-          //$('#actionSelect').append('<option value="04"         >Play beat  - Play Notes - Display Cursor</option>');
-          //$('#actionSelect').append('<option value="05"         >Play beat  - Play Notes</option>');
-          //$('#actionSelect').append('<option value="06"         >Play beat  - Display Cursor</option>');
-          //$('#actionSelect').append('<option value="07"         >Play beat</option>'); 
-          $('#actionSelect').append('<option value="08"         >Play Notes - Display Cursor</option>');
-          //$('#actionSelect').append('<option value="09"         >Play Notes</option>'); 
-          $('#actionSelect').append('<option value="10"         >Display Cursor</option>');           
-          $('#actionSelect').on('change',function(){   
-            var value=$('#actionSelect').val();
+          $('#playSelect').html(' '); 
+          $('#playSelect').append('<option value="00" selected>Play Intro - Play beat  - Display Cursor</option>');
+          //$('#playSelect').append('<option value="01"         >Play Intro - Play beat </option>');
+          $('#playSelect').append('<option value="02"         >Play Intro - Display Cursor </option>');
+          //$('#playSelect').append('<option value="03"         >Play Intro</option>');
+          //$('#playSelect').append('<option value="04"         >Play beat  - Play Notes - Display Cursor</option>');
+          //$('#playSelect').append('<option value="05"         >Play beat  - Play Notes</option>');
+          //$('#playSelect').append('<option value="06"         >Play beat  - Display Cursor</option>');
+          //$('#playSelect').append('<option value="07"         >Play beat</option>'); 
+          $('#playSelect').append('<option value="08"         >Play Notes - Display Cursor</option>');
+          //$('#playSelect').append('<option value="09"         >Play Notes</option>'); 
+          $('#playSelect').append('<option value="10"         >Display Cursor</option>'); 
+          $('#playSelect').val('08');       
+          $('#playSelect').on('change',function(){   
+            var value=$('#playSelect').val();
             if(value==='00'){ web.playIntro=true;  web.playBack=true;  web.playCursor=true;  web.playNotes=false; } 
             if(value==='01'){ web.playIntro=true;  web.playBack=true;  web.playCursor=false; web.playNotes=false; }
             if(value==='02'){ web.playIntro=true;  web.playBack=false; web.playCursor=true;  web.playNotes=false; }
@@ -541,16 +557,29 @@
             if(value==='08'){ web.playIntro=false; web.playBack=false; web.playCursor=true;  web.playNotes=true;  }
             if(value==='09'){ web.playIntro=false; web.playBack=false; web.playCursor=false; web.playNotes=true;  }
             if(value==='10'){ web.playIntro=false; web.playBack=false; web.playCursor=true;  web.playNotes=false; }
-            web.toast($( "#actionSelect option:selected" ).text());
-            web.syncAppValue();
-            web.exeApp(); 
-            web.resetPlayBtn();
-          });           
+            web.toast($("#playSelect option:selected").text()); 
+            web.exeApp();  
+          });  
+          $('#playSelect').trigger('change');   
+
+          $('#tempoBar').val(web.bpm);
+          $('#tempoBarValue').html($('#tempoBar').val()); 
+          $('#tempoBar').on('change',function(){ 
+            $('#tempoBarValue').html($('#tempoBar').val()); 
+            web.bpm=parseInt($('#tempoBar').val()); 
+            web.exeApp();  
+          });
+
+          $('#levelSelect').on('change',function(){   
+            web.level=parseInt($('#levelSelect').val());
+            web.toast('Level: '+$( "#levelSelect option:selected" ).text());
+            web.syncAppValue(); 
+          });        
 
           $('#createBtn').on('click',function(){   
             web.resetMain();
-            web.exeApp();
             web.resize();
+            web.exeApp();
           });
 
           web.resetPlayBtn();
@@ -559,21 +588,17 @@
           });
   
           $.each(app.songs,function(i,e){  
-            $('#modeSelect').append('<option value="'+app.songs[i].id+'">'+app.songs[i].title+'</option>'); 
+            $('#songsSelect').append('<option value="'+app.songs[i].id+'">'+app.songs[i].title+'</option>'); 
           });
 
-          web.mode = $('#modeSelect').val();
-          $('#modeSelect').on('change',function(){   
-            web.mode = $('#modeSelect').val();
-            if(web.mode!=='rndMode'){
-              web.toast('Song: '+$( "#modeSelect option:selected" ).text());
-            }else{
-              web.toast($( "#modeSelect option:selected" ).text());
-            } 
-            web.syncAppValue(); 
-            web.exeApp();
-            web.resetPlayBtn();
+          $('#songsSelect').val(web.song);
+          $('#songsSelect').on('change',function(){   
+            web.song=$('#songsSelect').val();
+            web.toast('Song: '+$( "#songsSelect option:selected" ).text()); 
+            web.exeApp();  
           }); 
+          $('#songsSelect').trigger('change'); 
+           
         },
         resetPlayBtn: function(){ 
           var $e = $('#playBtn');
@@ -603,9 +628,11 @@
           app.playCursor=web.playCursor;
           app.playNotes=web.playNotes;
           app.mode=web.mode;
+          app.song=web.song;
         },
         exeApp: function(){
-          web.syncAppValue();         
+          web.syncAppValue();   
+          web.resetPlayBtn();      
           app.init(function clickFn(noteText){ 
             web.toast(noteText);             
           },function endFn(){ 
@@ -625,14 +652,13 @@
             web.exeApp();
             web.toast('Start App');  
             setTimeout(function(){
-              //$($('button')[1]).trigger('click');
-              //$('#actionSelect').val('08');  
-              //$('#modeSelect').val('song6');  
-              //$('#actionSelect').trigger('change'); 
+              //$($('button')[2]).trigger('click');
+              //$('#modeSelect').val('playMode');  
+              //$('#modeSelect').trigger('change'); 
               setTimeout(function(){
-                //$('#modeSelect').trigger('change'); 
-                setTimeout(function(){ 
-                  //$('#playBtn').trigger('click'); 
+                //$('#songSelect').val('song6');  
+                //$('#songSelect').trigger('change');  
+                setTimeout(function(){   
                 },1000); 
               },1000);
             },1000);
