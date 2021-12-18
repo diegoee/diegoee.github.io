@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Web test">  
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+	<title>Web Test5_gameOfLife</title>
+	<style> 
+    html,body{ 
+			background-color: #333;
+    } 
+		#canvas{
+      position: absolute;
+      top: 0;
+      left: 0;
+			margin: 1em;
+			width: calc(100% - 2em);
+			height: calc(100% - 2em);
+			background-color: #000;
+		}
+	</style>
+  </head>
+  <body>    
+	<div id="canvas"></div>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
+  <script type="text/javascript" src="https://threejs.org/build/three.js"></script> 
+	<script type="text/javascript"> 
+	  var app = { 
+      idE: 'canvas',
+      getRndN: function (nstart,nEnd){
+        return Math.floor(Math.random()*nEnd)+nstart;
+      },
+      rndColor: function(){
+        var color='#';
+        var values = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
+        for(var i=0; i<6; i++){ 
+          color=color+values[this.getRndN(0,values.length)];
+        } 
+        return color;
+      },  
+      matrix: [],
+      exe: function(){  
+        console.log('app exe ini');
+        $('#'+this.idE).html(' '); 
+         
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera( 50, $('#'+this.idE).innerWidth()/$('#'+this.idE).innerHeight(), 1, 1000);
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize($('#'+this.idE).innerWidth(),$('#'+this.idE).innerHeight());
+        renderer.setClearColor( '#111111', 1);
+         
+        $('#'+this.idE).html(renderer.domElement);
+ 
+        function createBox(pos){ 
+          var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+          var material = new THREE.MeshBasicMaterial({ 
+            color: app.rndColor()
+          }); 
+          var mesh = new THREE.Mesh( geometry, material ); 
+          mesh.position.x = pos.x;
+          mesh.position.y = pos.y;
+          mesh.position.z = 0; 
+          return mesh;  
+        }
+        var radioWH = 50;
+        var l = 2*radioWH-1;
+
+        for(var i=0; i<l; i++) {
+          app.matrix[i] = new Array(l);
+        } 
+        var group = new THREE.Group();
+        for(var x=-radioWH+1; x<radioWH; x++){ 
+          for(var y=-radioWH+1; y<radioWH; y++){ 
+            var box = createBox({
+              x: x,
+              y: y
+            });
+            app.matrix[radioWH-1+x][radioWH-1+y]={
+              alive: 1,
+              box: box
+            }
+            group.add(box);
+          } 
+        }   
+
+        scene.add(group); 
+           
+        camera.position.set( 0, 0, l+l/10); 
+        renderer.render( scene, camera );  
+ 
+        $(window).on('resize',function resize(){  
+          window.location.reload();  
+        });  
+
+        function changeColorBoxMatrix(){
+          var len = app.matrix.length;  
+          for(var x=0; x<len; x++){
+            for(var y=0; y<len; y++){ 
+              app.matrix[x][y].box.material.color.set(app.rndColor());
+            }
+          }
+          renderer.render( scene, camera );  
+        }  
+
+        changeColorBoxMatrix();
+
+        var msInterval=100;
+        var step = 50;
+        var inter = setInterval(function(){
+          changeColorBoxMatrix();
+        },msInterval);
+        setTimeout(function(){
+          clearInterval(inter);
+        },step*msInterval);
+
+        console.log('app exe end');
+      }
+	  }
+    app.exe();
+	</script>
+	<noscript>JAVASCRIPT NOT WORKING!</noscript>
+  </body>
+</html>
