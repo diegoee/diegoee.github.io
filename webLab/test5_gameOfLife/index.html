@@ -73,7 +73,11 @@
       z-index: 1; 
       font-size: 1em;  
       border-radius: 5px;
-      opacity: 0;
+      opacity: 1;
+      transition: 0.25s;
+		}
+    #display:hover{  
+      opacity: 0.25;
 		}
 	</style>
   </head>
@@ -111,7 +115,7 @@
         } 
         $('#display').html('<div>Pob: '+pob+'</div><div>N iter.: '+this.nIter+'</div>');
         $('#display').css({
-          opacity: 1
+          //opacity: 1
         });
       },
       nIter: 0,
@@ -169,7 +173,7 @@
         });  
 
         function rndAlive(){
-          var n = 1;
+          var n = 2;
           var len = app.matrix.length;  
           for(var x=0; x<len; x++){
             for(var y=0; y<len; y++){ 
@@ -189,8 +193,7 @@
                 app.matrix[x][y].box.material.color.set(app.deadColor);
               }
             }
-          }
-          renderer.render( scene, camera ); 
+          } 
           app.updateDisplay(); 
         }   
 
@@ -248,30 +251,32 @@
               }
             }
           }
-          app.nIter++;
         }
+
+        app.nIter=0;
+        var exe = false;
+        function loopAnimate(){ 
+          if(exe){
+            renderer.render(scene, camera);
+            deadOrAlive(); 
+            changeColorBoxMatrix();
+            app.nIter++;
+            requestAnimationFrame(loopAnimate);
+          }
+        } 
          
-        setTimeout(function(){
-          rndAlive();
-          changeColorBoxMatrix();
-          var msInterval=50; 
-          var exe = true;
-          var inter = undefined; 
+        setTimeout(function(){ 
+          rndAlive();  
+          renderer.render(scene, camera);
           $e.on('click',function(){ 
-            console.log('click run-> '+exe);
-            deadOrAlive();
-            clearInterval(inter);
+            console.log('click run-> '+exe); 
             if(exe){
-              exe=false;
-              inter = setInterval(function(){
-                deadOrAlive();
-                changeColorBoxMatrix(); 
-              },msInterval); 
+              exe=false; 
             }else{ 
               exe=true; 
-              rndAlive();  
-            } 
-            changeColorBoxMatrix();
+              rndAlive(); 
+              loopAnimate(); 
+            }  
           });
           $('#loading').remove(); 
         },1000); 
