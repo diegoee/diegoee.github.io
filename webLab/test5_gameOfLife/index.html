@@ -101,22 +101,9 @@
           color=color+values[this.getRndN(0,values.length-1)];
         } 
         return color;
-      },  
-      matrix: [],
-      updateDisplay: function(){
-        var pob=0;
-        var len = app.matrix.length;  
-        for(var x=0; x<len; x++){
-          for(var y=0; y<len; y++){ 
-            if(app.matrix[x][y].alive){ 
-              pob++;
-            } 
-          }
-        } 
-        $('#display').html('<div>Pob: '+pob+'</div><div>N iter.: '+this.nIter+'</div>');
-        $('#display').css({
-          //opacity: 1
-        });
+      },   
+      updateDisplay: function(pob,n){
+        $('#display').html('<div>Pob: '+pob+'</div><div>N iter.: '+n+'</div>');
       },
       nIter: 0,
       exe: function(){  
@@ -125,7 +112,7 @@
         $e.html(' '); 
          
         var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera( 50, $e.innerWidth()/$e.innerHeight(), 1, 1000);
+        var camera = new THREE.PerspectiveCamera( 40, $e.innerWidth()/$e.innerHeight(), 1, 1000); 
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize($e.innerWidth(),$e.innerHeight());
         renderer.setClearColor( '#111111', 1);
@@ -146,8 +133,9 @@
         var radioWH = 75;
         var l = 2*radioWH-1;
 
+        var matrix = [];
         for(var i=0; i<l; i++) {
-          app.matrix[i] = new Array(l);
+          matrix[i] = new Array(l);
         } 
         var group = new THREE.Group();
         for(var x=-radioWH+1; x<radioWH; x++){ 
@@ -156,7 +144,7 @@
               x: x,
               y: y
             });
-            app.matrix[radioWH-1+x][radioWH-1+y]={
+            matrix[radioWH-1+x][radioWH-1+y]={
               alive: true,
               box: box
             } 
@@ -174,31 +162,41 @@
 
         function rndAlive(){
           var n = 2;
-          var len = app.matrix.length;  
+          var len = matrix.length;  
           for(var x=0; x<len; x++){
             for(var y=0; y<len; y++){ 
-              app.matrix[x][y].alive=(app.getRndN(0,n)===0);
+              matrix[x][y].alive=(app.getRndN(0,n)===0);
             }
           }           
           app.nIter=0;
         } 
 
         function changeColorBoxMatrix(){
-          var len = app.matrix.length;  
+          var len = matrix.length;  
           for(var x=0; x<len; x++){
             for(var y=0; y<len; y++){ 
-              if(app.matrix[x][y].alive){
-                app.matrix[x][y].box.material.color.set(app.rndColor());
+              if(matrix[x][y].alive){
+                matrix[x][y].box.material.color.set(app.rndColor());
               }else{ 
-                app.matrix[x][y].box.material.color.set(app.deadColor);
+                matrix[x][y].box.material.color.set(app.deadColor);
               }
             }
           } 
-          app.updateDisplay(); 
+          
+          var pob=0;
+          var len = matrix.length;  
+          for(var x=0; x<len; x++){
+            for(var y=0; y<len; y++){ 
+              if(matrix[x][y].alive){ 
+                pob++;
+              } 
+            }
+          } 
+          app.updateDisplay(pob,app.nIter); 
         }   
 
         function deadOrAlive(){
-          var len = app.matrix.length;  
+          var len = matrix.length;  
           var mtx = [];
           for(var i=0; i<len; i++) {
             mtx[i] = new Array(len);
@@ -213,7 +211,7 @@
                   xx=(xx>len-1?0:xx);
                   var yy=(y+neighbor[ii]<0?len-1:y+neighbor[ii]);
                   yy=(yy>len-1?0:yy); 
-                  if(app.matrix[xx][yy].alive){ 
+                  if(matrix[xx][yy].alive){ 
                     c++;
                   }
                 }
@@ -227,7 +225,7 @@
               mtx[x][y]=false;
               var c = 0;
               //Una célula viva con 2 o 3 células vecinas vivas sigue viva, en otro caso muere (por "soledad" o "superpoblación").
-              if(app.matrix[x][y].alive){  
+              if(matrix[x][y].alive){  
                 c = countAlive(x,y);  
                 if(c===2||c===3){
                   mtx[x][y]=true;
@@ -243,11 +241,11 @@
           }  
           for(var x=0; x<len; x++){
             for(var y=0; y<len; y++){
-              app.matrix[x][y].alive=mtx[x][y];
+              matrix[x][y].alive=mtx[x][y];
               //Regla inventada: viva expontanea. probabilidad de 1/n
-              if(!app.matrix[x][y].alive){
+              if(!matrix[x][y].alive){
                 var n = 10000;
-                app.matrix[x][y].alive=(app.getRndN(0,n)===0);
+                matrix[x][y].alive=(app.getRndN(0,n)===0);
               }
             }
           }
@@ -265,22 +263,23 @@
           }
         } 
          
-        setTimeout(function(){ 
-          rndAlive();  
-          renderer.render(scene, camera);
-          $e.on('click',function(){ 
-            console.log('click run-> '+exe); 
-            if(exe){
-              exe=false; 
-            }else{ 
-              exe=true; 
-              rndAlive(); 
-              loopAnimate(); 
-            }  
-          });
-          $('#loading').remove(); 
-        },1000); 
- 
+        $e.on('click',function(){ 
+          console.log('click run-> '+exe); 
+          if(exe){
+            exe=false; 
+          }else{ 
+            exe=true; 
+            rndAlive(); 
+            loopAnimate(); 
+          }  
+        });
+
+        $(window).on('load',function(){ 
+          setTimeout(function(){  
+            $('#loading').remove(); 
+          },3000); 
+        }); 
+
         console.log('app exe end');
       }
 	  }
