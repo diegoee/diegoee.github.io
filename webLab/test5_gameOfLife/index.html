@@ -101,7 +101,7 @@
 	<div id="canvas"></div>  
 	<button id="load"> relaod</button>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
-  <script type="text/javascript" src="https://threejs.org/build/three.js"></script> 
+  <script type="text/javascript" src="https://threejs.org/build/three.js"></script>  
 	<script type="text/javascript"> 
 	  var app = {
       loadE: '<div id="loading"><div class="spinner"></div></div>', 
@@ -140,7 +140,7 @@
         renderer.setSize($e.innerWidth(),$e.innerHeight());
         renderer.setClearColor( '#111111', 1);
          
-        $e.html(renderer.domElement);
+        $e.html(renderer.domElement);  
 
         function createBox(pos){ 
           var geometry = new THREE.PlaneGeometry( 1, 1);
@@ -279,7 +279,7 @@
             renderer.render(scene, camera);
             deadOrAlive(); 
             changeColorBoxMatrix();
-            app.nIter++;
+            app.nIter++; 
             requestAnimationFrame(loopAnimate);
           }
         } 
