@@ -71,7 +71,7 @@
 			background-color: #DDD;
       color: #333;
       z-index: 1; 
-      font-size: 1em;  
+      font-size: 1.5em;  
       border-radius: 5px;
       opacity: 1;
       transition: 0.25s;
@@ -79,17 +79,39 @@
     #display:hover{  
       opacity: 0.25;
 		}
+    #load{
+      display: none;
+      padding: 5px;
+      margin: 2px;
+      position: absolute;
+      bottom: 0;
+      right: 0; 
+			background-color: #DDD;
+      color: #333;
+      z-index: 1; 
+      font-size: 2em;  
+      border-radius: 5px;
+      opacity: 1;
+      transition: 0.25s;
+		}  
 	</style>
   </head>
   <body>    
-	<div id="canvas" ></div> 
-	<div id="loading"><div class="spinner"></div></div>
-	<div id="display"></div>
+  <div id="display"></div>
+	<div id="canvas"></div>  
+	<button id="load"> relaod</button>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
   <script type="text/javascript" src="https://threejs.org/build/three.js"></script> 
 	<script type="text/javascript"> 
-	  var app = { 
-      idE: 'canvas',
+	  var app = {
+      loadE: '<div id="loading"><div class="spinner"></div></div>', 
+      loadOn: function(){
+        app.loadOff();
+        $('body').append(app.loadE);
+      },
+      loadOff: function(){   
+        $('#loading').remove(); 
+      },
       getRndN: function (nstart,nEnd){
         return Math.round(Math.random()*nEnd)+nstart;
       },
@@ -104,11 +126,12 @@
       },   
       updateDisplay: function(pob,n){
         $('#display').html('<div>Pob: '+pob+'</div><div>N iter.: '+n+'</div>');
-      },
+      }, 
       nIter: 0,
       exe: function(){  
         console.log('app exe ini');
-        $e=$('#'+this.idE);
+        app.loadOn();
+        $e=$('#canvas');
         $e.html(' '); 
          
         var scene = new THREE.Scene();
@@ -120,9 +143,10 @@
         $e.html(renderer.domElement);
 
         function createBox(pos){ 
-          var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+          var geometry = new THREE.PlaneGeometry( 1, 1);
           var material = new THREE.MeshBasicMaterial({ 
-            color: app.rndColor()
+            color: app.rndColor(), 
+            side: THREE.DoubleSide
           }); 
           var mesh = new THREE.Mesh( geometry, material ); 
           mesh.position.x = pos.x;
@@ -131,6 +155,7 @@
           return mesh;  
         }
         var radioWH = 75;
+        //radioWH = 3;
         var l = 2*radioWH-1;
 
         var matrix = [];
@@ -156,10 +181,6 @@
         camera.position.set( 0, 0, l+l/10); 
         renderer.render( scene, camera );  
  
-        $(window).on('resize',function resize(){  
-          window.location.reload();  
-        });  
-
         function rndAlive(){
           var n = 2;
           var len = matrix.length;  
@@ -275,10 +296,21 @@
         });
 
         $(window).on('load',function(){ 
-          setTimeout(function(){  
-            $('#loading').remove(); 
+          setTimeout(function(){   
+            app.loadOff();
           },3000); 
+        });  
+        
+        $(window).on('resize',function(){  
+          $('#load').css({
+            display: 'flex'
+          });
         }); 
+        $('#load').on('click',function(){  
+          exe = false;
+          app.loadOn();
+          window.location.reload();  
+        });  
 
         console.log('app exe end');
       }
