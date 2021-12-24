@@ -141,11 +141,8 @@
         var canvas = document.getElementById('canvas');  
         paper.setup(canvas);  
         
-        var s = 10; 
-        
-        //w = 50;
-        //h = 30;
-         
+        var s = 10;  
+
         var pos = [];
         var i = 0;
         for(var x=0; x<h; x=x+s){ 
@@ -271,6 +268,7 @@
           }
         }
 
+        //TODO: Frame
         var exe = true;
         rndAlive();
         view.onFrame = function(event){ 
