@@ -117,7 +117,8 @@
       getRndN: function (nstart,nEnd){
         return Math.round(Math.random()*nEnd)+nstart;
       },
-      deadColor: '#000',
+      deadColor: '#333333',
+      aliveColor: '#DDDDDD',
       rndColor: function(){
         var color='#';
         var values = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
@@ -139,7 +140,7 @@
         var canvas = document.getElementById('canvas');  
         paper.setup(canvas);  
         
-        var s = 10;  
+        var s = 7;  
 
         var pos = [];
         var i = 0;
@@ -175,28 +176,32 @@
         } 
 
         function rndAlive(){
-          var n = 2;
+          var n = 1.25;
           var len = matrix.length;  
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){  
               matrix[x][y].alive=(app.getRndN(0,n)===0);
-            }
-          }           
-          app.nIter=0;
-        } 
-
-        function changeColorBoxMatrix(){
-          var len = matrix.length;  
-          for(var x=0; x<matrix.length; x++){ 
-            for(var y=0; y<matrix[0].length; y++){  
               if(matrix[x][y].alive){ 
                 matrix[x][y].cell.fillColor=app.rndColor();
               }else{ 
                 matrix[x][y].cell.fillColor='#333333';
               }
             }
-          } 
-          
+          }           
+          app.nIter=0;
+        }  
+        
+        function color(){ 
+          for(var x=0; x<matrix.length; x++){ 
+            for(var y=0; y<matrix[0].length; y++){  
+              if(matrix[x][y].alive){ 
+                matrix[x][y].cell.fillColor=app.rndColor();
+              } 
+            }
+          }  
+        }
+
+        function countPob(){
           var pob=0; 
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){  
@@ -234,6 +239,7 @@
             }       
             return c;
           }
+
           //https://es.wikipedia.org/wiki/Juego_de_la_vida    
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){  
@@ -253,14 +259,20 @@
                 }  
               }
             }
-          }  
+          } 
+
+          //Regla inventada: viva expontanea. probabilidad de 1/n
+          var n = 50000;
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){
               matrix[x][y].alive=mtx[x][y];
-              //Regla inventada: viva expontanea. probabilidad de 1/n
               if(!matrix[x][y].alive){
-                var n = 10000;
                 matrix[x][y].alive=(app.getRndN(0,n)===0);
+              }
+              if(matrix[x][y].alive){ 
+                matrix[x][y].cell.fillColor=app.aliveColor;
+              }else{ 
+                matrix[x][y].cell.fillColor=app.deadColor;
               }
             }
           }
@@ -269,13 +281,15 @@
         //TODO: Frame
         var exe = true;
         rndAlive();
-        view.onFrame = function(event){ 
+        view.onFrame = function(event){  
           if(exe){    
-            deadOrAlive(); 
-            var pob = changeColorBoxMatrix();
+            deadOrAlive();  
             app.nIter++;   
+            var pob = countPob();
             app.updateDisplay(pob,app.nIter); 
-          }  
+          }else{
+            color();
+          } 
         }
         paper.view.draw(); 
  
