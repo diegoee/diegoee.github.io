@@ -127,8 +127,8 @@
         } 
         return color;
       },   
-      updateDisplay: function(pob,n){
-        $('#display').html('<div>Pob: '+pob+'</div><div>N iter.: '+n+'</div>');
+      updateDisplay: function(html){
+        $('#display').html(html);
       }, 
       nIter: 0,
       exe: function(){
@@ -262,7 +262,7 @@
           } 
 
           //Regla inventada: viva expontanea. probabilidad de 1/n
-          var n = 50000;
+          var n = 75000;
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){
               matrix[x][y].alive=mtx[x][y];
@@ -282,13 +282,14 @@
         var exe = true;
         rndAlive();
         view.onFrame = function(event){  
+          var pob = countPob();
           if(exe){    
             deadOrAlive();  
-            app.nIter++;   
-            var pob = countPob();
-            app.updateDisplay(pob,app.nIter); 
+            app.nIter++;    
+            app.updateDisplay('<div>Time: '+Math.round(event.time)+' - Inc: '+Math.round(event.delta*100)/100+'</div><div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>'); 
           }else{
             color();
+            app.updateDisplay('<div>Time: '+Math.round(event.time)+' - Inc: '+Math.round(event.delta*100)/100+'</div><div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>'); 
           } 
         }
         paper.view.draw(); 
