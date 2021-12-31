@@ -157,21 +157,16 @@
         for(var i=0; i<pos.length; i++) {
           matrix[i] = new Array(pos[i].length);
         } 
-        
-        var group = new paper.Path();
+         
         for(var x=0; x<matrix.length; x++){ 
           for(var y=0; y<matrix[0].length; y++){ 
-            var cell = new paper.Path.Rectangle({
+            matrix[x][y] = new paper.Path.Rectangle({
               point: [pos[x][y][1],  pos[x][y][0]],
               size:  [s, s],
               strokeColor: '#444444',
               fillColor: '#333333',
-            });
-            matrix[x][y]={
-              alive: true,
-              cell: cell
-            } 
-            group.add(cell);
+              alive: true 
+            });  
           } 
         } 
 
@@ -182,9 +177,9 @@
             for(var y=0; y<matrix[0].length; y++){  
               matrix[x][y].alive=(app.getRndN(0,n)===0);
               if(matrix[x][y].alive){ 
-                matrix[x][y].cell.fillColor=app.rndColor();
+                matrix[x][y].fillColor=app.rndColor();
               }else{ 
-                matrix[x][y].cell.fillColor='#333333';
+                matrix[x][y].fillColor='#333333';
               }
             }
           }           
@@ -195,7 +190,7 @@
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){  
               if(matrix[x][y].alive){ 
-                matrix[x][y].cell.fillColor=app.rndColor();
+                matrix[x][y].fillColor=app.rndColor();
               } 
             }
           }  
@@ -270,9 +265,9 @@
                 matrix[x][y].alive=(app.getRndN(0,n)===0);
               }
               if(matrix[x][y].alive){ 
-                matrix[x][y].cell.fillColor=app.aliveColor;
+                matrix[x][y].fillColor=app.aliveColor;
               }else{ 
-                matrix[x][y].cell.fillColor=app.deadColor;
+                matrix[x][y].fillColor=app.deadColor;
               }
             }
           }
@@ -281,7 +276,7 @@
         //TODO: Frame
         var exe = true;
         rndAlive();
-        view.onFrame = function(event){  
+        view.on('frame',function(event){  
           var pob = countPob();
           if(exe){    
             deadOrAlive();  
@@ -291,18 +286,17 @@
             color();
             app.updateDisplay('<div>Time: '+Math.round(event.time)+' - Inc: '+Math.round(event.delta*100)/100+'</div><div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>'); 
           } 
-        }
-        paper.view.draw(); 
+        });
  
-        $('#canvas').on('click',function(){ 
-          console.log('click run-> '+exe); 
+        view.on('click',function(){ 
           if(exe){
             exe=false; 
           }else{ 
             rndAlive();
             exe=true;    
           }  
-        }); 
+          console.log('click run-> '+exe); 
+        });
 
         $(window).off('resize');
         $(window).on('resize',function(){  
