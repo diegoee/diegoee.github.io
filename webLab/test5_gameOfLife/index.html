@@ -103,8 +103,14 @@
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
   <script type="text/javascript" src="https://threejs.org/build/three.js"></script>  
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js"></script> 
 	<script type="text/javascript">  
     paper.install(window);
+
+    var stats = new Stats();
+    stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
+
 	  var app = {
       loadE: '<div id="loading"><div class="spinner"></div></div>', 
       loadOn: function(){
@@ -118,15 +124,7 @@
         return Math.round(Math.random()*nEnd)+nstart;
       },
       deadColor: '#333333',
-      aliveColor: '#DDDDDD',
-      rndColor: function(){
-        var color='#';
-        var values = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
-        for(var i=0; i<6; i++){ 
-          color=color+values[this.getRndN(0,values.length-1)];
-        } 
-        return color;
-      },   
+      aliveColor: '#DDDDDD', 
       updateDisplay: function(html){
         $('#display').html(html);
       }, 
@@ -140,7 +138,7 @@
         var canvas = document.getElementById('canvas');  
         paper.setup(canvas);  
         
-        var s = 7;  
+        var s = 15;  
 
         var pos = [];
         var i = 0;
@@ -165,7 +163,10 @@
               size:  [s, s],
               strokeColor: '#444444',
               fillColor: '#333333',
-              alive: true 
+              alive: true,
+              onClick: function(e){
+                this.alive=!this.alive;
+              } 
             });  
           } 
         } 
@@ -177,24 +178,15 @@
             for(var y=0; y<matrix[0].length; y++){  
               matrix[x][y].alive=(app.getRndN(0,n)===0);
               if(matrix[x][y].alive){ 
-                matrix[x][y].fillColor=app.rndColor();
+                matrix[x][y].fillColor=app.aliveColor;
               }else{ 
-                matrix[x][y].fillColor='#333333';
+                matrix[x][y].fillColor=app.deadColor;
               }
             }
           }           
           app.nIter=0;
         }  
-        
-        function color(){ 
-          for(var x=0; x<matrix.length; x++){ 
-            for(var y=0; y<matrix[0].length; y++){  
-              if(matrix[x][y].alive){ 
-                matrix[x][y].fillColor=app.rndColor();
-              } 
-            }
-          }  
-        }
+         
 
         function countPob(){
           var pob=0; 
@@ -274,29 +266,22 @@
         }
 
         //TODO: Frame
-        var exe = true;
+        var on = false;
         rndAlive();
         view.on('frame',function(event){  
-          var pob = countPob();
-          if(exe){    
+          stats.begin();  
+          if(on&&event.count%4===0){
+            var pob = countPob(); 
             deadOrAlive();  
             app.nIter++;    
-            app.updateDisplay('<div>Time: '+Math.round(event.time)+' - Inc: '+Math.round(event.delta*100)/100+'</div><div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>'); 
-          }else{
-            color();
-            app.updateDisplay('<div>Time: '+Math.round(event.time)+' - Inc: '+Math.round(event.delta*100)/100+'</div><div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>'); 
+            app.updateDisplay('<div>Time: '+Math.round(event.time)+' - Inc: '+Math.round(event.delta*100)/100+'</div><div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>');   
           } 
+          stats.end();
         });
  
-        view.on('click',function(){ 
-          if(exe){
-            exe=false; 
-          }else{ 
-            rndAlive();
-            exe=true;    
-          }  
-          console.log('click run-> '+exe); 
-        });
+        $(window).on('click',function(){  
+          on=true;
+        });  
 
         $(window).off('resize');
         $(window).on('resize',function(){  
@@ -306,8 +291,7 @@
         });  
 
         $('#load').off('click');
-        $('#load').on('click',function(){ 
-          exe = false;
+        $('#load').on('click',function(){  
           app.loadOn();
           window.location.reload();   
         });   
