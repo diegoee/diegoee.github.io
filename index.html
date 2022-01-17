@@ -210,8 +210,7 @@
         <div class="divDetail">
           <p>
             <a href="https://github.com/diegoee/androidDice" target="_blank">Dado (Dice)</a>.
-            <a href="https://play.google.com/store/apps/details?id=com.deeapp.dice" target="_blank">(Play Store)</a>
-            <a href="#" id="linkApp01">(Web version)</a>
+            <a href="https://play.google.com/store/apps/details?id=com.deeapp.dice" target="_blank">(Play Store)</a> 
           </p> 
         </div>
       </details>
@@ -379,38 +378,7 @@
           xhttp.open('GET','https://api.github.com/repos/diegoee/diegoee.github.io/git/trees/'+res+'?recursive=1', true);
           xhttp.send();
         };
-      })();
-      (function webapp(){  
-        document.getElementById('linkApp01').addEventListener('click', function(){  
-          var xhttp01 = new XMLHttpRequest();
-          xhttp01.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-              var res01 = this.responseText;
-              var res02 = undefined;
-              var xhttp02 = new XMLHttpRequest();
-              xhttp02.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                  res02 = this.responseText;
-                  res02 = res02.substr(169);  
-                  console.clear();
-                  res01=res01.replace('src="node_modules/jquery/dist/jquery.min.js"', 'src="https://code.jquery.com/jquery-3.2.1.min.js"');
-                  res01=res01.replace('src="node_modules/three/build/three.min.js"', 'src="https://threejs.org/build/three.js"'); 
-                  res01=res01.replace('<script src="dado.js">','<script type="text/javascript">'+res02);
-                  console.log(res01);
-                  var newWin = window.open('', '_blank');
-                  newWin.document.write(res01);
-                  newWin.document.close();
-                  newWin.focus();  
-                }
-              };
-              xhttp02.open('GET', 'https://raw.githubusercontent.com/diegoee/androidDice/main/app/src/main/assets/www/dado.js', true);
-              xhttp02.send();  
-            }
-          };
-          xhttp01.open('GET', 'https://raw.githubusercontent.com/diegoee/androidDice/main/app/src/main/assets/www/index.html', true);
-          xhttp01.send();
-        },false);  
-      })();
+      })(); 
     </script>
     <noscript>JAVASCRIPT NOT WORKING!</noscript>
   </body>
