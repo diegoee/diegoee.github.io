@@ -265,7 +265,6 @@
           }
         }
 
-        //TODO: Frame
         var on = false;
         rndAlive();
         view.on('frame',function(event){  
@@ -279,7 +278,7 @@
           stats.end();
         });
  
-        $(window).on('click',function(){  
+        view.on('click',function(){  
           on=true;
         });  
 

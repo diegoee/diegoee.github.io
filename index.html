@@ -126,13 +126,12 @@
           max-width: 900px
         }
       } 
-      #particles-js{ 
-        position: absolute; 
+      #canvas{  
         position: fixed;
         z-index: -1;
         opacity: 0.125;
         width: 100%;
-        height: 100%;
+        height: 100%;  
       } 
       #loading.loading{ 
         position: absolute;
@@ -196,10 +195,9 @@
       }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">  
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>   
   </head>
   <body>
-    <div id="particles-js"></div>
+    <canvas id="canvas"></canvas>
     <header id="header">
       <h1>Diego E.E. Github</h1> 
     </header>
@@ -232,113 +230,21 @@
       </div>
     </footer>  
     <script>
-      (function app(){        
-        var setUp = {
-          "particles": {
-            "number": {
-              "value": 50,
-              "density": {
-                "enable": true,
-                "value_area": 800
-              }
-            },
-            "color": {
-              "value": "#000000"
-            },
-            "shape": {
-              "type": "circle",
-              "stroke": {
-                "width": 0,
-                "color": "#000000"
-              },
-              "polygon": {
-                "nb_sides": 5
-              }, 
-            },
-            "opacity": {
-              "value": 1,
-              "random": false,
-              "anim": {
-                "enable": false,
-                "speed": 1,
-                "opacity_min": 0.1,
-                "sync": false
-              }
-            },
-            "size": {
-              "value": 3,
-              "random": true,
-              "anim": {
-                "enable": false,
-                "speed": 40,
-                "size_min": 0.1,
-                "sync": false
-              }
-            },
-            "line_linked": {
-              "enable": true,
-              "distance": 140,
-              "color": "#000000",
-              "opacity": 0.25,
-              "width": 0.95
-            },
-            "move": {
-              "enable": true,
-              "speed": 3,
-              "direction": "none",
-              "random": true,
-              "straight": false,
-              "out_mode": "out",
-              "bounce": false,
-              "attract": {
-                "enable": false,
-                "rotateX": 2405,
-                "rotateY": 2245
-              }
-            }
-          },
-          "interactivity": {
-            "detect_on": "window",
-            "events": {
-              "onhover": {
-                "enable": true,
-                "mode": "bubble"
-              },
-              "onclick": {
-                "enable": true,
-                "mode": "push"
-              },
-              "resize": true
-            },
-            "modes": {
-              "grab": {
-                "distance": 400,
-                "line_linked": {
-                  "opacity": 1
-                }
-              },
-              "bubble": {
-                "distance": 105,
-                "size": 20,
-                "duration": 0.8,
-                "opacity": 0.2,
-                "speed": 3
-              },
-              "repulse": {
-                "distance": 200,
-                "duration": 0.4
-              },
-              "push": {
-                "particles_nb": 4
-              },
-              "remove": {
-                "particles_nb": 2
-              }
-            }
-          },
-          "retina_detect": true
-        };
-        particlesJS('particles-js',setUp);          
+      (function canvas(){  
+        var canvas = document.getElementById('canvas');
+		    var c = canvas.getContext('2d'); 
+        canvas.width = innerWidth;
+        canvas.height = innerHeight; 
+		    var imageData = c.createImageData(canvas.width, canvas.height); 
+        function loop() { 
+          var l  = imageData.data.length;
+          for (var i = 0; i<l; i++) {
+              imageData.data[i] = (Math.random() * 255)|0;
+          } 
+          c.putImageData(imageData, 0, 0);
+          requestAnimationFrame(loop);            
+        }
+        loop();             
       })();
       (function getFolder(){
         Array.prototype.unique=function(a){
