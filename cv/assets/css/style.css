@@ -403,6 +403,9 @@ a.aNav:active{
 .mtop{
   margin-top: 2.5em;
 }
+.mbottom{
+  margin-bottom: 1.5em;
+}
 
 #education{
   page-break-before: always;

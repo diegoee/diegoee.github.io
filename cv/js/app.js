@@ -241,7 +241,7 @@ require([
       } 
       */ 
       
-      $e = $('#education h3')
+      $e = $('#education h3');
       for(i=0;i<$e.length;i++){
         var text = $($e[i]).text();
         $($e[i]).html('<b>'+text+'</b>');
@@ -256,6 +256,7 @@ require([
       $e = [];
       $e[0] = $('#portfolio h2');
       $e[0].addClass('mtop');
+      $e[0].addClass('mbottom'); 
       $('#portfolio').empty();
       $('#portfolio').append($e[0]);
       for(i=0;i<pos.length;i++){
