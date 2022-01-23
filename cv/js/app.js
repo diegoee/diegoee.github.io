@@ -3,14 +3,10 @@ require.config({
   baseUrl: 'js',
   paths: {
     jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min',
-    bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min',
-    slick: 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min'
+    bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min' 
   },
   shim: {
     bootstrap : {
-      deps : ['jquery']
-    }, 
-    slick : {
       deps : ['jquery']
     }  
   }
@@ -18,8 +14,7 @@ require.config({
 
 require([
   'jquery',
-  'bootstrap',
-  'slick'
+  'bootstrap'
   ],
   function(
     $
@@ -87,17 +82,6 @@ require([
 
         $('#language1').on('click',App.translate);
         $('#language2').on('click',App.translate);
-
-        $('.slick').slick({
-          dots: true,
-          infinite: true,
-          speed: 300, 
-          slidesToShow: 2,
-          centerMode: true,
-          variableWidth: true,
-          autoplay: true,
-          autoplaySpeed: 3000,
-        });
 
         App.exeTranslate = false;
         App.activeSpinner(false);
@@ -265,7 +249,8 @@ require([
 
       pos=[];
       for(i=0;i<$('.panel-heading').length;i++){
-        pos[i] = $($('.panel-heading')[i]).text();
+        pos[i] = '<p>'+$($('.panel-heading')[i]).text()+' ('+$($($('.panel-heading')[i]).find('a')[0]).attr('href')+')</p>';
+        console.log(pos[i]);
       }
 
       $e = [];
@@ -274,7 +259,7 @@ require([
       $('#portfolio').empty();
       $('#portfolio').append($e[0]);
       for(i=0;i<pos.length;i++){
-        $('#portfolio').append('<p>'+pos[i]+'<p>');
+        $('#portfolio').append(pos[i]);
       }
       
       $('#other div.col-sm-2').addClass('col-xs-2');

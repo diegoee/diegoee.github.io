@@ -116,6 +116,10 @@ article h4 {
     border-top-right-radius: 0px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
+    min-height: 125px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .panel-footer {
     background-color: white !important;
@@ -131,6 +135,9 @@ article h4 {
     margin: 15px 0;
     background-color: #555f66;
     color: #fff;
+}
+.panelPorfolio{
+  min-height: 300px;
 }
 .navbar {
     margin-bottom: 0;
@@ -415,7 +422,7 @@ a.aNav:active{
     font-size: 1.25em;
   }
   #experience,#education,#portfolio,#other{
-    font-size: 0.85em;
+    font-size: 0.8em;
   }
   h2, #education h3, #education h4, p{
     margin: 0;
@@ -425,6 +432,9 @@ a.aNav:active{
     margin-top: 2em;
     padding: 0;
   } 
+  #experience{
+    font-size: 0.75em;
+  }
 }
 
 .slick-prev:before, .slick-next:before{
