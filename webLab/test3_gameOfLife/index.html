@@ -10,13 +10,12 @@
     html,body{ 
 			background-color: #333;
     } 
-		#canvas{
+		canvas{
       position: absolute;
       top: 0;
       left: 0; 
 			width: 100%;
 			height: 100%;
-			background-color: #000;
 		}
     #loading{
       position: absolute;
@@ -98,15 +97,12 @@
   </head>
   <body>    
   <div id="display"></div>
-	<canvas id="canvas"></canvas>  
+	<!--<canvas id="canvas"></canvas>-->  
 	<button id="load"> reload</button>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
-  <script type="text/javascript" src="https://threejs.org/build/three.js"></script>  
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js"></script> 
-	<script type="text/javascript">  
-    paper.install(window);
-
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js"></script>  
+  <script type="text/javascript" src="https://threejs.org/build/three.js"></script>     
+	<script type="text/javascript">   
     var stats = new Stats();
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild( stats.dom );
@@ -123,53 +119,74 @@
       getRndN: function (nstart,nEnd){
         return Math.round(Math.random()*nEnd)+nstart;
       },
-      deadColor: '#333333',
+      deadColor:  '#333333',
       aliveColor: '#DDDDDD', 
+      lineColor:  '#444444', 
       updateDisplay: function(html){
         $('#display').html(html);
       }, 
       nIter: 0,
       exe: function(){
         console.log('app exe ini');
-        app.loadOn(); 
-        var w = $('#canvas').innerWidth();
-        var h = $('#canvas').innerHeight();
-  
-        var canvas = document.getElementById('canvas');  
-        paper.setup(canvas);  
-        
-        var s = 15;  
+        app.loadOn();  
 
-        var pos = [];
-        var i = 0;
-        for(var x=0; x<h; x=x+s){ 
-          var a = []; 
-          for(var y=0; y<w; y=y+s){  
-            a.push([x,y]); 
-          }
-          pos.push(a);
-        }    
-        //console.log(pos.length+' - '+pos[0].length);
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+ 
+        var scene = new THREE.Scene();
+        //var camera = new THREE.PerspectiveCamera( 100, w/h, 1, 1000 );  
+			  var frustumSize = 100;
+				var aspect = w / h;
+				var camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 ); 
+        camera.position.z = 2;
         
-        var matrix = [];
-        for(var i=0; i<pos.length; i++) {
-          matrix[i] = new Array(pos[i].length);
-        } 
+        var dx = Math.round((1/2)*w/9.5);
+        var dy = Math.round((1/2)*h/9.5);
+        var s = 1; 
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );  
          
-        for(var x=0; x<matrix.length; x++){ 
-          for(var y=0; y<matrix[0].length; y++){ 
-            matrix[x][y] = new paper.Path.Rectangle({
-              point: [pos[x][y][1],  pos[x][y][0]],
-              size:  [s, s],
-              strokeColor: '#444444',
-              fillColor: '#333333',
-              alive: true,
-              onClick: function(e){
-                this.alive=!this.alive;
-              } 
-            });  
+        var matrix = [];
+        for(var i=0; i<2*dx; i++) {
+          matrix[i] = new Array(2*dy);
+        }
+ 
+        for(var x=0; x<2*dx; x++){ 
+          for(var y=0; y<2*dy; y++){  
+
+            //cube
+            group = new THREE.Group();
+            geometry = new THREE.BoxGeometry( s, s, 0.1);
+            material = new THREE.MeshBasicMaterial( { color: app.aliveColor} ); 
+            mesh = new THREE.Mesh( geometry, material );  
+            group.add( mesh ); 
+
+            //line black
+            material = new THREE.LineBasicMaterial( { color: app.lineColor } );
+            var points = [];         
+            //1 side
+            
+            points.push( new THREE.Vector3(  -0.5*s,  -0.5*s,  0.051)); //x, y, z
+            points.push( new THREE.Vector3(  -0.5*s,   0.5*s,  0.051)); 
+            points.push( new THREE.Vector3(   0.5*s,   0.5*s,  0.051)); 
+            points.push( new THREE.Vector3(   0.5*s,  -0.5*s,  0.051));
+            points.push( new THREE.Vector3(  -0.5*s,  -0.5*s,  0.051));
+            geometry = new THREE.BufferGeometry().setFromPoints( points );
+            mesh = new THREE.Line( geometry, material );   
+            group.add( mesh );   
+ 
+            group.alive=false;  
+            group.position.x = s*(x-dx);
+            group.position.y = s*(y-dy);
+            matrix[x][y] = group; 
+            scene.add( group );  
+             
+            //ON CLCIK!!!
+            //this.alive=!this.alive; 
           } 
-        } 
+        }
 
         function rndAlive(){
           var n = 1.25;
@@ -177,16 +194,15 @@
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){  
               matrix[x][y].alive=(app.getRndN(0,n)===0);
-              if(matrix[x][y].alive){ 
-                matrix[x][y].fillColor=app.aliveColor;
+              if(matrix[x][y].alive){  
+                matrix[x][y].children[0].material.color=new THREE.Color(app.aliveColor);
               }else{ 
-                matrix[x][y].fillColor=app.deadColor;
+                matrix[x][y].children[0].material.color=new THREE.Color(app.deadColor);
               }
             }
           }           
           app.nIter=0;
-        }  
-         
+        }   
 
         function countPob(){
           var pob=0; 
@@ -202,8 +218,8 @@
 
         function deadOrAlive(){   
           var mtx = [];
-          var lenx = pos.length;
-          var leny = pos[0].length; 
+          var lenx = 2*dx;
+          var leny = 2*dy; 
           for(var i=0; i<lenx; i++) {
             mtx[i] = new Array(leny);
           }
@@ -246,9 +262,9 @@
                 }  
               }
             }
-          } 
-
-          //Regla inventada: viva expontanea. probabilidad de 1/n
+          }
+    
+            //Regla inventada: viva expontanea. probabilidad de 1/n
           var n = 75000;
           for(var x=0; x<matrix.length; x++){ 
             for(var y=0; y<matrix[0].length; y++){
@@ -256,31 +272,38 @@
               if(!matrix[x][y].alive){
                 matrix[x][y].alive=(app.getRndN(0,n)===0);
               }
-              if(matrix[x][y].alive){ 
-                matrix[x][y].fillColor=app.aliveColor;
+              if(matrix[x][y].alive){  
+                matrix[x][y].children[0].material.color=new THREE.Color(app.aliveColor);
               }else{ 
-                matrix[x][y].fillColor=app.deadColor;
+                matrix[x][y].children[0].material.color=new THREE.Color(app.deadColor);
               }
             }
           }
         }
 
-        var on = false;
-        rndAlive();
-        view.on('frame',function(event){  
-          stats.begin();  
-          if(on&&event.count%4===0){
-            var pob = countPob(); 
-            deadOrAlive();  
-            app.nIter++;    
-            app.updateDisplay('<div>Time: '+Math.round(event.time)+' - Inc: '+Math.round(event.delta*100)/100+'</div><div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>');   
-          } 
-          stats.end();
+        var pointer = new THREE.Vector2();
+				var raycaster = new THREE.Raycaster(); 
+
+        var on = false;  
+        $('canvas').on('click',function(event){  
+          if(!on){
+            on=true; 
+          }else{ 
+            pointer.x =   ( event.clientX / w ) * 2 - 1;
+            pointer.y = - ( event.clientY / h ) * 2 + 1;
+            raycaster.setFromCamera( pointer, camera ); 
+            var intersects = raycaster.intersectObjects(scene.children);   
+            if(intersects.length>0){ 
+              intersects[0].object.parent.alive=!intersects[0].object.parent.alive;
+              if(intersects[0].object.parent.alive){  
+                intersects[0].object.parent.children[0].material.color=new THREE.Color(app.aliveColor);
+              }else{ 
+                intersects[0].object.parent.children[0].material.color=new THREE.Color(app.deadColor);
+              } 
+            }
+          }
         });
- 
-        view.on('click',function(){  
-          on=true;
-        });  
+
 
         $(window).off('resize');
         $(window).on('resize',function(){  
@@ -293,7 +316,27 @@
         $('#load').on('click',function(){  
           app.loadOn();
           window.location.reload();   
-        });   
+        });    
+         
+        function render() { 
+          var pob = countPob(); 
+          deadOrAlive();  
+          app.nIter++;    
+          app.updateDisplay('<div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>');  
+          renderer.render( scene, camera );   
+        }; 
+   
+        function animate() {
+          requestAnimationFrame( animate );
+          if(on){ 
+            render(); 
+          } 
+          stats.update();
+        }; 
+
+        rndAlive();
+        render();
+        animate(); 
  
         app.loadOff();
         console.log('app exe end'); 
