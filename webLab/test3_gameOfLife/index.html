@@ -138,10 +138,12 @@
 			  var frustumSize = 100;
 				var aspect = w / h;
 				var camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 ); 
-        camera.position.z = 2;
+        camera.position.z = 20;
+        camera.aspect=aspect;
+        camera.updateProjectionMatrix();
         
-        var dx = Math.round((1/2)*w/9.5);
-        var dy = Math.round((1/2)*h/9.5);
+        var dx = Math.floor(w/20);
+        var dy = Math.floor(h/20);
         var s = 1; 
 
         var renderer = new THREE.WebGLRenderer();
