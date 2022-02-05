@@ -398,7 +398,8 @@
         },
         exeApp: function(){
           web.syncAppValue();   
-          web.resetPlayBtn();      
+          web.resetPlayBtn();  
+          web.resetLoopBtn();      
           app.init(function clickFn(noteText){ 
             web.toast(noteText);             
           },function endFn(){ 
