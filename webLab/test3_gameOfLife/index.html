@@ -29,10 +29,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.5s ease-out;
-      animation-name: ani;
-      animation-duration: 4s;
-      animation-iteration-count: infinite; 
+      transition: all 0.5s ease-out; 
 		}
     .spinner {
       width: 140px;
@@ -86,22 +83,77 @@
       right: 0; 
 			background-color: #DDD;
       color: #333;
-      z-index: 1; 
+      z-index: 2; 
       font-size: 2em;  
       border-radius: 5px;
       opacity: 1;
       transition: 0.25s;
       cursor: pointer;
 		}  
+    
+    #start{   
+      position: absolute;
+      top: 0;
+      left: 0; 
+			width: 100%;
+			height: 100%;
+      color: #DDD;
+			background-color: rgba(33, 33, 33, 0.85);
+      z-index: 1; 
+      font-size: 3em; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease-out;
+      cursor: pointer; 
+		} 
+    #start svg{
+      transition: all 0.25s ease-out;
+      animation-name: ani;
+      animation-duration: 1s;
+      animation-iteration-count: infinite; 
+    }
+    @-webkit-keyframes ani {
+      0% { 
+        -webkit-transform: scale(0.85) 
+      }
+      50% {
+        -webkit-transform: scale(1.0); 
+      }
+      100% {
+        -webkit-transform: scale(0.85); 
+      }
+    } 
+    @keyframes ani {
+      0% { 
+        -webkit-transform: scale(0.85);
+        transform: scale(0.85);
+      }  
+      50% {
+        -webkit-transform: scale(1.0);
+        transform: scale(1.0); 
+      }
+      100% {
+        -webkit-transform: scale(0.85);
+        transform: scale(0.85);
+      }
+    }
 	</style>
   </head>
   <body>    
-  <div id="display"></div>
-	<!--<canvas id="canvas"></canvas>-->  
+  <div id="display"></div>  
 	<button id="load"> reload</button>
+	<div id="start">
+    <svg height="100" width="100">
+      <polygon 
+        points="0,0 0,100 100,50" 
+        style="fill:#DDD;" 
+      />
+    </svg>
+  </div>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js"></script>  
-  <script type="text/javascript" src="https://threejs.org/build/three.js"></script>     
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js"></script>   
+  <script type="text/javascript"  src="https://pixijs.download/release/pixi.js"></script>           
 	<script type="text/javascript">   
     var stats = new Stats();
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -119,9 +171,9 @@
       getRndN: function (nstart,nEnd){
         return Math.round(Math.random()*nEnd)+nstart;
       },
-      deadColor:  '#333333',
-      aliveColor: '#DDDDDD', 
-      lineColor:  '#444444', 
+      deadColor:  0x333333,
+      aliveColor: 0xDDDDDD, 
+      lineColor:  0x444444, 
       updateDisplay: function(html){
         $('#display').html(html);
       }, 
@@ -132,80 +184,82 @@
 
         var w = window.innerWidth;
         var h = window.innerHeight;
- 
-        var scene = new THREE.Scene();
-        //var camera = new THREE.PerspectiveCamera( 100, w/h, 1, 1000 );  
-			  var frustumSize = 100;
-				var aspect = w / h;
-				var camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 ); 
-        camera.position.z = 20;
-        camera.aspect=aspect;
-        camera.updateProjectionMatrix();
-        
-        var dx = Math.floor(w/20);
-        var dy = Math.floor(h/20);
-        var s = 1; 
 
-        var renderer = new THREE.WebGLRenderer();
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        document.body.appendChild( renderer.domElement );  
-         
+        var pixiApp = new PIXI.Application({
+          width: w, 
+          height: h, 
+          backgroundColor: 0x333333, 
+          resolution: window.devicePixelRatio || 1,
+          antialias: true
+        });
+        document.body.appendChild(pixiApp.view); 
+
+        var wR = 12;
+        var hR = 12;
+        var dx = Math.ceil(w/wR);
+        var dy = Math.ceil(h/hR);
         var matrix = [];
-        for(var i=0; i<2*dx; i++) {
-          matrix[i] = new Array(2*dy);
-        }
+        for(var i=0; i<dx; i++) {
+          matrix[i] = new Array(dy);
+        } 
  
-        for(var x=0; x<2*dx; x++){ 
-          for(var y=0; y<2*dy; y++){  
+        for(var x=0; x<matrix.length; x++){ 
+          for(var y=0; y<matrix[0].length; y++){  
 
-            //cube
-            group = new THREE.Group();
-            geometry = new THREE.BoxGeometry( s, s, 0.1);
-            material = new THREE.MeshBasicMaterial( { color: app.aliveColor} ); 
-            mesh = new THREE.Mesh( geometry, material );  
-            group.add( mesh ); 
-
-            //line black
-            material = new THREE.LineBasicMaterial( { color: app.lineColor } );
-            var points = [];         
-            //1 side
-            
-            points.push( new THREE.Vector3(  -0.5*s,  -0.5*s,  0.051)); //x, y, z
-            points.push( new THREE.Vector3(  -0.5*s,   0.5*s,  0.051)); 
-            points.push( new THREE.Vector3(   0.5*s,   0.5*s,  0.051)); 
-            points.push( new THREE.Vector3(   0.5*s,  -0.5*s,  0.051));
-            points.push( new THREE.Vector3(  -0.5*s,  -0.5*s,  0.051));
-            geometry = new THREE.BufferGeometry().setFromPoints( points );
-            mesh = new THREE.Line( geometry, material );   
-            group.add( mesh );   
- 
-            group.alive=false;  
-            group.position.x = s*(x-dx);
-            group.position.y = s*(y-dy);
-            matrix[x][y] = group; 
-            scene.add( group );  
-             
-            //ON CLCIK!!!
-            //this.alive=!this.alive; 
-          } 
-        }
-
-        function rndAlive(){
-          var n = 1.25;
-          var len = matrix.length;  
-          for(var x=0; x<matrix.length; x++){ 
-            for(var y=0; y<matrix[0].length; y++){  
-              matrix[x][y].alive=(app.getRndN(0,n)===0);
-              if(matrix[x][y].alive){  
-                matrix[x][y].children[0].material.color=new THREE.Color(app.aliveColor);
+            var container = new PIXI.Container();
+            container.alive=false
+            container.interactive = true;
+            function callBackClick(ev){
+              this.alive=!this.alive; 
+              if(this.alive){  
+                this.children[0].visible=false;
+                this.children[1].visible=true;
               }else{ 
-                matrix[x][y].children[0].material.color=new THREE.Color(app.deadColor);
-              }
-            }
-          }           
-          app.nIter=0;
+                this.children[0].visible=true;
+                this.children[1].visible=false;
+              } 
+            } 
+            container.on('pointerdown',callBackClick); 
+            pixiApp.stage.addChild(container);
+
+            var graphics = undefined;
+            // Rectangle + line style 1
+            graphics = new PIXI.Graphics();   
+            graphics.lineStyle(1, app.lineColor, 1);
+            graphics.beginFill(app.deadColor);
+            graphics.drawRect(x*wR, y*hR, wR, hR);
+            graphics.endFill();  
+            container.addChild(graphics); 
+
+            graphics = new PIXI.Graphics();   
+            graphics.lineStyle(1, app.lineColor, 1);
+            graphics.beginFill(app.aliveColor);
+            graphics.drawRect(x*wR, y*hR, wR, hR);
+            graphics.endFill(); 
+            container.addChild(graphics); 
+
+            matrix[x][y]=container;   
+          } 
         }   
 
+        function rndAlive(){
+          var n = 1.25;  
+          for(var x=0; x<matrix.length; x++){ 
+            for(var y=0; y<matrix[0].length; y++){  
+              matrix[x][y].alive=(app.getRndN(0,n)===0);  
+              if(matrix[x][y].alive){  
+                matrix[x][y].children[0].visible=false;
+                matrix[x][y].children[1].visible=true;
+              }else{ 
+                matrix[x][y].children[0].visible=true;
+                matrix[x][y].children[1].visible=false;
+              }   
+            }
+          }           
+          app.nIter=0; 
+        }
+        rndAlive();
+ 
         function countPob(){
           var pob=0; 
           for(var x=0; x<matrix.length; x++){ 
@@ -217,11 +271,11 @@
           } 
           return pob; 
         }
-
+ 
         function deadOrAlive(){   
           var mtx = [];
-          var lenx = 2*dx;
-          var leny = 2*dy; 
+          var lenx = matrix.length;
+          var leny = matrix[0].length; 
           for(var i=0; i<lenx; i++) {
             mtx[i] = new Array(leny);
           }
@@ -246,8 +300,8 @@
           }
 
           //https://es.wikipedia.org/wiki/Juego_de_la_vida    
-          for(var x=0; x<matrix.length; x++){ 
-            for(var y=0; y<matrix[0].length; y++){  
+          for(var x=0; x<lenx; x++){ 
+            for(var y=0; y<leny; y++){  
               mtx[x][y]=false;
               var c = 0;
               //Una célula viva con 2 o 3 células vecinas vivas sigue viva, en otro caso muere (por "soledad" o "superpoblación").
@@ -266,44 +320,29 @@
             }
           }
     
-            //Regla inventada: viva expontanea. probabilidad de 1/n
+          //Regla inventada: viva expontanea. probabilidad de 1/n
           var n = 75000;
-          for(var x=0; x<matrix.length; x++){ 
-            for(var y=0; y<matrix[0].length; y++){
+          for(var x=0; x<lenx; x++){ 
+            for(var y=0; y<leny; y++){
               matrix[x][y].alive=mtx[x][y];
               if(!matrix[x][y].alive){
                 matrix[x][y].alive=(app.getRndN(0,n)===0);
               }
               if(matrix[x][y].alive){  
-                matrix[x][y].children[0].material.color=new THREE.Color(app.aliveColor);
+                matrix[x][y].children[0].visible=false;
+                matrix[x][y].children[1].visible=true;
               }else{ 
-                matrix[x][y].children[0].material.color=new THREE.Color(app.deadColor);
+                matrix[x][y].children[0].visible=true;
+                matrix[x][y].children[1].visible=false;
               }
             }
           }
-        }
-
-        var pointer = new THREE.Vector2();
-				var raycaster = new THREE.Raycaster(); 
+        } 
 
         var on = false;  
-        $('canvas').on('click',function(event){  
-          if(!on){
-            on=true; 
-          }else{ 
-            pointer.x =   ( event.clientX / w ) * 2 - 1;
-            pointer.y = - ( event.clientY / h ) * 2 + 1;
-            raycaster.setFromCamera( pointer, camera ); 
-            var intersects = raycaster.intersectObjects(scene.children);   
-            if(intersects.length>0){ 
-              intersects[0].object.parent.alive=!intersects[0].object.parent.alive;
-              if(intersects[0].object.parent.alive){  
-                intersects[0].object.parent.children[0].material.color=new THREE.Color(app.aliveColor);
-              }else{ 
-                intersects[0].object.parent.children[0].material.color=new THREE.Color(app.deadColor);
-              } 
-            }
-          }
+        $('#start').on('click',function(event){ 
+          on=true; 
+          $(this).remove();
         });
 
 
@@ -318,28 +357,18 @@
         $('#load').on('click',function(){  
           app.loadOn();
           window.location.reload();   
-        });    
+        });   
          
-        function render() { 
+        pixiApp.ticker.add(function(){
           var pob = countPob(); 
-          deadOrAlive();  
-          app.nIter++;    
-          app.updateDisplay('<div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>');  
-          renderer.render( scene, camera );   
-        }; 
-   
-        function animate() {
-          requestAnimationFrame( animate );
-          if(on){ 
-            render(); 
-          } 
+          if(on){
+            deadOrAlive();  
+            app.nIter++;    
+          }
+          app.updateDisplay('<div>N iter.: '+app.nIter+' - Pob: '+pob+'</div>');
           stats.update();
-        }; 
-
-        rndAlive();
-        render();
-        animate(); 
- 
+        });  
+        
         app.loadOff();
         console.log('app exe end'); 
       }
