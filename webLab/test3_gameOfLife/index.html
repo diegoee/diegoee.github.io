@@ -8,7 +8,13 @@
 	<title>Web Test3_gameOfLife</title>
 	<style> 
     html,body{ 
-			background-color: #333;
+			background-color: #333; 
+      -webkit-user-select: none;  
+      -khtml-user-select: none;  
+        -moz-user-select: none;  
+          -ms-user-select: none;  
+              user-select: none; 
+      -webkit-tap-highlight-color: transparent; 
     } 
 		canvas{
       position: absolute;
@@ -157,8 +163,7 @@
 	<script type="text/javascript">   
     var stats = new Stats();
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-    document.body.appendChild( stats.dom );
-
+    //$('body').append( stats.dom );
 	  var app = {
       loadE: '<div id="loading"><div class="spinner"></div></div>', 
       loadOn: function(){
@@ -358,7 +363,8 @@
           app.loadOn();
           window.location.reload();   
         });   
-         
+
+        pixiApp.ticker.maxFPS = 20;
         pixiApp.ticker.add(function(){
           var pob = countPob(); 
           if(on){
