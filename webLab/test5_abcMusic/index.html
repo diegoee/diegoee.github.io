@@ -188,12 +188,18 @@
       abc=abc+'M:C\n';
       abc=abc+'Q:126\n';
       abc=abc+'K:C\n'; 
-      abc=abc+'c4 A4|"E-6"E2E2E2E2|E2E2E2E2|E8|E8|\n';
-      abc=abc+'"A-6"A2A2A2A2|A2A2A2A2|A8|A8|\n';
-      abc=abc+'"E-6"E2E2E2E2|E2E2E2E2|E8|E2E2E2E2|\n'; 
-      abc=abc+'"G"G2G2G2G2|G2G2G2G2|"E-6"E2E2E2E2|E2E2E2E2|]\n'; 
+      abc=abc+'B1 B2 A1G1|"E-6"E2z2G1E1z2|z3B1 B2 A1G1|E2z2B,1^C1E1z1z2|z4z2^F1G1|\n';
+      abc=abc+'"A-6"A3z2_A1A2z2|z8|z8|z8|\n';
+      abc=abc+'"E-6"z8|z8|z8|z8|\n'; 
+      abc=abc+'"G"z8|z8|"E-6" B,1^C1D1_E1 z1E1z2|z2z1A1E2z2|]\n'; 
       abc=abc+' '; 
       //$('#inputText').val(abc);
+      setTimeout(function(){
+        //$('.abcjs-midi-start').trigger('click');
+      },2000);
+      setTimeout(function(){
+        //location.reload();
+      },30000);
     </script> 
   </body>
 </html>
