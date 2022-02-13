@@ -272,27 +272,24 @@
           render();  
           //console.log('visual exe end'); 
         } 
-      }
-      /*
-      //devOps 
+      } 
+      //devOps
+      /*   
       setTimeout(function(){
         console.log('change1');
-        $('#tempoBar').val('120');
+        $('#tempoBar').val('60');
         $('#tempoBar').trigger('change');
         setTimeout(function(){ 
         console.log('change2');
-          $('#rhythmSelect').val('r44_3');
+          $('#rhythmSelect').val('r54_2');
           $('#rhythmSelect').trigger('change'); 
           setTimeout(function(){  
             console.log('click'); 
             //$('#loopBtn').trigger('click'); 
-            $('#playBtn').trigger('click');
-            setTimeout(function(){
-              //location.reload();
-            },10000);
+            $('#playBtn').trigger('click'); 
           },1000);
         },1000);
-      },1000); 
+      },1000);  
       */
 
       //app
@@ -304,12 +301,12 @@
         synth: undefined,  
         rhythm: 'r01',
         rhythms:[ 
-          {id: 'r24_1', title:'2/4 - 1', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4A4|c4A4|c4A4|c4A4||', visual:{beatPulses:2,div:1,beats:[2,1]}},
-          {id: 'r24_2', title:'2/4 - 2', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nz4A4|z4A4|z4A4|z4A4||', visual:{beatPulses:2,div:1,beats:[0,1]}},
+          {id: 'r24_1', title:'2/4 - 1', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4 A4|c4 A4|c4 A4|c4 A4||', visual:{beatPulses:2,div:1,beats:[2,1]}},
+          {id: 'r24_2', title:'2/4 - 2', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nz4 A4|z4 A4|z4 A4|z4 A4||', visual:{beatPulses:2,div:1,beats:[0,1]}},
           {id: 'r24_3', title:'2/4 - 3', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z2A2|c4z2A2|c4z2A2|c4z2A2||', visual:{beatPulses:2,div:1,beats:[2,0,0,1]}},
           {id: 'r24_4', title:'2/4 - 4', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z2AA|c4z2AA|c4z2AA|c4z2AA||', visual:{beatPulses:2,div:1,beats:[2,0,0,0,0,0,1,1]}},
-          {id: 'r24_5', title:'2/4 - 5', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z3A|c4z3A|c4z3A|c4z3A||', visual:{beatPulses:2,div:1,beats:[2,0,0,0,0,0,0,1]}},
-          {id: 'r24_6', title:'2/4 - 6', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4A z2A|c4A z2A|c4A z2A|c4A z2A||', visual:{beatPulses:2,div:1,beats:[2,1,0,0,0,0,0,1]}},
+          {id: 'r24_5', title:'2/4 - 5', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z3A|c4z3A|c4z3A|c4z3A||', visual:{beatPulses:2,div:1,beats:[2,0,0,0,0,0,0,1]}}, 
+          {id: 'r24_6', title:'2/4 - 6', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc2 z2 Az Az|c2 z2 Az Az|c2 z2 Az Az|c2 z2 Az Az||', visual:{beatPulses:2,div:1,beats:[2,0,0,0,1,0,1,0]}}, 
           {id: 'r24_7', title:'2/4 - 7', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nz2 c2 z2 A2|z2 c2 z2 A2|z2 c2 z2 A2|z2 c2 z2 A2||', visual:{beatPulses:2,div:1,beats:[0,1,0,1]}},
           {id: 'r34_1', title:'3/4 - 1', abc1:'\nM:3/4\nQ:', abc2:'\nK:C\nc2A2A2|c2A2A2|c2A2A2|c2A2A2||', visual:{beatPulses:3,div:1,beats:[2,1,1]}},  
           {id: 'r44_1', title:'4/4 - 1', abc1:'\nM:4/4\nQ:', abc2:'\nK:C\nc2A2A2A2|c2A2A2A2|c2A2A2A2|c2A2A2A2||', visual:{beatPulses:4,div:1,beats:[2,1,1,1]}}, 
