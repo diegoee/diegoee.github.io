@@ -273,15 +273,15 @@
           //console.log('visual exe end'); 
         } 
       }
-      //devOps
       /*
+      //devOps 
       setTimeout(function(){
         console.log('change1');
-        $('#tempoBar').val('60');
+        $('#tempoBar').val('120');
         $('#tempoBar').trigger('change');
         setTimeout(function(){ 
         console.log('change2');
-          $('#rhythmSelect').val('r24_2');
+          $('#rhythmSelect').val('r44_3');
           $('#rhythmSelect').trigger('change'); 
           setTimeout(function(){  
             console.log('click'); 
@@ -293,7 +293,7 @@
           },1000);
         },1000);
       },1000); 
-      */  
+      */
 
       //app
       var app = {  
@@ -306,12 +306,18 @@
         rhythms:[ 
           {id: 'r24_1', title:'2/4 - 1', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4A4|c4A4|c4A4|c4A4||', visual:{beatPulses:2,div:1,beats:[2,1]}},
           {id: 'r24_2', title:'2/4 - 2', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nz4A4|z4A4|z4A4|z4A4||', visual:{beatPulses:2,div:1,beats:[0,1]}},
-          {id: 'r24_3', title:'2/4 - 3', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z2A2|nc4z2A2|nc4z2A2|nc4z2A2||', visual:{beatPulses:2,div:1,beats:[2,0,0,1]}},
-          {id: 'r24_4', title:'2/4 - 4', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z2AA|nc4z2AA|nc4z2AA|nc4z2AA||', visual:{beatPulses:2,div:1,beats:[2,0,0,0,0,0,1,1]}},
+          {id: 'r24_3', title:'2/4 - 3', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z2A2|c4z2A2|c4z2A2|c4z2A2||', visual:{beatPulses:2,div:1,beats:[2,0,0,1]}},
+          {id: 'r24_4', title:'2/4 - 4', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z2AA|c4z2AA|c4z2AA|c4z2AA||', visual:{beatPulses:2,div:1,beats:[2,0,0,0,0,0,1,1]}},
+          {id: 'r24_5', title:'2/4 - 5', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4z3A|c4z3A|c4z3A|c4z3A||', visual:{beatPulses:2,div:1,beats:[2,0,0,0,0,0,0,1]}},
+          {id: 'r24_6', title:'2/4 - 6', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nc4A z2A|c4A z2A|c4A z2A|c4A z2A||', visual:{beatPulses:2,div:1,beats:[2,1,0,0,0,0,0,1]}},
+          {id: 'r24_7', title:'2/4 - 7', abc1:'\nM:2/4\nQ:', abc2:'\nK:C\nz2 c2 z2 A2|z2 c2 z2 A2|z2 c2 z2 A2|z2 c2 z2 A2||', visual:{beatPulses:2,div:1,beats:[0,1,0,1]}},
           {id: 'r34_1', title:'3/4 - 1', abc1:'\nM:3/4\nQ:', abc2:'\nK:C\nc2A2A2|c2A2A2|c2A2A2|c2A2A2||', visual:{beatPulses:3,div:1,beats:[2,1,1]}},  
-          {id: 'r44_1', title:'4/4 - 1', abc1:'\nM:4/4\nQ:', abc2:'\nK:C\nc2A2A2A2|c2A2A2A2|c2A2A2A2|c2A2A2A2||', visual:{beatPulses:4,div:1,beats:[2,1,1,1]}},  
+          {id: 'r44_1', title:'4/4 - 1', abc1:'\nM:4/4\nQ:', abc2:'\nK:C\nc2A2A2A2|c2A2A2A2|c2A2A2A2|c2A2A2A2||', visual:{beatPulses:4,div:1,beats:[2,1,1,1]}}, 
+          {id: 'r44_2', title:'4/4 - 2', abc1:'\nM:4/4\nQ:', abc2:'\nK:C\nc2A2zAA2|c2A2zAA2|c2A2zAA2|c2A2zAA2||', visual:{beatPulses:4,div:1,beats:[2,0,1,0,0,1,1,0]}}, 
+          {id: 'r44_3', title:'4/4 - 3', abc1:'\nM:4/4\nQ:', abc2:'\nK:C\nc2A2ccA2|c2A2ccA2|c2A2ccA2|c2A2ccA2||', visual:{beatPulses:4,div:1,beats:[2,0,1,0,2,2,1,0]}},
           {id: 'r68_1', title:'6/8 - 1', abc1:'\nM:6/8\nQ:', abc2:'\nK:C\ncAA AAA|cAA AAA|cAA AAA|cAA AAA||', visual:{beatPulses:6,div:2,beats:[2,1,1,1,1,1]}},  
-          {id: 'r54_1', title:'5/4 - 1', abc1:'\nM:5/4\nQ:', abc2:'\nK:C\nc2A2A2A2A2|c2A2A2A2A2|c2A2A2A2A2|c2A2A2A2A2||', visual:{beatPulses:5,div:1,beats:[2,1,1,1,1]}},      
+          {id: 'r54_1', title:'5/4 - 1', abc1:'\nM:5/4\nQ:', abc2:'\nK:C\nc2A2A2A2A2|c2A2A2A2A2|c2A2A2A2A2|c2A2A2A2A2||', visual:{beatPulses:5,div:1,beats:[2,1,1,1,1]}}, 
+          {id: 'r54_2', title:'5/4 - 2', abc1:'\nM:5/4\nQ:', abc2:'\nK:C\nc3A3A2A2|c3A3A2A2|c3A3A2A2|c3A3A2A2||', visual:{beatPulses:5,div:1,beats:[2,0,0,1,0,0,1,0,1,0]}},     
         ], 
         translateNote: function(noteName,pitch,type){ 
           var notesPitchTranslator = [ 
