@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Test5_abcMusic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/abcjs-audio.css" />
+    <style>   
+      #version{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        left: 5px;
+        font-size: 0.75em;
+        z-index: 100;
+      }  
+      #control{
+        height: 40px;
+      }
+      .abcjs-inline-audio{
+        height: 40px;
+        padding: 0 10px;
+      }
+      .abcjs-inline-audio .abcjs-btn{ 
+        padding: 0px;
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+      .currentNote{
+        color: #2196F3;
+      }
+      @media print{
+        @page { 
+          size: A4 portrait;
+        } 
+        #version, #control, #menu, #text{  
+          display: none; 
+        }
+      }
+    </style>  
+  </head>
+  <body>
+    <div id="version"></div>
+    <nav id='menu' class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid"> 
+        <span class="navbar-brand">Abc music anotation </span>   
+        <ul class="nav justify-content-end"> 
+          <li class="nav-item"><button type="button" class="btn btn-outline-dark" id="btnPrint">Print <i class="fas fa-print"></i></button></li>   
+        </ul>
+      </div>
+    </nav> 
+    
+    <div id="control" class=""></div> 
+    <div class="container"> 
+    <div class="row">   
+      <div class="col-12">  
+        <div id="main">Hola</div>  
+        <div id="text"  class="form-row">
+          <div class="input-group displayGroup">
+            <span class="input-group-text">abc.txt</span>
+            <textarea class="form-control" aria-label="With textarea" id="inputText"></textarea>
+          </div> 
+        </div>
+      </div>  
+    </div>
+    </div> 
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>  
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/dist/abcjs-basic-min.js"></script>
+    <script type="text/javascript">  
+      var abcjs=window.ABCJS;  
+      $('#version').html('v1.0');
+      var app = { 
+        inter: undefined,
+        playMusicSheet: [undefined,undefined],
+        musicSheet: '',
+        createMusicSheet: function(){ 
+          //console.log(abc);
+          var abc = $('#inputText').val(); 
+          this.musicSheet = abcjs.renderAbc('main',abc,{ 
+            add_classes: true,
+            responsive: 'resize'
+          });    
+          this.resetStatePlayer();
+        },
+        resetStatePlayer: function(){ 
+          if($('.abcjs-midi-start').hasClass('abcjs-pushed')){
+            $('.abcjs-midi-start').trigger('click');  
+          }
+          app.playMusicSheet=[undefined,undefined];
+          $('#control').html(' ');
+        },
+        resetPlayer:function(){  
+          this.resetStatePlayer();
+          
+          app.playMusicSheet[0] = new ABCJS.synth.SynthController();
+          app.playMusicSheet[0].load("#control", {
+            beatSubdivisions: 1,
+            extraMeasuresAtBeginning: 0,
+            onStart: function() {    
+              $('.abcjs-note').removeClass('currentNote');
+              $('.abcjs-rest').removeClass('currentNote'); 
+              $('.abcjs-time-signature').removeClass('currentNote');
+              $('.abcjs-time-signature').addClass('currentNote');
+            },
+            onFinished: function() {    
+              $('.abcjs-time-signature').removeClass('currentNote');
+              $('.abcjs-note').removeClass('currentNote');  
+            },
+            onBeat: function(beatNumber) {  
+            },
+            onEvent: function(event) {  
+              $('.abcjs-time-signature').removeClass('currentNote'); 
+              $('.abcjs-note').removeClass('currentNote');
+              $('.abcjs-rest').removeClass('currentNote');
+              try{
+                $(event.elements[0][0]).addClass('currentNote');
+              }catch(e){
+                console.error(e);
+              } 
+            }
+          },{
+            displayRestart: true, 
+            displayLoop: true,
+            displayPlay: true, 
+            displayProgress: true 
+          });
+  
+          app.playMusicSheet[1] = new ABCJS.synth.CreateSynth(); 
+          app.playMusicSheet[1].init({  
+            visualObj: app.musicSheet[0]
+          }).then(function (results){
+            app.playMusicSheet[0].setTune( app.musicSheet[0],false,{ 
+              soundFontVolumeMultiplier: '1' //'0' sound off
+            }).then(function (response) {
+              console.log("Audio successfully loaded.");  
+            }).catch(function (error) {
+              console.warn("Audio problem:", error);
+            });
+          }).catch(function (reason) {
+            console.log(reason);
+          }); 
+
+        },
+        resize: function(){  
+          $('#inputText').innerHeight($(window).innerHeight()/2); 
+        }, 
+        init: function(){
+          console.log('app exe start');
+          var self = this;
+
+          $('#inputText').val('X:1\nT:Text\nM:4/4\nQ:120\nK:C\nc4 G4|E4 C4||');
+          $('#inputText').on('change',function(){ 
+            //console.log('change');
+            self.createMusicSheet();
+            self.resetPlayer();  
+          }); 
+
+          $('#btnPrint').on('click',function(){ 
+            window.print(); 
+          });
+
+          self.resize(); 
+          $(window).on('resize',self.resize);           
+
+          self.createMusicSheet();
+          self.resetPlayer(); 
+
+          var valSheet = $('#inputText').val();
+          self.inter = setInterval(function(){ 
+            if(valSheet!==$('#inputText').val()){ 
+              $('#inputText').trigger('change');
+            }
+            valSheet=$('#inputText').val();
+          },1000);  
+
+          console.log('app exe end');
+        }      
+      };
+      app.init();     
+
+      var abc=''; 
+      abc=abc+'X:1\n';
+      abc=abc+'T:Solo\n'; 
+      abc=abc+'M:C\n';
+      abc=abc+'Q:126\n';
+      abc=abc+'K:C\n'; 
+      abc=abc+'c4 A4|"E-6"E2E2E2E2|E2E2E2E2|E8|E8|\n';
+      abc=abc+'"A-6"A2A2A2A2|A2A2A2A2|A8|A8|\n';
+      abc=abc+'"E-6"E2E2E2E2|E2E2E2E2|E8|E2E2E2E2|\n'; 
+      abc=abc+'"G"G2G2G2G2|G2G2G2G2|"E-6"E2E2E2E2|E2E2E2E2|]\n'; 
+      abc=abc+' '; 
+      //$('#inputText').val(abc);
+    </script> 
+  </body>
+</html>

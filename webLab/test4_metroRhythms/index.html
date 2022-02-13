@@ -92,31 +92,30 @@
     <button id="playBtn" class="uk-button uk-button-primary uk-margin play" disabled><span uk-icon="play-circle"></span></button>    
     <div id="header" class=""> 
       <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu" disabled><span uk-icon="menu"></span></button>
-      <div class="uk-padding-small uk-padding-remove-bottom"><div id="control" class=></div></div>   
+      <div class="uk-padding-small uk-padding-remove-bottom"><div id="control" class=""></div></div>   
     </div>
     <div id="visual">  </div>   
     <div id="main" class="center">  </div>
     <div id="modalMenu" uk-modal>
       <div class="uk-modal-dialog">
-          <button class="uk-modal-close-default" type="button" uk-close></button>
-          <div class="uk-modal-header"> 
-              <h2 class="uk-modal-title">Menú</h2>
-          </div>
-          <div class="uk-modal-body" uk-overflow-auto>  
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header"> 
+          <h2 class="uk-modal-title">Menú</h2>
+        </div>
+        <div class="uk-modal-body" uk-overflow-auto>  
+          <div class="uk-margin">
+            <label>Rhythm</label>
+            <select id="rhythmSelect" class="uk-select">  
+            </select>
+          </div>  
+          <div class="uk-margin">  
+            <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
             <div class="uk-margin">
-              <label>Rhythm</label>
-              <select id="rhythmSelect" class="uk-select">  
-              </select>
+              <input class="uk-range" type="range" value="60" id="tempoBar" min="40" max="150" step="1">
             </div>  
-            <div class="uk-margin">  
-              <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
-              <div class="uk-margin">
-                <input class="uk-range" type="range" value="60" id="tempoBar" min="40" max="150" step="1">
-              </div>  
-            </div>  
-          </div> 
-          <div class="uk-modal-footer uk-text-right"> 
-          </div>
+          </div>  
+        </div> 
+        <div class="uk-modal-footer uk-text-right">  </div>
       </div>
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
@@ -131,7 +130,7 @@
       var abcjs=window.ABCJS; 
       //versión
       $('#version').html('v2.0.0');
-      $('#control').css({ display: 'none' });
+      //$('#control').css({ display: 'none' });
       //visual App
       var visual = {
         inter: undefined,
@@ -615,7 +614,7 @@
           web.initInputElements();  
           web.resetMain(); 
           web.resize(); 
-          $(window).on('resize',web.resize); 
+          $(window).on('resize', web.resize); 
           web.loaderOff();  
           web.toast('Start App'); 
           //console.log('web exe end');
@@ -623,7 +622,6 @@
       } 
       web.init();
     })();
-    </script>
-    <noscript>JAVASCRIPT NOT WORKING!</noscript>
+    </script> 
   </body>
 </html>
