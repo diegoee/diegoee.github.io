@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test">  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/css/uikit.min.css" /> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/abcjs-audio.css" />
+    <title>Web Test5_3DObject</title>
+    <style>  
+      html,body{  
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+          -moz-user-select: none;  
+            -ms-user-select: none;  
+                user-select: none; 
+        -webkit-tap-highlight-color: transparent; 
+        overflow-y: hidden;  
+        overflow-x: hidden; 
+      }
+      #version{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        right: 5px;
+        font-size: 0.75em;
+      } 
+      #header{
+        background-color: #EEE;
+      } 
+      #playBtn{
+        position: fixed; 
+        bottom: 0;
+        right: 5px;
+        z-index: 1; 
+        border-radius: 5px;
+        color: #fff;
+      }  
+      #playBtn.play{
+        background-color: green;
+      }       
+      #playBtn.stop{
+        background-color: #f0506e; 
+      } 
+      
+      #loader{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;    
+        background-color: rgba(255, 255, 255, 0.7); 
+      }
+      .uk-notification-close {
+        display: block;
+      }
+      .center{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }  
+    </style>
+  </head>
+  <body>
+    <div id="version"></div>  
+    <button id="playBtn" class="uk-button uk-button-primary uk-margin play" disabled><span uk-icon="play-circle"></span></button>    
+    <div id="header" class=""> 
+      <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu" disabled><span uk-icon="menu"></span></button>
+      <div class="uk-padding-small uk-padding-remove-bottom"></div>   
+    </div>
+    <div id="visual">  </div>   
+    <div id="modalMenu" uk-modal>
+      <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header"> 
+          <h2 class="uk-modal-title">Menú</h2>
+        </div>
+        <div class="uk-modal-body" uk-overflow-auto>            
+          <div class="uk-margin">  
+            <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
+            <div class="uk-margin">
+              <input class="uk-range" type="range" value="60" id="tempoBar" min="40" max="150" step="1">
+            </div>  
+          </div>  
+        </div> 
+        <div class="uk-modal-footer uk-text-right">  </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit-icons.min.js"></script>    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
+    <script type="text/javascript" src="https://threejs.org/build/three.js"></script>              
+    <script type="text/javascript">
+    /*global $, UIkit, window, setTimeout, clearTimeout, Promise, Tone, ABCJS*/ 
+    (function exe(){ 
+      //versión
+      $('#version').html('v2.0.0');
+      //visual App
+      var visual = {
+        inter: undefined,
+        play: false,
+        getRndN: function (nstart,nEnd){
+          return Math.round(Math.random()*nEnd)+nstart;
+        }, 
+        getMaxArry: function (a){
+          var l = a.length;
+          var max = a[0];
+          for(var i=1; i<l; i++){
+            max=Math.max(max,a[i]);
+          }
+          return max;
+        },
+        reset: function(){
+          $('#visual').html(' ');
+        },
+        init: function(data){
+          var self = this; 
+          //console.log('visual exe ini');
+          self.reset();   
+
+          console.log(data);
+          var w = $('#visual').innerWidth();
+          var h = $('#visual').innerHeight();
+  
+          var scene = new THREE.Scene();
+          scene.background = new THREE.Color( 0xEEEEEE );
+          var frustumSize = 100;
+          var aspect = w / h;
+          //var camera = new THREE.PerspectiveCamera( 100, w/h, 1, 1000 );   
+          var camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 ); 
+          camera.position.z = 45;
+          camera.aspect=aspect;
+          camera.updateProjectionMatrix();
+           
+          var s = (2/3)*camera.position.z; 
+          var zRef = 1; 
+          var renderer = new THREE.WebGLRenderer();
+          renderer.setSize( w, h);
+          $('#visual').append( renderer.domElement );           
+          
+          var group1 = new THREE.Group();
+          var group2 = new THREE.Group(); 
+          var geometry, material, mesh;
+          var points = []; 
+ 
+          material = new THREE.LineBasicMaterial( { color: 0x333333 } ); 
+          points = []; 
+          points.push( new THREE.Vector3(  0,  +(1+(+01/20))*s,  zRef));
+          points.push( new THREE.Vector3(  0,  -(1+(-15/20))*s,  zRef));
+          geometry = new THREE.BufferGeometry().setFromPoints( points );                    
+          mesh = new THREE.Line( geometry, material );  
+          group1.add( mesh ); 
+    
+          geometry = new THREE.CylinderGeometry( (1/20)*s, (1/20)*s, zRef, 120); 
+          mesh = new THREE.Mesh( geometry, material ); 
+          mesh.rotation.x=Math.PI/2;  
+          mesh.position.z=zRef;    
+          mesh.position.x=0; 
+          mesh.position.y=s;  
+          group1.add( mesh );
+
+          geometry = new THREE.CylinderGeometry( (1/20)*s, (1/20)*s, zRef, 120); 
+          mesh = new THREE.Mesh( geometry, material ); 
+          mesh.rotation.x=Math.PI/2;  
+          mesh.position.z=zRef;    
+          mesh.position.x=0; 
+          mesh.position.y=0;  
+          group1.add( mesh );
+
+           
+          material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF} );   
+          geometry = new THREE.CylinderGeometry( 0.99*s, 0.99*s, zRef, 120); 
+          mesh = new THREE.Mesh( geometry, material ); 
+          mesh.position.z=-zRef/2;    
+          mesh.rotation.x=Math.PI/2;  
+          group1.add( mesh );
+
+          var l = data.beats.length;
+          var max = self.getMaxArry(data.beats);
+          for(var i=0; i<l; i++){
+            var h = 0.75*data.beats[i]*s/max;
+            var rot = i*2*Math.PI/l;
+            if(h!==0){
+              var group = new THREE.Group();
+              material = new THREE.LineBasicMaterial( { color: 0x000000 } ); 
+              points = []; 
+              points.push( new THREE.Vector3(  0,  0,  zRef));
+              points.push( new THREE.Vector3(  0,  0.95*s,  zRef));
+              geometry = new THREE.BufferGeometry().setFromPoints( points );                    
+              mesh = new THREE.Line( geometry, material );  
+              group.add( mesh ); 
+              material = new THREE.LineBasicMaterial( { color: 0x000000 } ); 
+              geometry = new THREE.CylinderGeometry( (1/20)*s, (1/20)*s, zRef, 120); 
+              mesh = new THREE.Mesh( geometry, material ); 
+              mesh.rotation.x=Math.PI/2;  
+              mesh.position.z=zRef;    
+              mesh.position.x=0; 
+              mesh.position.y=h;  
+              group.add( mesh ); 
+              group.rotation.z=rot;
+              group2.add( group );
+            }
+          }
+
+          scene.add( group1 );
+          scene.add( group2 );  
+          
+          //var pointer = new THREE.Vector2();
+          //var raycaster = new THREE.Raycaster(); 
+          self.play = false; 
+          $('#visual').off('click');
+          $('#visual').on('click',function(event){   
+            visual.play=!visual.play;
+          }); 
+          
+          var clock = new THREE.Clock();
+          var d = data.div*data.bpm/60; 
+          var p = data.beatPulses;
+          
+          function render(){  
+            requestAnimationFrame(render); 
+            var delta = clock.getDelta();
+            if(self.play){  
+              group2.rotation.z-= (1/p)*d*delta*2*Math.PI;   
+            }else{  
+              group1.rotation.z = 0; 
+              group1.rotation.y = 0; 
+              group1.rotation.x = 0; 
+              group2.rotation.z = 0; 
+              group2.rotation.y = 0; 
+              group2.rotation.x = 0;  
+            }
+            renderer.render(scene,camera);   
+          };     
+          render();  
+          //console.log('visual exe end'); 
+        } 
+      } 
+      //devOps
+      /*   
+      setTimeout(function(){
+        console.log('change1');
+        $('#tempoBar').val('60');
+        $('#tempoBar').trigger('change');
+        setTimeout(function(){ 
+        console.log('change2');
+          $('#rhythmSelect').val('r54_2');
+          $('#rhythmSelect').trigger('change'); 
+          setTimeout(function(){  
+            console.log('click'); 
+            //$('#loopBtn').trigger('click'); 
+            $('#playBtn').trigger('click'); 
+          },1000);
+        },1000);
+      },1000);  
+      */
+
+       
+      var web = {
+        bpm: 120, 
+        currentToast: undefined, 
+        toast: function (data){
+          if(this.currentToast!==undefined){
+            this.currentToast.close(true);
+          }
+          this.currentToast = UIkit.notification({
+              message: data,
+              status: 'primary',
+              pos: 'top-right',
+              timeout: 4000
+          }); 
+        }, 
+        resize: function(){  
+          $('#visual').innerHeight($(window).innerHeight()-$('#header').innerHeight()); 
+        },
+        loaderE: '<div id="loader" class="center"> <div uk-spinner="ratio: 6"></div></div>',
+        loaderOn: function(){
+          $('body').append(this.loaderE);
+        },
+        loaderOff: function(){
+          $('#loader').remove();
+        },
+        resetMain: function(){
+          $('#main').html(' ');
+          web.resetPlayBtn();
+          $('button').attr('disabled',false);
+        },
+        initInputElements:function(){    
+          $('#tempoBar').val(web.bpm);
+          $('#tempoBarValue').html($('#tempoBar').val()); 
+          $('#tempoBar').on('change',function(){ 
+            $('#tempoBarValue').html($('#tempoBar').val()); 
+            web.bpm=parseInt($('#tempoBar').val()); 
+          });
+          $('#tempoBar').trigger('change'); 
+          
+          web.resetPlayBtn();
+          $('#playBtn').on('click',function(){ 
+          });   
+        },
+        resetPlayBtn: function(){ 
+          var $e = $('#playBtn');
+          $e.removeClass('stop');
+          $e.addClass('play');
+          $e.html('<span uk-icon="play-circle"></span>');  
+        },
+        init: function (){   
+          //console.log('web exe init');
+          web.loaderOn();
+          web.initInputElements();  
+          web.resetMain(); 
+          web.resize(); 
+          $(window).on('resize', web.resize); 
+          visual.init({
+            bpm: web.bpm,
+            beatPulses:2,
+            div:1,
+            beats:[2,0,0,0,1,0,1,0]
+          });
+          web.loaderOff();  
+          web.toast('Start App'); 
+          //console.log('web exe end');
+        }        
+      } 
+      web.init();
+    })();
+    </script> 
+  </body>
+</html>
