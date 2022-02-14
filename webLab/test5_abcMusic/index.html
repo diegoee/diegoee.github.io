@@ -15,7 +15,7 @@
         top: 0;
         left: 5px;
         font-size: 0.75em;
-        z-index: 100;
+        z-index: 200;
       }  
       #control{
         height: 40px;
@@ -36,23 +36,86 @@
         @page { 
           size: A4 portrait;
         } 
-        #version, #control, #menu, #text{  
+        #version, #control, #menu, #text, #menuScreen{  
           display: none; 
         }
+      }
+
+      #menuScreen{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        left: -100%;
+        width: 100%; 
+        height: 100%; 
+        z-index: 100;
+        transition: ease-in-out 1s;
+      }
+      #menuScreen.open{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        left: 0;
+      }  
+      .closeBtnContainer{
+        padding: 1em;
+        margin-bottom: 2em;
+      } 
+      .m{ 
+        margin: 1em;
+      }
+      .mb{
+        margin-bottom: 3em;
+      }
+      .form-group{
+        display: none;
       }
     </style>  
   </head>
   <body>
     <div id="version"></div>
+    <div id='menuScreen' class="bg-light open"> 
+      <div class="closeBtnContainer">
+        <button type="button" class="close" aria-label="Close" id="btnMenuClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="card m">
+        <div class="card-body"> 
+          <div class="container"> 
+            <div class="row">    
+              <div class="col-md-4"></div>
+              <div class="col-md-3 mb">
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnPrint"> <i class="fas fa-print"></i> Print</button> 
+              </div>
+              <div class="col-md-4"></div>
+              <div class="col-md-4"></div>
+              <div class="col-md-3 mb">
+                <div class="form-group">
+                  <label for="exampleFormControlFile1">Example file inpñut</label>
+                  <input type="file" class="form-control-file" id="exampleFormControlFile1">
+                </div>
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnUpload"><i class="fas fa-upload"></i> Load abc file </button> 
+              </div>
+              <div class="col-md-4"></div>
+              <div class="col-md-4"></div>
+              <div class="col-md-3 mb">
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnDownload"><i class="fas fa-download"></i> Download abc file </button> 
+              </div>
+              <div class="col-md-4"></div>
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
     <nav id='menu' class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid"> 
-        <span class="navbar-brand">Abc music anotation </span>   
+        <span class="navbar-brand">Abc Anotation Music</span>   
         <ul class="nav justify-content-end"> 
-          <li class="nav-item"><button type="button" class="btn btn-outline-dark" id="btnPrint">Print <i class="fas fa-print"></i></button></li>   
+          <li class="nav-item"><button type="button" class="btn btn-outline-dark" id="btnMenu"><i class="fas fa-bars"></i></button></li>   
         </ul>
-      </div>
+      </div> 
     </nav> 
-    
     <div id="control" class=""></div> 
     <div class="container"> 
     <div class="row">   
@@ -60,7 +123,7 @@
         <div id="main">Hola</div>  
         <div id="text"  class="form-row">
           <div class="input-group displayGroup">
-            <span class="input-group-text">abc.txt</span>
+            <span class="input-group-text">abc</span>
             <textarea class="form-control" aria-label="With textarea" id="inputText"></textarea>
           </div> 
         </div>
@@ -72,7 +135,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/dist/abcjs-basic-min.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v1.0');
+      $('#version').html('v1.1');
       var app = { 
         inter: undefined,
         playMusicSheet: [undefined,undefined],
@@ -147,7 +210,28 @@
         },
         resize: function(){  
           $('#inputText').innerHeight($(window).innerHeight()/2); 
+        },
+        openCloseMenu: function(){
+          if($('#menuScreen').hasClass('open')){
+            $('#menuScreen').removeClass('open'); 
+          }else{
+            $('#menuScreen').addClass('open'); 
+          }
         }, 
+        loadAbcFile: function(){
+
+        },
+        downloadAbcFile: function(){
+          var text = $('#inputText').val();;
+          var filename = 'song.abc';
+          var element = document.createElement('a');
+          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+          element.setAttribute('download', filename);
+          element.style.display = 'none';
+          document.body.appendChild(element);
+          element.click();
+          document.body.removeChild(element);
+        },
         init: function(){
           console.log('app exe start');
           var self = this;
@@ -161,6 +245,25 @@
 
           $('#btnPrint').on('click',function(){ 
             window.print(); 
+            self.openCloseMenu();
+          });
+
+          $('#btnUpload').on('click',function(){  
+            self.loadAbcFile();
+            self.openCloseMenu();
+          });
+
+          $('#btnDownload').on('click',function(){ 
+            self.downloadAbcFile();
+            self.openCloseMenu();
+          });
+
+          $('#btnMenu').on('click',function(){ 
+            self.openCloseMenu();
+          });
+
+          $('#btnMenuClose').on('click',function(){ 
+            self.openCloseMenu();
           });
 
           self.resize(); 
