@@ -43,8 +43,7 @@
       }       
       #playBtn.stop{
         background-color: #f0506e; 
-      } 
-      
+      }      
       #loader{
         position: absolute;
         top: 0;
@@ -132,7 +131,7 @@
           var aspect = w / h;
           //var camera = new THREE.PerspectiveCamera( 100, w/h, 1, 1000 );   
           var camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 ); 
-          camera.position.z = 45;
+          camera.position.z = 55;
           camera.aspect=aspect;
           camera.updateProjectionMatrix();
            
@@ -226,6 +225,8 @@
             var delta = clock.getDelta();
             if(self.play){  
               group2.rotation.z-= (1/p)*d*delta*2*Math.PI;   
+              //group1.rotation.z -= 0.125*Math.sin((1/p)*d*delta*2*Math.PI); 
+              //group2.rotation.z -= 0.125*Math.sin((1/p)*d*delta*2*Math.PI); 
             }else{  
               group1.rotation.z = 0; 
               group1.rotation.y = 0; 
@@ -261,7 +262,7 @@
 
        
       var web = {
-        bpm: 120, 
+        bpm: 60, 
         currentToast: undefined, 
         toast: function (data){
           if(this.currentToast!==undefined){
@@ -276,6 +277,7 @@
         }, 
         resize: function(){  
           $('#visual').innerHeight($(window).innerHeight()-$('#header').innerHeight()); 
+          $('#playBtn').trigger('click');
         },
         loaderE: '<div id="loader" class="center"> <div uk-spinner="ratio: 6"></div></div>',
         loaderOn: function(){
@@ -295,11 +297,24 @@
           $('#tempoBar').on('change',function(){ 
             $('#tempoBarValue').html($('#tempoBar').val()); 
             web.bpm=parseInt($('#tempoBar').val()); 
+            $('#playBtn').trigger('change'); 
           });
           $('#tempoBar').trigger('change'); 
           
           web.resetPlayBtn();
           $('#playBtn').on('click',function(){ 
+            var beats = [];
+            var l = visual.getRndN(2,12);
+            for(var i=0; i<l; i++){
+              beats.push(visual.getRndN(0,2)); 
+            }
+
+            visual.init({
+              bpm: web.bpm,
+              beatPulses:2,
+              div:1,
+              beats: beats
+            });
           });   
         },
         resetPlayBtn: function(){ 
@@ -315,12 +330,7 @@
           web.resetMain(); 
           web.resize(); 
           $(window).on('resize', web.resize); 
-          visual.init({
-            bpm: web.bpm,
-            beatPulses:2,
-            div:1,
-            beats:[2,0,0,0,1,0,1,0]
-          });
+          $('#playBtn').trigger('click');
           web.loaderOff();  
           web.toast('Start App'); 
           //console.log('web exe end');
