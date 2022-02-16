@@ -37,12 +37,6 @@
         z-index: 1; 
         border-radius: 5px;
         color: #fff;
-      }  
-      #playBtn.play{
-        background-color: green;
-      }       
-      #playBtn.stop{
-        background-color: #f0506e; 
       }      
       #loader{
         position: absolute;
@@ -65,7 +59,7 @@
   </head>
   <body>
     <div id="version"></div>  
-    <button id="playBtn" class="uk-button uk-button-primary uk-margin play" disabled><span uk-icon="play-circle"></span></button>    
+    <button id="playBtn" class="uk-button uk-button-primary uk-margin play" disabled><span uk-icon="refresh"></span></button>    
     <div id="header" class=""> 
       <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu" disabled><span uk-icon="menu"></span></button>
       <div class="uk-padding-small uk-padding-remove-bottom"></div>   
@@ -101,6 +95,7 @@
       //visual App
       var visual = {
         inter: undefined,
+        synth: undefined, 
         play: false,
         getRndN: function (nstart,nEnd){
           return Math.round(Math.random()*nEnd)+nstart;
@@ -120,8 +115,7 @@
           var self = this; 
           //console.log('visual exe ini');
           self.reset();   
-
-          console.log(data);
+ 
           var w = $('#visual').innerWidth();
           var h = $('#visual').innerHeight();
   
@@ -206,27 +200,34 @@
           }
 
           scene.add( group1 );
-          scene.add( group2 );  
+          scene.add( group2 );   
+
+          self.synth = new Tone.Synth().toMaster(); 
           
+          var clock = new THREE.Clock();
+          var d = data.div*data.bpm/60; 
+          var p = data.beatPulses; 
+          //console.log(d);
+          //console.log(data.beats);
+
           //var pointer = new THREE.Vector2();
           //var raycaster = new THREE.Raycaster(); 
           self.play = false; 
           $('#visual').off('click');
           $('#visual').on('click',function(event){   
-            visual.play=!visual.play;
-          }); 
-          
-          var clock = new THREE.Clock();
-          var d = data.div*data.bpm/60; 
-          var p = data.beatPulses;
+            self.play=!self.play; 
+            if(self.play){
+              self.synth.triggerAttackRelease('A4','8n');  
+            }else{
+              self.synth.triggerAttackRelease('E4','8n');  
+            }
+          });  
           
           function render(){  
             requestAnimationFrame(render); 
             var delta = clock.getDelta();
             if(self.play){  
               group2.rotation.z-= (1/p)*d*delta*2*Math.PI;   
-              //group1.rotation.z -= 0.125*Math.sin((1/p)*d*delta*2*Math.PI); 
-              //group2.rotation.z -= 0.125*Math.sin((1/p)*d*delta*2*Math.PI); 
             }else{  
               group1.rotation.z = 0; 
               group1.rotation.y = 0; 
@@ -234,6 +235,7 @@
               group2.rotation.z = 0; 
               group2.rotation.y = 0; 
               group2.rotation.x = 0;  
+              clearInterval(self.inter);
             }
             renderer.render(scene,camera);   
           };     
@@ -258,8 +260,7 @@
           },1000);
         },1000);
       },1000);  
-      */
-
+      */ 
        
       var web = {
         bpm: 60, 
@@ -287,8 +288,7 @@
           $('#loader').remove();
         },
         resetMain: function(){
-          $('#main').html(' ');
-          web.resetPlayBtn();
+          $('#main').html(' '); 
           $('button').attr('disabled',false);
         },
         initInputElements:function(){    
@@ -300,8 +300,7 @@
             $('#playBtn').trigger('change'); 
           });
           $('#tempoBar').trigger('change'); 
-          
-          web.resetPlayBtn();
+           
           $('#playBtn').on('click',function(){ 
             var beats = [];
             var l = visual.getRndN(2,12);
@@ -316,12 +315,6 @@
               beats: beats
             });
           });   
-        },
-        resetPlayBtn: function(){ 
-          var $e = $('#playBtn');
-          $e.removeClass('stop');
-          $e.addClass('play');
-          $e.html('<span uk-icon="play-circle"></span>');  
         },
         init: function (){   
           //console.log('web exe init');

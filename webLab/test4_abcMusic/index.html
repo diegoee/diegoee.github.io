@@ -50,7 +50,7 @@
         width: 100%; 
         height: 100%; 
         z-index: 100;
-        transition: ease-in-out 1s;
+        transition: ease-in-out 0.25s;
       }
       #menuScreen.open{
         position: absolute;
@@ -109,7 +109,7 @@
     </div>
     <nav id='menu' class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid"> 
-        <span class="navbar-brand">Abc Anotation Music</span>   
+        <span class="navbar-brand"><a href="https://abcnotation.com/examples" class="" >Abc Anotation Music</a></span>   
         <ul class="nav justify-content-end"> 
           <li class="nav-item"><button type="button" class="btn btn-outline-dark" id="btnMenu"><i class="fas fa-bars"></i></button></li>   
         </ul>
@@ -325,15 +325,16 @@
       app.init();     
 
       var abc=''; 
-      abc=abc+'X:1\n';
-      abc=abc+'T:Solo\n'; 
-      abc=abc+'M:C\n';
-      abc=abc+'Q:126\n';
-      abc=abc+'K:C\n'; 
-      abc=abc+'B1 B2 A1G1|"E-6"E2z2G1E1z2|z3B1 B2 A1G1|E2z2B,1^C1E1z1z2|z4z2^F1G1|\n';
-      abc=abc+'"A-6"A3z2_A1A2z2|z8|z8|z8|\n';
-      abc=abc+'"E-6"z8|z8|z8|z8|\n'; 
-      abc=abc+'"G"z8|z8|"E-6" B,1^C1D1_E1 z1E1z2|z2z1A1E2z2|]\n'; 
+      abc=abc+'X: 1\n';
+      abc=abc+'T: Solo\n'; 
+      abc=abc+'M: C\n';
+      abc=abc+'Q: 126\n';
+      abc=abc+'K: Em\n'; 
+      abc=abc+'B1 B2 A1G1|';
+      abc=abc+'"Em"E2z2z1G1E2|z2B1 B1B2A1G1|E2z2B,1^C1D1E1|z4z2F1G1|\n';
+      abc=abc+'"Am"A2z2z1_A1=A2|z4z2F1G1|A1A2z2G1E2|z2 z1B1 B2 A1G1|\n';
+      abc=abc+'"Em"E2z2z1G1E2|z2B1 B1B2A1G1|E2z2B,1^C1D1E1|z8|\n'; 
+      abc=abc+'"G"F1G1_A4=A1G1|z2A1G1z4|"Em"z2 B,1^C1D1_E1 =E1E1|z8|]\n'; 
       abc=abc+' '; 
       $('#inputText').val(abc);
       setTimeout(function(){
