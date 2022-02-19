@@ -83,25 +83,41 @@
       <div class="card m">
         <div class="card-body"> 
           <div class="container"> 
-            <div class="row">    
-              <div class="col-md-4"></div>
-              <div class="col-md-3 mb">
+            <div class="row mb">    
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnPrint"> <i class="fas fa-print"></i> Print</button> 
               </div>
-              <div class="col-md-4"></div>
-              <div class="col-md-4"></div>
-              <div class="col-md-3 mb">
+              <div class="col-md-3"></div> 
+            </div>
+            <div class="row mb">  
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
                 <div class="form-group">
                   <label class="btn btn-outline-dark btn-lg btn-block" for="file"><i class="fas fa-upload"></i> Load abc file </label>
                   <input type="file" class="form-control-file" id="file"> 
                 </div>   
               </div>
-              <div class="col-md-4"></div>
-              <div class="col-md-4"></div>
-              <div class="col-md-3 mb">
+              <div class="col-md-3"></div>
+            </div>
+            <div class="row mb">  
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnDownload"><i class="fas fa-download"></i> Download abc file </button> 
               </div>
-              <div class="col-md-4"></div>
+              <div class="col-md-3"></div>
+            </div>
+            <div class="row mb">  
+              <div class="col-md-3"></div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <select class="form-control form-control-lg" id="selectSong"></select> 
+                </div> 
+              </div>
+              <div class="col-md-3">
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnSong"><i class="fas fa-play"></i> Load song</button> 
+              </div>
+              <div class="col-md-3"></div>
             </div>
           </div> 
         </div>
@@ -137,6 +153,7 @@
       var abcjs=window.ABCJS;  
       $('#version').html('v1.1');
       var app = { 
+        songs: [],
         inter: undefined,
         playMusicSheet: [undefined,undefined],
         musicSheet: '',
@@ -190,8 +207,8 @@
         resetPlayer:function(){  
           this.resetStatePlayer();
           
-          app.playMusicSheet[0] = new ABCJS.synth.SynthController();
-          app.playMusicSheet[0].load("#control", {
+          this.playMusicSheet[0] = new ABCJS.synth.SynthController();
+          this.playMusicSheet[0].load("#control", {
             beatSubdivisions: 1,
             extraMeasuresAtBeginning: 0,
             onStart: function() {    
@@ -223,8 +240,8 @@
             displayProgress: true 
           });
   
-          app.playMusicSheet[1] = new ABCJS.synth.CreateSynth(); 
-          app.playMusicSheet[1].init({  
+          this.playMusicSheet[1] = new ABCJS.synth.CreateSynth(); 
+          this.playMusicSheet[1].init({  
             visualObj: app.musicSheet[0]
           }).then(function (results){
             app.playMusicSheet[0].setTune( app.musicSheet[0],false,{ 
@@ -254,7 +271,7 @@
         init: function(){
           console.log('app exe start');
           var self = this; 
-          this.synth = new Tone.Synth().toMaster(); 
+          self.synth = new Tone.Synth().toMaster(); 
 
           $('#btnPrint').on('click',function(){ 
             window.print(); 
@@ -284,7 +301,7 @@
             self.openCloseMenu();
           });
 
-          $('#inputText').val('X:1\nT:Text\nM:4/4\nQ:120\nK:C\nc4 G4|E4 C4||');
+          $('#inputText').val(' ');
           $('#inputText').on('change',function(){ 
             //console.log('change');
             self.createMusicSheet();
@@ -304,6 +321,19 @@
             }   
           }); 
 
+          $('#selectSong').append();
+          for(var i in self.songs){
+            //TODO: get tittle song
+            var name = self.songs[i].substring(self.songs[i].indexOf("T:"),self.songs[i].length);
+            name = name.substring(2,name.indexOf("\n")); 
+            $('#selectSong').append('<option value='+i+'>'+name+'</option>');
+          }
+          $('#btnSong').on('click',function(){ 
+            var i = parseInt($('#selectSong').val()); 
+            $('#inputText').val(self.songs[i]);
+            self.openCloseMenu();
+          });
+
           self.createMusicSheet();
           self.resetPlayer(); 
 
@@ -321,28 +351,40 @@
 
           console.log('app exe end');
         }      
-      };
-      app.init();     
-
-      var abc=''; 
-      abc=abc+'X: 1\n';
-      abc=abc+'T: My Hot and Humid Solo\n'; 
-      abc=abc+'M: C\n';
-      abc=abc+'Q: 126\n';
-      abc=abc+'K: Em\n'; 
+      };    
+      var abc='';
+      
+      abc=''; 
+      abc=abc+'X:1\n';
+      abc=abc+'T:My Hot and Humid Solo\n'; 
+      abc=abc+'M:C\n';
+      abc=abc+'Q:126\n';
+      abc=abc+'K:Em\n'; 
       abc=abc+'B1 B2 A1G1|';
       abc=abc+'"Em"E2z2z1G1E2|z2B1 B1B2A1G1|E2z2B,1^C1E2|z4z2F1G1|\n';
       abc=abc+'"Am"A2z2z1B1A2|z4z2F1G1|A2A2z1G1E2|z3B1 B2 A1G1|\n';
       abc=abc+'"Em"E2z2z1G1E2|z2B1 B1B2A1G1|E2z2B,1^C1E2|z4F1G1|\n'; 
-      abc=abc+'"G"_A2 =A1G1  A3 z1 |z2e2 B1A1 G1A1 |"Em" G1E1z2B2E2|z8|]\n'; 
-      abc=abc+' '; 
-      $('#inputText').val(abc);
-      setTimeout(function(){
-        //$('.abcjs-midi-start').trigger('click');
-      },2000);
-      setTimeout(function(){
-        //location.reload();
-      },30000);
+      abc=abc+'"G"_A2 =A1G1  A3 z1 |z2e2 B1A1 G1A1 |"Em" G1E1z2B2E2|z8|]\n';       
+      app.songs.push(abc);  
+ 
+      abc=''; 
+      abc=abc+'X:1\n';
+      abc=abc+'T:My Love for Sale Solo\n'; 
+      abc=abc+'M:C\n';
+      abc=abc+'Q:165\n';
+      abc=abc+'K:Cm\n'; 
+      abc=abc+'"F"(c8|c2)z2=A4|"Cm"G4z2E2|C2z2E4|\n';
+      abc=abc+'"F"z2F2G4|z2E2B,2C2|"Cm"/(C8|C6)z2|\n';
+      abc=abc+'"F"z1D1F2F2|D1F2F1F4|"Eb"G4F4|E4C4|\n';
+      abc=abc+'"Dm"G8|z4c2G2|"Cm"(C8|C8)|]\n'; 
+      
+      app.songs.push(abc); 
+      app.init(); 
+
+      $('#inputText').val(app.songs[1]);
+      //$('#btnMenu').trigger('click'); 
+ 
+
     </script> 
   </body>
 </html>
