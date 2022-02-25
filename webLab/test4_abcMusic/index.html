@@ -39,8 +39,7 @@
         #version, #control, #menu, #text, #menuScreen{  
           display: none; 
         }
-      }
-
+      } 
       #menuScreen{
         position: absolute;
         margin: 0;
@@ -71,6 +70,49 @@
       } 
       #file{
         display: none;
+      }
+      #loading{
+        position: absolute;
+        top: 0;
+        left: 0; 
+        width: 100%;
+        height: 100%;
+        background-color: rgba(33, 33, 33, 0.85);
+        z-index: 1; 
+        font-size: 3em; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.5s ease-out; 
+      }
+      .spinner {
+        width: 140px;
+        height: 140px;
+        margin: 100px auto;
+        background-color: #DDD; 
+        border-radius: 100%;  
+        -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+        animation: sk-scaleout 1.0s infinite ease-in-out;
+      } 
+      @-webkit-keyframes sk-scaleout {
+        0% { -webkit-transform: scale(0) }
+        100% {
+          -webkit-transform: scale(1.0);
+          opacity: 0;
+        }
+      } 
+      @keyframes sk-scaleout {
+        0% { 
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        } 100% {
+          -webkit-transform: scale(1.0);
+          transform: scale(1.0);
+          opacity: 0;
+        }
+      }
+      .notScroll{
+        overflow: hidden;
       }
     </style>  
   </head>
@@ -149,10 +191,21 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>  
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/dist/abcjs-basic-min.js"></script> 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
+    <script type="text/javascript" src="songs.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v1.1');
+      $('#version').html('v1.2');
       var app = { 
+        loadE: '<div id="loading"><div class="spinner"></div></div>', 
+        loadOn: function(){
+          app.loadOff();
+          $('body').append(app.loadE);
+          $('body').addClass('notScroll');
+        },
+        loadOff: function(){   
+          $('#loading').remove(); 
+          $('body').removeClass('notScroll');
+        },
         songs: [],
         inter: undefined,
         playMusicSheet: [undefined,undefined],
@@ -267,10 +320,14 @@
           }else{
             $('#menuScreen').addClass('open'); 
           }
-        }, 
+        },       
         init: function(){
           console.log('app exe start');
           var self = this; 
+
+          self.loadOn();            
+          self.songs=window.songs;
+          
           self.synth = new Tone.Synth().toMaster(); 
 
           $('#btnPrint').on('click',function(){ 
@@ -303,14 +360,14 @@
 
           $('#inputText').val(' ');
           $('#inputText').on('change',function(){ 
-            //console.log('change');
+            //console.log('change'); 
             self.createMusicSheet();
-            self.resetPlayer();   
+            self.resetPlayer();    
           }); 
 
           $('#file').on('change',function(){ 
             if (this.files && this.files[0]) {
-              console.log(this.files);
+              //console.log(this.files);
               var myFile = this.files[0];
               var reader = new FileReader();              
               reader.addEventListener('load', function (e) {
@@ -321,18 +378,21 @@
             }   
           }); 
 
-          $('#selectSong').append();
-          for(var i in self.songs){
-            //TODO: get tittle song
-            var name = self.songs[i].substring(self.songs[i].indexOf("T:"),self.songs[i].length);
-            name = name.substring(2,name.indexOf("\n")); 
-            $('#selectSong').append('<option value='+i+'>'+name+'</option>');
-          }
           $('#btnSong').on('click',function(){ 
             var i = parseInt($('#selectSong').val()); 
             $('#inputText').val(self.songs[i]);
             self.openCloseMenu();
           });
+
+          var self = this;
+          $('#selectSong').html(' ');
+          for(var i in self.songs){
+            //TODO: get tittle song
+            var name = self.songs[i].substring(self.songs[i].indexOf("T:"),self.songs[i].length);
+            name = name.substring(2,name.indexOf("\n")); 
+            $('#selectSong').append('<option value='+i+'>'+name+'</option>');
+          } 
+          $('#inputText').val(self.songs[0]);
 
           self.createMusicSheet();
           self.resetPlayer(); 
@@ -348,43 +408,12 @@
             }
             valSheet=$('#inputText').val();
           },1000);  
-
+ 
+          self.loadOff();
           console.log('app exe end');
-        }      
-      };    
-      var abc='';
-      
-      abc=''; 
-      abc=abc+'X:1\n';
-      abc=abc+'T:My Hot and Humid Solo\n'; 
-      abc=abc+'M:C\n';
-      abc=abc+'Q:126\n';
-      abc=abc+'K:Em\n'; 
-      abc=abc+'B1 B2 A1G1|';
-      abc=abc+'"Em"E2z2z1G1E2|z2B1 B1B2A1G1|E2z2B,1^C1E2|z4z2F1G1|\n';
-      abc=abc+'"Am"A2z2z1B1A2|z4z2F1G1|A2A2z1G1E2|z3B1 B2 A1G1|\n';
-      abc=abc+'"Em"E2z2z1G1E2|z2B1 B1B2A1G1|E2z2B,1^C1E2|z4F1G1|\n'; 
-      abc=abc+'"G"_A2 =A1G1  A3 z1 |z2e2 B1A1 G1A1 |"Em" G1E1z2B2E2|z8|]\n';       
-      app.songs.push(abc);  
- 
-      abc=''; 
-      abc=abc+'X:1\n';
-      abc=abc+'T:My Love for Sale Solo\n'; 
-      abc=abc+'M:C\n';
-      abc=abc+'Q:165\n';
-      abc=abc+'K:Cm\n'; 
-      abc=abc+'"F"(c8|c2)z2=A4|"Cm"G4z2E2|C2z2E4|\n';
-      abc=abc+'"F"z2F2G4|z2E2C2B,2|"Cm"/(C8|C6)z2|\n';
-      abc=abc+'"F"z1D1F2F1F3|z1D1F2F1F3|"Eb"G4F4|E4C4|\n';
-      abc=abc+'"Dm"G8|z4c2G2|"Cm"(C8|C8)|]\n'; 
-      
-      app.songs.push(abc); 
-      app.init(); 
-
-      $('#inputText').val(app.songs[1]);
-      //$('#btnMenu').trigger('click'); 
- 
-
+        }     
+      };  
+      app.init();   
     </script> 
   </body>
 </html>
