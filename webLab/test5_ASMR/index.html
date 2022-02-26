@@ -85,7 +85,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit-icons.min.js"></script>    
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
-    <script type="text/javascript" src="https://threejs.org/build/three.js"></script>              
+    <script type="text/javascript" src="https://threejs.org/build/three.js"></script>        
     <script type="text/javascript">
     /*global $, UIkit, window, setTimeout, clearTimeout, Promise, Tone, ABCJS*/ 
     (function exe(){ 
@@ -124,7 +124,7 @@
           var aspect = w / h;
           //var camera = new THREE.PerspectiveCamera( 100, w/h, 1, 1000 );   
           var camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 ); 
-          camera.position.z = 55;
+          camera.position.z = 45;
           camera.aspect=aspect;
           camera.updateProjectionMatrix();
            
@@ -211,14 +211,15 @@
 
           //var pointer = new THREE.Vector2();
           //var raycaster = new THREE.Raycaster(); 
+
           self.play = false; 
           $('#visual').off('click');
           $('#visual').on('click',function(event){   
             self.play=!self.play; 
             if(self.play){
-              self.synth.triggerAttackRelease('A4','8n');  
+              self.synth.triggerAttackRelease('A4','16n');  
             }else{
-              self.synth.triggerAttackRelease('E4','8n');  
+              self.synth.triggerAttackRelease('E4','16n');  
             }
           });  
           
@@ -227,13 +228,19 @@
             var delta = clock.getDelta();
             if(self.play){  
               group2.rotation.z-= (1/p)*d*delta*2*Math.PI;   
+              group1.rotation.z+= 0.002*Math.PI; 
+              group1.rotation.y+= 0.001*Math.PI; 
+              group1.rotation.x-= 0.001*Math.PI; 
+              group2.rotation.z+= 0.002*Math.PI; 
+              group2.rotation.y+= 0.001*Math.PI; 
+              group2.rotation.x-= 0.001*Math.PI;  
             }else{  
-              group1.rotation.z = 0; 
-              group1.rotation.y = 0; 
-              group1.rotation.x = 0; 
-              group2.rotation.z = 0; 
-              group2.rotation.y = 0; 
-              group2.rotation.x = 0;  
+              //group1.rotation.z = 0; 
+              //group1.rotation.y = 0; 
+              //group1.rotation.x = 0; 
+              //group2.rotation.z = 0; 
+              //group2.rotation.y = 0; 
+              //group2.rotation.x = 0;  
               clearInterval(self.inter);
             }
             renderer.render(scene,camera);   

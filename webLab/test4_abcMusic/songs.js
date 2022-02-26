@@ -2,8 +2,9 @@
 var songs = [];
 var abc=''; 
 
-//values
-abc=''; 
+//values  <z
+
+0-abc=''; 
 abc=abc+'X:1\n';
 abc=abc+'T:My Love for Sale Solo (A)\n'; 
 abc=abc+'M:C\n';
