@@ -61,10 +61,7 @@
       .closeBtnContainer{
         padding: 1em;
         margin-bottom: 2em;
-      } 
-      .m{ 
-        margin: 1em;
-      }
+      }  
       .mb{
         margin-bottom: 3em;
       } 
@@ -176,7 +173,15 @@
     <div id="control" class=""></div> 
     <div class="container"> 
     <div class="row">   
-      <div class="col-12">  
+      <div class="col-12">    
+        <div class="card">
+          <div class="card-body">
+          <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="btnSwing">
+            <label class="custom-control-label" for="btnSwing">Play with "swing"</label>
+          </div>
+          </div>
+        </div>  
         <div id="main">Hola</div>  
         <div id="text"  class="form-row">
           <div class="input-group displayGroup">
@@ -211,6 +216,7 @@
         playMusicSheet: [undefined,undefined],
         musicSheet: '',
         synth: undefined,  
+        swingMode: false,
         translateNote: function(noteName,pitch){ 
           var notesPitchTranslator = [ 
             [ 48,    49,  50,   51,  52,  53,  54,     55,    56, 57,    58, 59 ],  
@@ -258,8 +264,9 @@
           $('#control').html(' ');
         },
         resetPlayer:function(){  
-          this.resetStatePlayer();
-          
+          this.resetStatePlayer(); 
+          var self = this;
+
           this.playMusicSheet[0] = new ABCJS.synth.SynthController();
           this.playMusicSheet[0].load("#control", {
             beatSubdivisions: 1,
@@ -286,7 +293,7 @@
                 console.error(e);
               } 
             }
-          },{
+          },{  
             displayRestart: true, 
             displayLoop: true,
             displayPlay: true, 
@@ -298,7 +305,26 @@
             visualObj: app.musicSheet[0]
           }).then(function (results){
             app.playMusicSheet[0].setTune( app.musicSheet[0],false,{ 
-              soundFontVolumeMultiplier: '1' //'0' sound off
+              soundFontVolumeMultiplier: '1', //'0' sound off,  
+              sequenceCallback: function(tracks){
+                if(self.swingMode){
+                  var value = 2;
+                  // The beats are 0.25 long so the amount of swing needs to be between 0 and 0.125,
+                  // but practically it needs to be a bit smaller so that it doesn't sound like a grace note.
+                  var swing = 0.1 - 0.1 / value; 
+                  var track = tracks[0];
+                  for (var i = 0; i < track.length; i++) {
+                    var event = track[i];
+                    if (event.start % 0.25) {
+                      // This is the off beat
+                      event.start += swing;
+                    } else {
+                      // This is the beat
+                      event.end += swing;
+                    }
+                  }
+                } 
+              } 
             }).then(function (response) {
               console.log("Audio successfully loaded.");  
             }).catch(function (error) {
@@ -382,6 +408,12 @@
             var i = parseInt($('#selectSong').val()); 
             $('#inputText').val(self.songs[i]);
             self.openCloseMenu();
+          });
+
+          self.swingMode = false;
+          $('#btnSwing').on('click',function(){ 
+            self.swingMode=!self.swingMode; 
+            self.resetPlayer();   
           });
 
           var self = this;
