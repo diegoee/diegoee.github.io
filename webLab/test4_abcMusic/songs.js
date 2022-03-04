@@ -14,7 +14,7 @@ abc=abc+'"F"(c8|c2)z2=A4|"Cm"G4z2E2|C2z2E4|\n';
 abc=abc+'"F"z2F2G4|z2E2C2B,2|"Cm"/(C8|C6)z2|\n';
 abc=abc+'"F"z1D1F2F1F3|z1D1F2F1F3|"Eb"G4F4|E4C4|\n';
 abc=abc+'"Dm"G8|z4c2G2|"Cm"(C8|C8)|]\n'; 
-//songs.push(abc);  
+songs.push(abc);  
 
 abc=''; 
 abc=abc+'X:1\n';
