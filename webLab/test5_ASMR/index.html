@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Web test">  
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/css/uikit.min.css" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">  
     <title>Web Test5_ASMR</title>
     <style>  
       html,body{  
@@ -18,6 +17,7 @@
         overflow-y: hidden;  
         overflow-x: hidden; 
       }
+
       #version{
         position: absolute;
         margin: 0;
@@ -26,76 +26,101 @@
         right: 5px;
         font-size: 0.75em;
       } 
-      #header{
-        background-color: #EEE;
-      } 
-      #playBtn{
-        position: fixed; 
-        bottom: 0;
-        right: 5px;
-        z-index: 1; 
-        border-radius: 5px;
-        color: #fff;
-      }      
-      #loader{
+      
+      #visual{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;  
+      }
+
+      #loading{
+        background-color: rgb(255,255,255,0.85);
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 1;    
-        background-color: rgba(255, 255, 255, 0.7); 
-      }
-      .uk-notification-close {
-        display: block;
-      }
-      .center{
+        z-index: 1000;
         display: flex;
         align-items: center;
         justify-content: center;
-      }  
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px; 
+        position: relative;
+        margin: 100px auto;
+      }
+
+      .double-bounce1, .double-bounce2 {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #333;
+        opacity: 0.6;
+        position: absolute;
+        top: 0;
+        left: 0;        
+        -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+        animation: sk-bounce 2.0s infinite ease-in-out;
+      }
+
+      .double-bounce2 {
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+      }
+
+      @-webkit-keyframes sk-bounce {
+        0%, 100% { -webkit-transform: scale(0.0) }
+        50% { -webkit-transform: scale(1.0) }
+      }
+
+      @keyframes sk-bounce {
+        0%, 100% { 
+          transform: scale(0.0);
+          -webkit-transform: scale(0.0);
+        } 50% { 
+          transform: scale(1.0);
+          -webkit-transform: scale(1.0);
+        }
+      } 
     </style>
   </head>
   <body>
-    <div id="version"></div>  
-    <button id="playBtn" class="uk-button uk-button-primary uk-margin play" disabled><span uk-icon="refresh"></span></button>    
-    <div id="header" class=""> 
-      <button class="uk-button uk-button-default uk-button" uk-toggle="target: #modalMenu" disabled><span uk-icon="menu"></span></button>
-      <div class="uk-padding-small uk-padding-remove-bottom"></div>   
-    </div>
-    <div id="visual">  </div>   
-    <div id="modalMenu" uk-modal>
-      <div class="uk-modal-dialog">
-        <button class="uk-modal-close-default" type="button" uk-close></button>
-        <div class="uk-modal-header"> 
-          <h2 class="uk-modal-title">Menú</h2>
-        </div>
-        <div class="uk-modal-body" uk-overflow-auto>            
-          <div class="uk-margin">  
-            <p>Tempo (beats): (<span id="tempoBarValue"></span> bpm)</p>
-            <div class="uk-margin">
-              <input class="uk-range" type="range" value="60" id="tempoBar" min="40" max="150" step="1">
-            </div>  
-          </div>  
-        </div> 
-        <div class="uk-modal-footer uk-text-right">  </div>
-      </div>
-    </div>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/uikit@3.9.2/dist/js/uikit-icons.min.js"></script>    
+    <div id="version"></div>   
+    <div id="visual"></div>  
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>      
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
     <script type="text/javascript" src="https://threejs.org/build/three.js"></script>        
     <script type="text/javascript">
-    /*global $, UIkit, window, setTimeout, clearTimeout, Promise, Tone, ABCJS*/ 
+    /*global $, window, setTimeout, clearTimeout, Promise, Tone*/ 
     (function exe(){ 
       //versión
-      $('#version').html('v2.0.0');
+      $('#version').html('v3.0.0');
       //visual App
-      var visual = {
+      var app = {
+        loaderE: '<div id="loading"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>',
         inter: undefined,
         synth: undefined, 
         play: false,
+        reset: function(){ 
+          $('#visual').html(' ');
+          this.createAnimation();
+        },
+        resize: function(){   
+          app.reset(); 
+        }, 
+        loaderOn: function(){
+          $('body').append(this.loaderE);
+        },
+        loaderOff: function(){
+          $('#loading').remove();
+        },
         getRndN: function (nstart,nEnd){
           return Math.round(Math.random()*nEnd)+nstart;
         }, 
@@ -107,14 +132,19 @@
           }
           return max;
         },
-        reset: function(){
-          $('#visual').html(' ');
-        },
-        init: function(data){
-          var self = this; 
-          //console.log('visual exe ini');
-          self.reset();   
- 
+        createAnimation: function(){
+          console.log('createAnimation ini');
+          var self = this;  
+          var data = {
+            beats: [],
+            div: 1,
+            bpm: 90,
+            beatPulses: 4
+          } 
+          var l = self.getRndN(2,12);
+          for(var i=0; i<l; i++){
+            data.beats.push(self.getRndN(0,2)); 
+          }  
           var w = $('#visual').innerWidth();
           var h = $('#visual').innerHeight();
   
@@ -133,7 +163,7 @@
           var renderer = new THREE.WebGLRenderer();
           renderer.setSize( w, h);
           $('#visual').append( renderer.domElement );           
-          
+           
           var group1 = new THREE.Group();
           var group2 = new THREE.Group(); 
           var geometry, material, mesh;
@@ -162,7 +192,6 @@
           mesh.position.x=0; 
           mesh.position.y=0;  
           group1.add( mesh );
-
            
           material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF} );   
           geometry = new THREE.CylinderGeometry( 0.99*s, 0.99*s, zRef, 120); 
@@ -245,97 +274,19 @@
             }
             renderer.render(scene,camera);   
           };     
-          render();  
-          //console.log('visual exe end'); 
+          render(); 
+          console.log('createAnimation end');
+        },
+        init: function(){
+          console.log('exe init');
+          this.loaderOn();
+          $(window).on('resize', this.resize);
+          this.reset();  
+          this.loaderOff();  
+          console.log('exe end'); 
         } 
       } 
-      //devOps
-      /*   
-      setTimeout(function(){
-        console.log('change1');
-        $('#tempoBar').val('60');
-        $('#tempoBar').trigger('change');
-        setTimeout(function(){ 
-        console.log('change2');
-          $('#rhythmSelect').val('r54_2');
-          $('#rhythmSelect').trigger('change'); 
-          setTimeout(function(){  
-            console.log('click'); 
-            //$('#loopBtn').trigger('click'); 
-            $('#playBtn').trigger('click'); 
-          },1000);
-        },1000);
-      },1000);  
-      */ 
-       
-      var web = {
-        bpm: 60, 
-        currentToast: undefined, 
-        toast: function (data){
-          if(this.currentToast!==undefined){
-            this.currentToast.close(true);
-          }
-          this.currentToast = UIkit.notification({
-              message: data,
-              status: 'primary',
-              pos: 'top-right',
-              timeout: 4000
-          }); 
-        }, 
-        resize: function(){  
-          $('#visual').innerHeight($(window).innerHeight()-$('#header').innerHeight()); 
-          $('#playBtn').trigger('click');
-        },
-        loaderE: '<div id="loader" class="center"> <div uk-spinner="ratio: 6"></div></div>',
-        loaderOn: function(){
-          $('body').append(this.loaderE);
-        },
-        loaderOff: function(){
-          $('#loader').remove();
-        },
-        resetMain: function(){
-          $('#main').html(' '); 
-          $('button').attr('disabled',false);
-        },
-        initInputElements:function(){    
-          $('#tempoBar').val(web.bpm);
-          $('#tempoBarValue').html($('#tempoBar').val()); 
-          $('#tempoBar').on('change',function(){ 
-            $('#tempoBarValue').html($('#tempoBar').val()); 
-            web.bpm=parseInt($('#tempoBar').val()); 
-            $('#playBtn').trigger('change'); 
-          });
-          $('#tempoBar').trigger('change'); 
-           
-          $('#playBtn').on('click',function(){ 
-            var beats = [];
-            var l = visual.getRndN(2,12);
-            for(var i=0; i<l; i++){
-              beats.push(visual.getRndN(0,2)); 
-            }
-
-            visual.init({
-              bpm: web.bpm,
-              beatPulses:2,
-              div:1,
-              beats: beats
-            });
-          });   
-        },
-        init: function (){   
-          //console.log('web exe init');
-          web.loaderOn();
-          web.initInputElements();  
-          web.resetMain(); 
-          web.resize(); 
-          $(window).on('resize', web.resize); 
-          $('#playBtn').trigger('click');
-          web.loaderOff();  
-          web.toast('Start App'); 
-          //console.log('web exe end');
-        }        
-      } 
-      web.init();
+      app.init();
     })();
     </script> 
   </body>
