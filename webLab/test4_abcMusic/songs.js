@@ -4,6 +4,25 @@ var abc='';
 
 abc=''; 
 abc=abc+'X:1\n';
+abc=abc+'T:Ain\'t no sunshine\n'; 
+abc=abc+'L:1/16\n';   
+abc=abc+'%%barnumbers 4\n'; 
+abc=abc+'M:4/4\n';
+abc=abc+'Q:1/4=75\n';
+abc=abc+'K:Am\n'; 
+abc=abc+'     z4 E1G2(A1 A1)c3 B2(A2    |"Am"A2) A6 "Em7"z4"G"z4        |"Am" z4 E1G2(A1 A3)(c1 c1)B2G1 |"Am"A8 "Em7"z4"G"z4            |\n';
+abc=abc+'"Am" z4 A1A2(c1 c1)e3 d2e2     |"Em"d4 z1 A1d1(c1 c2)A2G2A2    |"Dm7"z4 c1d1(c2 c4) A1G2A1     |"Am"A8 "Em7"z4"G"z4            |\n'; 
+abc=abc+'"Am" z4 E1G3 A1c3 B4           |"Am"A2  A6 "Em7"z4"G"z4        |"Am" z4 E1G3 A1c3 B4           |"Am"G2  A6 "Em7"z4"G"z4        |\n';
+abc=abc+'"Am" z4 A1A2(c1 c1)e3 d2e2     |"Em"d4 z1 A1d1(c1 c2)A2G2A2    |"Dm7"z4 c1d1(c2 c4) A1G2A1     |"Am"A8 "Em7"z4"G"z4            |\n';  
+abc=abc+'"Am" z3 E1 G1A2G1 A2G1A2G1A2   |G1A2G1 A2G1A2G1A1E2 G1A2G1     |G1A2G1 A2G1A2G1A1E2 G1A2G1     |G1A2G1 A2G1A2G1A1E2 G1A2G1     |\n';
+abc=abc+'"Am" G1A2G1 A2G1A2G1A1E2 G1A2G1|"Em"z4 z1 A1d1(c1 c2)A2G2A2    |"Dm7"z4 c1d1(c2 c4) A1G2A1     |"Am"A8 "Em7"z4"G"z4            |]\n'; 
+abc=abc+'"Am" z4 E1G2(A1 A1)c3 B2(A2    |"Am"A2) A6 "Em7"z4"G"z4        | z4 E1G2(A1 A3)(c1 c1)B2G1     |"Am"A8 "Em7"z4"G"z4            |\n';
+abc=abc+'"Am" z4 A1A2(c1 c1)e3 d2e2     |"Em"d4 z1 A1d1(c1 c2)A2G2A2    |"Dm7"z4 c1d1(c2 c4) A1G2A1     |"Am"A8 "Em7"z4"G"z4            |\n'; 
+abc=abc+'"Am"z4 c1d1(c2 c4) A1G2A1      |"Am"A8 "Em7"z4"G"z4            |"Am"z4 c1d1(c2 c4) A1G2A1      |"Am"A8 z8                      |\n';  
+songs.push(abc); 
+
+abc=''; 
+abc=abc+'X:1\n';
 abc=abc+'T:My Rock On Solo\n'; 
 abc=abc+'L:1/8\n';   
 abc=abc+'%%barnumbers 4\n'; 
