@@ -4,7 +4,8 @@ var abc='';
 
 abc=''; 
 abc=abc+'X:1\n';
-abc=abc+'T:Ain\'t no sunshine\n'; 
+abc=abc+'T:Ain\'t no sunshine (Trans. Diego)\n'; 
+abc=abc+'C:Bill Withers\n'; 
 abc=abc+'L:1/16\n';   
 abc=abc+'%%barnumbers 4\n'; 
 abc=abc+'M:4/4\n';
