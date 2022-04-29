@@ -75,7 +75,7 @@
         width: 100%;
         height: 100%;
         background-color: rgba(33, 33, 33, 0.85);
-        z-index: 1; 
+        z-index: 1000; 
         font-size: 3em; 
         display: flex;
         align-items: center;
@@ -175,15 +175,34 @@
     <div id="control" class=""></div> 
     <div class="container"> 
     <div class="row">   
-      <div class="col-12">    
+      <div class="col-sm-4">    
         <div class="card" id="swing">
           <div class="card-body">
-          <div class="custom-control custom-switch">
-            <input type="checkbox" class="custom-control-input" id="btnSwing">
-            <label class="custom-control-label" for="btnSwing">Play with "swing"</label>
-          </div>
-          </div>
+            <div class="input-group"> 
+              <div class="form-control custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="btnSwing">
+                <label class="custom-control-label ml-4" for="btnSwing">Play with "swing"</label>
+              </div>
+            </div>
+          </div> 
         </div>  
+      </div>
+      <div class="col-sm-8">    
+        <div class="card" id="transpor">
+          <div class="card-body">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text">Transpor. (1/2)</label>
+              </div>
+              <select class="custom-select" id="selectTransporSheet"> 
+              </select>
+              <select class="custom-select" id="selectTransporPitch"> 
+              </select>
+            </div>
+          </div>  
+        </div>  
+      </div> 
+      <div class="col-12">
         <div id="main">Hola</div>  
         <div id="text"  class="form-row">
           <div class="input-group displayGroup">
@@ -245,11 +264,12 @@
           res = notesPitchTranslator[2][res]+notesPitchTranslator[1][res];         
           return res;
         }, 
-        createMusicSheet: function(){ 
+        createMusicSheet: function(musicSheet,transpose){ 
           //console.log(abc);
-          var abc = $('#inputText').val(); 
+          var abc = musicSheet; 
           this.musicSheet = abcjs.renderAbc('main',abc,{ 
             add_classes: true,
+            visualTranspose: transpose,
             responsive: 'resize',
             clickListener: function(e){ 
               var note = app.translateNote(e.pitches[0].name,e.midiPitches[0].pitch,0); 
@@ -265,7 +285,7 @@
           app.playMusicSheet=[undefined,undefined];
           $('#control').html(' ');
         },
-        resetPlayer:function(){  
+        resetPlayer:function(transpose){  
           this.resetStatePlayer(); 
           var self = this;
 
@@ -300,8 +320,8 @@
             displayLoop: true,
             displayPlay: true, 
             displayProgress: true 
-          });
-  
+          }); 
+
           this.playMusicSheet[1] = new ABCJS.synth.CreateSynth(); 
           this.playMusicSheet[1].init({  
             visualObj: app.musicSheet[0]
@@ -328,7 +348,19 @@
                 } 
               } 
             }).then(function (response) {
-              console.log("Audio successfully loaded.");  
+              console.log("Audio successfully loaded."); 
+               
+              app.playMusicSheet[0].setTune(
+                app.musicSheet[0], 
+                true, { 
+                  midiTranspose: transpose
+              }).then(function(){
+                console.log('Audio successfully loaded.');
+              }).catch(function(error) {
+                console.warn('Audio problem: ', error);
+              }); 
+
+
             }).catch(function (error) {
               console.warn("Audio problem:", error);
             });
@@ -387,10 +419,10 @@
           });
 
           $('#inputText').val(' ');
-          $('#inputText').on('change',function(){ 
-            //console.log('change'); 
-            self.createMusicSheet();
-            self.resetPlayer();    
+          $('#inputText').on('change',function(){  
+            var musicSheet = $('#inputText').val();
+            self.createMusicSheet(musicSheet,0);
+            self.resetPlayer(0);    
           }); 
 
           $('#file').on('change',function(){ 
@@ -415,21 +447,54 @@
           self.swingMode = false;
           $('#btnSwing').on('click',function(){ 
             self.swingMode=!self.swingMode; 
-            self.resetPlayer();   
+            self.resetPlayer(0);   
           });
 
           var self = this;
           $('#selectSong').html(' ');
           for(var i in self.songs){
-            //TODO: get tittle song
             var name = self.songs[i].substring(self.songs[i].indexOf("T:"),self.songs[i].length);
             name = name.substring(2,name.indexOf("\n")); 
             $('#selectSong').append('<option value='+i+'>'+name+'</option>');
           } 
           $('#inputText').val(self.songs[0]);
 
-          self.createMusicSheet();
-          self.resetPlayer(); 
+
+          $('#selectTransporSheet').html(' ');
+          var ar = [12,11,10,9,8,7,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
+          for(var i in ar){ 
+            var desc = (ar[i]>0?'+'+ar[i]:ar[i]);
+            $('#selectTransporSheet').append('<option value='+ar[i]+'>'+desc+'</option>');
+            $('#selectTransporPitch').append('<option value='+ar[i]+'>Pitch '+desc+'</option>');
+          }       
+          //$('#selectTransporPitch').html(' ');  
+          ///$('#selectTransporPitch').append('<option value=0>Pitch 0</option>');  
+          $('#selectTransporSheet').val(0);          
+          $('#selectTransporPitch').val(0);
+
+          $('#selectTransporSheet').on('change',function(){ 
+            self.loadOn();  
+            var tSheet = $(this).val();
+            var tPitch = $('#selectTransporPitch').val();
+            var musicSheet = $('#inputText').val();
+            self.createMusicSheet(musicSheet,tSheet);  
+            self.resetPlayer(tPitch); 
+            self.loadOff(); 
+          });
+
+          $('#selectTransporPitch').on('change',function(){ 
+            self.loadOn();  
+            var tSheet = $('#selectTransporSheet').val();
+            var tPitch = $(this).val();
+            var musicSheet = $('#inputText').val();
+            self.createMusicSheet(musicSheet,tSheet); 
+            self.resetPlayer(tPitch); 
+            self.loadOff(); 
+          });
+
+          var musicSheet = $('#inputText').val();
+          self.createMusicSheet(musicSheet,0,0);
+          self.resetPlayer(0); 
 
           self.resize(); 
           $(window).on('resize',self.resize);   
