@@ -3,7 +3,7 @@ require.config({
   baseUrl: 'js',
   paths: {
     jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min',
-    bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min' 
+    bootstrap: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min'
   },
   shim: {
     bootstrap : {
@@ -65,20 +65,10 @@ require([
         //Active Section
         $('body').scrollspy({target: ".navbar", offset: 50});
 
-        //Print Button
-        var checkPrint = 0;
-        $('#printBtn').on('click',function(){
-           
-          if(checkPrint==5){
-            App.printBtn();
-          }else{
-            checkPrint = 0;
-            $("#modal").modal('show');
-          }
-        });
-        $('#secretPrintBtn').on('click',function(){
-          checkPrint++;
-        });
+        //Print Button 
+        $('#printBtn').on('click',function(){ 
+          App.printBtn(); 
+        }); 
 
         $('#language1').on('click',App.translate);
         $('#language2').on('click',App.translate);
@@ -250,7 +240,7 @@ require([
       pos=[];
       for(i=0;i<$('.panel-heading').length;i++){
         pos[i] = '<p>'+$($('.panel-heading')[i]).text()+' ('+$($($('.panel-heading')[i]).find('a')[0]).attr('href')+')</p>';
-        console.log(pos[i]);
+        //console.log(pos[i]);
       }
 
       $e = [];
@@ -278,10 +268,40 @@ require([
       window.print();
       App.afterprint();
 
+    },
+    pass: 'bqpqvamwjks',
+    code: function(value){
+      var s = value;
+      var k = 4;
+      var enc = "";
+      var str = ""; 
+      str = s.toString();
+      for (var i = 0; i < s.length; i++) { 
+        var a = s.charCodeAt(i); 
+        var b = a ^ k;
+        enc = enc + String.fromCharCode(b);
+      }  
+      return enc;  
+    },
+    access: function(){
+      $("#modal").modal('show');
+      $('#errorMsg').addClass('alertDisplayOff');
+      $('#errorMsg button').on('click',function(){  
+        $('#errorMsg').removeClass('alertDisplayOff'); 
+        $('#errorMsg').addClass('alertDisplayOff'); 
+      }); 
+      $('#enterBtn').on('click',function(){
+        var value = $('#passwordInput').val(); 
+        if(App.code(value)===App.pass){
+          App.exeLoad('assets/template/templateSP.html');
+        }else{ 
+          $('#errorMsg').removeClass('alertDisplayOff'); 
+        } 
+      }); 
     }
   };
-
-  App.exeLoad('assets/template/templateSP.html');
+  App.access();
+  
 });
 
 

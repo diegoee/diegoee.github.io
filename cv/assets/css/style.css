@@ -447,3 +447,7 @@ a.aNav:active{
 .slick-slide img {
   display: inline-block; 
 }
+
+.alertDisplayOff{
+  display: none;
+}
