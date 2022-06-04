@@ -56,12 +56,12 @@
         margin: 0;
         padding: 0;
         top: 0;
-        left: 0; 
+        left: 0;    
       }  
       .closeBtnContainer{
         padding: 1em;
         margin-bottom: 2em;
-      }  
+      }   
       .mb{
         margin-bottom: 3em;
       } 
@@ -119,7 +119,7 @@
       <div class="closeBtnContainer">
         <button type="button" class="close" aria-label="Close" id="btnMenuClose"><i class="fas fa-times"></i></button>
       </div>
-      <div class="card m">
+      <div class="card">
         <div class="card-body"> 
           <div class="container"> 
             <div class="row mb">    
@@ -278,7 +278,7 @@
           });    
           this.resetStatePlayer();
         },
-        resetStatePlayer: function(){ 
+        resetStatePlayer: function(){  
           if($('.abcjs-midi-start').hasClass('abcjs-pushed')){
             $('.abcjs-midi-start').trigger('click');  
           }
@@ -370,17 +370,39 @@
 
         },
         resize: function(){  
-          $('#inputText').innerHeight($(window).innerHeight()/2);  
-          var h = $('#menu').innerHeight()+$('#control').innerHeight()+$('#main').innerHeight()+$('#text').innerHeight();
-          $('#menuScreen').innerHeight(h); 
+          $('#inputText').innerHeight($(window).innerHeight()/2);   
+          $('#menuScreen').innerHeight($(document).innerHeight()); 
         },
         openCloseMenu: function(){
-          if($('#menuScreen').hasClass('open')){
+          if($('#menuScreen').hasClass('open')){ 
             $('#menuScreen').removeClass('open'); 
           }else{
             $('#menuScreen').addClass('open'); 
-          }
-        },       
+          } 
+          $(window).trigger('resize');  
+        }, 
+        initKeyEvent: function(){ 
+          //var self = this;            
+          $(window).off( 'keydown');
+          $(window).on( 'keydown', function(e){  
+            var data=e.originalEvent.code;
+            if(data==='Enter'){
+              $('.abcjs-midi-start').trigger('click');
+              $(window).scrollTop(0);
+            } 
+            if(data==='Escape'){
+              if($('.abcjs-midi-start').hasClass('abcjs-pushed')){
+                $('.abcjs-midi-start').trigger('click');  
+              }
+              $('.abcjs-midi-reset').trigger('click');  
+              $('.abcjs-note').removeClass('currentNote');
+              $('.abcjs-rest').removeClass('currentNote'); 
+              $('.abcjs-time-signature').removeClass('currentNote'); 
+              $(window).scrollTop(0);
+            }
+            //console.log(data);
+          });
+        },     
         init: function(){
           console.log('app exe start');
           var self = this; 
@@ -507,6 +529,7 @@
           var musicSheet = $('#inputText').val();
           self.createMusicSheet(musicSheet,0,0);
           self.resetPlayer(0); 
+          self.initKeyEvent();
 
           self.resize(); 
           $(window).on('resize',self.resize);   
@@ -518,7 +541,7 @@
               self.resize();
             }
             valSheet=$('#inputText').val();
-          },1000);  
+          },1000);   
  
           self.loadOff();
           console.log('app exe end');
