@@ -438,6 +438,9 @@ a.aNav:active{
   #experience{
     font-size: 0.75em;
   }
+  #back-to-top{
+    display: none; 
+  }
 }
 
 .slick-prev:before, .slick-next:before{
