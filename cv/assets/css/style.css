@@ -455,6 +455,7 @@ a.aNav:active{
 .back-to-top, 
 .back-to-top:active, 
 .back-to-top:focus, 
+.back-to-top:hover, 
 .back-to-top:visited {
   display: none;
   position: fixed;
