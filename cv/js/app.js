@@ -35,7 +35,7 @@ require([
       $(document).ready(function(){
 
         //Slide down-up effect
-        $(window).scroll(function() {
+        $(window).on('scroll', function(e){
           $('.slideanim').each(function(){
             var pos = $(this).offset().top;
             var winTop = $(window).scrollTop();
@@ -43,7 +43,26 @@ require([
                 $(this).addClass("slide");
               }
           });
-        });
+          if($(document).scrollTop().valueOf()>125){
+            if (!$('#back-to-top').hasClass('show')){
+              $('#back-to-top').addClass('show');
+            }  
+          }else{
+            $('#back-to-top').removeClass('show');
+          } 
+        }); 
+
+        //Button top
+        $('#back-to-top').on('click',function(){ 
+          $('html, body').animate({
+            scrollTop: 0
+          },500,function() {  
+            $('#myNavbar').removeClass('in');
+            $('#myNavbar').attr('aria-expanded','false');
+            $('button[data-target="#myNavbar"]').attr('aria-expanded','false');
+            $('button[data-target="#myNavbar"]').addClass('collapsed');
+          }); 
+        }); 
 
         //Slide animate scroll
         $('.navbar a, footer a[href="#home"]').on('click',function(event){
@@ -274,8 +293,7 @@ require([
       var s = value;
       var k = 4;
       var enc = "";
-      var str = ""; 
-      str = s.toString();
+      var str = s.toString();
       for (var i = 0; i < s.length; i++) { 
         var a = s.charCodeAt(i); 
         var b = a ^ k;
