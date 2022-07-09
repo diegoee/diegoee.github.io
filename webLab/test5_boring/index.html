@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web test">  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Test5_boring</title>
+    <style> 
+      html,body{ 
+        background-color: #333; 
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+        -moz-user-select: none;  
+        -ms-user-select: none;  
+        user-select: none; 
+        -webkit-tap-highlight-color: transparent; 
+      } 
+      canvas{
+        position: absolute;
+        top: 0;
+        left: 0; 
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>    
+    <canvas id="canvas"></canvas> 
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
+    <script type="text/javascript" src="https://paperjs.org/assets/js/paper.js"></script>           
+    <script type="text/javascript">  
+    var app = {   
+      init: function(){ 
+        paper.install(window); 
+        $('#canvas').html(' '); 
+      },
+      create: function(){  
+	      paper.setup('canvas');
+
+        var isPlaying=false;
+        var obj = new Path.Rectangle({
+          position: view.center,
+          size: view.size.width/5, 
+          fillColor: '#EEE',
+          onMouseDown: function(){
+            isPlaying=!isPlaying;
+          }
+        });  
+
+        console.log('http://paperjs.org/reference/global/');
+        
+        view.on('frame', function(event) { 
+          if(isPlaying){ 
+            obj.rotate(0.5);
+          }
+        }); 
+
+      },    
+      exe: function(){
+        console.clear(); 
+        console.log('app exe ini');  
+        var self = this;
+        self.init();
+        $(window).off('resize');
+        $(window).on('resize',function(){ 
+          self.create();
+        });    
+        self.create();
+        console.log('app exe end'); 
+      }
+	  }
+    app.exe();
+    </script> 
+  </body>
+</html>
