@@ -30,38 +30,129 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
     <script type="text/javascript" src="https://paperjs.org/assets/js/paper.js"></script>           
     <script type="text/javascript">  
-    var app = {   
+    var app = { 
+      canvasEle: '<canvas id="canvas"></canvas>',  
+      resetCanvas: function(){ 
+        $('#canvas').remove();
+        $('body').append(this.canvasEle);
+	      paper.setup('canvas');
+      },
       init: function(){ 
         paper.install(window); 
-        $('#canvas').html(' '); 
+        this.resetCanvas();
       },
-      create: function(){  
-	      paper.setup('canvas');
+      create: function(){ 
+        this.resetCanvas();  
 
-        var isPlaying=false;
+        var limits = new Group({
+          children: [], 
+          position: view.center
+        }); 
+        limits.l=5
+        limits.data=[{
+          point: [0, 0],
+          size: [view.size.width,limits.l],
+        },{
+          point: [0, 0],
+          size: [limits.l,view.size.height],
+        },{
+          point: [0, view.size.height-limits.l],
+          size: [view.size.width,limits.l],
+        },{
+          point: [view.size.width-limits.l, 0],
+          size: [limits.l,view.size.height],
+        }];
+        
+        for (var i=0; i<limits.data.length; i++){ 
+          limits.children.push(new Path.Rectangle({
+            point: limits.data[i].point,
+            size: limits.data[i].size, 
+            fillColor: '#EEE', 
+            opacity: 0,
+            onFrame:  function(e){
+              if(this.opacity===0){ 
+                this.opacity=0;  
+              }else{
+                this.opacity-=0.025;
+              }
+            } 
+          }));  
+        }   
+
+        var s = 20;
         var obj = new Path.Rectangle({
           position: view.center,
-          size: view.size.width/5, 
+          size: [s,s], 
           fillColor: '#EEE',
-          onMouseDown: function(){
-            isPlaying=!isPlaying;
-          }
-        });  
-
-        console.log('http://paperjs.org/reference/global/');
-        console.log('hello');
+          isMoving: false, 
+          onMouseDown: function(){ 
+            this.xTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
+            this.yTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
+          }, 
+          v: 10,
+          xTo: 0,
+          yTo: 0, 
+          angle: 0.25*Math.random(),  
+          changeXtoAndYto(){ 
+            var v = this.v; 
+            this.angle = Math.random(); 
+            var l = limits.l;   
+            if (this.position.x>l&&this.position.x<view.center.x/10){ 
+              console.log('left');
+              this.xTo = +1*v*Math.random(); 
+            }          
+            if (obj.position.x>view.size.width-l-s/2&&this.position.x>view.center.x/10){ 
+              console.log('right');
+              this.xTo = -1*v*Math.random(); 
+            }  
+            if (this.position.y>l&&this.position.y<view.center.y/2){ 
+              console.log('top');
+              this.yTo = +1*v*Math.random(); 
+            }          
+            if (obj.position.y>view.size.height-l-s/2&&this.position.y>view.center.y/10){ 
+              console.log('bottom');
+              this.yTo = -1*v*Math.random(); 
+            } 
+          },
+          move: function(){
+            this.rotate(2*Math.PI*this.angle);  
+            this.position.x=this.position.x+this.xTo; 
+            this.position.y=this.position.y+this.yTo;  
+          },
+          onFrame: function(){
+            if(this.isMoving){ 
+              this.move();
+              if(intersection()){
+                this.changeXtoAndYto();
+              }
+            }
+          } 
+        });    
         
-        view.on('frame', function(event) { 
-          if(isPlaying){ 
-            obj.rotate(0.5);
-          }
-        }); 
+        view.on('mousedown',function(){ 
+          obj.isMoving=!obj.isMoving;
+          obj.changeXtoAndYto();
+        })
 
+        function intersection(){
+            var isIntersected = false;
+            for (var i=0; i<limits.children.length; i++){ 
+              var item = limits.children[i].intersect(obj);
+              isIntersected=item.closed; 
+              item.remove(); 
+              if(isIntersected){ 
+                limits.children[i].opacity=1; 
+                break;
+              }
+            }    
+            return isIntersected;
+        }  
       },    
       exe: function(){
         console.clear(); 
+        console.log('http://paperjs.org/reference/global/'); 
         console.log('app exe ini');  
-        var self = this;
+        var self = this; 
         self.init();
         $(window).off('resize');
         $(window).on('resize',function(){ 
