@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Web test">  
+    <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="description" content="Web test">  
     <title>Web Test5_boring</title>
     <style> 
       html,body{ 
@@ -28,7 +27,7 @@
   <body>    
     <canvas id="canvas"></canvas> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
-    <script type="text/javascript" src="https://paperjs.org/assets/js/paper.js"></script>           
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.js"></script>
     <script type="text/javascript">  
     var app = { 
       canvasEle: '<canvas id="canvas"></canvas>',  
@@ -89,7 +88,7 @@
             this.xTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
             this.yTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
           }, 
-          v: 10,
+          v: 5,
           xTo: 0,
           yTo: 0, 
           angle: 0.25*Math.random(),  
