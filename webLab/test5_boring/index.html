@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Web test">  
+    <meta name="format-detection" content="telephone=no">
     <title>Web Test5_boring</title> 
     <style> 
       html,body{ 
@@ -24,8 +25,8 @@
       }
       #menu{
         position: absolute; 
-        top: 5px;
-        right: 5px; 
+        top: 15px;
+        right: 15px; 
         color: #EEE;
         cursor: pointer;
         font-size: 1em;
@@ -71,12 +72,18 @@
         $('body').append(this.canvasEle);
 	      paper.setup('canvas');
       },
-      playSound: function(type){
-        //console.log(type);
+      playSoundLimit: function(type){
+        ///console.log(type); 
         if(this.soundOnOff){
-          this.synth.triggerAttackRelease('A3','16n'); 
+          this.synth.triggerAttackRelease('A3','32n'); 
         }
       },
+      playSoundDelete: function(){ 
+        if(this.soundOnOff){
+          this.synth.triggerAttackRelease('E3','128n'); 
+        }
+      },
+      nObj: 5,
       create: function(){ 
         this.resetCanvas(); 
         var self = this; 
@@ -115,63 +122,94 @@
             } 
           }));  
         }   
+
         var s = 20;
         s = (view.size.width>view.size.height?view.size.width/s:view.size.height/s);
-        var obj = new Path.Rectangle({
-          position: view.center,
-          size: [s,s], 
-          fillColor: '#EEE',
-          isMoving: false, 
-          onMouseDown: function(){ 
-            this.xTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
-            this.yTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
-          }, 
-          v: 5,
-          xTo: 0,
-          yTo: 0, 
-          angle: 0.25*Math.random(),  
-          changeXtoAndYto(){ 
-            var v = this.v; 
-            this.angle = Math.random(); 
-            var l = limits.l;   
-            if (this.position.x>l&&this.position.x<view.center.x/10){  
-              self.playSound('left');
-              this.xTo = +1*v*Math.random(); 
-            }          
-            if (obj.position.x>view.size.width-l-s/2&&this.position.x>view.center.x/10){ 
-              self.playSound('right');
-              this.xTo = -1*v*Math.random(); 
-            }  
-            if (this.position.y>l&&this.position.y<view.center.y/2){ 
-              self.playSound('top');
-              this.yTo = +1*v*Math.random(); 
-            }          
-            if (obj.position.y>view.size.height-l-s/2&&this.position.y>view.center.y/10){ 
-              self.playSound('bottom');
-              this.yTo = -1*v*Math.random(); 
-            } 
-          },
-          move: function(){
-            this.rotate(2*Math.PI*this.angle);  
-            this.position.x=this.position.x+this.xTo; 
-            this.position.y=this.position.y+this.yTo;  
-          },
-          onFrame: function(){
-            if(this.isMoving){ 
-              this.move();
-              if(intersection()){
-                this.changeXtoAndYto();
-              }
-            }
-          } 
-        });    
-        
-        view.on('mousedown',function(){ 
-          obj.isMoving=!obj.isMoving;
-          obj.changeXtoAndYto();
-        })
 
-        function intersection(){
+        function createObj(destroyer){
+          var obj = new Path.Rectangle({
+            position: view.center,
+            size: [s,s], 
+            fillColor: (destroyer?'#EEE':'#AAA'),
+            isMoving: false, 
+            isDying: false, 
+            isDeath: false, 
+            isAKiller: false,
+            onMouseDown: function(){ 
+              this.xTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
+              this.yTo = (Math.random()-0.5>0?1:-1)*this.v*Math.random();
+              if(this.isDying){
+                this.isDeath=true;
+              }
+              if(this.isDeath){
+                this.remove();
+              }
+            }, 
+            v: 5,
+            xTo: 0,
+            yTo: 0, 
+            angle: 0.25*Math.random(),  
+            changeXtoAndYto(){ 
+              var v = this.v; 
+              this.angle = Math.random(); 
+              var l = limits.l;   
+              if (this.position.x>l&&this.position.x<view.center.x/10){  
+                self.playSoundLimit('left');
+                this.xTo = +1*v*Math.random(); 
+              }          
+              if (this.position.x>view.size.width-l-s/2&&this.position.x>view.center.x/10){ 
+                self.playSoundLimit('right');
+                this.xTo = -1*v*Math.random(); 
+              }  
+              if (this.position.y>l&&this.position.y<view.center.y/2){ 
+                self.playSoundLimit('top');
+                this.yTo = +1*v*Math.random(); 
+              }          
+              if (this.position.y>view.size.height-l-s/2&&this.position.y>view.center.y/10){ 
+                self.playSoundLimit('bottom');
+                this.yTo = -1*v*Math.random(); 
+              } 
+            },
+            move: function(){
+              this.rotate(2*Math.PI*this.angle);  
+              this.position.x=this.position.x+this.xTo; 
+              this.position.y=this.position.y+this.yTo;  
+            },
+            onFrame: function(e){
+              if(this.isMoving){ 
+                this.move();
+                if(intersectionLimit(this)){
+                  this.changeXtoAndYto();
+                } 
+              } 
+              if(this.isDying){   
+                this.opacity-=0.015; 
+                if(this.opacity<=0){
+                  this.opacity=1;
+                  this.isDeath=true;
+                }
+              }
+              if(this.isAKiller){   
+                this.opacity-=0.1; 
+                this.fillColor='#000'; 
+                if(this.opacity<=0){
+                  this.opacity=1;
+                  this.fillColor='#EEE';
+                  this.isAKiller=false;
+                }
+              }
+            } 
+          });
+          return obj; 
+        }  
+ 
+        var objs=[];
+        for(var i=0; i<this.nObj; i++ ){
+          objs.push(createObj(false)); 
+        } 
+        var objAlpha = createObj(true);
+
+        function intersectionLimit(obj){
             var isIntersected = false;
             for (var i=0; i<limits.children.length; i++){ 
               var item = limits.children[i].intersect(obj);
@@ -183,7 +221,40 @@
               }
             }    
             return isIntersected;
+        }   
+ 
+        view.on('mousedown',function(){  
+          for(var i=0; i<objs.length; i++ ){ 
+            objs[i].isMoving=!objs[i].isMoving&&!objs[i].isDeath&&!objs[i].isDying;
+            objs[i].changeXtoAndYto();
+          }           
+          objAlpha.isMoving=!objAlpha.isMoving;
+          objAlpha.changeXtoAndYto();
+        });
+
+        view.on('frame',function(e){
+          if(e.count>200){
+            for (var i=0; i<objs.length; i++){ 
+              var item = objAlpha.intersect(objs[i]);
+              isIntersected=item.closed; 
+              item.remove(); 
+              if(isIntersected&&!objs[i].isDeath){ 
+                objs[i].isDying=true;   
+                objs[i].isMoving=false;  
+                objAlpha.isAKiller=true; 
+                self.playSoundDelete(); 
+              }
+            } 
+          }  
+        });   
+
+        for(var i=0; i<objs.length; i++ ){ 
+          objs[i].isMoving=!objs[i].isMoving;
+          objs[i].onMouseDown();
         }  
+        objAlpha.isMoving=!objAlpha.isMoving;
+        objAlpha.onMouseDown(); 
+
       },    
       exe: function(){
         console.clear(); 
