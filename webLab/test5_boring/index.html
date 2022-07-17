@@ -83,7 +83,7 @@
           this.synth.triggerAttackRelease('E3','128n'); 
         }
       },
-      nObj: 5,
+      nObj: 2,
       create: function(){ 
         this.resetCanvas(); 
         var self = this; 
@@ -189,12 +189,10 @@
                   this.isDeath=true;
                 }
               }
-              if(this.isAKiller){   
-                this.opacity-=0.1; 
-                this.fillColor='#000'; 
+              if(this.isAKiller){  
+                this.opacity-=0.15;   
                 if(this.opacity<=0){
-                  this.opacity=1;
-                  this.fillColor='#EEE';
+                  this.opacity=1;   
                   this.isAKiller=false;
                 }
               }
