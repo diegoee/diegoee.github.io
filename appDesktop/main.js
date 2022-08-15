@@ -1,32 +1,27 @@
 var electron = require('electron');
 var path = require('path');
-var url = require('url');
-var fs = require('fs');
-var folderData = 'data';
-
-function readData2Plot(){
-  var list = []; 
-  var directoryPath = undefined; 
-  if(process.env.PORTABLE_EXECUTABLE_DIR){
-    directoryPath = path.join(process.env.PORTABLE_EXECUTABLE_DIR,folderData);
-  }else{ 
-    directoryPath = path.join(__dirname, folderData); 	
-  }   
-  /*
-  electron.dialog.showMessageBox(null,{
-    type: 'info',  
-    title: 'Alert',
-    message: 'directoryPath',
-    detail: directoryPath,  
-  });
-  */     
-
-  console.log('readData2Plot exe');
-  fs.readdirSync(directoryPath).forEach(function (file) {
-    console.log(file);
-    list.push(path.join(directoryPath,file));
-  }); 
-  return list;
+var url = require('url'); 
+var request = require('request'); 
+ 
+function getDataByAPI(){ 
+  return new Promise(function (resolve, reject){
+    console.log('getDataByAPI exe');
+    var url = 'https://v2.jokeapi.dev/joke/Any?lang=en&safeMode'   
+    request({
+      url: url,
+      method: 'GET' 
+    }, function(err, res, body) {
+      var json = JSON.parse(body); 
+      var data = ':('; 
+      if(json.type==='single'){
+        data=json.category+':<br>'+json.joke;
+      } 
+      if(json.type==='twopart'){
+        data=json.category+':<br>-'+json.setup+'<br>-'+json.delivery;
+      }
+      resolve(data);
+    });
+  });;
 }    
 
 electron.app.on('window-all-closed', function() { 
@@ -51,6 +46,7 @@ electron.app.on('ready', function() {
       slashes: true
     }));
   }
+
   function devTools(){
     if(mainWindow.webContents.isDevToolsOpened()){
       mainWindow.webContents.closeDevTools(); 
@@ -68,9 +64,11 @@ electron.app.on('ready', function() {
     label: 'Menu',
     submenu: [{
       label:'DevTools',
+      accelerator: 'F12', //darwin=MACOS
       click: devTools
     },{
       label:'Reload',
+      accelerator: 'F5', 
       click: reload
     },{
       type:'separator'
@@ -89,9 +87,12 @@ electron.app.on('ready', function() {
   
   electron.ipcMain.on('request01',function(event,arg){
     if(arg){  
-      console.log('request01 (readData2Plot)'); 
-      var list = readData2Plot();
-      event.sender.send('replyRequest01',list); 
+      console.log('request01'); 
+      getDataByAPI().then(function(data){ 
+        event.sender.send('replyRequest01',data); 
+      }).catch(function(data){ 
+        event.sender.send('replyRequest01','Error getting Data.'); 
+      });;
     }
   });  
 

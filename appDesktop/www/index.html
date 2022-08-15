@@ -9,32 +9,24 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <title>My App</title> 
   </head>
-  <body> 
+  <body>  
     <div class="col">  
       <div class="row" id="menu">
-        <div class="col-md-4">
+        <div class="col-md-6">
           <div class="input-group">
-            <div class="input-group-text"><i class="fa fa-database"></i></div> 
+            <div class="input-group-text">Nº jokes</div> 
+            <div class="input-group-text"><i class="fa fa-comment"></i></div> 
             <select class="form-control" id="selectData">
-              <option value="1" selected>1</option>
-              <option value="2">Pie</option> 
+              <option value="5" selected>5</option>
+              <option value="20">20</option>  
             </select>
           </div>
-        </div> 
-        <div class="col-md-4">
-          <div class="input-group">
-            <div class="input-group-text"><i class="fa fa-line-chart"></i></div> 
-            <select class="form-control" id="selectPlot"> 
-              <option value="1" selected>Candlestick</option>
-              <option value="2">Pie</option> 
-            </select>
-          </div>
-        </div> 
-        <div class="col-md-2"> 
-          <button type="button" class="btn btn-dark btn-block" id='plotBtn'><i class="fa fa-play"></i></button> 
+        </div>  
+        <div class="col-md-3"> 
+          <button type="button" class="btn btn-success btn-block" id='playBtn'><i class="fa fa-play"></i></button> 
         </div>
-        <div class="col-md-2"> 
-          <button type="button" class="btn btn-dark btn-block" data-toggle="collapse" data-target="#collapseTerminal"><i class="fa fa-terminal"></i></button> 
+        <div class="col-md-3"> 
+          <button type="button" class="btn btn-dark    btn-block" data-toggle="collapse" data-target="#collapseTerminal"><i class="fa fa-terminal"></i></button> 
         </div> 
       </div>
       <div class="collapse" id="collapseTerminal">
@@ -46,7 +38,17 @@
       </div>
       <div class="row">
         <div class="col-12">
-          <div id="chart"> Algo</div>
+          <div id="plot"></div>
+        </div> 
+      </div>  
+      <div class="row">
+        <div class="col-12"> 
+          <div class="jumbotron">
+            <h1 class="display-4">Wellcome</h1>
+            <p class="lead">Jokes!!</p>
+            <hr class="my-4">
+            <p>Play to laugh.</p> 
+          </div>  
         </div> 
       </div>  
     </div>  
@@ -71,15 +73,7 @@
       }catch(error){
         console.error(error);
       }
-    </script> 
-    <script type="text/javascript" src="../node_modules/highcharts/highstock.js"></script>
-    <script type="text/javascript" >
-      try{
-        window.Highcharts = require('../node_modules/highcharts/highstock.js');
-      }catch(error){
-        console.error(error);
-      }
-    </script> 
+    </script>  
     <!--<script type="text/javascript" src="../node_modules/popper.js/dist/umd/popper.js"></script>--> 
     <script type="text/javascript" src="../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script> 
     <script type="text/javascript" src="../node_modules/moment/moment.js"></script>  
