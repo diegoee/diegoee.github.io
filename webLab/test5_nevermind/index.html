@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Test5_nevermind</title>
+    <style>
+      body{ 
+        background-color: #444;
+        margin: 0;
+        padding: 0; 
+      } 
+      #version{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 10px;
+        right: 15px;
+        font-size: 0.75em;
+        z-index: 200;
+        color: #AAA;
+      }  
+      #main{
+        height: calc(100% - 10px);
+        width: calc(100% - 10px);
+        position: absolute;
+        background-color: #333;
+        margin: 5px;
+        padding: 0; 
+      } 
+    </style>  
+  </head>
+  <body>
+    <div id="version"></div>
+    <div id="main"></div> 
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">  
+      $('#version').html('v0.0');
+      var app = {  
+        init: function(){
+          console.log('app exe start');
+          var self = this; 
+          $('#main').html(' ');
+          var color = '#333';
+          $('#main').on('click',function(){ 
+            color=color==='#333'?'#555':'#333';
+            $(this).css({
+              'background-color': color
+            });
+          }); 
+          console.log('app exe end');
+        }     
+      };  
+      app.init();   
+    </script> 
+  </body>
+</html>
