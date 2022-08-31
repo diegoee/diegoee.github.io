@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
     <title>Web Test5_nevermind</title>
     <style>
-      body{ 
+      html,body{ 
         background-color: #444;
         margin: 0;
-        padding: 0; 
-      } 
+        padding: 0;  
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+        -moz-user-select: none;  
+        -ms-user-select: none;  
+        user-select: none; 
+        -webkit-tap-highlight-color: transparent;  
+        overflow-y: hidden;
+        overflow-x: hidden;
+      }  
       #version{
         position: absolute;
         margin: 0;
@@ -21,31 +29,47 @@
         color: #AAA;
       }  
       #main{
+        position: absolute;
         height: calc(100% - 10px);
         width: calc(100% - 10px);
-        position: absolute;
         background-color: #333;
         margin: 5px;
         padding: 0; 
+        cursor: pointer;
+        color: #AAA; 
+        font-size: 10em;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        transition: 0.15s;
       } 
+      #main div{ 
+        transition: 0.25s;
+      }  
     </style>  
   </head>
   <body>
     <div id="version"></div>
-    <div id="main"></div> 
+    <div id="main">
+      <div>:)<div> 
+    </div> 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">  
       $('#version').html('v0.0');
       var app = {  
         init: function(){
           console.log('app exe start');
-          var self = this; 
-          $('#main').html(' ');
+          var self = this;  
           var color = '#333';
+          var d = 0;
           $('#main').on('click',function(){ 
             color=color==='#333'?'#555':'#333';
+            d=d+90;
             $(this).css({
-              'background-color': color
+              'background-color': color 
+            }); 
+            $(this).find('div').css({ 
+              'transform': 'rotate('+d+'deg)',
             });
           }); 
           console.log('app exe end');
