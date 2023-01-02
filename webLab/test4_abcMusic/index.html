@@ -36,11 +36,11 @@
         @page { 
           size: A4 portrait;
         } 
-        #version, #control, #menu, #text, #menuScreen, #swing, #transpor{  
+        #version, #control, #menu, #text, #menuScreen, #musicScreen, #swing, #transpor{  
           display: none; 
         }
       } 
-      #menuScreen{
+      #menuScreen, #musicScreen{
         position: absolute;
         margin: 0;
         padding: 0;
@@ -51,7 +51,7 @@
         z-index: 100;
         transition: ease-in-out 0.25s;
       }
-      #menuScreen.open{
+      #menuScreen.open, #musicScreen.open{
         position: absolute;
         margin: 0;
         padding: 0;
@@ -125,7 +125,7 @@
             <div class="row mb">    
               <div class="col-md-3"></div>
               <div class="col-md-6">
-                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnPrint"> <i class="fas fa-print"></i> Print</button> 
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnPrint"> <i class="fas fa-print"></i> Print song</button> 
               </div>
               <div class="col-md-3"></div> 
             </div>
@@ -157,6 +157,13 @@
                 <div class="form-group">
                   <select class="form-control form-control-lg" id="selectSong"></select> 
                 </div> 
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+            <div class="row mb">  
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnMusic"><i class="fas fa-book"></i> Music knowledge</button> 
               </div>
               <div class="col-md-3"></div>
             </div>
@@ -213,6 +220,38 @@
       </div>  
     </div>
     </div> 
+    <div id="musicScreen" class="bg-light"> 
+      <div class="closeBtnContainer">
+        <button type="button" class="close" aria-label="Close" id="btnMusicClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="card">
+        <div class="card-body"> 
+          <div class="container">    
+            <div class="row mb">  
+              <div class="col-md-12 text-center"> 
+                <h5 class="card-title">Circle of fifths</h5> 
+              </div>
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
+                <img src="assets/Img1.png" class="img-fluid" alt="Circle of fifths"> 
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+            <div class="row mb">  
+              <div class="col-md-12 text-center"> 
+                <h6 class="card-subtitle mb-2 text-muted">Use of Circle</h6>
+              </div>
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
+                <img src="assets/Img2.png" class="img-fluid" alt="Circle of fifths"> 
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+          </div> 
+        </div>
+        
+      </div>
+    </div>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>  
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/dist/abcjs-basic-min.js"></script> 
@@ -220,7 +259,7 @@
     <script type="text/javascript" src="songs.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v1.7');
+      $('#version').html('v1.8');
       var app = { 
         loadE: '<div id="loading"><div class="spinner"></div></div>', 
         loadOn: function(){
@@ -380,6 +419,20 @@
             $('#menuScreen').addClass('open'); 
           } 
           $(window).trigger('resize');  
+          $('html, body').animate({
+              scrollTop: 0
+          },250); 
+        }, 
+        openCloseMusic: function(){
+          if($('#musicScreen').hasClass('open')){ 
+            $('#musicScreen').removeClass('open'); 
+          }else{
+            $('#musicScreen').addClass('open'); 
+          } 
+          $(window).trigger('resize');  
+          $('html, body').animate({
+              scrollTop: 0
+          },250); 
         }, 
         initKeyEvent: function(){ 
           //var self = this;            
@@ -478,6 +531,15 @@
             self.openCloseMenu();
           });
 
+          $('#btnMusic').on('click',function(){  
+            self.openCloseMusic();
+            self.openCloseMenu();
+          }); 
+          
+          $('#btnMusicClose').on('click',function(){ 
+            self.openCloseMusic();
+          });
+
           self.swingMode = false;
           $('#btnSwing').on('click',function(){ 
             self.swingMode=!self.swingMode; 
@@ -491,8 +553,7 @@
             name = name.substring(2,name.indexOf("\n")); 
             $('#selectSong').append('<option value='+i+'>'+name+'</option>');
           } 
-          $('#inputText').val(self.songs[0]);
-
+          $('#inputText').val(self.songs[0]); 
 
           $('#selectTransporSheet').html(' ');
           var ar = [12,11,10,9,8,7,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];

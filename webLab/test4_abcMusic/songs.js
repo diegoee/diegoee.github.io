@@ -1,6 +1,19 @@
 // init var
 var songs = [];
-var abc=''; 
+var abc='';  
+
+
+abc=''; 
+abc=abc+'X:1\n';
+abc=abc+'T: Scales\n'; 
+abc=abc+'C:Diego E.\n'; 
+abc=abc+'L:1/4\n';     
+abc=abc+'M:4/4\n';
+abc=abc+'Q:1/4=80\n';
+abc=abc+'K:C\n'; 
+abc=abc+'"^Mayor"  "C"  C1 D1 E1 F1   | G1 A1 B1 c1| c1 d1 e1 f1 | g1 a1 b1 c\'1| C3 G1 |C4|\n';  
+abc=abc+'"^Minor " "Am" A,1 B,1 C1 D1 | E1 F1 G1 A1| A1 B1 c1 d1 | e1 f1 g1 a1  | A,3 E1 |A,4|]\n';
+songs.push(abc); 
 
 abc=''; 
 abc=abc+'X:1\n';
