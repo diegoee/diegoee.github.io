@@ -2,7 +2,6 @@
 var songs = [];
 var abc='';  
 
-
 abc=''; 
 abc=abc+'X:1\n';
 abc=abc+'T: Scales\n'; 
