@@ -5,7 +5,7 @@ var abc='';
  
 abc=''; 
 abc=abc+'X:1\n';
-abc=abc+'T: mysolo\n'; 
+abc=abc+'T: City of Star (My solo)\n'; 
 abc=abc+'C: Diego E.\n'; 
 abc=abc+'L:1/8\n';     
 abc=abc+'M:4/4\n';
