@@ -2,10 +2,24 @@
 var songs = [];
 var abc='';  
 
+ 
+abc=''; 
+abc=abc+'X:1\n';
+abc=abc+'T: mysolo\n'; 
+abc=abc+'C: Diego E.\n'; 
+abc=abc+'L:1/8\n';     
+abc=abc+'M:4/4\n';
+abc=abc+'Q:1/4=100\n';
+abc=abc+'K:C\n'; 
+abc=abc+'D1E1F1A1- A1 z1 A1|A2 G1A1 c1B1A1B1|E4 z1 D1 E2|z8|\n';  
+abc=abc+'D1E1F1A1- A2 z2| z2 A1E1A1E1 D2|E2 z4 G1D1 E2|z4 z2 E1|\n';
+abc=abc+'F2 z1 E1F2 z1 E1|F2 z1 D1E2 z1 D1|E2 z1 D1E2 z1|E2 z4 e2|]\n';
+songs.push(abc);
+
 abc=''; 
 abc=abc+'X:1\n';
 abc=abc+'T: Scales\n'; 
-abc=abc+'C:Diego E.\n'; 
+abc=abc+'C: Diego E.\n'; 
 abc=abc+'L:1/4\n';     
 abc=abc+'M:4/4\n';
 abc=abc+'Q:1/4=80\n';

@@ -86,8 +86,8 @@ class AppGiroValues:
     plotData = pd.DataFrame({'Plottype': [ ], 'Desc': [ ], 'CastflowEUR': []})  
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Tax Cost'],   'CastflowEUR': [round(abs(data[data['ID_Producto']=='TAX']['Total'].sum()), 2)]})]) 
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Buy Cost'],   'CastflowEUR': [round(abs(data[data['ID_Producto']=='BUY']['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [3],'Desc': ['Total Cost'], 'CastflowEUR': [round(abs(data[data['ID_Producto'].isin(['BUY','TAX'])]['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [0],'Desc': ['Input Cash'], 'CastflowEUR': [round(abs(data[data['ID_Producto']=='BANK INPUT']['Total'].sum()), 2)]})]) 
+    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [0],'Desc': ['Total Cost'], 'CastflowEUR': [round(abs(data[data['ID_Producto'].isin(['BUY','TAX'])]['Total'].sum()), 2)]})]) 
+    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [3],'Desc': ['Input Cash'], 'CastflowEUR': [round(abs(data[data['ID_Producto']=='BANK INPUT']['Total'].sum()), 2)]})]) 
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Cash'],       'CastflowEUR': [round(abs(data[data['ID_Producto'].isin(['BANK INPUT','BUY','TAX'])]['Total'].sum()), 2)]})]) 
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Stocks'],     'CastflowEUR': [round(abs(stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 2)]})])
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [2],'Desc': ['Cartera'],    'CastflowEUR': [round(abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 2)]})])
@@ -168,14 +168,14 @@ class AppGiroValues:
           colortext = 'red'  
         pt3.annotate(text,(0,i), textcoords='offset points', xytext=(350,0), ha='right', va='center', fontname='Times New Roman', size=fontsize-4, color=colortext) 
       if plotData3['Plottype'].iloc[i]==3:
-        text = 'B/P: '+str(round((plotData1['CastflowEUR'].iloc[-1]-plotData1['CastflowEUR'].iloc[i])/plotData1['CastflowEUR'].iloc[i],2))+'%'  
+        text = 'B/P: '+str(round(((plotData3['CastflowEUR'].iloc[-1]-plotData3['CastflowEUR'].iloc[i])/plotData3['CastflowEUR'].iloc[i])*100,2))+'%'  
         colortext = 'black' 
         if plotData1['CastflowEUR'].iloc[-1]>0: 
           colortext = 'green' 
         if plotData1['CastflowEUR'].iloc[-1]<0: 
           colortext = 'red'  
         pt3.annotate(text,(0,i), textcoords='offset points', xytext=(350,0), ha='right', va='center', fontname='Times New Roman', size=fontsize-4, color=colortext)
-
+    
     pt3.set_title('Información Cartera GIRO', fontname="Times New Roman", size=18 , fontweight='bold')
     pt3.xaxis.set_label_text('')  
     pt3.yaxis.set_label_text('EUR')  
