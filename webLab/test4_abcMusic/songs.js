@@ -12,7 +12,7 @@ abc=abc+'M:4/4\n';
 abc=abc+'Q:1/4=100\n';
 abc=abc+'K:C\n'; 
 abc=abc+'"Dm" D1E1F1A1- A2 z1 A1|"Bm" A2 G1A1 c1B1A1B1|"Am"E4 z2 z1 D1 |E2 z6|\n';  
-abc=abc+'"Dm" D1E1F1A1- A2 z1 A1|"Bm" A2 A1E1 A1E1D1E1|"C"z1 E2 z1 z2 G1D1|E2 z4 z1E1|\n';
+abc=abc+'"Dm" D1E1F1A1- A2 z1 A1|"Bm" A2 A1E1 A1E1D1E1|"C"z1 E3 z2 G1D1|E2 z4 z1E1|\n';
 abc=abc+'"Dm"   F2 z1 E1F2 z1 E1|"Bm" F2 z1 E1F2 z1 D1|"Am" E2 z1 D1E2 z1D1|E2 z4 e2|]\n';
 songs.push(abc);
 
