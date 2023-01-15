@@ -121,21 +121,7 @@ class AppGiroValues:
         (plotDataS.index.size-2,plotDataS['Mean'].iloc[-1]), # these are the coordinates to position the label
         textcoords="offset points", # how to position the text
         xytext=(0,10), # distance from text to points (x,y)
-        ha='center') # horizontal alignment can be left, right or center
-      colortext = 'black' 
-      if plotDataS['CastflowEUR'].iloc[-1]>0: 
-        colortext = 'green' 
-      if plotDataS['CastflowEUR'].iloc[-1]<0: 
-        colortext = 'red' 
-      axs[i].annotate('B/P: '+str(plotDataS['CastflowEUR'].iloc[-1])+' €', # this is the text
-        (plotDataS.index.size-2,plotDataS['CastflowEUR'].iloc[-1]), # these are the coordinates to position the label
-        textcoords="offset points", # how to position the text
-        xytext=(0,10), # distance from text to points (x,y)
-        ha='center', # horizontal alignment can be left, right or center
-        fontname="Times New Roman", 
-        size=16, 
-        fontweight='bold',
-        color=colortext) 
+        ha='center') # horizontal alignment can be left, right or center 
     
     #plots 1: DATA
     plotData = pd.DataFrame({'Fecha': [ ], 'CastflowEUR': []}) 
