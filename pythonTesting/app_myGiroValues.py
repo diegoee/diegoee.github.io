@@ -33,7 +33,7 @@ class AppGiroValues:
     print('MOVEMENTS')
     print(data)
     
-    def getStockValue(type, ticket, N, dStart, dEnd, DescTicket, value): 
+    def getStockValue(type, ticket, N, dStart, dEnd, descTicket): 
       stock = pd.DataFrame({'Fecha': [ ], 'ID_Producto': [], 'Desc': [], 'N': [], 'CastflowEUR': []}) 
 
       if type=='STOCK': 
@@ -49,13 +49,10 @@ class AppGiroValues:
             aux['Fecha'] = date 
             stock = pd.concat([stock, aux])         
 
-      if type=='DIVIDEND RIGHT': 
-        stock['Fecha'] = pd.date_range(start=dStart, end=dEnd, freq='D')  
-        stock['CastflowEUR'] = value
-
+      #pd.date_range(start=dStart, end=dEnd, freq='D') 
       stock['ID_Producto'] = type
       stock['N'] = N
-      stock['Desc'] = DescTicket  
+      stock['Desc'] = descTicket  
       stock = stock[['Fecha','ID_Producto','Desc','N','CastflowEUR']]
       return stock
 
@@ -65,7 +62,7 @@ class AppGiroValues:
 
     stocks = pd.DataFrame({'Fecha': [ ], 'ID_Producto': [], 'Desc': [], 'N': [], 'CastflowEUR': []}) 
     for i in range(stocksData.index.size):  
-      stocks = pd.concat([stocks, getStockValue(stocksData['type'].loc[i], stocksData['ticker'].loc[i], stocksData['N'].loc[i], stocksData['dStart'].loc[i], stocksData['dEnd'].loc[i], stocksData['desc'].loc[i], stocksData['value'].loc[i])])   
+      stocks = pd.concat([stocks, getStockValue(stocksData['type'].loc[i], stocksData['ticker'].loc[i], stocksData['N'].loc[i], stocksData['dStart'].loc[i], stocksData['dEnd'].loc[i], stocksData['desc'].loc[i])])   
     stocks.sort_values(by=['Fecha', 'ID_Producto','Desc'], inplace=True, ascending=True)
       
     stocks['CastflowEUR'] = stocks['CastflowEUR'].replace(',','.', regex=True) 
@@ -107,6 +104,13 @@ class AppGiroValues:
       axs[i].grid() 
       axs[i].legend().remove()   
 
+      axs[i].spines['left'  ].set_color('white')
+      axs[i].spines['right' ].set_color('white')
+      axs[i].spines['top'   ].set_color('white') 
+      axs[i].spines['bottom'].set_color('white')
+      axs[i].yaxis.label.set_color('grey')
+      axs[i].tick_params(axis='x', colors='grey') 
+      axs[i].tick_params(axis='y', colors='grey') 
       axs[i].annotate('Min.: '+str(plotDataS['Min'].iloc[-1])+' €', # this is the text
         (plotDataS.index.size-2,plotDataS['Min'].iloc[-1]), # these are the coordinates to position the label
         textcoords="offset points", # how to position the text
@@ -172,7 +176,14 @@ class AppGiroValues:
       fontname="Times New Roman", 
       size=16, 
       fontweight='bold',
-      color=colortext)
+      color=colortext) 
+    ax1.spines['left'  ].set_color('white')
+    ax1.spines['right' ].set_color('white')
+    ax1.spines['top'   ].set_color('white') 
+    ax1.spines['bottom'].set_color('white')
+    ax1.yaxis.label.set_color('grey')
+    ax1.tick_params(axis='x', colors='grey') 
+    ax1.tick_params(axis='y', colors='grey') 
 
     #plots 2: DATA
     plotData = pd.DataFrame({'ID_Producto': [ ], 'Total': []})  
@@ -201,6 +212,11 @@ class AppGiroValues:
     ax2.get_legend().remove() 
     ax2.legend(title=None, labels=plotData2['Labels'], loc="center left", bbox_to_anchor=(1, 0, 0.5, 1), prop={'size': 8}) 
     ax2.set_title('Información Cartera GIRO', fontname="Times New Roman", size=18, fontweight='bold')
+
+    ax2.spines['left'  ].set_color('white')
+    ax2.spines['right' ].set_color('white')
+    ax2.spines['top'   ].set_color('white') 
+    ax2.spines['bottom'].set_color('white')
     
     #plots 3: DATA
     plotData = pd.DataFrame({'Plottype': [ ], 'Desc': [ ], 'CastflowEUR': []})  
@@ -209,7 +225,6 @@ class AppGiroValues:
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [0],'Desc': ['Total Cost'], 'CastflowEUR': [round(abs(data[data['ID_Producto'].isin(['BUY','TAX'])]['Total'].sum()), 2)]})]) 
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [3],'Desc': ['Input Cash'], 'CastflowEUR': [round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2)]})]) 
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Cash'],       'CastflowEUR': [round(abs(data[data['ID_Producto'].isin(['FREE INPUT','INPUT','BUY','TAX'])]['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Div. Rights'],'CastflowEUR': [round(abs(stocks[stocks['ID_Producto'].isin(['DIVIDEND RIGHT']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum()), 2)]})])
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Stocks'],     'CastflowEUR': [round(abs(stocks[stocks['ID_Producto'].isin(['STOCK'])          & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum()), 2)]})])
     plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [2],'Desc': ['Cartera'],    'CastflowEUR': [round(abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 2)]})])
     plotData3 = plotData 
@@ -286,7 +301,6 @@ class AppGiroValues:
         fontweight=fontw
       ) 
 
-
     for i in range(0, ncols):
       ax3.annotate(
         xy=(x[i], nrows),
@@ -294,7 +308,7 @@ class AppGiroValues:
         weight='bold',
         va='bottom',
         ha='center'
-      ) 
+      )  
 
     #plots 4: MATPLOT
     ax4.set_axis_off() 
@@ -349,7 +363,7 @@ class AppGiroValues:
         weight='bold',
         va='bottom',
         ha='center'
-      ) 
+      )  
     
     fig.tight_layout(pad=0.5) 
     fig.savefig(os.path.dirname(__file__)+'/'+'CarteraGiro.png', bbox_inches='tight', dpi=300)
