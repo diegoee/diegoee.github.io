@@ -46,15 +46,15 @@
             selection: false,
             preserveObjectStacking: true,             
           }); 
-          var rC = 50;
+          var rC = (canvas.height<canvas.width?canvas.width*0.0125:canvas.height*0.0125);
           var circle = new fabric.Circle({
             radius: rC,
             fill: '#DDD',
             left: canvas.width/2-rC, 
             top: canvas.height/2-rC,
             selectable: false,
-            evented: false 
-          }); 
+            hoverCursor: "pointer" 
+          });  
           canvas.add(circle);
           canvas.renderAll();   
 
@@ -63,7 +63,7 @@
                 left: app.getRandomN(2*rC,canvas.width -2*rC),
                 top:  app.getRandomN(2*rC,canvas.height-2*rC) 
               },{
-              duration: 500,
+              duration: 2000,
               onChange: canvas.renderAll.bind(canvas),
               onComplete: function(){ 
                 if(startStop){
@@ -76,17 +76,36 @@
           var startStop = true;
           animate();
           canvas.on({ 
-            'mouse:down': function(options){ 
+            'mouse:down': function(e){ 
+              var clickPoint = new fabric.Circle({
+                radius: 10,
+                fill: '#DDD',
+                left: e.pointer.x-10, 
+                top: e.pointer.y-10,
+                selectable: false,
+                evnted: false,
+                hoverCursor: 'none'
+              });                
+              clickPoint.animate({ 
+                  radius: 50,  
+                  left: e.pointer.x-50, 
+                  top: e.pointer.y-50,
+                  opacity: 0.1
+                },{
+                  duration: 200,
+                  onChange: canvas.renderAll.bind(canvas),
+                  onComplete: function(){  
+                    canvas.remove(clickPoint);
+                  }
+              });
+              canvas.add(clickPoint);
+              canvas.renderAll(); 
               startStop = !startStop;
               if(startStop){
                 animate();
               }
             }, 
           });
-          //var fx = 0.0025;
-          //var fy = fx;
-          //graphics.x =  canvas.width/2 +(3/7)*canvas.width *Math.cos(2*Math.PI*fx*t);
-          //graphics.y =  canvas.height/2+(3/7)*canvas.height*Math.sin(2*Math.PI*fy*t);  
         },
         resize: function(){ 
           app.nResize++;   
