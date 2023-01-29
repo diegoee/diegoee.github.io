@@ -56,58 +56,90 @@
             hoverCursor: "pointer" 
           });  
           canvas.add(circle);
-          canvas.renderAll();   
+          canvas.renderAll();  
 
-          function animate(){ 
-            circle.animate({ 
-                left: app.getRandomN(2*rC,canvas.width -2*rC),
-                top:  app.getRandomN(2*rC,canvas.height-2*rC) 
-              },{
-              duration: 2000,
-              onChange: canvas.renderAll.bind(canvas),
-              onComplete: function(){ 
-                if(startStop){
-                  animate();
-                }
-              },
-              easing: fabric.util.ease.easeOutBack
-            });
-          }
           var startStop = true;
-          animate();
+          var points=[];
           canvas.on({ 
             'mouse:down': function(e){ 
               var clickPoint = new fabric.Circle({
-                radius: 10,
+                radius: 5,
                 fill: '#DDD',
-                left: e.pointer.x-10, 
-                top: e.pointer.y-10,
+                left: e.pointer.x-5, 
+                top: e.pointer.y-5,
                 selectable: false,
                 evnted: false,
                 hoverCursor: 'none'
               });                
               clickPoint.animate({ 
-                  radius: 50,  
-                  left: e.pointer.x-50, 
-                  top: e.pointer.y-50,
+                  radius: 40,  
+                  left: e.pointer.x-40, 
+                  top: e.pointer.y-40,
                   opacity: 0.1
                 },{
                   duration: 200,
                   onChange: canvas.renderAll.bind(canvas),
                   onComplete: function(){  
-                    canvas.remove(clickPoint);
+                    clickPoint.animate({ 
+                      radius: 5,  
+                      left: e.pointer.x-5, 
+                      top: e.pointer.y-5,
+                      opacity: 1
+                    },{
+                      duration: 200,
+                      onChange: canvas.renderAll.bind(canvas),
+                      onComplete: function(){  
+                        clickPoint.animate({  
+                          opacity: 0
+                        },{
+                          duration: 15000,
+                          onChange: canvas.renderAll.bind(canvas),
+                          onComplete: function(){  
+                            canvas.remove(clickPoint);
+                          }
+                        }); 
+                      }
+                    }); 
                   }
               });
+              points.push(clickPoint);
               canvas.add(clickPoint);
               canvas.renderAll(); 
-              startStop = !startStop;
-              if(startStop){
-                animate();
-              }
+              //startStop = !startStop;    
             }, 
-          });
+          }); 
+
+          var xPos = app.getRandomN(2*rC,canvas.width -2*rC);
+          var yPos = app.getRandomN(2*rC,canvas.height-2*rC);
+          var time = 0; 
+          function animate(){ 
+            if(startStop){
+              time++;  
+              if(circle.left>xPos){
+                circle.left=circle.left-10;
+              }
+              if(circle.left<xPos){
+                circle.left=circle.left+10;
+              }
+              if(circle.top>yPos){
+                circle.top=circle.top-10;
+              }
+              if(circle.top<yPos){
+                circle.top=circle.top+10;
+              } 
+              if(time%30===0){
+                xPos = app.getRandomN(2*rC,canvas.width -2*rC); 
+                yPos = app.getRandomN(2*rC,canvas.height-2*rC); 
+              }  
+            } 
+            fabric.util.requestAnimFrame(animate, canvas.getElement());
+            canvas.renderAll(); 
+          } 
+          fabric.util.requestAnimFrame(animate, canvas.getElement());
+          canvas.renderAll(); 
         },
         resize: function(){ 
+          console.log('app resize');  
           app.nResize++;   
           if (app.nResize>app.nLimitResize){
             location.reload();
