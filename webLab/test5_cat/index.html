@@ -38,6 +38,56 @@
         },
         getRandomB: function() {
           return Math.random()<0.5?0:1;
+        }, 
+        createCircleClick: function(canvas,x,y,fnCallBack){  
+          var clickPoint = new fabric.Circle({ 
+              radius: 5,
+              fill: '#DDD',
+              left: x-5, 
+              top: y-5,
+              selectable: false,
+              evnted: false,
+              hoverCursor: 'none'
+            });                 
+            clickPoint.animate({ 
+                radius: 40,  
+                left: x-40, 
+                top: y-40,
+                opacity: 0.1
+              },{
+                duration: 200,
+                onChange: canvas.renderAll.bind(canvas),
+                onComplete: function(){  
+                  clickPoint.animate({ 
+                    radius: 5,  
+                    left: x-5, 
+                    top: y-5,
+                    opacity: 1
+                  },{
+                    duration: 200,
+                    onChange: canvas.renderAll.bind(canvas),
+                    onComplete: function(){   
+                      var r = app.getRandomN(3,5);
+                      clickPoint.animate({   
+                        radius: r,  
+                        left: x-r, 
+                        top: y-r,
+                        opacity: Math.random()+0.2
+                      },{
+                        duration: 5000,
+                        onChange: canvas.renderAll.bind(canvas), 
+                        onComplete: function(){  
+                          if(typeof fnCallBack === 'function'){
+                            fnCallBack(clickPoint);
+                          }
+                        } 
+                      }); 
+                    }
+                  }); 
+                }
+            });
+            canvas.add(clickPoint);
+            canvas.renderAll(); 
         },
         plot: function(){  
           var canvas = new fabric.Canvas('canvas',{ 
@@ -48,6 +98,7 @@
           }); 
           var rC = (canvas.height<canvas.width?canvas.width*0.0125:canvas.height*0.0125);
           var circle = new fabric.Circle({
+            id: 'circle',
             radius: rC,
             fill: '#DDD',
             left: canvas.width/2-rC, 
@@ -57,54 +108,21 @@
           });  
           canvas.add(circle);
           canvas.renderAll();  
+          
+          //init samme click
+          for(var i=0; i<canvas.width; i++){
+            for(var ii=0; ii<canvas.height; ii++){
+              if(Math.random()<0.000025){ 
+                app.createCircleClick(canvas,i,ii); 
+              }
+            }
+          }
 
           var startStop = true; 
           canvas.on({ 
             'mouse:down': function(e){ 
-              var clickPoint = new fabric.Circle({
-                radius: 5,
-                fill: '#DDD',
-                left: e.pointer.x-5, 
-                top: e.pointer.y-5,
-                selectable: false,
-                evnted: false,
-                hoverCursor: 'none'
-              });                 
-              clickPoint.animate({ 
-                  radius: 40,  
-                  left: e.pointer.x-40, 
-                  top: e.pointer.y-40,
-                  opacity: 0.1
-                },{
-                  duration: 200,
-                  onChange: canvas.renderAll.bind(canvas),
-                  onComplete: function(){  
-                    clickPoint.animate({ 
-                      radius: 5,  
-                      left: e.pointer.x-5, 
-                      top: e.pointer.y-5,
-                      opacity: 1
-                    },{
-                      duration: 200,
-                      onChange: canvas.renderAll.bind(canvas),
-                      onComplete: function(){   
-                        var r = app.getRandomN(3,5);
-                        clickPoint.animate({   
-                          radius: r,  
-                          left: e.pointer.x-r, 
-                          top: e.pointer.y-r,
-                          opacity: Math.random()+0.2
-                        },{
-                          duration: 5000,
-                          onChange: canvas.renderAll.bind(canvas) 
-                        }); 
-                      }
-                    }); 
-                  }
-              });
-              canvas.add(clickPoint);
-              canvas.renderAll(); 
-              //startStop = !startStop;    
+              app.createCircleClick(canvas,e.pointer.x,e.pointer.y,function(point){ 
+              });   
             }, 
           }); 
 
@@ -120,32 +138,17 @@
               onChange: canvas.renderAll.bind(canvas),
               easing: fabric.util.ease.easeOutBack,
               onComplete: function(){   
+                for(var i=0; i<canvas.getObjects().length; i++){  
+                  if(canvas.getObjects()[i].id!=='circle'){
+                    if(canvas.getObjects()[i].intersectsWithObject(circle)){  
+                      canvas.remove(canvas.getObjects()[i]);
+                    }
+                  }
+                }   
+                canvas.renderAll();             
                 animate(); 
               }
-            });
-            /*
-            if(startStop){
-              time++;  
-              if(circle.left>xPos){
-                circle.left=circle.left-10;
-              }
-              if(circle.left<xPos){
-                circle.left=circle.left+10;
-              }
-              if(circle.top>yPos){
-                circle.top=circle.top-10;
-              }
-              if(circle.top<yPos){
-                circle.top=circle.top+10;
-              } 
-              if(time%30===0){
-                xPos = app.getRandomN(2*rC,canvas.width -2*rC); 
-                yPos = app.getRandomN(2*rC,canvas.height-2*rC); 
-              }  
-            }  
-            //fabric.util.requestAnimFrame(animate, canvas.getElement());
-            //canvas.renderAll();  
-            */
+            }); 
           } 
           fabric.util.requestAnimFrame(animate, canvas.getElement());
           canvas.renderAll(); 

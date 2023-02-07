@@ -26,9 +26,12 @@ class AppGiroValues:
     data.loc[data['Desc'].str.contains('Venta'), 'ID_Producto'] = 'SELL' 
     data.loc[data['Desc'].str.contains('reembolso'), 'ID_Producto'] = 'FREE INPUT' 
     data.loc[data['Desc'].str.contains('Income'), 'ID_Producto'] = 'FREE INPUT' 
+    data.loc[data['Desc'].str.contains('ividendo'), 'ID_Producto'] = 'FREE INPUT' 
+    data.loc[data['Desc'].str.contains('etención'), 'ID_Producto'] = 'TAX' 
     data['CastflowEUR'] = data['CastflowEUR'].replace(',','.', regex=True) 
     data['CastflowEUR'] = data['CastflowEUR'].astype(float)
     data['Total'] = data['N']*data['CastflowEUR']
+    data = data[data['CastflowEUR']!=0]
     data.sort_values(by=['Fecha','Desc'], inplace=True, ascending=True)
     print('MOVEMENTS')
     print(data)
