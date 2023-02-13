@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Test6_QR</title> 
+    <style>   
+      html,body{ 
+        padding: 0;
+        margin: 0;
+        background-color: #333; 
+        color: #DDD;
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+          -moz-user-select: none;  
+            -ms-user-select: none;  
+                user-select: none; 
+        -webkit-tap-highlight-color: transparent; 
+      }  
+       
+      #menu{     
+        font-size: 2em;
+        padding: 1em;
+        text-align: center;  
+      }
+      
+      #menu>input{    
+        font-size: 0.75em; 
+        width: 50%;
+      }
+      @media (max-width: 680px) {
+        #menu>input{     
+          width: 95%;
+        }
+      }
+
+      #qrcode{  
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+      }  
+      
+      /*
+      #menu{ 
+        position: absolute;
+        top: 0;
+        left: 0; 
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+        background-color: #333;
+        color: #DDD;
+        z-index: 10;
+      } 
+      */
+    </style>  
+  </head>
+  <body>   
+    <div id="body"> 
+      <div id="menu">
+        <div>Test to QR </div> 
+        <input type="text"   id="textExe" value="Hola Mundo"> 
+      </div>
+    </div>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>  
+    <script type="text/javascript">  
+      var app = {  
+        exe: function(){ 
+          $('#qrcode').remove(); 
+          $('#body').append('<div id="qrcode"></div>'); 
+          var dim = ($(window).innerHeight()-$('#menu').innerHeight()>$(window).innerWidth()?$(window).innerWidth()-10:$(window).innerHeight()-$('#menu').innerHeight()-10);
+          try{
+            var text = $('#textExe').val().trim(); 
+            var qrcode = new QRCode("qrcode", {
+              text: text,
+              width: dim,
+              height: dim,
+              colorDark : "#000000",
+              colorLight : "#ffffff"
+            });  
+          }catch(e){
+            console.error(e);
+            $('#qrcode').html('<p>Error in <b>qrcodejs</b>. '+e+'</p>');
+          }
+        },
+        init: function(){
+          console.log('app exe start');   
+          $('#textExe').on('input',function(){
+            app.exe();
+          }); 
+          app.exe();
+          $(window).on('resize',app.exe);           
+          console.log('app exe end');
+        }     
+      };  
+      app.init();   
+    </script> 
+  </body>
+</html>
