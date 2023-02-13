@@ -49,7 +49,7 @@
         text-shadow: 0 0 10px #DDD;
       } 
 
-      #qrcode{  
+      #qrcode-container{  
         display: flex;
         align-items: center;
         justify-content: center; 
@@ -64,31 +64,27 @@
         <div><a id="downloadImg" href="#" download="myQr.jpg"> Download QR</a></div>  
       </div>
     </div>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
-    <script type="text/javascript" src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>  
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script type="text/javascript">  
       var app = {  
         exe: function(){ 
-          $('#qrcode').remove(); 
-          $('#body').append('<div id="qrcode"></div>'); 
+          $('#qrcode-container').remove(); 
+          $('#body').append('<div id="qrcode-container"><canvas id="qrcode"></canvas><div>'); 
           var dim = ($(window).innerHeight()-$('#menu').innerHeight()>$(window).innerWidth()?$(window).innerWidth()-10:$(window).innerHeight()-$('#menu').innerHeight()-10);
           try{
             var text = $('#textExe').val().trim(); 
-            var qrcode = new QRCode("qrcode", {
-              text: text,
-              width: dim,
-              height: dim,
-              colorDark : "#000000",
-              colorLight : "#ffffff",
-              correctLevel : QRCode.CorrectLevel.H
-            });  
+            var qrcode = new QRious({
+              element: document.getElementById('qrcode'), 
+              level: 'H', 
+              size: dim, 
+              value: text
+            }); 
             $('#downloadImg').attr('download','myQr_'+text.replaceAll(/ /ig,'_')+'.jpg'); 
-            setTimeout(function(){ 
-              $('#downloadImg').attr('href',$($('#qrcode img')[0]).attr('src'));
-            },1000);
+            $('#downloadImg').attr('href',document.getElementById('qrcode').toDataURL());
           }catch(e){
             console.error(e);
-            $('#qrcode').html('<p>Error in <b>qrcodejs</b>. '+e+'</p>');
+            $('#qrcode-container').html('<p>Error in <b>qriousjs</b>. '+e+'</p>');  
           }
         },
         init: function(){
