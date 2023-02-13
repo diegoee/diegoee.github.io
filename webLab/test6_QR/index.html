@@ -23,45 +23,45 @@
         padding: 1em;
         text-align: center;  
       }
-      
-      #menu>input{    
+      #menu p{     
+        padding: 0;
+        margin: 0;  
+      }
+
+      #textExe{    
         font-size: 0.75em; 
         width: 50%;
       }
       @media (max-width: 680px) {
-        #menu>input{     
+        #textExe{     
           width: 95%;
         }
       }
+
+      #downloadImg{ 
+        color: #DDD;
+        transition: 0.25s;
+      }
+      #downloadImg:active{ 
+        color: #444;
+      }
+      #downloadImg:hover{ 
+        text-shadow: 0 0 10px #DDD;
+      } 
 
       #qrcode{  
         display: flex;
         align-items: center;
         justify-content: center; 
       }  
-      
-      /*
-      #menu{ 
-        position: absolute;
-        top: 0;
-        left: 0; 
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center; 
-        background-color: #333;
-        color: #DDD;
-        z-index: 10;
-      } 
-      */
     </style>  
   </head>
   <body>   
     <div id="body"> 
       <div id="menu">
-        <div>Test to QR </div> 
-        <input type="text"   id="textExe" value="Hola Mundo"> 
+        <div><p>Text to QR</p></div> 
+        <div><input type="text"   id="textExe" value="Hola Mundo"></div>
+        <div><a id="downloadImg" href="#" download="myQr.jpg"> Download QR</a></div>  
       </div>
     </div>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
@@ -79,8 +79,13 @@
               width: dim,
               height: dim,
               colorDark : "#000000",
-              colorLight : "#ffffff"
+              colorLight : "#ffffff",
+              correctLevel : QRCode.CorrectLevel.H
             });  
+            $('#downloadImg').attr('download','myQr_'+text.replaceAll(/ /ig,'_')+'.jpg'); 
+            setTimeout(function(){ 
+              $('#downloadImg').attr('href',$($('#qrcode img')[0]).attr('src'));
+            },1000);
           }catch(e){
             console.error(e);
             $('#qrcode').html('<p>Error in <b>qrcodejs</b>. '+e+'</p>');
