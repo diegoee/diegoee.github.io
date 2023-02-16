@@ -2,82 +2,83 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">  
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" > 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css"> 
     <title>Web Test6_QR</title>   
     <style>
       html,body{ 
         padding: 0;
         margin: 0;
         background-color: #333; 
-        color: #DDD;
-        -webkit-user-select: none;  
-        -khtml-user-select: none;  
-          -moz-user-select: none;  
-            -ms-user-select: none;  
-                user-select: none; 
-        -webkit-tap-highlight-color: transparent; 
-      } 
-      #page-intro{
-        padding-top: 100px; 
-      } 
-      #page-intro>.col{
-        padding-top:    50px; 
-        padding-bottom: 50px; 
+        color: #DDD;  
       }   
-      #scanQR-scanner{
-        width: 100%;
-      }  
-      #scanQR-result{
-        padding: 50px;
-      }  
+      .notDisplay{
+        display: none;
+      } 
+      #page-btn-back{
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        margin: 1em;
+        z-index: 10;
+      }
+      #page-createQR,#page-scanQR,#page-intro{
+        padding-top: 40px;  
+      }
+      #page-intro{ 
+        padding-bottom: 50px;
+        height: 350px;
+      }
+      #scanQR-result{ 
+        color: #000;
+      }
     </style>
   </head>
   <body>   
-    <div class="fixed-action-btn" id="page-btn-back">
-      <a class="btn-floating btn-large scale-transition scale-out" id="btn-back">
-        <i class="large material-icons">keyboard_arrow_left</i>
-      </a> 
+    <div id="page-btn-back" class="notDisplay">
+      <button id="btn-back" type="button" class="btn btn-light" ><i class="large material-icons">keyboard_arrow_left</i></button> 
     </div>
-    <div class="container"> 
-      <div class="row" id="page-intro">  
-        <div class="col s12 m6 l6 center-align"><button class="btn waves-effect waves-light btn-large" type="button" value="create"><i class="material-icons left">code</i>Create QR</button></div>
-        <div class="col s12 m6 l6 center-align"><button class="btn waves-effect waves-light btn-large" type="button" value="scan"  ><i class="material-icons left">photo_camera</i>Scan QR</button></div>  
+    <div class="container px-4"> 
+      <div class="row g-4"            id="page-intro"   >  
+        <div class="col-sm-6 gx-5 text-center d-grid"><button class="btn btn-light btn-lg align-middle" value="create"><i class="material-icons">code</i> <span>Create QR</span></button></div>
+        <div class="col-sm-6 gx-5 text-center d-grid"><button class="btn btn-light btn-lg align-middle" value="scan"  ><i class="material-icons">photo_camera</i> <span>Scan QR</span></button></div>  
       </div>
-      <div class="row" id="page-createQR">  
-        <div class="col s12 m12 l12 center-align"><input type="text" id="qrcode-textExe" value="Hola Mundo"></div>  
-        <div class="col s12 m12 l12 center-align">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title activator grey-text text-darken-4">Text to QR<i class="material-icons right">more_vert</i></span> 
-            </div>
-            <div class="card-image">
+      <div class="row g-4 notDisplay" id="page-createQR">   
+        <div class="col gx-5 text-center">
+          <div class="card"> 
+            <div class="card-body">
+              <div class="input-group input-group-lg mb-3">
+                <span class="input-group-text"><i class="material-icons">text_fields</i></span>
+                <input type="text" class="form-control" id="qrcode-textExe" value="Hola Mundo">
+              </div> 
               <canvas id="qrcode"></canvas>
-            </div>
-            <div class="card-reveal">
-              <span class="card-title grey-text text-darken-4"><i class="material-icons right">close</i></span> 
-              <a id="qrcode-downloadImg" href="#" download="myQr.jpg"> Download QR</a>
-            </div>
-          </div>
+              <p class="card-text fs-4"><a id="qrcode-downloadImg" href="#" download="myQr.jpg"> Download QR</a></p> 
+            </div> 
+          </div> 
         </div>  
       </div>  
-      <div class="row" id="page-scanQR">  
-        <div class="col s12 m12 l12 center-align">    
-          <div class="card grey-text text-darken-4" id="scanQR-result">algo</div> 
+      <div class="row g-4 notDisplay" id="page-scanQR"  >  
+        <div class="col-12 gx-5 text-center">    
+          <div class="card" id="scanQR-result">
+            <div class="card-body">  
+            </div>  
+          </div>  
+        </div> 
+        <div class="col-12 gx-5 text-center">     
           <video id="scanQR-scanner"></video> 
         </div> 
       </div> 
     </div> 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/qr-scanner/1.4.2/qr-scanner.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript">    
       var app = {  
         generateCodeQR: function(){   
-          var dim = ($(window).innerHeight()-250>$(window).innerWidth()?$(window).innerWidth():$(window).innerHeight()-250);
-          $('#qrcode').height(dim-70);
+          var dim = ($(window).innerHeight()>$(window).innerWidth()?$(window).innerWidth()-100:$(window).innerHeight()-220);
+          $('#qrcode').height(dim);
           try{
             var text = $('#qrcode-textExe').val().trim(); 
             var qrcode = new QRious({
@@ -94,19 +95,29 @@
           }
         },
         qrScanner: undefined,
-        scanCodeQR: function(){ 
-          $('#scanQR-scanner').innerHeight($(window).innerHeight()-30); 
-          $('#scanQR-result').addClass('hide');   
+        scanCodeQR: function(){  
+          $('#scanQR-scanner').width($('#page-scanQR').width()-100);
+          $('#scanQR-result').addClass('notDisplay'); 
+          $('#scanQR-scanner').removeClass('notDisplay');     
           app.qrScanner = new QrScanner(
             document.getElementById('scanQR-scanner'),
             function(result){
-              if (!(result===null||result===undefined||result==='')){ 
+              if (!(result===null||result===undefined||result==='')){
+                result=result.trim(); 
                 console.log('Scanned result: '+result); 
-                app.qrScanner.stop(); 
-                $('#scanQR-result').removeClass('hide');
-                $('#scanQR-result').html('<p>'+result+'</p>');
-                $('#scanQR-result').append('<a class="btn waves-effect waves-light btn-large" href="#init"> Scan QR again</a>'); 
-                $('#btn-back').addClass('scale-out'); 
+                app.qrScanner.stop();  
+                $('#scanQR-result').removeClass('notDisplay'); 
+                $('#scanQR-scanner').addClass('notDisplay');  
+                $('#page-btn-back').addClass('notDisplay');  
+                if((result.indexOf('.')!==-1)&&(result.indexOf(' ')===-1)){
+                  $('#scanQR-result .card-body').html('<p class="fs-3 text-break" ><a href="'+result+'" class="link-primary">'+result+'</a></p>'); 
+                }else{ 
+                  $('#scanQR-result .card-body').html('<p class="fs-3 text-break" >'+result+'</p>');
+                }   
+                $('#scanQR-result .card-body').append('<button class="btn btn-dark btn-lg" value="init"><i class="material-icons left">refresh</i> <span>Scan QR Again</span></button>');
+                $('#scanQR-result .card-body button').one('click',function(){
+                  app.exe();
+                });
               }
             }
           );
@@ -116,28 +127,25 @@
           var hash = window.location.hash; 
           if((app.qrScanner!==undefined) && (typeof app.qrScanner.stop ==="function")){
             app.qrScanner.stop();  
+          }  
+          $('#page-btn-back').addClass('notDisplay');  
+          $('#page-intro').removeClass('notDisplay');  
+          $('#page-createQR').addClass('notDisplay');  
+          $('#page-scanQR').addClass('notDisplay');    
+          if(hash==='#create'){
+            $('#page-btn-back').removeClass('notDisplay'); 
+            $('#page-createQR').removeClass('notDisplay');
+            $('#page-intro').addClass('notDisplay');   
+            $('#page-scanQR').addClass('notDisplay');   
+            app.generateCodeQR(); 
           }
-          $('#scanQR-result').addClass('hide');
-          if(hash!=='#scan-using-file'){
-            $('#btn-back').addClass('scale-out');  
-            $('#page-intro').removeClass('hide');  
-            $('#page-createQR').addClass('hide');  
-            $('#page-scanQR').addClass('hide');    
-            if(hash==='#create'){
-              $('#btn-back').removeClass('scale-out'); 
-              $('#page-createQR').removeClass('hide');
-              $('#page-intro').addClass('hide');   
-              $('#page-scanQR').addClass('hide');   
-              app.generateCodeQR(); 
-            }
-            if(hash==='#scan'){
-              $('#btn-back').removeClass('scale-out'); 
-              $('#page-scanQR').removeClass('hide'); 
-              $('#page-intro').addClass('hide');   
-              $('#page-createQR').addClass('hide');  
-              app.scanCodeQR(); 
-            }
-          }
+          if(hash==='#scan'){
+            $('#page-btn-back').removeClass('notDisplay'); 
+            $('#page-scanQR').removeClass('notDisplay'); 
+            $('#page-intro').addClass('notDisplay');   
+            $('#page-createQR').addClass('notDisplay');  
+            app.scanCodeQR(); 
+          } 
         },
         init: function(){
           console.log('app exe start');  
