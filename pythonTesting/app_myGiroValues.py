@@ -1,33 +1,33 @@
 class AppGiroValues:        
   def __init__(self):
     print('***')
-    print('*** START: AppGiroValues ***')
+    print('*** START: AppGiroValues ***')  
+    import numpy as np
     import pandas as pd 
     import yahoofinancials as yf
     import datetime as dt
     import matplotlib.pyplot as plt 
-    import os
-
+    import os 
+    #Read, cleaning and formating MOVMENTS 
     data = pd.read_csv(os.path.dirname(__file__)+'/'+'giro_count.csv', sep=',') 
     data = data[data['ISIN']!='NLFLATEXACNT']
     data = data[~data['Descripción'].str.contains('Cuenta')]  
-
     data = data[['Fecha','Producto','Descripción','Unnamed: 8']] 
     data.columns = ['Fecha', 'ID_Producto', 'Desc', 'CastflowEUR']
     data['N'] = 1
     data = data[['Fecha','ID_Producto','Desc','N','CastflowEUR']] 
     data['Fecha'] = pd.to_datetime(data['Fecha'], format='%d-%m-%Y') 
-    
-    for desc in ['flatex Deposit','Ingreso']: 
-      data.loc[data['Desc'] == desc, 'ID_Producto'] = 'INPUT' 
-    data.loc[data['Desc'].str.contains('Tax'), 'ID_Producto'] = 'TAX' 
-    data.loc[data['Desc'].str.contains('Costes'), 'ID_Producto'] = 'TAX' 
-    data.loc[data['Desc'].str.contains('Compra'), 'ID_Producto'] = 'BUY' 
-    data.loc[data['Desc'].str.contains('Venta'), 'ID_Producto'] = 'SELL' 
+       
+    data.loc[data['Desc'] == 'flatex Deposit'      , 'ID_Producto'] = 'INPUT' 
+    data.loc[data['Desc'] == 'Ingreso'             , 'ID_Producto'] = 'INPUT' 
+    data.loc[data['Desc'].str.contains('Tax')      , 'ID_Producto'] = 'TAX' 
+    data.loc[data['Desc'].str.contains('Costes')   , 'ID_Producto'] = 'TAX' 
+    data.loc[data['Desc'].str.contains('Compra')   , 'ID_Producto'] = 'BUY' 
+    data.loc[data['Desc'].str.contains('Venta')    , 'ID_Producto'] = 'SELL' 
     data.loc[data['Desc'].str.contains('reembolso'), 'ID_Producto'] = 'FREE INPUT' 
-    data.loc[data['Desc'].str.contains('Income'), 'ID_Producto'] = 'FREE INPUT' 
-    data.loc[data['Desc'].str.contains('ividendo'), 'ID_Producto'] = 'FREE INPUT' 
-    data.loc[data['Desc'].str.contains('etención'), 'ID_Producto'] = 'TAX' 
+    data.loc[data['Desc'].str.contains('Income')   , 'ID_Producto'] = 'FREE INPUT' 
+    data.loc[data['Desc'].str.contains('ividendo') , 'ID_Producto'] = 'FREE INPUT' 
+    data.loc[data['Desc'].str.contains('etención') , 'ID_Producto'] = 'TAX' 
     data['CastflowEUR'] = data['CastflowEUR'].replace(',','.', regex=True) 
     data['CastflowEUR'] = data['CastflowEUR'].astype(float)
     data['Total'] = data['N']*data['CastflowEUR']
@@ -36,9 +36,9 @@ class AppGiroValues:
     print('MOVEMENTS')
     print(data)
     
+    #AUX function to get data STOCKS
     def getStockValue(type, ticket, N, dStart, dEnd, descTicket): 
       stock = pd.DataFrame({'Fecha': [ ], 'ID_Producto': [], 'Desc': [], 'N': [], 'CastflowEUR': []}) 
-
       if type=='STOCK': 
         stock = yf.YahooFinancials(ticket).get_historical_price_data(dStart, dEnd, 'daily') 
         stock = pd.DataFrame.from_dict(stock[ticket]['prices'])
@@ -50,24 +50,20 @@ class AppGiroValues:
           if maxDate.size==0:  
             aux = stock[stock['Fecha']==stock[stock['Fecha']<=date]['Fecha'].max()].iloc[[0]]
             aux['Fecha'] = date 
-            stock = pd.concat([stock, aux])         
-
-      #pd.date_range(start=dStart, end=dEnd, freq='D') 
+            stock = pd.concat([stock, aux])      
       stock['ID_Producto'] = type
       stock['N'] = N
       stock['Desc'] = descTicket  
       stock = stock[['Fecha','ID_Producto','Desc','N','CastflowEUR']]
       return stock
 
+    #Generate STOCKS values in time
     stocksData  = pd.read_json(os.path.dirname(__file__)+'/'+'stocks.json')
-    stocksData['dEnd'] = dt.datetime.today().strftime("%Y-%m-%d")
-
-
+    stocksData['dEnd'] = dt.datetime.today().strftime("%Y-%m-%d") 
     stocks = pd.DataFrame({'Fecha': [ ], 'ID_Producto': [], 'Desc': [], 'N': [], 'CastflowEUR': []}) 
     for i in range(stocksData.index.size):  
       stocks = pd.concat([stocks, getStockValue(stocksData['type'].loc[i], stocksData['ticker'].loc[i], stocksData['N'].loc[i], stocksData['dStart'].loc[i], stocksData['dEnd'].loc[i], stocksData['desc'].loc[i])])   
-    stocks.sort_values(by=['Fecha', 'ID_Producto','Desc'], inplace=True, ascending=True)
-      
+    stocks.sort_values(by=['Fecha', 'ID_Producto','Desc'], inplace=True, ascending=True) 
     stocks['CastflowEUR'] = stocks['CastflowEUR'].replace(',','.', regex=True) 
     stocks['CastflowEUR'] = stocks['CastflowEUR'].astype(float)
     stocks['Total'] = stocks['N']*stocks['CastflowEUR']
@@ -85,12 +81,19 @@ class AppGiroValues:
     axs = []
     for i in range(0,s.size): 
       axs.append(fig.add_subplot(gs[i+5,:])) 
+    aux = 0;
 
     for i in range(0,s.size): 
       #plots Stocks: DATA 
       plotDataS = stocks[stocks['Desc'] == s[i]]
       title = s[i]+': N='+str(round(plotDataS['N'].iloc[-1]))+' ('+plotDataS['ID_Producto'].iloc[-1]+')'
-      plotDataS = plotDataS[['Fecha','Total']]
+      aux = round(plotDataS['Total'].iloc[-1]-plotDataS['Total'].iloc[0], 2)
+      colortext='black'
+      if aux>0:
+          colortext='green'
+      if aux<0:
+          colortext='red'
+      plotDataS = plotDataS[['Fecha','CastflowEUR']]
       plotDataS['Fecha'] = plotDataS['Fecha'].dt.strftime('%Y-%m-%d')
       plotDataS.columns = ['Fecha', 'CastflowEUR'] 
       plotDataS['CastflowEUR'] = round(plotDataS['CastflowEUR'], 2)
@@ -114,22 +117,19 @@ class AppGiroValues:
       axs[i].yaxis.label.set_color('grey')
       axs[i].tick_params(axis='x', colors='grey') 
       axs[i].tick_params(axis='y', colors='grey') 
-      axs[i].annotate('Min.: '+str(plotDataS['Min'].iloc[-1])+' €', # this is the text
-        (plotDataS.index.size-2,plotDataS['Min'].iloc[-1]), # these are the coordinates to position the label
-        textcoords="offset points", # how to position the text
-        xytext=(0,10), # distance from text to points (x,y)
-        ha='center') # horizontal alignment can be left, right or center       
-      axs[i].annotate('Max.: '+str(plotDataS['Max'].iloc[-1])+' €', # this is the text
-        (plotDataS.index.size-2,plotDataS['Max'].iloc[-1]), # these are the coordinates to position the label
-        textcoords="offset points", # how to position the text
-        xytext=(0,-15), # distance from text to points (x,y)
-        ha='center') # horizontal alignment can be left, right or center
-      axs[i].annotate('Media: '+str(plotDataS['Mean'].iloc[-1])+' €', # this is the text
-        (plotDataS.index.size-2,plotDataS['Mean'].iloc[-1]), # these are the coordinates to position the label
-        textcoords="offset points", # how to position the text
-        xytext=(0,10), # distance from text to points (x,y)
-        ha='center') # horizontal alignment can be left, right or center 
-    
+      axs[i].annotate('Min.: '     +str(plotDataS['Min'].iloc[-1])+' €' , (plotDataS.index.size-2, plotDataS['Min'].iloc[-1] ), textcoords="offset points",  xytext=(0,10)   , ha='center')
+      axs[i].annotate('Max.: '     +str(plotDataS['Max'].iloc[-1])+' €' , (plotDataS.index.size-2, plotDataS['Max'].iloc[-1] ), textcoords="offset points",  xytext=(0,-15)  , ha='center')  
+      axs[i].annotate('Media: '    +str(plotDataS['Mean'].iloc[-1])+' €', (plotDataS.index.size-2, plotDataS['Mean'].iloc[-1]), textcoords="offset points",  xytext=(0,10)   , ha='center')  
+      axs[i].annotate('B/P total: '                                     , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(40,-15) , ha='center', size=16)
+      axs[i].annotate(str(aux)+' €'                                     , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-15), ha='center', size=16, fontweight='bold', color=colortext) 
+      aux = round((plotDataS['CastflowEUR'].iloc[-1]-plotDataS['CastflowEUR'].iloc[0])/plotDataS['CastflowEUR'].iloc[0], 4)*100
+      if(aux>0):
+        axs[i].annotate('Var: '                                         , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(40,-35) , ha='center', size=16)
+        axs[i].annotate('+ '+str(aux)+' %'                              , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-35), ha='center', size=16, fontweight='bold', color=colortext) 
+      if(aux<0):
+        axs[i].annotate('Var: '                                         , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(40,-35) , ha='center', size=16)
+        axs[i].annotate('- '+str(aux)+' %'                              , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-35), ha='center', size=16, fontweight='bold', color=colortext) 
+   
     #plots 1: DATA
     plotData = pd.DataFrame({'Fecha': [ ], 'CastflowEUR': []}) 
     for date in pd.date_range(start='2022-11-20', end=dt.datetime.today().strftime('%Y-%m-%d')):  
@@ -151,35 +151,18 @@ class AppGiroValues:
     ax1.yaxis.set_label_text('EUR') 
     ax1.grid() 
     ax1.legend(loc='upper left')  
-    ax1.annotate('Min.: '+str(plotData1['Min'].iloc[-1])+' €', # this is the text
-      (plotData1.index.size-2,plotData1['Min'].iloc[-1]), # these are the coordinates to position the label
-      textcoords="offset points", # how to position the text
-      xytext=(0,10), # distance from text to points (x,y)
-      ha='center') # horizontal alignment can be left, right or center
-    ax1.annotate('Max.: '+str(plotData1['Max'].iloc[-1])+' €', # this is the text
-      (plotData1.index.size-2,plotData1['Max'].iloc[-1]), # these are the coordinates to position the label
-      textcoords="offset points", # how to position the text
-      xytext=(0,-15), # distance from text to points (x,y)
-      ha='center') # horizontal alignment can be left, right or center
-    ax1.annotate('Media: '+str(plotData1['Mean'].iloc[-1])+' €', # this is the text
-      (plotData1.index.size-2,plotData1['Mean'].iloc[-1]), # these are the coordinates to position the label
-      textcoords="offset points", # how to position the text
-      xytext=(0,10), # distance from text to points (x,y)
-      ha='center') # horizontal alignment can be left, right or center
     colortext = 'black' 
     if plotData1['CastflowEUR'].iloc[-1]>0: 
       colortext = 'green' 
     if plotData1['CastflowEUR'].iloc[-1]<0: 
       colortext = 'red' 
-    ax1.annotate('B/P: '+str(plotData1['CastflowEUR'].iloc[-1])+' €', # this is the text
-      (plotData1.index.size-2,plotData1['CastflowEUR'].iloc[-1]), # these are the coordinates to position the label
-      textcoords="offset points", # how to position the text
-      xytext=(0,10), # distance from text to points (x,y)
-      ha='center', # horizontal alignment can be left, right or center
-      fontname="Times New Roman", 
-      size=16, 
-      fontweight='bold',
-      color=colortext) 
+    ax1.annotate('Min.: '  +str(plotData1['Min'].iloc[-1])+' €'        , (plotData1.index.size-2,plotData1['Min'].iloc[-1]) , textcoords="offset points", xytext=(0,10)   , ha='center')
+    ax1.annotate('Max.: '  +str(plotData1['Max'].iloc[-1])+' €'        , (plotData1.index.size-2,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(0,-15)  , ha='center')  
+    ax1.annotate('Media: ' +str(plotData1['Mean'].iloc[-1])+' €'       , (plotData1.index.size-2,plotData1['Mean'].iloc[-1]), textcoords="offset points", xytext=(0,10)   , ha='center')      
+    ax1.annotate('B/P: '   +str(plotData1['CastflowEUR'].iloc[-1])+' €', (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(120,-25), ha='center', fontname="Times New Roman", size=20, fontweight='bold',  color=colortext) 
+    aux = (pd.to_datetime(plotData1.index[plotData1.index.size-1], format="%Y/%m/%d")-pd.to_datetime(plotData1.index[0], format="%Y/%m/%d")).days
+    ax1.annotate('Period: '+str(aux)+' days'                           , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(120,-45), ha='center') 
+    
     ax1.spines['left'  ].set_color('white')
     ax1.spines['right' ].set_color('white')
     ax1.spines['top'   ].set_color('white') 
@@ -222,19 +205,73 @@ class AppGiroValues:
     ax2.spines['bottom'].set_color('white')
     
     #plots 3: DATA
-    plotData = pd.DataFrame({'Plottype': [ ], 'Desc': [ ], 'CastflowEUR': []})  
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Tax Cost'],   'CastflowEUR': [round(abs(data[data['ID_Producto']=='TAX']['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Buy Cost'],   'CastflowEUR': [round(abs(data[data['ID_Producto']=='BUY']['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [0],'Desc': ['Total Cost'], 'CastflowEUR': [round(abs(data[data['ID_Producto'].isin(['BUY','TAX'])]['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [3],'Desc': ['Input Cash'], 'CastflowEUR': [round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Cash'],       'CastflowEUR': [round(abs(data[data['ID_Producto'].isin(['FREE INPUT','INPUT','BUY','TAX'])]['Total'].sum()), 2)]})]) 
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [1],'Desc': ['Stocks'],     'CastflowEUR': [round(abs(stocks[stocks['ID_Producto'].isin(['STOCK'])          & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum()), 2)]})])
-    plotData = pd.concat([plotData, pd.DataFrame({'Plottype': [2],'Desc': ['Cartera'],    'CastflowEUR': [round(abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 2)]})])
-    plotData3 = plotData 
-    
+    plotData = pd.DataFrame({})  
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [11],
+      'Fontw': [None],
+      'Desc':  ['Tax Cost'],   
+      'Value': [round(abs(data[data['ID_Producto']=='TAX']['Total'].sum()), 2)],   
+      'Extra': [None],   
+      'Extra_color': [None]
+    })]) 
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [11],
+      'Fontw': [None],
+      'Desc':  ['Buy Cost'],   
+      'Value': [round(abs(data[data['ID_Producto']=='BUY']['Total'].sum()), 2)],   
+      'Extra': [None],   
+      'Extra_color': [None]
+    })]) 
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [11],
+      'Fontw': [None],
+      'Desc':  ['Total Cost'], 
+      'Value': [round(abs(data[data['ID_Producto'].isin(['BUY','TAX'])]['Total'].sum()), 2)],   
+      'Extra': [None],   
+      'Extra_color': [None]
+    })])    
+    colortext='black'
+    if plotData1['CastflowEUR'].iloc[-1]>0:
+        colortext='green'
+    if plotData1['CastflowEUR'].iloc[-1]<0:
+        colortext='red' 
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [14],
+      'Fontw': ['bold'],
+      'Desc':  ['Input Cash'], 
+      'Value': [round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2)],   
+      'Extra': ['B/P: '+str(round(((plotData1['CastflowEUR'].iloc[-1])/round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2))*100,2))+'%'],
+      'Extra_color': [colortext]
+    })]) 
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [11],
+      'Fontw': [None],
+      'Desc':  ['Cash'],       
+      'Value': [round(abs(data[data['ID_Producto'].isin(['FREE INPUT','INPUT','BUY','TAX'])]['Total'].sum()), 2)],   
+      'Extra': [None],   
+      'Extra_color': [None]
+    })]) 
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [11],
+      'Fontw': [None],
+      'Desc':  ['Stocks'],     
+      'Value': [round(abs(stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum()), 2)],   
+      'Extra': [None],   
+      'Extra_color': [None]
+    })])
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [18],
+      'Fontw': ['bold'],
+      'Desc':  ['Cartera'],    
+      'Value': [round(abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 2)],   
+      'Extra': ['B/P: '+str(plotData1['CastflowEUR'].iloc[-1])+'€'],   
+      'Extra_color': [colortext]
+    })])
+    plotData3 = plotData  
+
     #plots 3: MATPLOT
     ax3.set_axis_off()
-    cols = ['Desc','Value','B/P']
+    cols = ['Desc','Value','']
     ncols = len(cols)
     nrows = plotData3.index.size
     x = [0.5, 1.5, 2.5]
@@ -254,54 +291,30 @@ class AppGiroValues:
       alpha=0.5,
       ec='None'
     )
-    for i in range(0, nrows):
-      fontsize = 11
-      fontw = None
-      if plotData3['Plottype'].iloc[i] in [2, 3]:
-        fontsize = 14
-        fontw = 'bold'
-      if plotData3['Plottype'].iloc[i]==2:
-        fontsize = 18
-
+    
+    for i in range(0, nrows):  
       ax3.annotate(
         xy = (x[0]-0.4,i+0.15),
         text = plotData3['Desc'].iloc[i],
         ha = 'left', 
         fontname='Times New Roman', 
-        size=fontsize, 
-        fontweight=fontw
-      ) 
-        
+        size=plotData3['Fonts'].iloc[i], 
+        fontweight=plotData3['Fontw'].iloc[i]
+      )  
       ax3.annotate(
         xy = (x[1]+0.4,i+0.15),
-        text = '{0:.2f}€'.format(plotData3['CastflowEUR'].iloc[i]),
+        text = '{0:.2f}€'.format(plotData3['Value'].iloc[i]),
         ha = 'right',
         fontname='Times New Roman', 
-        size=fontsize, 
-        fontweight=fontw
-      ) 
-       
-      colortext= None
-      text=None 
-      if plotData1['CastflowEUR'].iloc[-1]>0: 
-        colortext = 'green' 
-      if plotData1['CastflowEUR'].iloc[-1]<0: 
-        colortext = 'red'
-      if plotData3['Plottype'].iloc[i]==3:
-        text = 'B/P: '+str(round(((plotData3['CastflowEUR'].iloc[-1]-plotData3['CastflowEUR'].iloc[i])/plotData3['CastflowEUR'].iloc[i])*100,2))+'%' 
-        fontw = 'bold'
-      if plotData3['Plottype'].iloc[i]==2:
-        text = 'B/P: '+str(plotData1['CastflowEUR'].iloc[-1])+'€' 
-        fontw = 'bold'
-      if plotData3['Plottype'].iloc[i] not in [2, 3]:
-        text = None 
-      
+        size=plotData3['Fonts'].iloc[i], 
+        fontweight=plotData3['Fontw'].iloc[i]
+      )   
       ax3.annotate(
         xy=(x[2]+0.4,i+0.15),
-        text=text,
+        text=plotData3['Extra'].iloc[i],
         ha='right',
-        color=colortext, 
-        fontweight=fontw
+        color=plotData3['Extra_color'].iloc[i], 
+        fontweight=plotData3['Fontw'].iloc[i]
       ) 
 
     for i in range(0, ncols):
