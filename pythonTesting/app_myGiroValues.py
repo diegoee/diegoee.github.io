@@ -24,10 +24,9 @@ class AppGiroValues:
     data.loc[data['Desc'].str.contains('Costes')   , 'ID_Producto'] = 'TAX' 
     data.loc[data['Desc'].str.contains('Compra')   , 'ID_Producto'] = 'BUY' 
     data.loc[data['Desc'].str.contains('Venta')    , 'ID_Producto'] = 'SELL' 
-    data.loc[data['Desc'].str.contains('reembolso'), 'ID_Producto'] = 'FREE INPUT' 
-    data.loc[data['Desc'].str.contains('Income')   , 'ID_Producto'] = 'FREE INPUT' 
-    data.loc[data['Desc'].str.contains('ividendo') , 'ID_Producto'] = 'FREE INPUT' 
-    data.loc[data['Desc'].str.contains('etención') , 'ID_Producto'] = 'TAX' 
+    data.loc[data['Desc'].str.contains('reembolso'), 'ID_Producto'] = 'INPUT FREE'  
+    data.loc[data['Desc'] == 'Dividendo' , 'ID_Producto'] = 'DIV' 
+    data.loc[data['Desc'] == 'Retención del dividendo' , 'ID_Producto'] = 'TAX DIV' 
     data['CastflowEUR'] = data['CastflowEUR'].replace(',','.', regex=True) 
     data['CastflowEUR'] = data['CastflowEUR'].astype(float)
     data['Total'] = data['N']*data['CastflowEUR']
@@ -209,27 +208,35 @@ class AppGiroValues:
     plotData = pd.concat([plotData, pd.DataFrame({
       'Fonts': [11],
       'Fontw': [None],
-      'Desc':  ['Tax Cost'],   
-      'Value': [round(abs(data[data['ID_Producto']=='TAX']['Total'].sum()), 2)],   
+      'Desc':  ['Nº distinct Stocks'],   
+      'Value': [stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].count()], 
       'Extra': [None],   
       'Extra_color': [None]
     })]) 
     plotData = pd.concat([plotData, pd.DataFrame({
       'Fonts': [11],
       'Fontw': [None],
-      'Desc':  ['Buy Cost'],   
-      'Value': [round(abs(data[data['ID_Producto']=='BUY']['Total'].sum()), 2)],   
+      'Desc':  ['Timing'],   
+      'Value': [str(aux)+' day(s)'], 
       'Extra': [None],   
       'Extra_color': [None]
     })]) 
     plotData = pd.concat([plotData, pd.DataFrame({
       'Fonts': [11],
       'Fontw': [None],
-      'Desc':  ['Total Cost'], 
-      'Value': [round(abs(data[data['ID_Producto'].isin(['BUY','TAX'])]['Total'].sum()), 2)],   
+      'Desc':  ['Tax Buy/Sell'],   
+      'Value': ['{0:.2f}€'.format(round(abs(data[data['ID_Producto'].isin(['TAX','INPUT FREE'])]['Total'].sum()), 2))], 
       'Extra': [None],   
       'Extra_color': [None]
-    })])    
+    })]) 
+    plotData = pd.concat([plotData, pd.DataFrame({
+      'Fonts': [11],
+      'Fontw': [None],
+      'Desc':  ['Cash Div'],   
+      'Value': ['{0:.2f}€'.format(round(abs(data[data['ID_Producto'].isin(['DIV','TAX DIV'])]['Total'].sum()), 2))], 
+      'Extra': [None],   
+      'Extra_color': [None]
+    })])   
     colortext='black'
     if plotData1['CastflowEUR'].iloc[-1]>0:
         colortext='green'
@@ -239,7 +246,7 @@ class AppGiroValues:
       'Fonts': [14],
       'Fontw': ['bold'],
       'Desc':  ['Input Cash'], 
-      'Value': [round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2)],   
+      'Value': ['{0:.2f}€'.format(round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2))],   
       'Extra': ['B/P: '+str(round(((plotData1['CastflowEUR'].iloc[-1])/round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2))*100,2))+'%'],
       'Extra_color': [colortext]
     })]) 
@@ -247,23 +254,23 @@ class AppGiroValues:
       'Fonts': [11],
       'Fontw': [None],
       'Desc':  ['Cash'],       
-      'Value': [round(abs(data[data['ID_Producto'].isin(['FREE INPUT','INPUT','BUY','TAX'])]['Total'].sum()), 2)],   
-      'Extra': [None],   
+      'Value': ['{0:.2f}€'.format(round(abs(data[data['ID_Producto'].isin(['INPUT FREE','INPUT','BUY','TAX','DIV','TAX DIV'])]['Total'].sum()), 2))],   
+      'Extra': [str(round(abs(data[data['ID_Producto'].isin(['INPUT FREE','INPUT','BUY','TAX','DIV','TAX DIV'])]['Total'].sum())/abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 4)*100)+' % Cartera'],   
       'Extra_color': [None]
     })]) 
     plotData = pd.concat([plotData, pd.DataFrame({
       'Fonts': [11],
       'Fontw': [None],
       'Desc':  ['Stocks'],     
-      'Value': [round(abs(stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum()), 2)],   
-      'Extra': [None],   
+      'Value': ['{0:.2f}€'.format(round(abs(stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum()), 2))],   
+      'Extra': [str(round(abs(stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum())/abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 4)*100)+' % Cartera'],   
       'Extra_color': [None]
     })])
     plotData = pd.concat([plotData, pd.DataFrame({
       'Fonts': [18],
       'Fontw': ['bold'],
       'Desc':  ['Cartera'],    
-      'Value': [round(abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 2)],   
+      'Value': ['{0:.2f}€'.format(round(abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 2))],   
       'Extra': ['B/P: '+str(plotData1['CastflowEUR'].iloc[-1])+'€'],   
       'Extra_color': [colortext]
     })])
@@ -300,10 +307,11 @@ class AppGiroValues:
         fontname='Times New Roman', 
         size=plotData3['Fonts'].iloc[i], 
         fontweight=plotData3['Fontw'].iloc[i]
-      )  
+      )    
+
       ax3.annotate(
         xy = (x[1]+0.4,i+0.15),
-        text = '{0:.2f}€'.format(plotData3['Value'].iloc[i]),
+        text = plotData3['Value'].iloc[i],
         ha = 'right',
         fontname='Times New Roman', 
         size=plotData3['Fonts'].iloc[i], 
