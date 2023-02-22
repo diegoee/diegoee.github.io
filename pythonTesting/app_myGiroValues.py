@@ -121,7 +121,7 @@ class AppGiroValues:
       axs[i].annotate('Media: '    +str(plotDataS['Mean'].iloc[-1])+' €', (plotDataS.index.size-2, plotDataS['Mean'].iloc[-1]), textcoords="offset points",  xytext=(0,10)   , ha='center')  
       axs[i].annotate('B/P total: '                                     , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(40,-15) , ha='center', size=16)
       axs[i].annotate(str(aux)+' €'                                     , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-15), ha='center', size=16, fontweight='bold', color=colortext) 
-      aux = round((plotDataS['CastflowEUR'].iloc[-1]-plotDataS['CastflowEUR'].iloc[0])/plotDataS['CastflowEUR'].iloc[0], 4)*100
+      aux = round(((plotDataS['CastflowEUR'].iloc[-1]-plotDataS['CastflowEUR'].iloc[0])/plotDataS['CastflowEUR'].iloc[0])*100, 2)
       if(aux>0):
         axs[i].annotate('Var: '                                         , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(40,-35) , ha='center', size=16)
         axs[i].annotate('+ '+str(aux)+' %'                              , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-35), ha='center', size=16, fontweight='bold', color=colortext) 
@@ -255,7 +255,7 @@ class AppGiroValues:
       'Fontw': [None],
       'Desc':  ['Cash'],       
       'Value': ['{0:.2f}€'.format(round(abs(data[data['ID_Producto'].isin(['INPUT FREE','INPUT','BUY','TAX','DIV','TAX DIV'])]['Total'].sum()), 2))],   
-      'Extra': [str(round(abs(data[data['ID_Producto'].isin(['INPUT FREE','INPUT','BUY','TAX','DIV','TAX DIV'])]['Total'].sum())/abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 4)*100)+' % Cartera'],   
+      'Extra': [str(round((abs(data[data['ID_Producto'].isin(['INPUT FREE','INPUT','BUY','TAX','DIV','TAX DIV'])]['Total'].sum())/abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()))*100, 2))+' % Cartera'],   
       'Extra_color': [None]
     })]) 
     plotData = pd.concat([plotData, pd.DataFrame({
@@ -263,7 +263,7 @@ class AppGiroValues:
       'Fontw': [None],
       'Desc':  ['Stocks'],     
       'Value': ['{0:.2f}€'.format(round(abs(stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum()), 2))],   
-      'Extra': [str(round(abs(stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum())/abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()), 4)*100)+' % Cartera'],   
+      'Extra': [str(round((abs(stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].sum())/abs(data['Total'].sum() + stocks[stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d')]['Total'].sum()))*100, 2))+' % Cartera'],   
       'Extra_color': [None]
     })])
     plotData = pd.concat([plotData, pd.DataFrame({
