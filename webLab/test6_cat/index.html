@@ -44,7 +44,8 @@
         addCircleClick: function (x,y){ 
           var self = this;
           self.idCountercircleClick++;
-          self.circlesClick.push({
+          self.circlesClick.push({ 
+            clickAni: 1,
             id: self.idCountercircleClick,
             x: x,
             y: y,
@@ -66,7 +67,7 @@
           var seft = this;
           function collisionCircle(circ1,circ2){   
             var dis = dist(circ1.x, circ1.y, circ2.x, circ2.y);
-            if (dis < circ1.r + circ2.r){
+            if (dis < circ1.r + circ2.r - 20){//20 ¿?¿?
               return true;
             }else{
               return false;
@@ -91,18 +92,29 @@
             seft.circlesClick=removeObjectWithId(seft.circlesClick,e);
           });   
 
-          this.circlesClick.forEach(function(e,i){   
-            if(e.o>e.oEnd){
-              e.o--;
-            }
-            if(e.o<e.oEnd){
-              e.o++;
-            }
-            if(e.r>e.rEnd){
-              e.r=e.r-0.01;
-            }
-            if(e.r<e.rEnd){
-              e.r=e.r+0.01;
+          this.circlesClick.forEach(function(e,i){ 
+            if(e.clickAni!==0){
+              e.r=e.r+e.clickAni*5;
+              e.o=e.o-e.clickAni*5; 
+              if(e.r>50){
+                e.clickAni=-1; 
+              }
+              if(e.r<10){
+                e.clickAni=0;
+              }
+            }else{ 
+              if(e.o>e.oEnd){
+                e.o=e.o-5;
+              }
+              if(e.o<e.oEnd){
+                e.o=e.o+5;
+              }
+              if(e.r>e.rEnd){
+                e.r=e.r-0.025;
+              }
+              if(e.r<e.rEnd){
+                e.r=e.r+0.025;
+              }
             }
           });  
  
