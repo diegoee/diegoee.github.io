@@ -8,7 +8,7 @@
       html,body{ 
         padding: 0;
         margin: 0;  
-        background-color: #333;  
+        background-color: #333333;  
         color: #DDD
       }
       body{  
@@ -16,21 +16,28 @@
         align-items: center;
         justify-content: center;
       }  
+      #actionBtn{
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 10px;
+        font-size: 1.5em;
+      }
     </style>   
   </head>
   <body>    
+    <button id="actionBtn"> Next </button>
     <main></main>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>     
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script> 
     <script type="text/javascript"> 
       console.log('Exe start'); 
- 
-      var app = {
+      var app = [];
+      appPlay= 0 ;
+
+      app[0] = {
         getRandomN: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
-        },
-        getRandomB: function() {
-          return Math.random()<0.5?0:1;
         }, 
         circle: {
           x: undefined,
@@ -54,14 +61,15 @@
             o: 255, 
             oEnd: self.getRandomN(100,255),
           });  
-        },
+        }, 
         plot: function (){ 
+          noStroke(); 
           fill(221, 221, 221, 255);
           ellipse(this.circle.x, this.circle.y, this.circle.r, this.circle.r);   
           for (var i=0; i<this.circlesClick.length; i++){ 
             fill(221, 221, 221,this.circlesClick[i].o);
             ellipse(this.circlesClick[i].x, this.circlesClick[i].y, this.circlesClick[i].r, this.circlesClick[i].r); 
-          } 
+          }   
         },
         animation: function(){  
           var seft = this;
@@ -136,19 +144,14 @@
           }
           if (this.circle.y===this.circle.yEnd){
             this.circle.yEnd=this.getRandomN(0,height);   
-          } 
-
+          }  
         },
         //exe in mousePressed
         mousePressed: function(mouseX,mouseY){   
           this.addCircleClick(mouseX,mouseY);  
         },  
         //exe in setup
-        setup: function(){ 
-          createCanvas($(window).width()-6, $(window).height()-6);
-          frameRate(60);
-          background(color(51));
-          noStroke(); 
+        setup: function(){  
           this.circle.x = width/2;
           this.circle.y = height/2;
           this.circle.r = (width<width?width*0.05:height*0.05); 
@@ -161,6 +164,57 @@
                 this.addCircleClick(i,ii); 
               }
             }
+          }      
+        },
+        //exe in draw
+        draw: function(){ 
+          background(color(51));    
+          this.animation();   
+          this.plot();  
+        }
+      };
+
+      app[1] = { 
+        getRnd: function(min, max){
+          return Math.round(Math.random() * (max - min) + min);
+        }, 
+        signal: {
+          c:[], 
+          x:[], 
+          y:[], 
+        },
+        plot: function (){ 
+          noStroke(); 
+          for (var i=0; i<this.signal.x.length; i++){  
+            if(this.signal.c[i]){
+              fill(color(001)); 
+              ellipse(this.signal.x[i], this.signal.y[i], 08, 08);
+            }else{
+              fill(color(221)); 
+              ellipse(this.signal.x[i], this.signal.y[i], 05, 05);
+            } 
+          }
+        },
+        animation: function(){  
+          for (var i=0; i<this.signal.y.length; i++){  
+            this.signal.y[i]=this.signal.y[i]+this.getRnd(-1,1); 
+          }
+        },
+        //exe in mousePressed
+        mousePressed: function(mouseX,mouseY){   
+        },  
+        //exe in setup
+        setup: function(){  
+          //https://p5js.org/es/reference/  
+          for (var i=0; i<width; i++){ 
+            if(this.getRnd(0,50)===1){ 
+              this.signal.y.push(this.getRnd(250,height-250));
+              this.signal.c.push(true);
+            }else{ 
+              this.signal.y.push(height/2);
+              this.signal.c.push(false);
+            }
+            this.signal.x.push(i);
           }  
         },
         //exe in draw
@@ -170,23 +224,81 @@
           this.plot();  
         }
       };
- 
+
+      app[2] = {
+        getRnd: function(min, max){
+          return Math.round(Math.random() * (max - min) + min);
+        },   
+        signal: { 
+          x:[], 
+          y:[], 
+        },
+        plot: function (){ 
+          noStroke(); 
+          fill(221, 221, 221, 255);
+          for (var i=0; i<this.signal.x.length; i++){  
+            ellipse(this.signal.x[i], this.signal.y[i], 20, 20); 
+          }
+        },
+        animation: function(){  
+          for (var i=0; i<this.signal.y.length; i++){  
+            //this.signal.y[i]=this.signal.y[i]+this.getRnd(-1,1); 
+          }
+        },
+        //exe in mousePressed
+        mousePressed: function(mouseX,mouseY){   
+        },  
+        //exe in setup
+        setup: function(){  
+          //https://p5js.org/es/reference/  
+          for (var i=0; i<width; i=i+30){ 
+            if(i<width/3){  
+              this.signal.y.push(height-i); 
+            }else if(i>=width/3 && i<width*2/3){  
+              this.signal.y.push(height/2); 
+            }else{ 
+              this.signal.y.push(height/2+this.getRnd(-height/3,height/3)); 
+            }  
+            this.signal.x.push(i);
+          }  
+          //appPlay++; 
+          //appPlay++; 
+        },
+        //exe in draw
+        draw: function(){ 
+          background(color(51));    
+          this.animation();   
+          this.plot();  
+        }
+      };
+
       //https://p5js.org/es/examples/
       function setup(){ 
-        app.setup();  
+        createCanvas($(window).width()-6, $(window).height()-6);
+        frameRate(60);
+        for(var i=0; i<app.length; i++){
+          app[i].setup();  
+        } 
       }
  
       function draw(){ 
-        app.draw();  
+        app[appPlay].draw();  
       } 
 
       function mousePressed(){   
-        app.mousePressed(mouseX,mouseY);  
-      } 
+        app[appPlay].mousePressed(mouseX,mouseY);  
+      }  
 
       $(window).on('resize',function(){
         location.reload();  
-      });   
+      });  
+
+      $('#actionBtn').on('click',function(){
+        appPlay++;
+        if(appPlay>=app.length){
+          appPlay=0;
+        }  
+      }); 
       console.log('Exe end');   
     </script>
   </body>

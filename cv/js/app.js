@@ -316,6 +316,15 @@ require([
           $('#errorMsg').removeClass('alertDisplayOff'); 
         } 
       }); 
+      $('#passwordInput').on('input',function(){ 
+        $('#errorMsg').addClass('alertDisplayOff'); 
+      });
+      $(window,document).on('keypress', function(e){
+        console.log(e.originalEvent.key);
+        if(e.originalEvent.key=='Enter'){
+          $('#enterBtn').trigger('click'); 
+        }
+      });
     }
   };
   App.access();

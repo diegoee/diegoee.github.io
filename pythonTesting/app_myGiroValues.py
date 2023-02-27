@@ -14,7 +14,7 @@ class AppGiroValues:
     data = data[~data['Descripción'].str.contains('Cuenta')]  
     data = data[['Fecha','Producto','Descripción','Unnamed: 8']] 
     data.columns = ['Fecha', 'ID_Producto', 'Desc', 'CastflowEUR']
-    data['N'] = 1
+    data['N'] = 1 
     data = data[['Fecha','ID_Producto','Desc','N','CastflowEUR']] 
     data['Fecha'] = pd.to_datetime(data['Fecha'], format='%d-%m-%Y') 
        
@@ -25,8 +25,10 @@ class AppGiroValues:
     data.loc[data['Desc'].str.contains('Compra')   , 'ID_Producto'] = 'BUY' 
     data.loc[data['Desc'].str.contains('Venta')    , 'ID_Producto'] = 'SELL' 
     data.loc[data['Desc'].str.contains('reembolso'), 'ID_Producto'] = 'INPUT FREE'  
-    data.loc[data['Desc'] == 'Dividendo' , 'ID_Producto'] = 'DIV' 
-    data.loc[data['Desc'] == 'Retención del dividendo' , 'ID_Producto'] = 'TAX DIV' 
+    data.loc[data['Desc'] == 'Dividendo' , 'Desc'] = data['Desc']+': '+data['ID_Producto'] 
+    data.loc[data['Desc'].str.contains('Dividendo') , 'ID_Producto'] = 'DIV' 
+    data.loc[data['Desc'] == 'Retención del dividendo' , 'Desc'] = data['Desc']+': '+data['ID_Producto'] 
+    data.loc[data['Desc'].str.contains('Retención del dividendo') , 'ID_Producto'] = 'TAX DIV' 
     data['CastflowEUR'] = data['CastflowEUR'].replace(',','.', regex=True) 
     data['CastflowEUR'] = data['CastflowEUR'].astype(float)
     data['Total'] = data['N']*data['CastflowEUR']
@@ -158,7 +160,8 @@ class AppGiroValues:
     ax1.annotate('Min.: '  +str(plotData1['Min'].iloc[-1])+' €'        , (plotData1.index.size-2,plotData1['Min'].iloc[-1]) , textcoords="offset points", xytext=(0,10)   , ha='center')
     ax1.annotate('Max.: '  +str(plotData1['Max'].iloc[-1])+' €'        , (plotData1.index.size-2,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(0,-15)  , ha='center')  
     ax1.annotate('Media: ' +str(plotData1['Mean'].iloc[-1])+' €'       , (plotData1.index.size-2,plotData1['Mean'].iloc[-1]), textcoords="offset points", xytext=(0,10)   , ha='center')      
-    ax1.annotate('B/P: '   +str(plotData1['CastflowEUR'].iloc[-1])+' €', (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(120,-25), ha='center', fontname="Times New Roman", size=20, fontweight='bold',  color=colortext) 
+    aux = str(plotData1['CastflowEUR'].iloc[-1])+' € ('+str(round(((plotData1['CastflowEUR'].iloc[-1])/round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2))*100,2))+'%)'    
+    ax1.annotate('B/P: '   +str(aux)                                   , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(170,-25), ha='center', fontname="Times New Roman", size=20, fontweight='bold',  color=colortext) 
     aux = (pd.to_datetime(plotData1.index[plotData1.index.size-1], format="%Y/%m/%d")-pd.to_datetime(plotData1.index[0], format="%Y/%m/%d")).days
     ax1.annotate('Period: '+str(aux)+' days'                           , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(120,-45), ha='center') 
     
