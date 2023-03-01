@@ -8,7 +8,7 @@
       html,body{ 
         padding: 0;
         margin: 0;  
-        background-color: #333333;  
+        background-color: #333;  
         color: #DDD
       }
       body{  
@@ -33,8 +33,8 @@
     <script type="text/javascript"> 
       console.log('Exe start'); 
       var app = [];
-      appPlay= 0 ;
-
+      appPlay= 0 ; 
+       
       app[0] = {
         getRandomN: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
@@ -228,41 +228,65 @@
       app[2] = {
         getRnd: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
-        },   
+        },  
+        ecgData: [
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,          
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,           
+          0.08, 0.18, 0.08, 0, 0, 0, 0, 0, 0, -0.04,           
+          -0.08, 0.3, 0.7, 0.3, -0.17, 0.00, 0.04, 0.04, 
+          0.05, 0.05, 0.06, 0.07, 0.08, 0.10, 0.11, 0.11,           
+          0.10, 0.085, 0.06, 0.04, 0.03, 0.01, 0.01, 0.01,           
+          0.01, 0.02, 0.03, 0.05, 0.05, 0.05, 0.03, 0.02, 0, 0, 0
+        ], 
         signal: { 
           x:[], 
-          y:[], 
+          y:[],
+          c:[] 
         },
-        plot: function (){ 
-          noStroke(); 
-          fill(221, 221, 221, 255);
-          for (var i=0; i<this.signal.x.length; i++){  
-            ellipse(this.signal.x[i], this.signal.y[i], 20, 20); 
+        plot: function (){  
+          for (var i=0; i<this.signal.x.length-1; i++){ 
+            stroke(this.signal.c[i]);  
+            line(this.signal.x[i], this.signal.y[i], this.signal.x[i+1], this.signal.y[i+1]); 
           }
         },
-        animation: function(){  
-          for (var i=0; i<this.signal.y.length; i++){  
-            //this.signal.y[i]=this.signal.y[i]+this.getRnd(-1,1); 
-          }
+        startAni: true,
+        animation: function(){ 
+          if(this.startAni){ 
+            var e = this.signal.c.pop();
+            this.signal.c.unshift(e); 
+            var e = this.signal.c.pop();
+            this.signal.c.unshift(e);  
+          }  
         },
         //exe in mousePressed
-        mousePressed: function(mouseX,mouseY){   
+        mousePressed: function(mouseX,mouseY){  
+          this.startAni=!this.startAni; 
         },  
         //exe in setup
         setup: function(){  
           //https://p5js.org/es/reference/  
-          for (var i=0; i<width; i=i+30){ 
-            if(i<width/3){  
-              this.signal.y.push(height-i); 
-            }else if(i>=width/3 && i<width*2/3){  
-              this.signal.y.push(height/2); 
-            }else{ 
-              this.signal.y.push(height/2+this.getRnd(-height/3,height/3)); 
-            }  
-            this.signal.x.push(i);
-          }  
-          //appPlay++; 
-          //appPlay++; 
+          var aux = []; 
+          for (var i=0; i<this.ecgData.length; i++){ 
+            for (var ii=0; ii<2; ii++){   
+              aux.push(this.ecgData[i]);  
+            } 
+          } 
+          aux = aux.map(function(e) {
+            return 3*height/4-(1*height/2)*(e+0.025*Math.random());
+          }); 
+          var l = aux.length;  
+          var opac = 0;
+          var exe = true;
+          for (var i=0; i<width; i++){  
+            this.signal.x.push(i); 
+            this.signal.y.push(aux[i % aux.length]); 
+            if(opac>1){ 
+              this.signal.c.push('rgba(221, 221, 221, 0)');
+            }else{
+              opac=opac+0.0055;
+              this.signal.c.push('rgba(221, 221, 221, '+opac+')');
+            } 
+          }   
         },
         //exe in draw
         draw: function(){ 
@@ -271,7 +295,7 @@
           this.plot();  
         }
       };
-
+      appPlay=Math.round(Math.random()*2);
       //https://p5js.org/es/examples/
       function setup(){ 
         createCanvas($(window).width()-6, $(window).height()-6);
