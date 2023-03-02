@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
-    <title>Web Test6_cat</title> 
+    <title>Web Test6_art</title> 
     <style>  
       html,body{ 
         padding: 0;
@@ -33,19 +33,12 @@
     <script type="text/javascript"> 
       console.log('Exe start'); 
       var app = [];
-      appPlay= 0 ; 
+      appPlay= 0; 
        
       app[0] = {
         getRandomN: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
         }, 
-        circle: {
-          x: undefined,
-          y: undefined,
-          r: undefined,
-          xEnd: undefined,
-          yEnd: undefined
-        },
         idCountercircleClick: 0,
         circlesClick: [],
         addCircleClick: function (x,y){ 
@@ -60,19 +53,19 @@
             rEnd: self.getRandomN(5,15),
             o: 255, 
             oEnd: self.getRandomN(100,255),
+            lifeCounter: 0,
+            lifeTime: self.getRandomN(1000,10000),
           });  
         }, 
         plot: function (){ 
-          noStroke(); 
-          fill(221, 221, 221, 255);
-          ellipse(this.circle.x, this.circle.y, this.circle.r, this.circle.r);   
+          noStroke();   
           for (var i=0; i<this.circlesClick.length; i++){ 
             fill(221, 221, 221,this.circlesClick[i].o);
             ellipse(this.circlesClick[i].x, this.circlesClick[i].y, this.circlesClick[i].r, this.circlesClick[i].r); 
           }   
         },
         animation: function(){  
-          var seft = this;
+          var self = this;
           function collisionCircle(circ1,circ2){   
             var dis = dist(circ1.x, circ1.y, circ2.x, circ2.y);
             if (dis < circ1.r + circ2.r - 20){//20 ¿?¿?
@@ -88,16 +81,20 @@
             });
             arrCopy.splice(objWithIdIndex, 1);
             return arrCopy;
-          } 
+          }  
+          if(Math.random()<0.0125){ 
+            this.addCircleClick(self.getRandomN(0,width),self.getRandomN(0,height)); 
+          }
 
           var removeCircle=[];
-          this.circlesClick.forEach(function(e,i){  
-            if(collisionCircle(e,seft.circle)){ 
-              removeCircle.push(seft.circlesClick[i].id);
+          this.circlesClick.forEach(function(e,i){
+            e.lifeCounter++;     
+            if(e.lifeCounter>e.lifeTime){ 
+              removeCircle.push(e.id);
             }
           });  
           removeCircle.forEach(function(e,i){  
-            seft.circlesClick=removeObjectWithId(seft.circlesClick,e);
+            self.circlesClick = removeObjectWithId(self.circlesClick,e);
           });   
 
           this.circlesClick.forEach(function(e,i){ 
@@ -124,40 +121,14 @@
                 e.r=e.r+0.025;
               }
             }
-          });  
- 
-          //circle move
-          if (this.circle.x>this.circle.xEnd){
-            this.circle.x=this.circle.x-1;   
-          }
-          if (this.circle.x<this.circle.xEnd){
-            this.circle.x=this.circle.x+1;   
-          }
-          if (this.circle.x===this.circle.xEnd){
-            this.circle.xEnd=this.getRandomN(0,width);   
-          } 
-          if (this.circle.y>this.circle.yEnd){
-            this.circle.y=this.circle.y-1; 
-          }
-          if (this.circle.y<this.circle.yEnd){
-            this.circle.y=this.circle.y+1;   
-          }
-          if (this.circle.y===this.circle.yEnd){
-            this.circle.yEnd=this.getRandomN(0,height);   
-          }  
+          });    
         },
         //exe in mousePressed
         mousePressed: function(mouseX,mouseY){   
           this.addCircleClick(mouseX,mouseY);  
         },  
         //exe in setup
-        setup: function(){  
-          this.circle.x = width/2;
-          this.circle.y = height/2;
-          this.circle.r = (width<width?width*0.05:height*0.05); 
-          this.circle.xEnd = this.getRandomN(0,width);
-          this.circle.yEnd = this.getRandomN(0,height);
-
+        setup: function(){   
           for(var i=0; i<width; i++){
             for(var ii=0; ii<height; ii++){
               if(Math.random()<0.0005){ 
@@ -181,23 +152,23 @@
         signal: {
           c:[], 
           x:[], 
-          y:[], 
+          y:[],
+          r:[] 
         },
         plot: function (){ 
           noStroke(); 
-          for (var i=0; i<this.signal.x.length; i++){  
-            if(this.signal.c[i]){
-              fill(color(001)); 
-              ellipse(this.signal.x[i], this.signal.y[i], 08, 08);
-            }else{
-              fill(color(221)); 
-              ellipse(this.signal.x[i], this.signal.y[i], 05, 05);
-            } 
+          for (var i=0; i<this.signal.x.length; i++){   
+            fill(this.signal.c[i]); 
+            ellipse(this.signal.x[i], this.signal.y[i], this.signal.r[i], this.signal.r[i]); 
           }
         },
         animation: function(){  
           for (var i=0; i<this.signal.y.length; i++){  
             this.signal.y[i]=this.signal.y[i]+this.getRnd(-1,1); 
+            if(this.signal.y[i]<0||this.signal.y[i]>height){
+              this.signal.y[i]=height/2;
+              this.signal.r[i]++;
+            }
           }
         },
         //exe in mousePressed
@@ -209,10 +180,12 @@
           for (var i=0; i<width; i++){ 
             if(this.getRnd(0,50)===1){ 
               this.signal.y.push(this.getRnd(250,height-250));
-              this.signal.c.push(true);
+              this.signal.c.push('#000');
+              this.signal.r.push(8);
             }else{ 
               this.signal.y.push(height/2);
-              this.signal.c.push(false);
+              this.signal.c.push('#DDD');
+              this.signal.r.push(5);
             }
             this.signal.x.push(i);
           }  
@@ -241,21 +214,26 @@
         signal: { 
           x:[], 
           y:[],
-          c:[] 
+          c:[],
+          p:[], 
         },
         plot: function (){  
           for (var i=0; i<this.signal.x.length-1; i++){ 
             stroke(this.signal.c[i]);  
             line(this.signal.x[i], this.signal.y[i], this.signal.x[i+1], this.signal.y[i+1]); 
-          }
+            if(this.signal.p[i]){
+              ellipse(this.signal.x[i], this.signal.y[i], 4, 4);
+            }
+          } 
         },
         startAni: true,
         animation: function(){ 
+          //this.startAni=false;
           if(this.startAni){ 
             var e = this.signal.c.pop();
-            this.signal.c.unshift(e); 
-            var e = this.signal.c.pop();
             this.signal.c.unshift(e);  
+            var e = this.signal.p.pop();
+            this.signal.p.unshift(e);   
           }  
         },
         //exe in mousePressed
@@ -277,16 +255,20 @@
           var l = aux.length;  
           var opac = 0;
           var exe = true;
+          var count = 0;
           for (var i=0; i<width; i++){  
+            this.signal.p.push(false);
             this.signal.x.push(i); 
             this.signal.y.push(aux[i % aux.length]); 
             if(opac>1){ 
               this.signal.c.push('rgba(221, 221, 221, 0)');
             }else{
+              count++;
               opac=opac+0.0055;
               this.signal.c.push('rgba(221, 221, 221, '+opac+')');
             } 
           }   
+          this.signal.p[count]=true
         },
         //exe in draw
         draw: function(){ 
@@ -295,7 +277,8 @@
           this.plot();  
         }
       };
-      appPlay=Math.round(Math.random()*2);
+      
+      
       //https://p5js.org/es/examples/
       function setup(){ 
         createCanvas($(window).width()-6, $(window).height()-6);

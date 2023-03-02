@@ -126,10 +126,10 @@ class AppGiroValues:
       aux = round(((plotDataS['CastflowEUR'].iloc[-1]-plotDataS['CastflowEUR'].iloc[0])/plotDataS['CastflowEUR'].iloc[0])*100, 2)
       if(aux>0):
         axs[i].annotate('Var: '                                         , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(40,-35) , ha='center', size=16)
-        axs[i].annotate('+ '+str(aux)+' %'                              , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-35), ha='center', size=16, fontweight='bold', color=colortext) 
+        axs[i].annotate('+ '+str(abs(aux))+' %'                         , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-35), ha='center', size=16, fontweight='bold', color=colortext) 
       if(aux<0):
         axs[i].annotate('Var: '                                         , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(40,-35) , ha='center', size=16)
-        axs[i].annotate('- '+str(aux)+' %'                              , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-35), ha='center', size=16, fontweight='bold', color=colortext) 
+        axs[i].annotate('- '+str(abs(aux))+' %'                         , (0                     , plotDataS['Max'].iloc[0]  ), textcoords="offset points",  xytext=(130,-35), ha='center', size=16, fontweight='bold', color=colortext) 
    
     #plots 1: DATA
     plotData = pd.DataFrame({'Fecha': [ ], 'CastflowEUR': []}) 

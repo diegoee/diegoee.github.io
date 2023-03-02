@@ -2,6 +2,26 @@
 var songs = [];
 var abc='';  
 
+abc=''; 
+abc=abc+'X:1\n';
+abc=abc+'T: Stand by Me\n'; 
+abc=abc+'C: Jerry Leiber, Mike Stoller nad Ben E. King\n'; 
+abc=abc+'L:1/16\n';     
+abc=abc+'M:4/4\n';
+abc=abc+'Q:1/4=100\n';
+abc=abc+'K:F\n'; 
+abc=abc+'A2c2|d10 A2d2-|d10 z4|z4F2G2 A2 G4 F2-|\n';   
+abc=abc+'F8 z2 F2 G2A1G1|F8 z2 F2 A2G2-|G2 F5 z2 G2 G4|\n';   
+abc=abc+'F10 z4|z8 z4 A2c2|d8- d2A2c2d2-|\n';       
+abc=abc+'d5 c2 B2A2G2F2|A8 z2 G2 G4|F8- F2F2G2A2|\n';    
+abc=abc+'F8 z2 G2 A4|G2 F6 z2 A2 G4|F10 z2 c2|\n';    
+abc=abc+'d2c2 c4 f4 e4|d2c2 d4-d2 d4 d2-|d3 d2- d2c2 z2 A1G1|\n';    
+abc=abc+'F1G1 A5- A4 G4|F8 z4 A4|G2 F5-F4 z4|\n';  
+abc=abc+'z4 A2G2- G2 F5|z2 A2G2-G4 F4|z8 z2 A2 c2d2-|\n';
+abc=abc+'d8- d2A1c1 c1d1c2-|c2 d5-d4 z2|z4 z2 G2 A2A2 G4\n';
+abc=abc+'F8 z2 F2 G2A2|G2 F6-F4 z2G2|A2G2 F4- F2F2 G4\n';
+abc=abc+'F10 z4|]\n';
+songs.push(abc);
  
 abc=''; 
 abc=abc+'X:1\n';
