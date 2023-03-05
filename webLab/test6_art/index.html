@@ -63,17 +63,9 @@
             fill(221, 221, 221,this.circlesClick[i].o);
             ellipse(this.circlesClick[i].x, this.circlesClick[i].y, this.circlesClick[i].r, this.circlesClick[i].r); 
           }   
-        },
+        }, 
         animation: function(){  
-          var self = this;
-          function collisionCircle(circ1,circ2){   
-            var dis = dist(circ1.x, circ1.y, circ2.x, circ2.y);
-            if (dis < circ1.r + circ2.r - 20){//20 ¿?¿?
-              return true;
-            }else{
-              return false;
-            }
-          }
+          var self = this; 
           function removeObjectWithId(arr,id){
             var arrCopy = Array.from(arr); 
             var objWithIdIndex = arrCopy.findIndex(function(obj){
@@ -160,19 +152,29 @@
           for (var i=0; i<this.signal.x.length; i++){   
             fill(this.signal.c[i]); 
             ellipse(this.signal.x[i], this.signal.y[i], this.signal.r[i], this.signal.r[i]); 
+          } 
+          if(!this.startAni){ 
+            textSize(16);
+            textAlign(CENTER);
+            fill('#000');  
+            text('Pause... Press screen to play', width/2, 2*height/3); 
           }
         },
+        startAni: true,
         animation: function(){  
-          for (var i=0; i<this.signal.y.length; i++){  
-            this.signal.y[i]=this.signal.y[i]+this.getRnd(-1,1); 
-            if(this.signal.y[i]<0||this.signal.y[i]>height){
-              this.signal.y[i]=height/2;
-              this.signal.r[i]++;
+          if(this.startAni){ 
+            for (var i=0; i<this.signal.y.length; i++){  
+              this.signal.y[i]=this.signal.y[i]+this.getRnd(-1,1); 
+              if(this.signal.y[i]<0||this.signal.y[i]>height){
+                this.signal.y[i]=height/2;
+                this.signal.r[i]++;
+              }
             }
           }
         },
         //exe in mousePressed
-        mousePressed: function(mouseX,mouseY){   
+        mousePressed: function(mouseX,mouseY){     
+          this.startAni=!this.startAni; 
         },  
         //exe in setup
         setup: function(){  
@@ -219,12 +221,19 @@
         },
         plot: function (){  
           for (var i=0; i<this.signal.x.length-1; i++){ 
+            fill('#DDD');  
             stroke(this.signal.c[i]);  
             line(this.signal.x[i], this.signal.y[i], this.signal.x[i+1], this.signal.y[i+1]); 
             if(this.signal.p[i]){
               ellipse(this.signal.x[i], this.signal.y[i], 4, 4);
             }
           } 
+          if(!this.startAni){ 
+            textSize(16);
+            textAlign(CENTER);
+            fill('#000');  
+            text('Pause... Press screen to play', width/2, 2*height/3); 
+          }
         },
         startAni: true,
         animation: function(){ 
@@ -277,8 +286,125 @@
           this.plot();  
         }
       };
+
+      app[3] = { 
+        getRandomN: function(min, max){
+          return Math.round(Math.random() * (max - min) + min);
+        },
+        beens: [],
+        idBeen: 0,
+        dBeen: 55,
+        vMove: 15,
+        counterLimit: 1000,
+        collisionCircle: function (circ1,circ2){   
+          var dis = dist(circ1.x, circ1.y, circ2.x, circ2.y);
+          if (dis < this.dBeen){
+            return true;
+          }else{
+            return false;
+          }
+        },
+        addBeens: function (x,y){  
+          this.idBeen++;
+          this.beens.push({  
+            id: this.idBeen,
+            state: 1, //0: bad, 1: good, 2: again
+            x: x,
+            y: y, 
+            color: '#DDD',
+            counter: 0, 
+            counterLimit: this.getRandomN(this.counterLimit/2,this.counterLimit)
+          });  
+        }, 
+        plot: function(){   
+          noStroke();   
+          for (var i=0; i<this.beens.length; i++){ 
+            fill(this.beens[i].color);
+            ellipse(this.beens[i].x, this.beens[i].y, this.dBeen, this.dBeen); 
+          }    
+        }, 
+        animation: function(){  
+          for (var i=0; i<this.beens.length; i++){  
+            this.beens[i].x=this.beens[i].x+this.vMove*(Math.random()-0.5); 
+            this.beens[i].y=this.beens[i].y+this.vMove*(Math.random()-0.5); 
+            if (this.beens[i].x<0){
+              this.beens[i].x=0;  
+            }
+            if (this.beens[i].x>width){
+              this.beens[i].x=width;
+            }
+            if (this.beens[i].y<0){
+              this.beens[i].y=0;  
+            }
+            if (this.beens[i].y>height){
+              this.beens[i].y=height;
+            }
+          }
+          
+          for (var i=0; i<this.beens.length; i++){  
+            for (var ii=0; ii<this.beens.length; ii++){
+              if(this.beens[i].id!==this.beens[ii].id){
+                if(this.collisionCircle(this.beens[i],this.beens[ii])){ 
+                  if(this.beens[i].state===1&&this.beens[ii].state===0){ 
+                    this.beens[i].state=0;
+                  }
+                  if(this.beens[i].state===0&&this.beens[ii].state===1){ 
+                    this.beens[ii].state=0;
+                  }
+                }
+              }
+            }
+          }
+
+          for (var i=0; i<this.beens.length; i++){  
+            if(this.beens[i].state===0){ 
+              this.beens[i].color='#111'; 
+              this.beens[i].counter++;
+              if(this.beens[i].counter>this.beens[i].counterLimit){
+                this.beens[i].counter=0;
+                this.beens[i].state=2;
+              }
+            }
+            if(this.beens[i].state===1){ 
+              this.beens[i].color='#DDD'; 
+            }
+            if(this.beens[i].state===2){ 
+              this.beens[i].color='#555'; 
+              this.beens[i].counter++;
+              if(this.beens[i].counter>this.beens[i].counterLimit){
+                this.beens[i].counter=0;
+                this.beens[i].state=1;
+              }
+            }
+            if(this.beens[i].state===1&&Math.random()<0.00005){
+              this.beens[i].state=0;
+              this.beens[i].counter=0; 
+            }
+          }  
+        },
+        //exe in mousePressed
+        mousePressed: function(mouseX,mouseY){  
+          this.startAni=!this.startAni; 
+        },  
+        //exe in setup
+        setup: function(){  
+          //https://p5js.org/es/reference/ 
+          for (var i=this.dBeen; i<width; i=i+2*this.dBeen){ 
+            for (var ii=this.dBeen; ii<height; ii=ii+2*this.dBeen){ 
+              this.addBeens(i,ii); 
+            } 
+          }    
+        },
+        //exe in draw
+        draw: function(){ 
+          background(color(51));    
+          this.animation();   
+          this.plot();  
+        }
+      };
       
-      
+      appPlay = Math.floor(Math.random()*app.length);
+
       //https://p5js.org/es/examples/
       function setup(){ 
         createCanvas($(window).width()-6, $(window).height()-6);
