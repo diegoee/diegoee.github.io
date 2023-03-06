@@ -22,6 +22,7 @@
         right: 0;
         margin: 10px;
         font-size: 1.5em;
+        cursor: pointer;
       }
     </style>   
   </head>
@@ -115,8 +116,8 @@
             }
           });    
         },
-        //exe in mousePressed
-        mousePressed: function(mouseX,mouseY){   
+        //exe in mouseClicked
+        mouseClicked: function(mouseX,mouseY){   
           this.addCircleClick(mouseX,mouseY);  
         },  
         //exe in setup
@@ -172,8 +173,8 @@
             }
           }
         },
-        //exe in mousePressed
-        mousePressed: function(mouseX,mouseY){     
+        //exe in mouseClicked
+        mouseClicked: function(mouseX,mouseY){     
           this.startAni=!this.startAni; 
         },  
         //exe in setup
@@ -245,8 +246,8 @@
             this.signal.p.unshift(e);   
           }  
         },
-        //exe in mousePressed
-        mousePressed: function(mouseX,mouseY){  
+        //exe in mouseClicked
+        mouseClicked: function(mouseX,mouseY){  
           this.startAni=!this.startAni; 
         },  
         //exe in setup
@@ -293,8 +294,8 @@
         },
         beens: [],
         idBeen: 0,
-        dBeen: 55,
-        vMove: 15,
+        dBeen: 35,
+        vMove: 10,
         counterLimit: 1000,
         collisionCircle: function (circ1,circ2){   
           var dis = dist(circ1.x, circ1.y, circ2.x, circ2.y);
@@ -376,15 +377,19 @@
                 this.beens[i].state=1;
               }
             }
-            if(this.beens[i].state===1&&Math.random()<0.00005){
+          }  
+        },
+        //exe in mouseClicked
+        mouseClicked: function(mouseX,mouseY){   
+          for (var i=0; i<this.beens.length; i++){  
+            if(this.beens[i].state===1 && this.collisionCircle(this.beens[i],{
+              x: mouseX,
+              y: mouseY
+            })){ 
               this.beens[i].state=0;
               this.beens[i].counter=0; 
             }
-          }  
-        },
-        //exe in mousePressed
-        mousePressed: function(mouseX,mouseY){  
-          this.startAni=!this.startAni; 
+          }
         },  
         //exe in setup
         setup: function(){  
@@ -418,9 +423,9 @@
         app[appPlay].draw();  
       } 
 
-      function mousePressed(){   
-        app[appPlay].mousePressed(mouseX,mouseY);  
-      }  
+      function mouseClicked(){    
+        app[appPlay].mouseClicked(mouseX,mouseY);  
+      }    
 
       $(window).on('resize',function(){
         location.reload();  
