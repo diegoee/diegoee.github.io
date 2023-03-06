@@ -34,9 +34,9 @@
     <script type="text/javascript"> 
       console.log('Exe start'); 
       var app = [];
-      appPlay= 0; 
+      appPlay = 0; 
        
-      app[0] = {
+      aux = {
         getRandomN: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
         }, 
@@ -137,8 +137,9 @@
           this.plot();  
         }
       };
+      app.push(aux);
 
-      app[1] = { 
+      aux = { 
         getRnd: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
         }, 
@@ -200,8 +201,9 @@
           this.plot();  
         }
       };
+      app.push(aux);
 
-      app[2] = {
+      aux = {
         getRnd: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
         },  
@@ -287,8 +289,9 @@
           this.plot();  
         }
       };
+      app.push(aux);
 
-      app[3] = { 
+      aux = { 
         getRandomN: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
         },
@@ -407,7 +410,115 @@
           this.plot();  
         }
       };
-      
+      app.push(aux);
+
+      aux = {  
+        obj:{
+          s: 150,
+          x: 0,
+          y: 0,
+          xEnd: 0,
+          yEnd: 0,
+          xVel: 0,
+          yVel: 0,
+          round: 30
+        },
+        points:[],
+        move: function(x,y){ 
+          if(x<this.obj.s/2){
+            x=this.obj.s/2;
+          }
+          if(x>width-this.obj.s/2){
+            x=width-this.obj.s/2;
+          }
+          if(y<this.obj.s/2){
+            y=this.obj.s/2;
+          }
+          if(y>height-this.obj.s/2){
+            y=height-this.obj.s/2;
+          }
+          this.obj.xEnd = Math.round(x); 
+          this.obj.yEnd = Math.round(y);
+          var v = Math.abs(this.obj.x-this.obj.xEnd)/Math.abs(this.obj.y-this.obj.yEnd);
+          if(v>1){
+            v = Math.abs(this.obj.y-this.obj.yEnd)/Math.abs(this.obj.x-this.obj.xEnd);
+            this.obj.xVel = 3*1; 
+            this.obj.yVel = 3*v; 
+          }else{
+            this.obj.xVel = 3*v; 
+            this.obj.yVel = 3*1; 
+          }  
+        },
+        changePos: 0,
+        clicked: false,
+        plot: function(){   
+          noStroke();    
+          fill('#DDD');
+          square(this.obj.x-this.obj.s/2, this.obj.y-this.obj.s/2, this.obj.s, this.obj.round); 
+          if(this.clicked){  
+            stroke('#DDD');   
+            line(this.obj.x,this.obj.y,this.obj.xEnd,this.obj.yEnd); 
+            circle(this.obj.xEnd,this.obj.yEnd,this.obj.s/4,this.obj.s/4); 
+          }
+          for(var i=0; i<this.points.length; i++){
+            circle(this.points[i].x,this.points[i].y,5,5); 
+          }  
+        }, 
+        animation: function(){ 
+          this.changePos=0;
+          if(this.obj.y<this.obj.yEnd){
+            this.obj.y=this.obj.y+this.obj.yVel; 
+            this.changePos++; 
+          }
+          if(this.obj.y>this.obj.yEnd){
+            this.obj.y=this.obj.y-this.obj.yVel;  
+            this.changePos++; 
+          }
+          if(this.obj.x<this.obj.xEnd){
+            this.obj.x=this.obj.x+this.obj.xVel;
+            this.changePos++; 
+          }
+          if(this.obj.x>this.obj.xEnd){
+            this.obj.x=this.obj.x-this.obj.xVel; 
+            this.changePos++; 
+          }  
+          if(this.changePos==4){
+            this.points.push({
+              x: this.obj.x,
+              y: this.obj.y
+            });
+            var x = Math.floor(Math.random()*width);
+            var y = Math.floor(Math.random()*height);
+            this.move(x,y); 
+            this.clicked=false;
+          }
+        },
+        //exe in mouseClicked
+        mouseClicked: function(mouseX,mouseY){ 
+           this.move(mouseX,mouseY);
+           this.clicked=true;
+        },  
+        //exe in setup
+        setup: function(){  
+          //https://p5js.org/es/reference/ 
+          this.obj.s = width/60; 
+          this.obj.x = width/2; 
+          this.obj.y = height/2; 
+          this.obj.round = width/190;  
+          var x = Math.floor(Math.random()*width);
+          var y = Math.floor(Math.random()*height);
+          this.move(x,y);  
+        },
+        //exe in draw
+        draw: function(){ 
+          background(color(51));    
+          this.animation();   
+          this.plot();  
+        }
+      };
+      app.push(aux);
+      delete aux;
+
       appPlay = Math.floor(Math.random()*app.length);
 
       //https://p5js.org/es/examples/
@@ -430,13 +541,19 @@
       $(window).on('resize',function(){
         location.reload();  
       });  
-
+ 
       $('#actionBtn').on('click',function(){
         appPlay++;
         if(appPlay>=app.length){
           appPlay=0;
-        }  
+        }
       }); 
+      setInterval(function(){
+        appPlay++;
+        if(appPlay>=app.length){
+          appPlay=0;
+        }
+      },30000);
       console.log('Exe end');   
     </script>
   </body>
