@@ -544,9 +544,20 @@
           }
         },
         getTimeInMinSec: function(sec){ 
-          var res = Math.floor(sec/60)+':'+(sec%60<9?'0'+sec%60:sec%60)+'m';
-          if(Math.floor(sec/60)===0){
-            res = sec+'s';
+          //sec = (2*24*60*60+4*60*60+3*60+2) // 2dias 4horas 3min 2sec
+          var seg   = sec%60; 
+          var min   = Math.floor(sec%(60*60)/60); 
+          var hours = Math.floor(sec%(60*60*24)/60/60);
+          var days  = Math.floor(sec/(60*60*24)); 
+          res = days+'d '+hours+':'+(min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+          if(days===0){ 
+            res = hours+':'+(min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+          }
+          if(days===0&&hours===0){ 
+            res = (min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+          }
+          if(days===0&&hours===0&&min===0){ 
+            res = (seg<9?'0'+seg:seg)+'s'; 
           }
           return res;
         },
