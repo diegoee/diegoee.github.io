@@ -33,21 +33,20 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script> 
     <script type="text/javascript"> 
       console.log('Exe start'); 
-      var app = [];
-      appPlay = 0; 
-       
+      sketchs = [];
+
       aux = {
         getRandomN: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
         }, 
-        idCountercircleClick: 0,
+        idCounterCircleClick: 0,
         circlesClick: [],
         addCircleClick: function (x,y){ 
           var self = this;
-          self.idCountercircleClick++;
+          self.idCounterCircleClick++;
           self.circlesClick.push({ 
             clickAni: 1,
-            id: self.idCountercircleClick,
+            id: self.idCounterCircleClick,
             x: x,
             y: y,
             r: 10,
@@ -137,61 +136,71 @@
           this.plot();  
         }
       };
-      app.push(aux);
+      sketchs.push(aux);
 
       aux = { 
         getRnd: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
-        }, 
-        signal: {
-          c:[], 
-          x:[], 
-          y:[],
-          r:[] 
+        },  
+        signal: [],
+        clickedCircle: function (circ, point){   
+          var dis = dist(circ.x, circ.y, point.x, point.y);
+          if (dis < circ.r){
+            return true;
+          }else{
+            return false;
+          }
         },
         plot: function (){ 
           noStroke(); 
-          for (var i=0; i<this.signal.x.length; i++){   
-            fill(this.signal.c[i]); 
-            ellipse(this.signal.x[i], this.signal.y[i], this.signal.r[i], this.signal.r[i]); 
-          } 
-          if(!this.startAni){ 
-            textSize(16);
-            textAlign(CENTER);
-            fill('#000');  
-            text('Pause... Press screen to play', width/2, 2*height/3); 
-          }
-        },
-        startAni: true,
+          for (var i=0; i<this.signal.length; i++){   
+            fill(this.signal[i].c); 
+            ellipse(this.signal[i].x, this.signal[i].y, this.signal[i].r, this.signal[i].r); 
+          }   
+        }, 
         animation: function(){  
-          if(this.startAni){ 
-            for (var i=0; i<this.signal.y.length; i++){  
-              this.signal.y[i]=this.signal.y[i]+this.getRnd(-1,1); 
-              if(this.signal.y[i]<0||this.signal.y[i]>height){
-                this.signal.y[i]=height/2;
-                this.signal.r[i]++;
-              }
+          for (var i=0; i<this.signal.length; i++){  
+            this.signal[i].y=this.signal[i].y+this.getRnd(-1,1); 
+            if(this.signal[i].y<0||this.signal[i].y>height){
+              this.signal[i].y=height/2;
+              this.signal[i].r=this.signal[i].r+10;
             }
-          }
+          } 
         },
         //exe in mouseClicked
-        mouseClicked: function(mouseX,mouseY){     
-          this.startAni=!this.startAni; 
+        mouseClicked: function(mouseX,mouseY){ 
+          var self = this;
+          for (var i=0; i<this.signal.length; i++){  
+            if(this.clickedCircle(this.signal[i],{
+              x: mouseX,
+              y: mouseY
+            })){  
+              this.signal=this.signal.filter(function(element, index, array){ 
+                return element.x!==self.signal[i].x;
+              });
+              break;
+            }
+          } 
         },  
         //exe in setup
         setup: function(){  
           //https://p5js.org/es/reference/  
-          for (var i=0; i<width; i++){ 
+          for (var i=0; i<width; i=i+10){ 
             if(this.getRnd(0,50)===1){ 
-              this.signal.y.push(this.getRnd(250,height-250));
-              this.signal.c.push('#000');
-              this.signal.r.push(8);
+              this.signal.push({
+                x: i,
+                y: this.getRnd(250,height-250),
+                r: 20,
+                c: '#000'
+              }); 
             }else{ 
-              this.signal.y.push(height/2);
-              this.signal.c.push('#DDD');
-              this.signal.r.push(5);
-            }
-            this.signal.x.push(i);
+              this.signal.push({
+                x: i,
+                y: height/2,
+                r: 15,
+                c: '#DDD'
+              });  
+            } 
           }  
         },
         //exe in draw
@@ -201,7 +210,7 @@
           this.plot();  
         }
       };
-      app.push(aux);
+      sketchs.push(aux);
 
       aux = {
         getRnd: function(min, max){
@@ -230,27 +239,20 @@
             if(this.signal.p[i]){
               ellipse(this.signal.x[i], this.signal.y[i], 4, 4);
             }
-          } 
-          if(!this.startAni){ 
-            textSize(16);
-            textAlign(CENTER);
-            fill('#000');  
-            text('Pause... Press screen to play', width/2, 2*height/3); 
-          }
-        },
-        startAni: true,
-        animation: function(){ 
-          //this.startAni=false;
-          if(this.startAni){ 
-            var e = this.signal.c.pop();
-            this.signal.c.unshift(e);  
-            var e = this.signal.p.pop();
-            this.signal.p.unshift(e);   
           }  
+        }, 
+        animation: function(){  
+          var e = this.signal.c.pop();
+          this.signal.c.unshift(e);  
+          var e = this.signal.p.pop();
+          this.signal.p.unshift(e);   
         },
         //exe in mouseClicked
-        mouseClicked: function(mouseX,mouseY){  
-          this.startAni=!this.startAni; 
+        mouseClicked: function(mouseX,mouseY){   
+          var step = this.getRnd(-10,10);   
+          for (var i=0; i<this.signal.y.length; i++){  
+            this.signal.y[i]=this.signal.y[i]+step;
+          } 
         },  
         //exe in setup
         setup: function(){  
@@ -289,7 +291,7 @@
           this.plot();  
         }
       };
-      app.push(aux);
+      sketchs.push(aux);
 
       aux = { 
         getRandomN: function(min, max){
@@ -410,11 +412,11 @@
           this.plot();  
         }
       };
-      app.push(aux);
+      sketchs.push(aux);
 
       aux = {  
         obj:{
-          s: 150,
+          r: 20,
           x: 0,
           y: 0,
           xEnd: 0,
@@ -448,41 +450,37 @@
             this.obj.xVel = 3*v; 
             this.obj.yVel = 3*1; 
           }  
-        },
-        changePos: 0,
+        }, 
         clicked: false,
         plot: function(){   
           noStroke();    
           fill('#DDD');
-          square(this.obj.x-this.obj.s/2, this.obj.y-this.obj.s/2, this.obj.s, this.obj.round); 
+          circle(this.obj.x, this.obj.y, this.obj.r, this.obj.r); 
           if(this.clicked){  
             stroke('#DDD');   
             line(this.obj.x,this.obj.y,this.obj.xEnd,this.obj.yEnd); 
-            circle(this.obj.xEnd,this.obj.yEnd,this.obj.s/4,this.obj.s/4); 
+            noStroke();    
+            circle(this.obj.xEnd,this.obj.yEnd,20,20); 
           }
           for(var i=0; i<this.points.length; i++){
             circle(this.points[i].x,this.points[i].y,5,5); 
           }  
         }, 
         animation: function(){ 
-          this.changePos=0;
+          var changePos = [this.obj.x,this.obj.y];
           if(this.obj.y<this.obj.yEnd){
-            this.obj.y=this.obj.y+this.obj.yVel; 
-            this.changePos++; 
+            this.obj.y=this.obj.y+this.obj.yVel;  
           }
           if(this.obj.y>this.obj.yEnd){
-            this.obj.y=this.obj.y-this.obj.yVel;  
-            this.changePos++; 
+            this.obj.y=this.obj.y-this.obj.yVel; 
           }
           if(this.obj.x<this.obj.xEnd){
-            this.obj.x=this.obj.x+this.obj.xVel;
-            this.changePos++; 
+            this.obj.x=this.obj.x+this.obj.xVel; 
           }
           if(this.obj.x>this.obj.xEnd){
-            this.obj.x=this.obj.x-this.obj.xVel; 
-            this.changePos++; 
-          }  
-          if(this.changePos==4){
+            this.obj.x=this.obj.x-this.obj.xVel;  
+          }   
+          if(changePos[0]===this.obj.x||changePos[2]===this.obj.y){
             this.points.push({
               x: this.obj.x,
               y: this.obj.y
@@ -501,10 +499,10 @@
         //exe in setup
         setup: function(){  
           //https://p5js.org/es/reference/ 
-          this.obj.s = width/60; 
+          this.obj.s = 30; 
           this.obj.x = width/2; 
           this.obj.y = height/2; 
-          this.obj.round = width/190;  
+          this.obj.round = 5;  
           var x = Math.floor(Math.random()*width);
           var y = Math.floor(Math.random()*height);
           this.move(x,y);  
@@ -516,45 +514,86 @@
           this.plot();  
         }
       };
-      app.push(aux);
-      delete aux;
+      sketchs.push(aux); 
 
-      appPlay = Math.floor(Math.random()*app.length);
+      app = { 
+        time: 0,
+        interval: undefined,
+        intervalTime: 0,
+        intervalTimeLimit: 30,
+        createInterval: function(){
+          var self = this;
+          if(this.interval!==undefined){
+            clearInterval(this.interval);
+          }
+          self.intervalTime=0;
+          this.interval = setInterval(function(){
+            self.intervalTime++;
+            if (self.intervalTime>self.intervalTimeLimit){ 
+              self.addCount();
+              self.intervalTime=0;
+            }
+          },1000);
+        },
+        counter: 0,
+        addCount: function(){
+          this.createInterval();
+          this.counter++;
+          if(this.counter>=this.sketchs.length){
+            this.counter=0;
+          }
+        },
+        getTimeInMinSec: function(sec){ 
+          var res = Math.floor(sec/60)+':'+(sec%60<9?'0'+sec%60:sec%60)+'m';
+          if(Math.floor(sec/60)===0){
+            res = sec+'s';
+          }
+          return res;
+        },
+        init: function(){
+          this.sketchs = Array.from(sketchs); 
+          this.counter = Math.floor(Math.random()*this.sketchs.length); 
+          $(window).on('resize',function(){
+            location.reload();  
+          });      
+          var self = this;
+          $('#actionBtn').on('click',function(){
+            self.addCount();
+          });  
+          this.createInterval();
+          setInterval(function(){
+            self.time++;  
+          },1000);
+        }
+      }
+      app.init();     
+      delete sketchs;   
+      delete aux; 
 
       //https://p5js.org/es/examples/
       function setup(){ 
         createCanvas($(window).width()-6, $(window).height()-6);
         frameRate(60);
-        for(var i=0; i<app.length; i++){
-          app[i].setup();  
+        for(var i=0; i<app.sketchs.length; i++){
+          app.sketchs[i].setup();  
         } 
       }
  
-      function draw(){ 
-        app[appPlay].draw();  
+      function draw(){  
+        background(color(51)); 
+        app.sketchs[app.counter].draw();  
+        noStroke();       
+        textAlign(LEFT);
+        textSize(18);
+        fill(0);
+        text('Art '+(app.counter+1)+'/'+app.sketchs.length+': '+app.getTimeInMinSec(app.intervalTime)+' ('+app.getTimeInMinSec(app.intervalTimeLimit)+')', 10, 30);
+        text('Time: '+app.getTimeInMinSec(app.time), 10, 50);
       } 
 
       function mouseClicked(){    
-        app[appPlay].mouseClicked(mouseX,mouseY);  
+        app.sketchs[app.counter].mouseClicked(mouseX,mouseY);  
       }    
-
-      $(window).on('resize',function(){
-        location.reload();  
-      });  
- 
-      $('#actionBtn').on('click',function(){
-        appPlay++;
-        if(appPlay>=app.length){
-          appPlay=0;
-        }
-      }); 
-      setInterval(function(){
-        appPlay++;
-        if(appPlay>=app.length){
-          appPlay=0;
-        }
-      },30000);
-      console.log('Exe end');   
+      console.log('Exe end'); 
     </script>
   </body>
 </html>

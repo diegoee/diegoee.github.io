@@ -163,7 +163,7 @@ class AppGiroValues:
     aux = str(plotData1['CastflowEUR'].iloc[-1])+' € ('+str(round(((plotData1['CastflowEUR'].iloc[-1])/round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2))*100,2))+'%)'    
     ax1.annotate('B/P: '   +str(aux)                                   , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(170,-25), ha='center', fontname="Times New Roman", size=20, fontweight='bold',  color=colortext) 
     aux = (pd.to_datetime(plotData1.index[plotData1.index.size-1], format="%Y/%m/%d")-pd.to_datetime(plotData1.index[0], format="%Y/%m/%d")).days
-    ax1.annotate('Period: '+str(aux)+' days'                           , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(120,-45), ha='center') 
+    ax1.annotate('Timing: '+str(aux)+' days'                           , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(120,-45), ha='center') 
     
     ax1.spines['left'  ].set_color('white')
     ax1.spines['right' ].set_color('white')
@@ -199,7 +199,7 @@ class AppGiroValues:
     ax2.yaxis.set_visible(False)
     ax2.get_legend().remove() 
     ax2.legend(title=None, labels=plotData2['Labels'], loc="center left", bbox_to_anchor=(1, 0, 0.5, 1), prop={'size': 8}) 
-    ax2.set_title('Información Cartera GIRO', fontname="Times New Roman", size=18, fontweight='bold')
+    ax2.set_title('GIRO Count', fontname="Times New Roman", size=18, fontweight='bold')
 
     ax2.spines['left'  ].set_color('white')
     ax2.spines['right' ].set_color('white')
@@ -211,7 +211,7 @@ class AppGiroValues:
     plotData = pd.concat([plotData, pd.DataFrame({
       'Fonts': [11],
       'Fontw': [None],
-      'Desc':  ['Nº distinct Stocks'],   
+      'Desc':  ['Distinct Stocks'],   
       'Value': [stocks[stocks['ID_Producto'].isin(['STOCK']) & (stocks['Fecha'] == dt.datetime.today().strftime('%Y-%m-%d'))]['Total'].count()], 
       'Extra': [None],   
       'Extra_color': [None]
