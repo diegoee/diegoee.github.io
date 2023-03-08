@@ -235,13 +235,14 @@
           x:[], 
           y:[],
           c:[],
-          p:[], 
+          p:[],
+          n:[], 
         },
         plot: function (){  
           for (var i=0; i<this.signal.x.length-1; i++){ 
             fill('#DDD');  
             stroke(this.signal.c[i]);  
-            line(this.signal.x[i], this.signal.y[i], this.signal.x[i+1], this.signal.y[i+1]); 
+            line(this.signal.x[i], this.signal.y[i]+this.signal.n[i], this.signal.x[i+1], this.signal.y[i+1]); 
             if(this.signal.p[i]){
               ellipse(this.signal.x[i], this.signal.y[i], 4, 4);
             }
@@ -252,13 +253,20 @@
           this.signal.c.unshift(e);  
           var e = this.signal.p.pop();
           this.signal.p.unshift(e);   
-        },
-        //exe in mouseClicked
-        mouseClicked: function(mouseX,mouseY){   
-          var step = this.getRnd(-10,10);   
-          for (var i=0; i<this.signal.y.length; i++){  
-            this.signal.y[i]=this.signal.y[i]+step;
+          for (var i=0; i<this.signal.n.length; i++){ 
+            if(this.signal.n[i]>0){ 
+              this.signal.n[i]=this.signal.n[i]-1;
+            }
+            if(this.signal.n[i]<0){ 
+              this.signal.n[i]=this.signal.n[i]+1;
+            }
           } 
+        },
+        //exe in mouseClicked 
+        mouseClicked: function(mouseX,mouseY){   
+          for (var i=0; i<this.signal.n.length; i++){  
+            this.signal.n[i]=this.signal.n[i]+(Math.random()<0.5?-1:1)*height*Math.random(); 
+          }
         },  
         //exe in setup
         setup: function(){  
@@ -269,14 +277,15 @@
               aux.push(this.ecgData[i]);  
             } 
           } 
-          aux = aux.map(function(e) {
-            return 3*height/4-(1*height/2)*(e+0.025*Math.random());
+          aux = aux.map(function(e){
+            return 3*height/4-(1*height/2)*(e+0.025*Math.random()); 
           }); 
           var l = aux.length;  
           var opac = 0;
           var exe = true;
           var count = 0;
           for (var i=0; i<width; i++){  
+            this.signal.n.push((Math.random()<0.5?-1:1)*height*Math.random());
             this.signal.p.push(false);
             this.signal.x.push(i); 
             this.signal.y.push(aux[i % aux.length]); 
@@ -409,7 +418,8 @@
             for (var ii=this.dBeen; ii<height; ii=ii+2*this.dBeen){ 
               this.addBeens(i,ii); 
             } 
-          }    
+          }     
+          this.beens[Math.floor(this.beens.length*Math.random())].state=0;
         },
         //exe in draw
         draw: function(){ 
