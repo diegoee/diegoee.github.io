@@ -217,97 +217,7 @@
         }
       };
       sketchs.push(aux);
-
-      aux = {
-        getRnd: function(min, max){
-          return Math.round(Math.random() * (max - min) + min);
-        },  
-        ecgData: [
-          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,          
-          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,           
-          0.08, 0.18, 0.08, 0, 0, 0, 0, 0, 0, -0.04,           
-          -0.08, 0.3, 0.7, 0.3, -0.17, 0.00, 0.04, 0.04, 
-          0.05, 0.05, 0.06, 0.07, 0.08, 0.10, 0.11, 0.11,           
-          0.10, 0.085, 0.06, 0.04, 0.03, 0.01, 0.01, 0.01,           
-          0.01, 0.02, 0.03, 0.05, 0.05, 0.05, 0.03, 0.02, 0, 0, 0
-        ], 
-        signal: { 
-          x:[], 
-          y:[],
-          c:[],
-          p:[],
-          n:[], 
-        },
-        plot: function (){  
-          for (var i=0; i<this.signal.x.length-1; i++){ 
-            fill('#DDD');  
-            stroke(this.signal.c[i]);  
-            line(this.signal.x[i], this.signal.y[i]+this.signal.n[i], this.signal.x[i+1], this.signal.y[i+1]); 
-            if(this.signal.p[i]){
-              ellipse(this.signal.x[i], this.signal.y[i], 4, 4);
-            }
-          }  
-        }, 
-        animation: function(){  
-          var e = this.signal.c.pop();
-          this.signal.c.unshift(e);  
-          var e = this.signal.p.pop();
-          this.signal.p.unshift(e);   
-          for (var i=0; i<this.signal.n.length; i++){ 
-            if(this.signal.n[i]>0){ 
-              this.signal.n[i]=this.signal.n[i]-1;
-            }
-            if(this.signal.n[i]<0){ 
-              this.signal.n[i]=this.signal.n[i]+1;
-            }
-          } 
-        },
-        //exe in mouseClicked 
-        mouseClicked: function(mouseX,mouseY){   
-          for (var i=0; i<this.signal.n.length; i++){  
-            this.signal.n[i]=this.signal.n[i]+(Math.random()<0.5?-1:1)*height*Math.random(); 
-          }
-        },  
-        //exe in setup
-        setup: function(){  
-          //https://p5js.org/es/reference/  
-          var aux = []; 
-          for (var i=0; i<this.ecgData.length; i++){ 
-            for (var ii=0; ii<2; ii++){   
-              aux.push(this.ecgData[i]);  
-            } 
-          } 
-          aux = aux.map(function(e){
-            return 3*height/4-(1*height/2)*(e+0.025*Math.random()); 
-          }); 
-          var l = aux.length;  
-          var opac = 0;
-          var exe = true;
-          var count = 0;
-          for (var i=0; i<width; i++){  
-            this.signal.n.push((Math.random()<0.5?-1:1)*height*Math.random());
-            this.signal.p.push(false);
-            this.signal.x.push(i); 
-            this.signal.y.push(aux[i % aux.length]); 
-            if(opac>1){ 
-              this.signal.c.push('rgba(221, 221, 221, 0)');
-            }else{
-              count++;
-              opac=opac+0.0055;
-              this.signal.c.push('rgba(221, 221, 221, '+opac+')');
-            } 
-          }   
-          this.signal.p[count]=true
-        },
-        //exe in draw
-        draw: function(){ 
-          background(color(51));    
-          this.animation();   
-          this.plot();  
-        }
-      };
-      sketchs.push(aux);
-
+      
       aux = { 
         getRandomN: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
@@ -531,6 +441,106 @@
         }
       };
       sketchs.push(aux); 
+      
+      aux = {
+        getRnd: function(min, max){
+          return Math.round(Math.random() * (max - min) + min);
+        },  
+        ecgData: [
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,          
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,           
+          0.08, 0.18, 0.08, 0, 0, 0, 0, 0, 0, -0.04,           
+          -0.08, 0.3, 0.7, 0.3, -0.17, 0.00, 0.04, 0.04, 
+          0.05, 0.05, 0.06, 0.07, 0.08, 0.10, 0.11, 0.11,           
+          0.10, 0.085, 0.06, 0.04, 0.03, 0.01, 0.01, 0.01,           
+          0.01, 0.02, 0.03, 0.05, 0.05, 0.05, 0.03, 0.02, 0, 0, 0
+        ], 
+        signal: { 
+          x:[], 
+          y:[],
+          c:[],
+          p:[],
+          n:[], 
+          s:[],
+        },
+        plot: function (){  
+          for (var i=0; i<this.signal.x.length-1; i++){ 
+            fill('#DDD');  
+            stroke(this.signal.c[i]);  
+            line(this.signal.x[i], this.signal.y[i], this.signal.x[i+1], this.signal.y[i+1]); 
+            if(this.signal.p[i]){
+              ellipse(this.signal.x[i], this.signal.y[i], 6, 6);
+            }
+          }  
+        }, 
+        animation: function(){  
+          this.signal.c.unshift(this.signal.c.pop());   
+          this.signal.c.unshift(this.signal.c.pop());   
+          this.signal.p.unshift(this.signal.p.pop());   
+          this.signal.p.unshift(this.signal.p.pop());  
+          for (var i=0; i<this.signal.s.length; i++){ 
+            if(this.signal.n[i]>0){ 
+              this.signal.n[i]=this.signal.n[i]-1;
+            }
+            if(this.signal.n[i]<0){ 
+              this.signal.n[i]=this.signal.n[i]+1;
+            } 
+            this.signal.y[i]=this.signal.s[i]+this.signal.n[i];  
+          }  
+          
+        },
+        //exe in mouseClicked 
+        mouseClicked: function(mouseX,mouseY){
+          var aux = 0;    
+          for (var i=0; i<this.signal.s.length; i++){  
+            if(this.signal.n[i]===0){
+              this.signal.n[i] = (Math.random()<0.5?-1:1);
+            }
+            if(Math.abs(this.signal.n[i])<height/50){
+              this.signal.n[i]=this.signal.n[i]*20;  
+            } 
+          }
+        },  
+        //exe in setup
+        setup: function(){  
+          //https://p5js.org/es/reference/  
+          var aux = [];  
+          for (var i=0; i<this.ecgData.length-1; i++){   
+              aux.push(this.ecgData[i]);     
+              aux.push((this.ecgData[i]+this.ecgData[i+1])/2); 
+          } 
+          aux = aux.map(function(e){
+            return 3*height/4-height*0.85*e; 
+          });   
+          var opac = 0;
+          var exe = true;
+          var count = 0;
+          for (var i=0; i<width; i++){  
+            this.signal.n.push(0);
+            this.signal.y.push(0);
+            this.signal.p.push(false);
+            this.signal.x.push(i); 
+            this.signal.s.push(aux[i % aux.length]); 
+            if(opac>1){ 
+              this.signal.c.push('rgba(221, 221, 221, 0)');
+            }else{
+              count++;
+              opac=opac+0.0055;
+              this.signal.c.push('rgba(221, 221, 221, '+opac+')');
+            } 
+          }   
+          this.signal.p[count]=true; 
+          this.mouseClicked();
+        },
+        //exe in draw
+        draw: function(){ 
+          background(color(51));    
+          this.animation();   
+          this.plot();  
+        }
+      };
+      sketchs.push(aux); 
+      //sketchs=[sketchs[sketchs.length-1]];
 
       app = { 
         time: 0,
