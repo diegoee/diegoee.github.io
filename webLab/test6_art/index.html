@@ -224,9 +224,9 @@
         },
         beens: [],
         idBeen: 0,
-        dBeen: 35,
-        vMove: 10,
-        counterLimit: 1000,
+        dBeen: 30,
+        vMove: 5,
+        counterLimit: 1500,
         collisionCircle: function (circ1,circ2){   
           var dis = dist(circ1.x, circ1.y, circ2.x, circ2.y);
           if (dis < this.dBeen){
@@ -478,27 +478,30 @@
           this.signal.c.unshift(this.signal.c.pop());   
           this.signal.p.unshift(this.signal.p.pop());   
           this.signal.p.unshift(this.signal.p.pop());  
-          for (var i=0; i<this.signal.s.length; i++){ 
-            if(this.signal.n[i]>0){ 
-              this.signal.n[i]=this.signal.n[i]-1;
-            }
-            if(this.signal.n[i]<0){ 
-              this.signal.n[i]=this.signal.n[i]+1;
-            } 
-            this.signal.y[i]=this.signal.s[i]+this.signal.n[i];  
-          }  
-          
+          for (var i=0; i<this.signal.s.length; i++){  
+            this.signal.y[i]=this.signal.s[i]+this.signal.n[i];    
+          }    
         },
         //exe in mouseClicked 
-        mouseClicked: function(mouseX,mouseY){
-          var aux = 0;    
-          for (var i=0; i<this.signal.s.length; i++){  
-            if(this.signal.n[i]===0){
-              this.signal.n[i] = (Math.random()<0.5?-1:1);
-            }
-            if(Math.abs(this.signal.n[i])<height/50){
-              this.signal.n[i]=this.signal.n[i]*20;  
+        mouseClicked: function(mouseX,mouseY){  
+          if((mouseY<7*height/8)&&(mouseY>1*height/8)){
+            for (var i=0; i<this.signal.s.length; i++){ 
+              this.signal.n[i]=-3*height/4+mouseY; 
             } 
+            var cursor=[0,mouseX];
+            for (var i=0; i<this.signal.p.length; i++){ 
+              if(this.signal.p[i]){
+                cursor[0] = i;
+              }
+            }  
+            while(cursor[0]!==cursor[1]){  
+              cursor[0]++;
+              if(cursor[0]>width){
+                cursor[0]=0;
+              }
+              this.signal.c.unshift(this.signal.c.pop());    
+              this.signal.p.unshift(this.signal.p.pop());
+            }   
           }
         },  
         //exe in setup
@@ -506,21 +509,21 @@
           //https://p5js.org/es/reference/  
           var aux = [];  
           for (var i=0; i<this.ecgData.length-1; i++){   
-              aux.push(this.ecgData[i]);     
+              aux.push(this.ecgData[i]);       
               aux.push((this.ecgData[i]+this.ecgData[i+1])/2); 
           } 
           aux = aux.map(function(e){
-            return 3*height/4-height*0.85*e; 
+            return 3*height/4-height*0.85*e+5*Math.random(); 
           });   
           var opac = 0;
           var exe = true;
           var count = 0;
           for (var i=0; i<width; i++){  
-            this.signal.n.push(0);
-            this.signal.y.push(0);
             this.signal.p.push(false);
             this.signal.x.push(i); 
             this.signal.s.push(aux[i % aux.length]); 
+            this.signal.n.push(0);
+            this.signal.y.push(0);
             if(opac>1){ 
               this.signal.c.push('rgba(221, 221, 221, 0)');
             }else{
@@ -529,8 +532,7 @@
               this.signal.c.push('rgba(221, 221, 221, '+opac+')');
             } 
           }   
-          this.signal.p[count]=true; 
-          this.mouseClicked();
+          this.signal.p[count]=true;  
         },
         //exe in draw
         draw: function(){ 
@@ -540,7 +542,6 @@
         }
       };
       sketchs.push(aux); 
-      //sketchs=[sketchs[sketchs.length-1]];
 
       app = { 
         time: 0,
