@@ -456,6 +456,7 @@
           0.01, 0.02, 0.03, 0.05, 0.05, 0.05, 0.03, 0.02, 0, 0, 0
         ], 
         signal: { 
+          r: 6,
           x:[], 
           y:[],
           c:[],
@@ -463,13 +464,13 @@
           n:[], 
           s:[],
         },
-        plot: function (){  
+        plot: function (){    
           for (var i=0; i<this.signal.x.length-1; i++){ 
             fill('#DDD');  
             stroke(this.signal.c[i]);  
             line(this.signal.x[i], this.signal.y[i], this.signal.x[i+1], this.signal.y[i+1]); 
             if(this.signal.p[i]){
-              ellipse(this.signal.x[i], this.signal.y[i], 6, 6);
+              ellipse(this.signal.x[i], this.signal.y[i], this.signal.r, this.signal.r);
             }
           }  
         }, 
@@ -480,28 +481,19 @@
           this.signal.p.unshift(this.signal.p.pop());  
           for (var i=0; i<this.signal.s.length; i++){  
             this.signal.y[i]=this.signal.s[i]+this.signal.n[i];    
-          }    
+          }   
+          this.signal.r--;
+          if(this.signal.r<6){
+            this.signal.r=6;
+          }
         },
         //exe in mouseClicked 
         mouseClicked: function(mouseX,mouseY){  
-          if((mouseY<7*height/8)&&(mouseY>1*height/8)){
+          this.signal.r=55;
+          if((mouseY<5*height/6)&&(mouseY>1*height/6)){
             for (var i=0; i<this.signal.s.length; i++){ 
               this.signal.n[i]=-3*height/4+mouseY; 
-            } 
-            var cursor=[0,mouseX];
-            for (var i=0; i<this.signal.p.length; i++){ 
-              if(this.signal.p[i]){
-                cursor[0] = i;
-              }
-            }  
-            while(cursor[0]!==cursor[1]){  
-              cursor[0]++;
-              if(cursor[0]>width){
-                cursor[0]=0;
-              }
-              this.signal.c.unshift(this.signal.c.pop());    
-              this.signal.p.unshift(this.signal.p.pop());
-            }   
+            }    
           }
         },  
         //exe in setup
