@@ -446,14 +446,14 @@
         getRnd: function(min, max){
           return Math.round(Math.random() * (max - min) + min);
         },  
-        ecgData: [
-          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,          
+        ecgData: [          
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,           
           0.08, 0.18, 0.08, 0, 0, 0, 0, 0, 0, -0.04,           
           -0.08, 0.3, 0.7, 0.3, -0.17, 0.00, 0.04, 0.04, 
           0.05, 0.05, 0.06, 0.07, 0.08, 0.10, 0.11, 0.11,           
           0.10, 0.085, 0.06, 0.04, 0.03, 0.01, 0.01, 0.01,           
-          0.01, 0.02, 0.03, 0.05, 0.05, 0.05, 0.03, 0.02, 0, 0, 0
+          0.01, 0.02, 0.03, 0.05, 0.05, 0.05, 0.03, 0.02, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  
         ], 
         signal: { 
           r: 6,
@@ -507,10 +507,9 @@
           aux = aux.map(function(e){
             return 3*height/4-height*0.85*e+5*Math.random(); 
           });   
-          var opac = 0;
-          var exe = true;
-          var count = 0;
-          for (var i=0; i<width; i++){  
+          var opac = 0; 
+          var count = 0; 
+          for (var i=0; i<Math.floor(width/aux.length)*aux.length; i++){  
             this.signal.p.push(false);
             this.signal.x.push(i); 
             this.signal.s.push(aux[i % aux.length]); 
