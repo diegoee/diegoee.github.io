@@ -11,7 +11,7 @@ abc=abc+'M:4/4\n';
 abc=abc+'Q:1/4=95\n';
 abc=abc+'K:F\n'; 
 abc=abc+'[V:1]\n'; 
-abc=abc+'A2c2|d12 A2d2- |d12 z4|z4F2G2 A2 G4 F2-|\n';   
+abc=abc+'A2c2|d12 A2c2- |c12 z4|z4F2G2 A2 G4 F2-|\n';   
 abc=abc+'F8 z2 F2 G2A1G1|F8 z2 F2 A2G2-|G2 F6 z2 G2 G4|\n';   
 abc=abc+'F12 z4|z8 z4 A2c2|d8- d2A2c2d2-|\n';       
 abc=abc+'d6 c2 B2A2G2F2|A8 z2 G2 G4|F8- F2F2G2A2|\n';    
