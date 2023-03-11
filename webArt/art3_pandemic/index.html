@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Art3: Pandemic</title> 
+    <style>   
+      html,body{ 
+        padding: 0;
+        margin: 0;  
+        background-color: #333;  
+        color: #DDD;
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+          -moz-user-select: none;  
+            -ms-user-select: none;  
+                user-select: none; 
+        -webkit-tap-highlight-color: transparent; 
+      }
+      body{  
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }  
+      #actionBtn{
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 10px;
+        font-size: 1.5em;
+        cursor: pointer;
+      }
+    </style>   
+  </head>
+  <body>     
+    <main></main>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>     
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script> 
+    <script type="text/javascript"> 
+      console.log('Exe start'); 
+
+      //variables
+      var beens = [];
+      var idBeen = 0;
+      var rBeen = 25;
+      var vMove = 5;
+      var counterLimit = 1500;
+      var exeTime = 0;
+
+      //init setup
+      $(window).on('resize',function(){
+        location.reload();  
+      });   
+
+      setInterval(function(){
+        exeTime++;  
+      },1000);
+
+      //aux funtion
+      function getTimeInMinSec(sec){ 
+        //sec = (2*24*60*60+4*60*60+3*60+2) // 2dias 4horas 3min 2sec
+        var seg   = sec%60; 
+        var min   = Math.floor(sec%(60*60)/60); 
+        var hours = Math.floor(sec%(60*60*24)/60/60);
+        var days  = Math.floor(sec/(60*60*24)); 
+        res = days+'d '+hours+':'+(min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+        if(days===0){ 
+          res = hours+':'+(min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+        }
+        if(days===0&&hours===0){ 
+          res = (min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+        }
+        if(days===0&&hours===0&&min===0){ 
+          res = (seg<9?'0'+seg:seg)+'s'; 
+        }
+        return res;
+      }
+
+      function getRandom(min, max){
+        return Math.random()*(max - min) + min;
+      }
+      function getRandomInt(min, max){ 
+        return Math.floor(Math.random() * (max - min + 1) ) + min;
+      }
+
+      function collisionCircle (circ1,circ2){   
+        var dis = dist(circ1.x, circ1.y, circ2.x, circ2.y);
+        if (dis < rBeen){
+          return true;
+        }else{
+          return false;
+        }
+      };
+
+      function addBeens(x,y){  
+        idBeen++;
+        beens.push({  
+          id: idBeen,
+          state: 1, //0: bad, 1: good, 2: again
+          x: x,
+          y: y, 
+          color: '#DDD',
+          counter: 0, 
+          counterLimit: getRandom(counterLimit/2,counterLimit)
+        });  
+      };
+ 
+      function animation(){  
+        for (var i=0; i<beens.length; i++){  
+          beens[i].x=beens[i].x+vMove*(Math.random()-0.5); 
+          beens[i].y=beens[i].y+vMove*(Math.random()-0.5); 
+          if (beens[i].x<0){
+            beens[i].x=0;  
+          }
+          if (beens[i].x>width){
+            beens[i].x=width;
+          }
+          if (beens[i].y<0){
+            beens[i].y=0;  
+          }
+          if (beens[i].y>height){
+            beens[i].y=height;
+          }
+        }
+        
+        for (var i=0; i<beens.length; i++){  
+          for (var ii=0; ii<beens.length; ii++){
+            if(beens[i].id!==beens[ii].id){
+              if(collisionCircle(beens[i],beens[ii])){ 
+                if(beens[i].state===1&&beens[ii].state===0){ 
+                  beens[i].state=0;
+                }
+                if(beens[i].state===0&&beens[ii].state===1){ 
+                  beens[ii].state=0;
+                }
+              }
+            }
+          }
+        }
+
+        for (var i=0; i<beens.length; i++){  
+          if(beens[i].state===0){ 
+            beens[i].color='#111'; 
+            beens[i].counter++;
+            if(beens[i].counter>beens[i].counterLimit){
+              beens[i].counter=0;
+              beens[i].state=2;
+            }
+          }
+          if(beens[i].state===1){ 
+            beens[i].color='#DDD'; 
+          }
+          if(beens[i].state===2){ 
+            beens[i].color='#555'; 
+            beens[i].counter++;
+            if(beens[i].counter>beens[i].counterLimit){
+              beens[i].counter=0;
+              beens[i].state=1;
+            }
+          }
+        }  
+      };    
+ 
+      //p5 function: https://p5js.org/es/examples/
+      function setup(){ 
+        createCanvas($(window).width()-6, $(window).height()-6);
+        frameRate(60);
+
+        for (var i=rBeen; i<width; i=i+2*rBeen){ 
+          for (var ii=rBeen; ii<height; ii=ii+2*rBeen){ 
+            addBeens(i,ii); 
+          } 
+        }     
+        for (var i=0; i<2; i++){ 
+          beens[Math.floor(beens.length*Math.random())].state=0;  
+        }  
+      }
+ 
+      function mouseClicked(){ 
+        for (var i=0; i<beens.length; i++){  
+          if(beens[i].state===1 && collisionCircle(beens[i],{
+            x: mouseX,
+            y: mouseY
+          })){ 
+            beens[i].state=0;
+            beens[i].counter=0; 
+          }
+        }     
+      } 
+
+      function draw(){   
+        background(color(51));    
+        animation();   
+        
+        noStroke();   
+        for (var i=0; i<beens.length; i++){ 
+          fill(beens[i].color);
+          ellipse(beens[i].x, beens[i].y, rBeen, rBeen); 
+        }  
+
+        noStroke();       
+        textAlign(LEFT);
+        textSize(18);
+        fill(0); 
+        text('Exe Time: '+getTimeInMinSec(exeTime), 10, 50);
+      } 
+  
+      console.log('Exe end'); 
+    </script>
+  </body>
+</html>
