@@ -133,18 +133,16 @@
         width: 100%;
         height: 100%;  
       }  
-      #canvasSignal{  
-        position: fixed;
+      #canvasSignal{   
         z-index: -1;
         opacity: 0.15;
         width: 100%;   
-      } 
+      }  
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">  
   </head>
-  <body>
-    <canvas id="canvasBackground"></canvas> 
-    <canvas id="canvasSignal"></canvas> 
+  <body> 
+    <canvas id="canvasBackground"></canvas>
     <header id="header">
       <h1>Diego E.E. Github</h1> 
     </header>
@@ -183,37 +181,87 @@
           <a href="https://es.linkedin.com/in/diegoespinolaespigares" target="_blank"><i class="fab fa-linkedin fa-lg"></i></a>
         </p>
       </div>
-    </footer>  
+    </footer>    
+    <canvas id="canvasSignal"></canvas> 
     <script>
       (function canvasSignal(){  
-        //aux function 
-
         //variables app
         var canvas = undefined; 
-		    var ctx = undefined;   
+		    var ctx = undefined;  
+        var ecgData = [          
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,           
+          0.08, 0.18, 0.08, 0, 0, 0, 0, 0, 0, -0.04,           
+          -0.08, 0.3, 0.7, 0.3, -0.17, 0.00, 0.04, 0.04, 
+          0.05, 0.05, 0.06, 0.07, 0.08, 0.10, 0.11, 0.11,           
+          0.10, 0.085, 0.06, 0.04, 0.03, 0.01, 0.01, 0.01,           
+          0.01, 0.02, 0.03, 0.05, 0.05, 0.05, 0.03, 0.02, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  
+        ]; 
+        var signal={
+          x: [],
+          y: [],
+          p: [],
+          o: []
+        };
         
         //start the canvas app
         function start(){
           canvas = document.getElementById('canvasSignal');
           canvas.width = innerWidth;
-          canvas.height = innerHeight; 
-		      ctx = canvas.getContext('2d');  
+          canvas.height = document.getElementById('footer').offsetHeight; 
+		      ctx = canvas.getContext('2d'); 
+          
+          var aux = [];  
+          for (var i=0; i<ecgData.length-1; i++){   
+              aux.push(ecgData[i]);       
+              aux.push((ecgData[i]+ecgData[i+1])/2); 
+          } 
+          aux = aux.map(function(e){
+            return 3*canvas.height/4-canvas.height*0.85*e+2*Math.random(); 
+          });   
+          var opac = 0; 
+          var count = 0; 
+          signal = {
+            x: [],
+            y: [],
+            p: [],
+            o: []
+          }; 
+          for (var i=0; i<canvas.width; i++){  
+            signal.p.push(false);
+            signal.x.push(i); 
+            signal.y.push(aux[i % aux.length]);   
+            if(opac>1){ 
+              signal.o.push(0);
+            }else{
+              count++;
+              opac=opac+0.0055;
+              signal.o.push(opac);
+            } 
+          }   
+          signal.p[count]=true; 
+
         }
 
         //animation logic
-        function animation(){   
+        function animation(){  
+          signal.o.unshift(signal.o.pop());   
+          signal.o.unshift(signal.o.pop());   
+          signal.p.unshift(signal.p.pop());   
+          signal.p.unshift(signal.p.pop()); 
         }
 
         //plot element
         function plot(){ 
-          ctx.clearRect(0, 0, canvas.width, canvas.height); 
-        } 
-
-        //Events
-        window.addEventListener('click', function(event) {
-            var mouseX = event.pageX;
-            var mouseY = event.pageY;      
-        },false);  
+          ctx.clearRect(0, 0, canvas.width, canvas.height);  
+          for (var i=0; i<signal.x.length-1; i++){  
+            ctx.beginPath();
+            ctx.moveTo(signal.x[i], signal.y[i]);
+            ctx.lineTo(signal.x[i+1], signal.y[i+1]); 
+            ctx.globalAlpha = signal.o[i];
+            ctx.stroke();
+          }   
+        }  
         
         window.addEventListener('resize', function(event) { 
           start();
@@ -393,9 +441,9 @@
         //plot element
         function plot(){ 
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          function plotCircle(centerX, centerY, radius, opacity){ 
+          function plotCircle(x, y, radius, opacity){ 
             ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, 2*Math.PI);
+            ctx.arc(x, y, radius, 0, 2*Math.PI);
             ctx.fillStyle = '#666'; 
             ctx.globalAlpha = opacity;
             ctx.fill(); 
