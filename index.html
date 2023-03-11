@@ -126,77 +126,25 @@
           max-width: 900px
         }
       } 
-      #canvas{  
+      #canvasBackground{  
         position: fixed;
-        z-index: -1;
-        opacity: 0.125;
+        z-index: -2;
+        opacity: 0.15;
         width: 100%;
         height: 100%;  
+      }  
+      #canvasSignal{  
+        position: fixed;
+        z-index: -1;
+        opacity: 0.15;
+        width: 100%;   
       } 
-      #loading.loading{ 
-        position: absolute;
-        top:0;
-        left:0;  
-        width: 100%;
-        height: 100%;
-        background-color: rgb(128, 128, 128, 0.25);
-        cursor: pointer;   
-        align-items: center;  
-        justify-content: center;
-        display: none;
-        z-index: -1;
-        opacity: 0;
-      }
-      #loading.loading.on{  
-        display: flex;
-        z-index: 1;
-        opacity: 1;
-      }
-      #loading.loading.off{ 
-        display: none;
-        z-index: -1;
-        opacity: 0;
-      }
-      .spinner {
-        width: 40px;
-        height: 40px;
-        position: relative;
-        margin: 100px auto;
-      }
-      .double-bounce1, .double-bounce2 {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        background-color: #333;
-        opacity: 0.6;
-        position: absolute;
-        top: 0;
-        left: 0;
-        -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-        animation: sk-bounce 2.0s infinite ease-in-out;
-      }
-      .double-bounce2 {
-        -webkit-animation-delay: -1.0s;
-        animation-delay: -1.0s;
-      }
-      @-webkit-keyframes sk-bounce {
-        0%, 100% { -webkit-transform: scale(0.0) }
-        50% { -webkit-transform: scale(1.0) }
-      }
-      @keyframes sk-bounce {
-        0%, 100% { 
-          transform: scale(0.0);
-          -webkit-transform: scale(0.0);
-        } 50% { 
-          transform: scale(1.0);
-          -webkit-transform: scale(1.0);
-        }
-      }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">  
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <canvas id="canvasBackground"></canvas> 
+    <canvas id="canvasSignal"></canvas> 
     <header id="header">
       <h1>Diego E.E. Github</h1> 
     </header>
@@ -237,21 +185,248 @@
       </div>
     </footer>  
     <script>
-      (function canvas(){  
-        var canvas = document.getElementById('canvas');
-		    var c = canvas.getContext('2d'); 
-        canvas.width = innerWidth;
-        canvas.height = innerHeight; 
-		    var imageData = c.createImageData(canvas.width, canvas.height); 
-        function loop() { 
-          var l  = imageData.data.length;
-          for (var i = 0; i<l; i++) {
-              imageData.data[i] = (Math.random() * 255)|0;
-          } 
-          c.putImageData(imageData, 0, 0);
-          requestAnimationFrame(loop);            
+      (function canvasSignal(){  
+        //aux function 
+
+        //variables app
+        var canvas = undefined; 
+		    var ctx = undefined;   
+        
+        //start the canvas app
+        function start(){
+          canvas = document.getElementById('canvasSignal');
+          canvas.width = innerWidth;
+          canvas.height = innerHeight; 
+		      ctx = canvas.getContext('2d');  
         }
-        loop();             
+
+        //animation logic
+        function animation(){   
+        }
+
+        //plot element
+        function plot(){ 
+          ctx.clearRect(0, 0, canvas.width, canvas.height); 
+        } 
+
+        //Events
+        window.addEventListener('click', function(event) {
+            var mouseX = event.pageX;
+            var mouseY = event.pageY;      
+        },false);  
+        
+        window.addEventListener('resize', function(event) { 
+          start();
+        },false);
+
+        //exe
+        function loop(){ 
+          animation();
+          plot(); 
+          requestAnimationFrame(loop); 
+        }
+        start();
+        loop();            
+      })();
+      (function canvasBackground(){  
+        //aux function
+        function getRandom(min, max){
+          return Math.random()*(max - min) + min;
+        }
+        function getRandomInt(min, max){ 
+          return Math.floor(Math.random() * (max - min + 1) ) + min;
+        }
+
+        function removeObjectWithId(arr,id){
+          var arrCopy = Array.from(arr); 
+          var objWithIdIndex = arrCopy.findIndex(function(obj){
+            return obj.id === id
+          });
+          arrCopy.splice(objWithIdIndex, 1);
+          return arrCopy;
+        } 
+
+        function addCircleClick (x,y){  
+          idCounterCircleClick++;
+          circlesClick.push({ 
+            clickAni: 1,
+            id: idCounterCircleClick,
+            x: x,
+            y: y,
+            r: 5,
+            rEnd: getRandomInt(3,6),
+            o: 1, 
+            oEnd: getRandom(0.05,1.1),
+            lifeCounter: 0,
+            lifeTime: getRandomInt(1000,10000),
+          });  
+        }
+
+        //variables app
+        var canvas = undefined; 
+		    var ctx = undefined;  
+        var idCounterCircleClick = 0;
+        var circlesClick = [];
+        var ovni = {
+          r: 15,
+          x: 0,
+          y: 0,
+          xEnd: 0,
+          yEnd: 0,
+          xVel: 0,
+          yVel: 0 
+        };
+        
+        //start the canvas app
+        function start(){
+          canvas = document.getElementById('canvasBackground');
+          canvas.width = innerWidth;
+          canvas.height = innerHeight; 
+		      ctx = canvas.getContext('2d'); 
+          idCounterCircleClick = 0;
+          circlesClick = [];
+          for(var i=0; i<canvas.width; i++){
+            for(var ii=0; ii<canvas.height; ii++){
+              if(Math.random()<0.0005){ 
+                addCircleClick(i,ii); 
+              }
+            }
+          } 
+          ovni.x = canvas.width/2; 
+          ovni.y = canvas.height/2; 
+          ovni.xEnd = getRandomInt(canvas.width/2-10,canvas.width/2+10); 
+          ovni.yEnd = getRandomInt(canvas.height/2-10,canvas.height/2+10); 
+        }
+
+        //animation logic
+        function animation(){  
+          //radom cretion circle
+          if(Math.random()<0.00125){ 
+            addCircleClick(getRandom(0, canvas.width),getRandom(0, canvas.height)); 
+          } 
+
+          //Remove dead circle
+          var removeCircle = [];
+          circlesClick.forEach(function(e,i){
+            e.lifeCounter++;     
+            if(e.lifeCounter>e.lifeTime){ 
+              removeCircle.push(e.id);
+            }
+          });  
+          
+          removeCircle.forEach(function(e,i){  
+            circlesClick = removeObjectWithId(circlesClick, e);
+          });   
+          
+          //Animiation circle to the end, opacity and radius 
+          circlesClick.forEach(function(e,i){ 
+            if(e.clickAni!==0){
+              e.r=e.r+e.clickAni*5;
+              e.o=e.o-e.clickAni*5; 
+            if(e.r>50){
+              e.clickAni=-1; 
+            }
+            if(e.r<10){
+              e.clickAni=0;
+            }
+            }else{ 
+              if(e.o>e.oEnd){
+                e.o=e.o-0.001;
+              }
+              if(e.o<e.oEnd){
+                e.o=e.o+0.001;
+              }
+              if(e.r>e.rEnd){
+                e.r=e.r-0.025;
+              }
+              if(e.r<e.rEnd){
+                e.r=e.r+0.025;
+              }
+            }
+          });  
+
+          //move Ovni 
+          var v = Math.abs(ovni.x-ovni.xEnd)/Math.abs(ovni.y-ovni.yEnd);
+          if(v>1){
+            v = Math.abs(ovni.y-ovni.yEnd)/Math.abs(ovni.x-ovni.xEnd);
+            ovni.xVel = 1*1; 
+            ovni.yVel = 1*v; 
+          }else{
+            ovni.xVel = 1*v; 
+            ovni.yVel = 1*1; 
+          } 
+
+          var changePos = [ovni.x,ovni.y];
+          if(ovni.y<ovni.yEnd){
+            ovni.y=ovni.y+ovni.yVel;  
+          }
+          if(ovni.y>ovni.yEnd){
+            ovni.y=ovni.y-ovni.yVel; 
+          }
+          if(ovni.x<ovni.xEnd){
+            ovni.x=ovni.x+ovni.xVel; 
+          }
+          if(ovni.x>ovni.xEnd){
+            ovni.x=ovni.x-ovni.xVel;  
+          }   
+          if(changePos[0]===ovni.x||changePos[2]===ovni.y){
+            var x = Math.floor(Math.random()*canvas.width);
+            var y = Math.floor(Math.random()*canvas.height);  
+            if(x<ovni.r/2){
+              x=ovni.s/2;
+            }
+            if(x>canvas.width-ovni.s/2){
+              x=canvas.width-ovni.s/2;
+            }
+            if(y<ovni.s/2){
+              y=ovni.s/2;
+            }
+            if(y>canvas.height-ovni.s/2){
+              y=canvas.height-ovni.s/2;
+            }
+            ovni.xEnd = Math.round(x); 
+            ovni.yEnd = Math.round(y);
+          }
+
+        }
+
+        //plot element
+        function plot(){ 
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          function plotCircle(centerX, centerY, radius, opacity){ 
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2*Math.PI);
+            ctx.fillStyle = '#666'; 
+            ctx.globalAlpha = opacity;
+            ctx.fill(); 
+          } 
+          for (var i=0; i<circlesClick.length; i++){  
+            plotCircle(circlesClick[i].x, circlesClick[i].y, circlesClick[i].r,circlesClick[i].o); 
+          }  
+          plotCircle(ovni.x, ovni.y, ovni.r, 1); 
+        } 
+
+        //Events
+        window.addEventListener('click', function(event) {
+            var mouseX = event.pageX;
+            var mouseY = event.pageY;  
+            ovni.xEnd = mouseX;
+            ovni.yEnd = mouseY;
+            addCircleClick(mouseX,mouseY);  
+        },false);  
+        
+        window.addEventListener('resize', function(event) { 
+          start();
+        },false);
+
+        //exe
+        function loop(){ 
+          animation();
+          plot(); 
+          requestAnimationFrame(loop); 
+        }
+        start();
+        loop();            
       })();
       (function getFolder(){
         Array.prototype.unique=function(a){
@@ -266,7 +441,7 @@
             if (this.readyState == 4 && this.status == 200) {
               var res = JSON.parse(this.responseText)[0].sha;
               getTree(res,'webApps','webApps');
-              getTree(res,'webArt','webArt');
+              getTree(res,'webArt', 'webArt' );
            }
         };
         xhttp.open('GET', 'https://api.github.com/repos/diegoee/diegoee.github.io/commits', true);
@@ -275,8 +450,7 @@
           var xhttp = new XMLHttpRequest();
           xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-              var res = JSON.parse(this.responseText).tree;
-              console.log(res);
+              var res = JSON.parse(this.responseText).tree; 
               var a = [];
               for(var i=0; i<res.length; i++){
                 if ((res[i].path.indexOf(folder+'/')!==-1)){
@@ -284,8 +458,7 @@
                   a.push(aux[1]);
                 }
               }
-              a=a.unique();
-              console.log(a);
+              a=a.unique(); 
               for(var i=0; i<a.length; i++){
                 document.getElementById(idElement).innerHTML +='<p><a href="/'+folder+'/'+a[i]+'" target="_blank">'+a[i]+'</a></p>';
               };
