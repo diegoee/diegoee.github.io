@@ -286,10 +286,6 @@
         location.reload();  
       });  
 
-      setTimeout(function(){
-        $('#menu').trigger('click');
-      },125); 
-
       if($(window).height()<620){ 
         $('#graph').height($(window).height()-60); 
       }else{ 
@@ -307,7 +303,9 @@
               title: {
                 display: true, 
                 text: '% beens',
-              }
+              },
+              min: 0,
+              max: 100,
             },
             x: {
               stacked: true, 
@@ -355,7 +353,7 @@
               },]
             };
             chart.update();
-          },1000);   
+          },500);   
         }, 
         cleanInterval: function(){ 
           clearInterval(this.interval);  
