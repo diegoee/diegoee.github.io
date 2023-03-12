@@ -44,7 +44,7 @@
       </div>
       <div class="offcanvas-body"> 
         <div class="container"> 
-          <div class="row d-none">
+          <div class="row">
             <div class="col">  
               <h6 class="">Parameters</h5>
             </div>  
@@ -290,10 +290,16 @@
         $('#menu').trigger('click');
       },125); 
 
+      if($(window).height()<620){ 
+        $('#graph').height($(window).height()-60); 
+      }else{ 
+        $('#graph').height($(window).height()-360); 
+      }
+      $('#graph').width($('#graph').parents().width()); 
       var chart = new Chart( document.getElementById('graph'),{
         type: 'line',
         options: {
-          responsive: true,
+          responsive: false, 
           animation: false,
           scales: {
             y: {
