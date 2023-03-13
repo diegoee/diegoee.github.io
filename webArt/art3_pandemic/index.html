@@ -61,7 +61,7 @@
           </div>    
           <div class="row">
             <div class="col text-center"> 
-              <button type="button" class="btn btn-light toStart" id="startBtn">Reset and Start</button>
+              <button type="button" class="btn btn-danger toStart" id="startBtn">Stop</button>
             </div> 
           </div> 
           <div class="row">
@@ -360,17 +360,20 @@
         }
       }
       interval.createInterval();
-      
-      $('#startBtn').html('Stop');
+       
       $('#startBtn').on('click',function(){
         if($(this).hasClass('toStart')){ 
           $(this).removeClass('toStart');
           $(this).addClass('toStop'); 
+          $(this).removeClass('btn-danger');
+          $(this).addClass('btn-success'); 
           $(this).html('Reset and Start');
           interval.cleanInterval();
         }else if($(this).hasClass('toStop')){ 
           $(this).removeClass('toStop');
           $(this).addClass('toStart'); 
+          $(this).removeClass('btn-secondary');
+          $(this).addClass('btn-danger'); 
           $(this).html('Stop');
           setup(); 
           interval.createInterval();
