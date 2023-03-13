@@ -9,8 +9,8 @@
     <style>   
       html,body{ 
         padding: 0;
-        margin: 0;  
-        background-color: #333;   
+        margin: 0;   
+        background-color: #212529;   
         -webkit-user-select: none;  
         -khtml-user-select: none;  
           -moz-user-select: none;  
@@ -27,7 +27,7 @@
         position: absolute; 
         top: 10px;
         right: 10px;
-        z-index: 1;  
+        z-index: 1;     
       }  
       .offcanvas-end{
         width: 100% !important;
@@ -70,11 +70,17 @@
             </div> 
           </div>  
           <div class="row">
-            <div class="col">  
+            <div class="col-sm"> 
               <div class="input-group">
-                <span class="input-group-text">Exe time</span>
-                <input type="text" class="form-control" type="text" id="inputTime" disabled>
+                <span class="input-group-text">Values</span>
+                <span class="form-control" type="text" id="inputValues"></span>
               </div>
+            </div> 
+            <div class="col-sm">  
+              <div class="input-group">
+                <span class="input-group-text">Exe Time</span>
+                <input type="text" class="form-control" type="text" id="inputTime" disabled>
+              </div>  
             </div> 
           </div>  
           <div class="row">
@@ -102,6 +108,12 @@
       var counter2Limit = 2500;
       var exeTime = 0;   
       var data = [];
+      var colorState = {
+        backgr: '#212529',
+        state0: '#F60',
+        state1: '#0F6',
+        state2: '#06F' 
+      }
 
       //aux funtion
       function getTimeInMinSec(sec){ 
@@ -146,7 +158,7 @@
           state: 1, //0: bad, 1: good, 2: recover
           x: x,
           y: y, 
-          color: '#DDD',
+          color: colorState.state1,
           counter0: 0, 
           counter0Limit: getRandom(counter0Limit/2,counter0Limit), 
           counter2: 0, 
@@ -190,7 +202,7 @@
 
         for (var i=0; i<beens.length; i++){  
           if(beens[i].state===0){ 
-            beens[i].color='#111'; 
+            beens[i].color=colorState.state0; 
             beens[i].counter0++;
             if(beens[i].counter0>beens[i].counter0Limit){
               beens[i].counter0=0;
@@ -199,10 +211,10 @@
             }
           }
           if(beens[i].state===1){ 
-            beens[i].color='#DDD'; 
+            beens[i].color=colorState.state1; 
           }
           if(beens[i].state===2){ 
-            beens[i].color='#555'; 
+            beens[i].color=colorState.state2; 
             beens[i].counter2++;
             if(beens[i].counter2>beens[i].counter2Limit){
               beens[i].counter0=0;
@@ -270,7 +282,7 @@
       } 
 
       function draw(){   
-        background(color(51));    
+        background(colorState.backgr);    
         animation();   
         
         noStroke();   
@@ -286,10 +298,14 @@
         location.reload();  
       });  
 
-      if($(window).height()<620){ 
+      if($(window).height()<621){ 
         $('#graph').height($(window).height()-60); 
       }else{ 
-        $('#graph').height($(window).height()-360); 
+        if($(window).width()<576){ 
+          $('#graph').height($(window).height()-440); 
+        }else{ 
+          $('#graph').height($(window).height()-340); 
+        } 
       }
       $('#graph').width($('#graph').parents().width()); 
       var chart = new Chart( document.getElementById('graph'),{
@@ -332,7 +348,19 @@
         interval: undefined,
         createInterval: function(){
           this.interval = setInterval(function(){            
-            $('#inputTime').val(getTimeInMinSec(Math.floor((exeTime/60)))); 
+            var textToShow = getTimeInMinSec(Math.floor((exeTime/60)));
+            $('#inputTime').val(textToShow); 
+            if(data.state0.length!==0){
+              textToShow='<small>';
+              textToShow=textToShow+'State0: '+Math.round(data.state0[data.state0.length-1]*100)/100+'%';
+              textToShow=textToShow+'<br>State1: '+Math.round(data.state1[data.state1.length-1]*100)/100+'%';
+              textToShow=textToShow+'<br>State2: '+Math.round(data.state2[data.state2.length-1]*100)/100+'%';
+              textToShow=textToShow+'</small>';
+            }else{
+              textToShow='--'; 
+            }
+            $('#inputValues').html(textToShow); 
+            $('#inputTime').height($('#inputValues').height()); 
             chart.data={ 
               labels: data.time, 
               datasets: [{
@@ -340,16 +368,19 @@
                 data: data.state0,
                 fill: true,
                 pointRadius: 0,
+                backgroundColor: colorState.state0
               },{
                 label: 'State 1',
                 data: data.state1,
                 fill: true,
                 pointRadius: 0,
+                backgroundColor: colorState.state1
               },{
                 label: 'State 2',
                 data: data.state2,
                 fill: true,
                 pointRadius: 0,
+                backgroundColor: colorState.state2
               },]
             };
             chart.update();
@@ -360,6 +391,11 @@
         }
       }
       interval.createInterval();
+      /*
+      setTimeout(function(){
+        $('#menu').trigger('click');
+      },250);
+      */
        
       $('#startBtn').on('click',function(){
         if($(this).hasClass('toStart')){ 
