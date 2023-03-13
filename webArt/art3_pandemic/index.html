@@ -122,15 +122,15 @@
         var min   = Math.floor(sec%(60*60)/60); 
         var hours = Math.floor(sec%(60*60*24)/60/60);
         var days  = Math.floor(sec/(60*60*24)); 
-        var res = days+'d '+hours+':'+(min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+        var res = days+'d '+hours+':'+(min<10?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
         if(days===0){ 
-          res = hours+':'+(min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+          res = hours+':'+(min<10?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
         }
         if(days===0&&hours===0){ 
-          res = (min<9?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
+          res = (min<10?'0'+min:min)+':'+(seg<9?'0'+seg:seg); 
         }
         if(days===0&&hours===0&&min===0){ 
-          res = (seg<9?'0'+seg:seg)+'s'; 
+          res = (seg<10?'0'+seg:seg)+'s'; 
         }
         return res;
       }
@@ -346,44 +346,50 @@
       
       var interval = {
         interval: undefined,
-        createInterval: function(){
-          this.interval = setInterval(function(){            
-            var textToShow = getTimeInMinSec(Math.floor((exeTime/60)));
-            $('#inputTime').val(textToShow); 
-            if(data.state0.length!==0){
-              textToShow='<small>';
-              textToShow=textToShow+'State0: '+Math.round(data.state0[data.state0.length-1]*100)/100+'%';
-              textToShow=textToShow+'<br>State1: '+Math.round(data.state1[data.state1.length-1]*100)/100+'%';
-              textToShow=textToShow+'<br>State2: '+Math.round(data.state2[data.state2.length-1]*100)/100+'%';
-              textToShow=textToShow+'</small>';
-            }else{
-              textToShow='--'; 
-            }
-            $('#inputValues').html(textToShow); 
+        actionInterval: function(){
+          var textToShow = getTimeInMinSec(Math.floor((exeTime/60)));
+          $('#inputTime').val(textToShow); 
+          if(data.state0.length!==0){
+            textToShow='<small>';
+            textToShow=textToShow+'State0: '+Math.round(data.state0[data.state0.length-1]*100)/100+'%';
+            textToShow=textToShow+'<br>State1: '+Math.round(data.state1[data.state1.length-1]*100)/100+'%';
+            textToShow=textToShow+'<br>State2: '+Math.round(data.state2[data.state2.length-1]*100)/100+'%';
+            textToShow=textToShow+'</small>';
+          }else{
+            textToShow='--'; 
+          }
+          $('#inputValues').html(textToShow); 
+          if($(window).width()>575){ 
             $('#inputTime').height($('#inputValues').height()); 
-            chart.data={ 
-              labels: data.time, 
-              datasets: [{
-                label: 'State 0',
-                data: data.state0,
-                fill: true,
-                pointRadius: 0,
-                backgroundColor: colorState.state0
-              },{
-                label: 'State 1',
-                data: data.state1,
-                fill: true,
-                pointRadius: 0,
-                backgroundColor: colorState.state1
-              },{
-                label: 'State 2',
-                data: data.state2,
-                fill: true,
-                pointRadius: 0,
-                backgroundColor: colorState.state2
-              },]
-            };
-            chart.update();
+          }            
+          chart.data={ 
+            labels: data.time, 
+            datasets: [{
+              label: 'State 0',
+              data: data.state0,
+              fill: true,
+              pointRadius: 0,
+              backgroundColor: colorState.state0
+            },{
+              label: 'State 1',
+              data: data.state1,
+              fill: true,
+              pointRadius: 0,
+              backgroundColor: colorState.state1
+            },{
+              label: 'State 2',
+              data: data.state2,
+              fill: true,
+              pointRadius: 0,
+              backgroundColor: colorState.state2
+            },]
+          };
+          chart.update();
+        },
+        createInterval: function(){
+          var self = this;
+          this.interval = setInterval(function(){            
+            self.actionInterval();  
           },500);   
         }, 
         cleanInterval: function(){ 
@@ -391,6 +397,7 @@
         }
       }
       interval.createInterval();
+      
       /*
       setTimeout(function(){
         $('#menu').trigger('click');
