@@ -214,7 +214,7 @@
           var aux = [];  
           for (var i=0; i<ecgData.length-1; i++){   
               aux.push(ecgData[i]);       
-              aux.push((ecgData[i]+ecgData[i+1])/2); 
+              //aux.push((ecgData[i]+ecgData[i+1])/2); 
           } 
           aux = aux.map(function(e){
             return 3*canvas.height/4-canvas.height*0.85*e+2*Math.random(); 
@@ -270,8 +270,10 @@
         //exe
         function loop(){ 
           animation();
-          plot(); 
-          requestAnimationFrame(loop); 
+          plot();  
+          setTimeout(function(){
+            requestAnimationFrame(loop);
+          },1000/60);
         }
         start();
         loop();            
@@ -455,12 +457,12 @@
         } 
 
         //Events
-        window.addEventListener('click', function(event) {
-            var mouseX = event.pageX;
-            var mouseY = event.pageY;  
-            ovni.xEnd = mouseX;
-            ovni.yEnd = mouseY;
-            addCircleClick(mouseX,mouseY);  
+        window.addEventListener('click', function(event) { 
+          var mouseX = event.clientX;
+          var mouseY = event.clientY;  
+          ovni.xEnd = mouseX;
+          ovni.yEnd = mouseY;
+          addCircleClick(mouseX,mouseY);  
         },false);  
         
         window.addEventListener('resize', function(event) { 
