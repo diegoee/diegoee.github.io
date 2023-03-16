@@ -399,11 +399,11 @@
           var v = Math.abs(ovni.x-ovni.xEnd)/Math.abs(ovni.y-ovni.yEnd);
           if(v>1){
             v = Math.abs(ovni.y-ovni.yEnd)/Math.abs(ovni.x-ovni.xEnd);
-            ovni.xVel = 1*1; 
-            ovni.yVel = 1*v; 
+            ovni.xVel = 0.5*1; 
+            ovni.yVel = 0.5*v; 
           }else{
-            ovni.xVel = 1*v; 
-            ovni.yVel = 1*1; 
+            ovni.xVel = 0.5*v; 
+            ovni.yVel = 0.5*1; 
           } 
 
           var changePos = [ovni.x,ovni.y];
