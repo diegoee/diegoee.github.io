@@ -2,21 +2,6 @@
 var songs = [];
 var abc='';  
 
-/*
-abc=''; 
-abc=abc+'X:1\n';
-abc=abc+'T:As Time Goes By\n';
-abc=abc+'M:4/4\n';
-abc=abc+'L:1/8\n';
-abc=abc+'K:F\n';
-abc=abc+'G| AG F E2 F3| GB AG F A3| Be dc B c3-| c3 z2 z| d| fe dc d2 e2| B2 B2 E2 F2|]\n';
-abc=abc+'G8-| G6 z G| AG FE F3 G| BA GF A3 B| ed cB c4| z4 z2 z d| fe dc d2 e2|]\n';
-abc=abc+'B2 B2 E2 F2| E8-| E4 z4| E F3/2 E/2 c3 c2| c_d c=B c4| FG F c3 c2|]\n';
-abc=abc+'c_d c=B c4| GA G e3 e2| ed ed f2 d2| c2 c2 G2 G2| B6 z G| AG FE F F2 G|]\n';
-abc=abc+'BA GF A A2 B| ed cB c4| z6 d2| fe dc d2 e2| B2 B4 G2| B4 B4| e6 z2|]\n';  
-songs.push(abc);
-*/
-
 abc=''; 
 abc=abc+'X:1\n';
 abc=abc+'T: All of Me (no Chords)\n'; 
