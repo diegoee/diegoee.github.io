@@ -15,7 +15,7 @@
         -webkit-tap-highlight-color: transparent;
         font-family: Georgia, 'Times New Roman', Times, serif;
         background-color: #DDD;
-        color: #808; 
+        color: rgb(136, 0, 136); 
         overflow-y: hidden;
         overflow-x: hidden;
         margin: 0;
@@ -33,26 +33,56 @@
       //variables
       var bgcolor = '#DDD';
       var obj={
-        color: '#808',
-        d: ($(window).width()>$(window).height()?$(window).height()/5:$(window).width()/5),
+        r: 136,
+        g: 0,
+        b: 136,
+        o: 255,
+        d: ($(window).width()>$(window).height()?$(window).height()/5:$(window).width()/5), 
         x: $(window).width()/2,
         y: $(window).height()/2
       }
- 
+      var exe = false;
+      var counter = 0;
+
+      //aux Function and init action
+      function resetVar(){ 
+        counter = 0;
+        obj.o = 255;
+        obj.d = ($(window).width()>$(window).height()?$(window).height()/5:$(window).width()/5);
+        obj.x = $(window).width()/2;
+        obj.y = $(window).height()/2;
+      } 
+
+      $(window).on('resize',function(){ 
+        setup(); 
+      });
+
       //p5 function: https://p5js.org/es/examples/
       function setup(){ 
         createCanvas($(window).width(), $(window).height());
-        frameRate(60); 
+        frameRate(60);
+        resetVar(); 
       }
  
       function mouseClicked(){
+        exe=!exe;
       } 
 
       function draw(){   
         background(bgcolor);  
         noStroke();  
-        fill(obj.color);
-        ellipse(obj.x, obj.y, obj.d, obj.d);  
+        fill(obj.r, obj.g, obj.b, obj.o);
+        ellipse(obj.x, obj.y, obj.d, obj.d); 
+        if(exe){
+          counter++;
+          obj.o=obj.o-1;
+          obj.d=obj.d+10;
+          if(counter>180){ 
+            resetVar();
+          } 
+        }else{
+          resetVar();
+        }
       } 
       
       console.log('Exe end'); 
