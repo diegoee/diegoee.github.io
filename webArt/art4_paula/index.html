@@ -32,25 +32,36 @@
       //***** CANVAS APP ******//       
       //variables
       var bgcolor = '#DDD';
-      var obj={
-        r: 136,
-        g: 0,
-        b: 136,
-        o: 255,
-        d: ($(window).width()>$(window).height()?$(window).height()/5:$(window).width()/5), 
-        x: $(window).width()/2,
-        y: $(window).height()/2
-      }
+      var obj=[];
       var exe = false;
       var counter = 0;
 
       //aux Function and init action
       function resetVar(){ 
-        counter = 0;
-        obj.o = 255;
-        obj.d = ($(window).width()>$(window).height()?$(window).height()/5:$(window).width()/5);
-        obj.x = $(window).width()/2;
-        obj.y = $(window).height()/2;
+        counter = 0; 
+        obj = [];
+        obj.push({
+          r: 136,
+          g: 0,
+          b: 136,
+          o: 255,
+          oInc: 0,
+          d: ($(window).width()>$(window).height()?$(window).height()/5:$(window).width()/5), 
+          dInc: 0.25,
+          x: $(window).width()/2,
+          y: $(window).height()/2
+        });        
+        obj.push({
+          r: 156,
+          g: 0,
+          b: 156,
+          o: 255,
+          oInc: -15,
+          d: 0, 
+          dInc: 15,
+          x: $(window).width()/2,
+          y: $(window).height()/2
+        });
       } 
 
       $(window).on('resize',function(){ 
@@ -68,16 +79,21 @@
         exe=!exe;
       } 
 
+      resetVar();
       function draw(){   
         background(bgcolor);  
-        noStroke();  
-        fill(obj.r, obj.g, obj.b, obj.o);
-        ellipse(obj.x, obj.y, obj.d, obj.d); 
-        if(exe){
+        noStroke(); 
+        for(var i=0; i<obj.length; i++){
+          fill(obj[i].r, obj[i].g, obj[i].b, obj[i].o);
+          ellipse(obj[i].x, obj[i].y, obj[i].d, obj[i].d); 
+        }
+        if(exe){ 
+          for(var i=0; i<obj.length; i++){ 
+            obj[i].o=obj[i].o+obj[i].oInc;
+            obj[i].d=obj[i].d+obj[i].dInc; 
+          } 
           counter++;
-          obj.o=obj.o-1;
-          obj.d=obj.d+10;
-          if(counter>180){ 
+          if(counter>60){ 
             resetVar();
           } 
         }else{
