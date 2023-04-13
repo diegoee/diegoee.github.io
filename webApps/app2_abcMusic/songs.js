@@ -4,6 +4,25 @@ var abc='';
 
 abc=''; 
 abc=abc+'X:1\n';
+abc=abc+'T: All of Me (Ejercicio)\n'; 
+abc=abc+'C: --\n'; 
+abc=abc+'L:1/16\n';     
+abc=abc+'M:4/4\n';
+abc=abc+'Q:1/4=135\n';
+abc=abc+'K:D\n';    
+abc=abc+'"D"   D8        F8 |     A8        D8 |"F#7" F8              ^A8 |     c4 E4    F8 |\n';   
+abc=abc+'"B7"  B,8       D8 |     F4  A4    B8 |"E-"  E8               G8 |     B8       E8 |\n';  
+abc=abc+'"F#7" F8       ^A8 |     c4  E4    F8 |"B-"  B8              _G8 |     E8       B8 |\n';  
+abc=abc+'"E7"  E8       ^G8 |     B4  F4    E8 |"E-7" E4 G4        B4  F4 |"A7" A4 c4 E4 G4 |\n';  
+abc=abc+'"D"   D8        F8 |     A8        D8 |"F#7" F8              ^A8 |     c4 E4    F8 |\n'; 
+abc=abc+'"B7"  B,8       D8 |     F4  A4    B8 |"E-"  E8               G8 |     B8       E8 |\n';  
+abc=abc+'"G"   G4  B4 D4 G4 |"G-" G4 _B4 D4 G4 |"D7"  D4 A4 "F#-7" F4  C4 |"B7" B4 D4 F4 A4 |\n';  
+abc=abc+'"E-7" E4  G4 B4 F4 |"A7" A4  c4 E4 G4 |"D6"  D4 F4        A8     |     D16         |]\n';   
+songs.push(abc);
+
+
+abc=''; 
+abc=abc+'X:1\n';
 abc=abc+'T: All of Me (no Chords)\n'; 
 abc=abc+'C: --\n'; 
 abc=abc+'L:1/16\n';     
@@ -18,8 +37,7 @@ abc=abc+'   d4 A2F2- F8- |F8      (3d4e4d4  |c4 ^A2F2- F8- |F16   |\n';
 abc=abc+'   B4 A2F2- F8- |F4  ^E4 (3F4=c4B4 |A8 G8-        |G16   |\n'; 
 abc=abc+'   e8 d4 c4     |e12 c4            |B8  F4 A4     |c12 B4|\n';  
 abc=abc+'   d8 B4 d4     |f8 f8             |d16-          |d16   |]\n';   
-songs.push(abc);
-
+songs.push(abc); 
 
 abc=''; 
 abc=abc+'X:1\n';
