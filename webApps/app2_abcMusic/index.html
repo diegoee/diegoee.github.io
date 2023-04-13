@@ -52,10 +52,6 @@
         transition: ease-in-out 0.25s;
       }
       #menuScreen.open, #musicScreen.open{
-        position: absolute;
-        margin: 0;
-        padding: 0;
-        top: 0;
         left: 0;    
       }  
       .closeBtnContainer{
@@ -407,6 +403,7 @@
         resize: function(){  
           $('#inputText').innerHeight($(window).innerHeight()/2);   
           $('#menuScreen').innerHeight($(document).innerHeight()); 
+          $('#musicScreen').innerHeight($(document).innerHeight()); 
         },
         openCloseMenu: function(){
           if($('#menuScreen').hasClass('open')){ 
