@@ -1,30 +1,33 @@
 // init var
 var songs = [];
-var abc='';  
+var abc='';
+
+setTimeout(function(){
+    $('#selectTransporPitch').val(2);
+    $('#selectTransporPitch').trigger('change'); 
+},2000);
 
 abc=''; 
 abc=abc+'X:1\n';
-abc=abc+'T: All of Me (Ejercicio)\n'; 
-abc=abc+'C: --\n'; 
+abc=abc+'T: All of Me (Ejercicio)\n';  
 abc=abc+'L:1/16\n';     
 abc=abc+'M:4/4\n';
 abc=abc+'Q:1/4=135\n';
 abc=abc+'K:D\n';    
-abc=abc+'"D"   D8        F8 |     A8        D8 |"F#7" F8              ^A8 |     c4 E4    F8 |\n';   
-abc=abc+'"B7"  B,8       D8 |     F4  A4    B8 |"E-"  E8               G8 |     B8       E8 |\n';  
-abc=abc+'"F#7" F8       ^A8 |     c4  E4    F8 |"B-"  B8              _G8 |     E8       B8 |\n';  
-abc=abc+'"E7"  E8       ^G8 |     B4  F4    E8 |"E-7" E4 G4        B4  F4 |"A7" A4 c4 E4 G4 |\n';  
-abc=abc+'"D"   D8        F8 |     A8        D8 |"F#7" F8              ^A8 |     c4 E4    F8 |\n'; 
-abc=abc+'"B7"  B,8       D8 |     F4  A4    B8 |"E-"  E8               G8 |     B8       E8 |\n';  
-abc=abc+'"G"   G4  B4 D4 G4 |"G-" G4 _B4 D4 G4 |"D7"  D4 A4 "F#-7" F4  C4 |"B7" B4 D4 F4 A4 |\n';  
-abc=abc+'"E-7" E4  G4 B4 F4 |"A7" A4  c4 E4 G4 |"D6"  D4 F4        A8     |     D16         |]\n';   
+abc=abc+'"D"   D4   F4  A4  d4- |     d4  A4  F4  D4 |"F#7" F4 ^A4        c4  f4- |     f4  ^E4  F8      |\n'; 
+abc=abc+'"B7"  B,4 ^D4 =F4  B4- |     B4 ^A4  B8     |"E-"  E4  G4        B4  e4- |     e4   B4  G4  E4  |\n'; 
+abc=abc+'"F#7" F4  ^A4  c4  f4- |     f4 ^E4  F8     |"B-"  B,4 D4       =F4  B4- |     B4   F4  D4  B,4 |\n';  
+abc=abc+'"E7"  E4  ^G4  B4  E4- |     E4 ^D4  E8     |"E-7" E4  G4        B,4 D4  |"A7" A4   c4  E4  G4  |\n';  
+abc=abc+'"D6"  D4   F4  A4  d4- |     d4  A4  F4  D4 |"F#7" F4 ^A4        c4  f4- |     f4  ^E4  F8      |\n'; 
+abc=abc+'"B7"  B,4  D4  F4  B4- |     B4  A4  B8     |"E-"  E4  G4        B4  e4- |     e4   B4  G4  E4  |\n';  
+abc=abc+'"G"   G4   B4  D4  G4  |"G-" G4 _B4  D4  G4 |"D7"  D4  A4 "F#-7" F4  C4  |"B7" B,4  D4  F4  A4  |\n';  
+abc=abc+'"E-7" E4   G4  B4  F4  |"A7" A4  c4  E4  G4 |"D6"  D4  F4        A8      |     D16              |]\n';  
 songs.push(abc);
 
 
 abc=''; 
 abc=abc+'X:1\n';
-abc=abc+'T: All of Me (no Chords)\n'; 
-abc=abc+'C: --\n'; 
+abc=abc+'T: All of Me (no Chords)\n';  
 abc=abc+'L:1/16\n';     
 abc=abc+'M:4/4\n';
 abc=abc+'Q:1/4=135\n';
@@ -41,8 +44,7 @@ songs.push(abc);
 
 abc=''; 
 abc=abc+'X:1\n';
-abc=abc+'T: All of Me\n'; 
-abc=abc+'C: --\n'; 
+abc=abc+'T: All of Me\n';  
 abc=abc+'L:1/16\n';     
 abc=abc+'M:4/4\n';
 abc=abc+'Q:1/4=135\n';
