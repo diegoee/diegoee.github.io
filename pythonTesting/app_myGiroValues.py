@@ -38,21 +38,20 @@ class AppGiroValues:
     print(data)
     
     #AUX function to get data STOCKS
-    def getStockValue(type, ticket, N, dStart, dEnd, descTicket): 
+    def getStockValue(ticket, N, dStart, dEnd, descTicket): 
       stock = pd.DataFrame({'Fecha': [ ], 'ID_Producto': [], 'Desc': [], 'N': [], 'CastflowEUR': []}) 
-      if type=='STOCK': 
-        stock = yf.YahooFinancials(ticket).get_historical_price_data(dStart, dEnd, 'daily') 
-        stock = pd.DataFrame.from_dict(stock[ticket]['prices'])
-        stock = stock[['formatted_date','close']] 
-        stock.columns = ['Fecha', 'CastflowEUR']
-        stock['Fecha'] = pd.to_datetime(stock['Fecha'], format='%Y-%m-%d')      
-        for date in pd.date_range(start=dStart, end=dEnd): 
-          maxDate = stock[stock['Fecha']==date]['Fecha']
-          if maxDate.size==0:  
-            aux = stock[stock['Fecha']==stock[stock['Fecha']<=date]['Fecha'].max()].iloc[[0]]
-            aux['Fecha'] = date 
-            stock = pd.concat([stock, aux])      
-      stock['ID_Producto'] = type
+      stock = yf.YahooFinancials(ticket).get_historical_price_data(dStart, dEnd, 'daily') 
+      stock = pd.DataFrame.from_dict(stock[ticket]['prices'])
+      stock = stock[['formatted_date','close']] 
+      stock.columns = ['Fecha', 'CastflowEUR']
+      stock['Fecha'] = pd.to_datetime(stock['Fecha'], format='%Y-%m-%d')      
+      for date in pd.date_range(start=dStart, end=dEnd): 
+        maxDate = stock[stock['Fecha']==date]['Fecha']
+        if maxDate.size==0:  
+          aux = stock[stock['Fecha']==stock[stock['Fecha']<=date]['Fecha'].max()].iloc[[0]]
+          aux['Fecha'] = date 
+          stock = pd.concat([stock, aux])      
+      stock['ID_Producto'] = 'STOCK'
       stock['N'] = N
       stock['Desc'] = descTicket  
       stock = stock[['Fecha','ID_Producto','Desc','N','CastflowEUR']]
@@ -61,10 +60,11 @@ class AppGiroValues:
     #Generate STOCKS values in time
     stocksData  = pd.read_json(os.path.dirname(__file__)+'/'+'stocks.json')
     stocksData['dEnd'] = dt.datetime.today().strftime("%Y-%m-%d") 
-    stocks = pd.DataFrame({'Fecha': [ ], 'ID_Producto': [], 'Desc': [], 'N': [], 'CastflowEUR': []}) 
+    stocks = pd.DataFrame({'Fecha': [ ],'ID_Producto': [],  'Desc': [], 'N': [], 'CastflowEUR': []}) 
     for i in range(stocksData.index.size):  
-      stocks = pd.concat([stocks, getStockValue(stocksData['type'].loc[i], stocksData['ticker'].loc[i], stocksData['N'].loc[i], stocksData['dStart'].loc[i], stocksData['dEnd'].loc[i], stocksData['desc'].loc[i])])   
-    stocks.sort_values(by=['Fecha', 'ID_Producto','Desc'], inplace=True, ascending=True) 
+      stocks = pd.concat([stocks, getStockValue( stocksData['ticker'].loc[i], stocksData['N'].loc[i], stocksData['dStart'].loc[i], stocksData['dEnd'].loc[i], stocksData['desc'].loc[i])])   
+    stocks = stocks.groupby(['Fecha','ID_Producto','Desc', 'CastflowEUR'], group_keys=True).sum().reset_index()  
+    stocks.sort_values(by=['Fecha','ID_Producto','Desc'], inplace=True, ascending=True) 
     stocks['CastflowEUR'] = stocks['CastflowEUR'].replace(',','.', regex=True) 
     stocks['CastflowEUR'] = stocks['CastflowEUR'].astype(float)
     stocks['Total'] = stocks['N']*stocks['CastflowEUR']
@@ -87,7 +87,7 @@ class AppGiroValues:
     for i in range(0,s.size): 
       #plots Stocks: DATA 
       plotDataS = stocks[stocks['Desc'] == s[i]]
-      title = s[i]+': N='+str(round(plotDataS['N'].iloc[-1]))+' ('+plotDataS['ID_Producto'].iloc[-1]+')'
+      title = s[i]+': N='+str(round(plotDataS['N'].iloc[-1]))+' '
       aux = round(plotDataS['Total'].iloc[-1]-plotDataS['Total'].iloc[0], 2)
       colortext='black'
       if aux>0:
