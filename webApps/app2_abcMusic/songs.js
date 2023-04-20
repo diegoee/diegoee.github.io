@@ -35,10 +35,10 @@ abc=abc+'K:D\n';
 abc=abc+'   d4 A2F2- F8- |F8      (3d4e4d4  |c4 ^A2F2- F8- |F16   |\n';   
 abc=abc+'   B6 A2 F8-    |F4  ^E4 (3F4=c4B4 |A8 G8-        |G16   |\n';  
 abc=abc+'   F6 =F2 E8-   |E8      (3F4^A4c4 |e8 d8-        |d16   |\n';  
-abc=abc+'   c6 =c2 B8-   |B8      (3B4e4c4  |B16           |c16   |\n';  
+abc=abc+'   c6 =c2 B8-   |B8      (3B4e4c4  |B16           |A16   |\n';  
 abc=abc+'   d4 A2F2- F8- |F8      (3d4e4d4  |c4 ^A2F2- F8- |F16   |\n';  
 abc=abc+'   B4 A2F2- F8- |F4  ^E4 (3F4=c4B4 |A8 G8-        |G16   |\n'; 
-abc=abc+'   e8 d4 c4     |e12 c4            |B8  F4 A4     |c12 B4|\n';  
+abc=abc+'   e8 d4 c4     |e12 d4            |c8  F4 A4     |c12 B4|\n';  
 abc=abc+'   d8 B4 d4     |f8 f8             |d16-          |d16   |]\n';   
 songs.push(abc); 
 
@@ -49,14 +49,14 @@ abc=abc+'L:1/16\n';
 abc=abc+'M:4/4\n';
 abc=abc+'Q:1/4=135\n';
 abc=abc+'K:D\n';    
-abc=abc+'"D"d4 A2F2- F8- |F8      (3d4e4d4  |"F#7"c4 ^A2F2- F8-|    F16|\n';   
-abc=abc+'"B7"B6 A2 F8-   |F4  ^E4 (3F4=c4B4 |"E-" A8 G8-       |    G16|\n';  
-abc=abc+'"F#7"F6 =F2 E8- |E8      (3F4^A4c4 |"B-" e8 d8-       |    d16|\n';  
-abc=abc+'"E7" c6 =c2 B8- |B8      (3B4e4c4  |"E-7"B16          |"A7"c16|\n';  
-abc=abc+'"D"d4 A2F2- F8-|F8      (3d4e4d4  |"F#7"c4 ^A2F2- F8- |F16    |\n';  
-abc=abc+'"B7"B4 A2F2- F8-|F4  ^E4 (3F4=c4B4 |"E-" A8 G8-       |G16    |\n'; 
-abc=abc+'"G" e8 d4 c4    |"G-"e12 c4        |"D7"B8 "F#-7"F4 A4|"B7"c12 B4|\n';  
-abc=abc+'"E-7"d8 B4 d4   |"A7"f8 f8         |"D6"d16-          |d16   |]\n';   
+abc=abc+'"D"d4 A2F2- F8- |F8      (3d4e4d4  |"F#7"c4 ^A2F2- F8-|    F16   |\n';   
+abc=abc+'"B7"B6 A2 F8-   |F4  ^E4 (3F4=c4B4 |"E-" A8 G8-       |    G16   |\n';  
+abc=abc+'"F#7"F6 =F2 E8- |E8      (3F4^A4c4 |"B-" e8 d8-       |    d16   |\n';  
+abc=abc+'"E7" c6 =c2 B8- |B8      (3B4e4c4  |"E-7"B16          |"A7"A16   |\n';  
+abc=abc+'"D"d4 A2F2- F8- |F8      (3d4e4d4  |"F#7"c4 ^A2F2- F8-|F16       |\n';  
+abc=abc+'"B7"B4 A2F2- F8-|F4  ^E4 (3F4=c4B4 |"E-" A8 G8-       |G16       |\n'; 
+abc=abc+'"G" e8 d4 c4    |"G-"e12 d4        |"D7"c8 "F#-7"F4 A4|"B7"c12 B4|\n';  
+abc=abc+'"E-7"d8 B4 d4   |"A7"f8 f8         |"D6"d16-          |d16       |]\n';   
 songs.push(abc);
 
 
