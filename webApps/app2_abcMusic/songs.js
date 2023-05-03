@@ -16,13 +16,13 @@ abc=abc+'L: 1/8\n';
 abc=abc+'M: 4/4\n';
 abc=abc+'K: Em\n';
 abc=abc+'z2 E2 F2 G2|  "Am7"       c8-          | "D7"   c2 D2  E2  F2   | "Gmaj7"  B4 B4-        | "Cmaj7" B2 C2    D2  E2 |\n';
-abc=abc+'              "F#m7b5"    A8-          | "B7"   A2 B,2 ^C2 ^D2  | "Em"     G8            | "Em"z2  E2 F2    G2     |\n'; 
+abc=abc+'              "F#m7b5"    A8-          | "B7"   A2 B,2 ^C2 ^D2  | "Em"     G8            | "Em"    z2 E2 F2 G2     |\n'; 
 abc=abc+'              "Am7"       c8-          | "D7"   c2 D2  E2  F2   | "Gmaj7"  B4 B4-        | "Cmaj7" B2 C2    D2  E2 |\n';
 abc=abc+'              "F#m7b5"    A8-          | "B7"   A2 F2  A2  G2   | "Em"     E8            | "Em"    z4 ^D2   E2     |\n';  
-abc=abc+'              "F#m7b5"    F2 B,2 F4-   | "B7"   F2 F2  E2  F2   | "Em"     G8-           |         G2 G2    F2  G2 |\n';
-abc=abc+'              "Am7"       A8-          | "D7"   A2 D2  d2  c2   | "Gmaj7"  B8-           |         B2 z2    ^A2 B2 |\n';
-abc=abc+'              "F#m7b5"    c2 c2  A2 A2 | "B7"   F6 c2           | "Em"     B4 "Eb7" B4-  | "D7"    B6 "Db7" E2     |\n';
-abc=abc+'              "Cmaj7"     A6 G2        | "B7b9" F4 G2  B,2      | "Em"     E8-           |         E8              |]\n';
+abc=abc+'              "F#m7b5"    F2 B,2 F4-   | "B7"   F2 F2  E2  F2   | "Em"     G8-           | "Em"    G2 G2    F2  G2 |\n';
+abc=abc+'              "Am7"       A8-          | "D7"   A2 D2  d2  c2   | "Gmaj7"  B8-           | "Cmaj7" B2 z2    ^A2 B2 |\n';
+abc=abc+'              "F#m7b5"    c2 c2  A2 A2 | "B7"   F6 c2           | "Em"     B4 "Eb7" B4-  | "D7"    B4 "Db7" E4     |\n';
+abc=abc+'              "Cmaj7"     A6 G2        | "B7b9" F4 G2  B,2      | "Em"     E8-           | "Em"    E8              |]\n';
 songs.push(abc);
 
 
