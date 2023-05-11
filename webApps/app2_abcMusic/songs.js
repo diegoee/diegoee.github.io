@@ -4,7 +4,7 @@ var abc='';
 
 setTimeout(function(){
     $('#selectTransporPitch').val(2);
-    $('#selectTransporSheet').val(5);
+    $('#selectTransporSheet').val(2);
     $('#selectTransporPitch').trigger('change'); 
 },2000);
 
