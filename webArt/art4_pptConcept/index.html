@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Art4: ppt Concept</title> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" rel="stylesheet" type="text/css"> 
+    <style>   
+      html,body{ 
+        padding: 0;
+        margin: 0;   
+        background-color: rgb(51, 51, 51);   
+        color: rgb(211, 211, 211);
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+          -moz-user-select: none;  
+            -ms-user-select: none;  
+                user-select: none; 
+        -webkit-tap-highlight-color: transparent; 
+      } 
+
+      /*Help*/
+      #btnHelpOpen{    
+        position: fixed;
+        top: 10px;
+        right: 10px; 
+        z-index: 10; 
+        font-size: 120%;
+        cursor: pointer;
+      }
+      #btnHelpClose{    
+        position: fixed; 
+        top: 10px;
+        right: 10px;  
+        z-index: 10; 
+        font-size: 150%;
+        cursor: pointer;
+      }
+      #help{ 
+        transform: rotateY(90deg); 
+        color: rgb(211, 211, 211);
+        background-color: rgb(51, 51, 51);   
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0x;
+        padding-left: 30px;
+        padding-right: 30px;
+        width: calc(100% - 60px);
+        height: 100%;
+        z-index: 10;   
+        transition: transform 0.15s ease-in-out;     
+        overflow-y: auto;
+      } 
+      #help.open{ 
+        transform: rotateY(0deg)
+      } 
+      #help>h1{ 
+        text-align: center;
+      }
+      h1{
+        font-size: 58px;
+      }
+      h3{
+        font-size: 28px;
+      }
+
+      /*Impress*/
+      .slide{
+        padding: 10px; 
+        background-color: rgb(211, 211, 211);
+        color: rgb(51, 51, 51);   
+        border-radius: 20px; 
+        opacity: 0.75;
+        transition: opacity 0.25s;
+        z-index: 1; 
+        overflow-y: auto;  
+        box-shadow: 0 4px 8px rgba(0, 0, 0, .1);
+        text-shadow: 0 3px 3px rgba(0, 0, 0, .2);
+        font-size: 36px;
+        font-family: 'Open Sans', Arial, sans-serif;
+        letter-spacing: -2px;
+      }   
+      .slide.active {
+        opacity: 1;
+        z-index: 2; 
+      }
+      .slide h1{ 
+        text-align: center; 
+      }
+      .slide h1>a{ 
+        text-align: center;
+        color: rgb(51, 51, 51);   
+        text-decoration: none;    
+      }
+      .notes{
+        display: none;
+      }
+      .impress-progressbar {
+        position: absolute;
+        width: 600px;
+        bottom: 25px;
+        left: 50px;
+        border-radius: 7px;
+        border: 2px solid rgba(100, 100, 100, 1);
+      }
+      .impress-progressbar div {
+        width: 0;
+        height: 5px;
+        border-radius: 5px;
+        background: rgba(75, 75, 75, 1);
+        transition: width 1s linear;
+      }
+      .impress-progress {
+        position: absolute;
+        right: 10px;
+        bottom: 5px;
+        text-align: left;
+        opacity: 0.6;
+      }
+      .impress-mouse-timeout {
+        cursor: none;
+      }
+      .impress-mouse-timeout div#impress-toolbar {
+        display: none;
+      }
+      .impress-mouse-timeout div#btnHelpOpen {
+        display: none;
+      }
+      .impress-enabled div#impress-toolbar {
+        position: fixed;
+        left: 1px;
+        top: 1px;
+        opacity: 0.6;
+        z-index: 3;
+      }
+
+      /*startSlide*/
+      #startSlide{  
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #startSlide h1{ 
+        text-align: center; 
+      }
+      #startSlide h3{ 
+        text-align: center;
+      } 
+      /*indexSlide*/ 
+
+      /*endSlide*/ 
+      #endSlide{  
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #endSlide>div{  
+        font-size: 64px;
+      }
+
+      /*templateSlide-01*/
+
+    </style>   
+  </head>
+  <body>   
+
+    <div class="impress-progressbar"><div></div></div>
+
+    <div class="impress-progress"></div> 
+
+    <div id="impress-toolbar"></div>
+
+    <div id="impress">
+
+      <div id="startSlide" class="step slide">
+        <div>
+          <h1><a href="#overview">Bienvenidos</a></h1>  
+          <h3>Presentación plantilla</h3> 
+        </div>
+        <div class="notes">
+          <p>Potada de la presentación</p>
+          <p>Primera slide de inicio</p>
+        </div>
+      </div>
+
+      <div id="indexSlide" class="step slide">
+        <h1><a href="#overview">Índice</a></h1>   
+        <ul>
+          <li><a href="#templateSlide-01">template-01</a></li> 
+          <li><a href="#templateSlide-02">template-02</a></li> 
+          <li><a href="#templateSlide-03">template-03</a></li> 
+          <li><a href="#templateSlide-04">template-04</a></li> 
+          <li><a href="#templateSlide-05">template-05</a></li> 
+        </ul>  
+        <div class="notes">
+          <p>Tabla de contenidos</p>
+          <p>Templates listos para usar.</p>
+        </div>
+      </div>
+
+      <!--templateSlide-01-->
+      <div id="templateSlide-01" class="step slide">
+        <h1><a href="#indexSlide">Template-01</a></h1>  
+        <h3>Tabla con datos</h3>  
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Value 1</th>
+              <th>Value 2</th>
+            </tr>
+          </thead>
+          <tbody> 
+            <tr>
+              <td>item1</td>
+              <td>5</td>
+              <td>6</td>
+            </tr> 
+            <tr>
+              <td>item2</td>
+              <td>7</td>
+              <td>8</td>
+            </tr> 
+            <tr>
+              <td>item3</td>
+              <td>3</td>
+              <td>4</td>
+            </tr> 
+            <tr>
+              <td>item4</td>
+              <td>6</td>
+              <td>7</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="notes">Notas template 01</div>
+      </div>
+
+      <!--templateSlide-02-->
+      <div id="templateSlide-02" class="step slide">
+        <h1><a href="#indexSlide">Template-02</a></h1>   
+        <div class="notes">Notas template 02</div>
+      </div>
+
+      <!--templateSlide-03-->
+      <div id="templateSlide-03" class="step slide">
+        <h1><a href="#indexSlide">Template-03</a></h1>   
+        <div class="notes">Notas template 03</div>
+      </div>
+
+      <!--templateSlide-04-->
+      <div id="templateSlide-04" class="step slide">
+        <h1><a href="#indexSlide">Template-04</a></h1>   
+        <div class="notes">Notas template 04</div>
+      </div> 
+
+      <!--templateSlide-05-->
+      <div id="templateSlide-05" class="step slide">
+        <h1><a href="#indexSlide">Template-05</a></h1>   
+        <div class="notes">Notas template 05</div>
+      </div> 
+
+      <div id="endSlide" class="step slide">
+        <div>Gracias ;)</div>  
+      </div>
+
+      <!--overview-->
+      <div id="overview" class="step">
+        <div class="notes">Presentación. Visión completa</div>
+      </div>
+    </div>  
+    
+    <div id="btnHelpOpen"><i class="fa fa-question-circle"></i></div> 
+
+    <div id="help"> 
+      <div id="btnHelpClose"><i class="fa fa-times"></i></div>
+      <h1>Ayuda</h1>  
+      <h2>Pantalla completa</h2>  
+      <p>Presionando <b>F5</b> / <b>ESC</b> entramos o slaimado de l modo pantalla completa</p>
+      <h2>Consola</h2> 
+      <p>Presionando <b>P</b>: Ocultamos todas las slides</p>
+      <h2>Navegación por teclado</h2> 
+      <p>Use la flecha del teclado izq.(<b>←</b>) y der.(<b>→</b>) para la navegación por la presentación</p>
+      <h2>Ocultar</h2> 
+      <p>Presionando <b>B</b> Ocultamos todas las slides</p>  
+    </div> 
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/impress/impress.js/js/impress.js"></script>
+    <script type="text/javascript">  
+      console.log('Exe start');   
+
+      //start
+      $('#impress').attr({
+        'data-transition-duration': 1000,
+        'data-width': 1,
+        'data-height': 1,
+        'data-max-scale': 1,
+        'data-min-scale': 1,
+        'data-perspective': 1,
+        'data-autoplay': 0
+      });  
+
+      function sizing(){ 
+        var w = ($(window).width()>1024)?1024:$(window).width();
+        var h = $(window).height();
+        $('.impress-progressbar').width(w-100);
+        $('.slide').width(w-100);
+        $('.slide').height(h-150);
+        
+        var n = Math.ceil(Math.sqrt($('.slide').length)); 
+        var i=0;
+        for(var y=0; y<n; y++){
+          for(var x=0; x<n; x++){
+            $($('.slide')[i]).attr({
+              'data-x': x*w,
+              'data-y': y*h,
+              'data-z': 1,
+              'data-scale': 1,
+              'data-rotate-x': 0,
+              'data-rotate-y': 0,
+              'data-rotate-z': 0
+            }); 
+            i++; 
+          }
+        } 
+        
+        $('#overview').attr({
+          'data-x': (n-1)*w/2,
+          'data-y': (n-1)*h/2,
+          'data-z': 1,
+          'data-scale': n+1,
+          'data-rotate-x': +0.005,
+          'data-rotate-y': -0.005,
+          'data-rotate-z': 1.5
+        });
+      } 
+
+      sizing();
+      $(window).on('resize',sizing);  
+      var apiImpress = impress('impress');
+      apiImpress.init();
+
+      //help action 
+      $("#btnHelpOpen").on('click',function() { 
+        $("#help").addClass('open');  
+      }); 
+      $("#btnHelpClose").on('click',function() { 
+        $("#help").removeClass('open');  
+      });
+
+      //template Action 
+      var timeout = undefined;
+      $('#impress').on('impress:stepenter', function(event) {
+        // 10sec ... fuera!!
+        clearTimeout(timeout);
+        timeout = setTimeout(function(){
+          apiImpress.goto('overview');  
+        },10000);
+      }); 
+
+      console.log('Exe end'); 
+    </script>
+  </body>
+</html>
