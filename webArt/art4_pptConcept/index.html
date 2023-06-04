@@ -57,22 +57,17 @@
       }
       .impress-mouse-timeout {
         cursor: none;
-      }
-      .impress-mouse-timeout div#impress-toolbar {
+      }  
+      .impress-mouse-timeout div#impress-toolbar{
         display: none;
-      }
-      .impress-mouse-timeout div#btnHelpOpen {
-        display: none;
-      }
+      } 
       .impress-enabled div#impress-toolbar {
         position: fixed;
         right: 1px;
         top: 1px; 
         z-index: 3;
-      }  
-      #helpBtn{
         margin: 5px;
-      } 
+      }  
       #impress .centerVH{
         display: flex;
         align-items: center;
@@ -85,11 +80,31 @@
       a:hover{ 
         text-shadow: 0 0px 3px rgba(0, 0, 0, 0.25); 
       } 
+
+      .input-group-text {
+        background-color: transparent;
+        border: none; 
+        padding: 5px;  
+      } 
+
+      @media print {
+        #helpModal{
+          display: none;
+        }
+        #impress-toolbar{
+          display: none;
+        }
+        .impress-progressbar{
+          display: none;
+        }
+        .impress-progress{
+          display: none;
+        } 
+      }
       
     </style>   
   </head>
-  <body>   
-    <button id="helpBtn" class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fa fa-question-circle"></i></button> 
+  <body>     
 
     <div id="helpModal" class="modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -99,14 +114,24 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <h2>Pantalla completa</h2>  
+            <h2> 
+              <span><button id="fullScreenBtn" class="btn btn-outline-secondary btn-sm" type="button" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-desktop"></i></button></span>
+              Pantalla completa
+            </h2>
             <p>Presionando <b>F5</b> / <b>ESC</b> entramos o slaimado de l modo pantalla completa</p>
-            <h2>Consola</h2> 
+            <h2> 
+              <span><button id="consoleBtn" class="btn btn-outline-secondary btn-sm" type="button" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-flag"></i></button></span>
+              Consola
+            </h2> 
             <p>Presionando <b>P</b>: Entramos en el modo presentador</p>
-            <h2>Navegación por teclado</h2> 
-            <p>Use la flecha del teclado <b>izq.(←)</b> y <b>der.(→)</b> para la navegación por la presentación</p>
-            <h2>Ocultar</h2> 
-            <p>Presionando <b>B</b> Ocultamos todas las slides</p>  
+            <h2> 
+              Navegación por teclado
+            </h2> 
+            <p>Use la flecha del teclado <b>izq.(<)</b> y <b>der.(>)</b> para la navegación por la presentación</p>
+            <h2> 
+              Ocultar
+            </h2> 
+            <p>Presionando <b>B</b> o <b>.</b>: Ocultamos todas las slides</p>  
           </div> 
         </div>
       </div>
@@ -116,7 +141,8 @@
 
     <div class="impress-progress"></div> 
 
-    <div id="impress-toolbar"></div>
+    <div id="impress-toolbar"></div> 
+ 
 
     <div id="impress">
 
@@ -332,7 +358,39 @@
       sizing();
       $(window).on('resize',sizing);  
       var apiImpress = impress('impress');
-      apiImpress.init();
+      apiImpress.init(); 
+
+      //styling impress by bootstrap
+      $('#impress-navigation-ui-prev').addClass('btn btn-secondary btn-sm');
+      $('#impress-navigation-ui-select').addClass('form-select form-select-sm');
+      $('#impress-navigation-ui-next').addClass('btn btn-secondary btn-sm');
+      $('#impress-autoplay-playpause').remove(); 
+      $('#impress-toolbar').append('<span><button id="helpBtn" class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fa fa-question-circle"></i></button></span>');
+      $('#impress-toolbar').append('<span><button id="printBtn" class="btn btn-secondary btn-sm" type="button"><i class="fa fa-print"></i></button></span>');
+      $('#impress-toolbar').addClass('input-group');
+      $('#impress-toolbar span').addClass('input-group-text');
+      $(document).on('keydown',function(e){
+        console.clear();
+        console.log(e.keyCode);
+      });
+      //impress action
+      $('#fullScreenBtn').on('click',function(){
+        var elem = document.documentElement;
+        if ( !document.fullscreenElement ) {
+            elem.requestFullscreen();
+        }
+      });
+      $('#consoleBtn').on('click',function(){ 
+        impressConsole().open();
+      });   
+      $('#printBtn').on('click',function(){  
+        //$('#impress').attr('style',null);
+        //$('#impress div').attr('style',null);
+        //$('#impress .slide').attr('style',null); 
+        window.print();
+        //apiImpress.init(); 
+      });
+         
 
       //Templates init 
       var $templates = $('.slide').filter(function(i,e){ 
@@ -406,8 +464,8 @@
         } 
       });
  
-      //Template Action 
-      var timeout = undefined;
+      //development
+      /*var timeout = undefined;
       $('#impress').on('impress:stepenter', function(event) {
         //5sec ... fuera!!
         clearTimeout(timeout);
@@ -415,6 +473,8 @@
           apiImpress.goto('overview');  
         },5000);
       }); 
+      $('#helpBtn').trigger('click');
+      */
 
       console.log('Exe end'); 
     </script>
