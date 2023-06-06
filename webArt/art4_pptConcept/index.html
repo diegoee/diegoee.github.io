@@ -80,11 +80,29 @@
       a:hover{ 
         text-shadow: 0 0px 3px rgba(0, 0, 0, 0.25); 
       } 
+      .input-group{
+        padding-left: 5px; 
+        padding-right: 5px;   
+
+      }
       .input-group-text {
         background-color: transparent;
         border: none; 
         padding: 5px;  
       } 
+      .aniSlide{
+        opacity: 0; 
+      }
+      .aniSlide.showSlide{
+        opacity: 1; 
+        animation-name: ani;
+        animation-duration: 1s;
+      }
+      @keyframes ani {
+        0%   {opacity: 0;   }
+        50%  {opacity: 1; font-size: 175%;}
+        100% {opacity: 1;   }
+      }
       @page {
           size: A4;
           margin: 50px;
@@ -119,7 +137,11 @@
         .notes{
           display: none;
         }
-      }  
+        button.nextBtn{
+          display: none;
+        }
+      } 
+       
     </style>   
   </head>
   <body>     
@@ -300,7 +322,11 @@
       <!--templateSlide-04-->
       <div id="templateSlide-04" class="step slide">
         <h1><a href="#indexSlide">Template-04</a></h1>   
-        <div class="alert alert-primary" role="alert"> Transiciones</div> 
+        <div class="alert alert-primary" role="alert"> Transiciones <button class="btn btn-outline-secondary btn-sm nextBtn" type="button"><i class="fa fa-arrow-right"></i></button></div> 
+        <h5 class="aniSlide showSlide" n="1">Hola</h5>
+        <h3 class="aniSlide showSlide" n="3">Hola</h3> 
+        <h4 class="aniSlide showSlide" n="2">Caracola</h4>
+        <h2 class="aniSlide showSlide" n="4">Caracola</h2>
         <div class="notes">Notas template 04</div>
       </div>  
 
@@ -401,6 +427,7 @@
           $('.slide').each(function(){ 
             $('#printFrame').append('<div class="slide">'+$(this).html()+'</div>');
           });            
+          $('.aniSlide').addClass('showSlide');
           window.print();   
           $('#printFrame').remove(); 
           sizing();
@@ -408,6 +435,7 @@
           apiImpress.init(); 
           addImpressNavigation();
           createChart();
+          animationActionSlide();
         }); 
       }
       addImpressNavigation(); 
@@ -505,6 +533,56 @@
         }); 
       }
       createChart();
+
+      function resetActionSlide(){ 
+        $('.aniSlide').removeClass('showSlide');
+        $('.nextBtn').html('<i class="fa fa-arrow-right"></i>');
+        $('.nextBtn').removeAttr('disabled'); 
+      } 
+      function animationActionSlide(){
+        resetActionSlide();
+        $('#impress').off('impress:stepleave');
+        $('#impress').on('impress:stepleave', function(){
+          resetActionSlide(); 
+        }); 
+        $('.nextBtn').off('click');
+        $('.nextBtn').on('click', function(){ 
+          var $e = $('.nextBtn').parents().filter(function(){ 
+            return $(this).hasClass('slide');
+          });
+          $e=$($e[0])
+          $e = $e.children().filter(function(){ 
+            return $(this).hasClass('aniSlide');
+          }); 
+          $e.sort(function(a, b){
+            var nA = parseInt($(a).attr('n'));
+            var nB = parseInt($(b).attr('n'));
+            if (nA < nB) {
+              return -1;
+            }
+            if (nA > nB) {
+              return 1;
+            }
+            return 0;
+          });  
+           
+          $e = $e.filter(function(){  
+            return !($(this).hasClass('showSlide'));
+          });  
+          $btn = $(this);
+          $btn.attr('disabled','disabled'); 
+          if($e.length===0){      
+            apiImpress.next(); 
+          }else{
+            $($e[0]).addClass('showSlide'); 
+            $('.aniSlide').off('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd');
+            $('.aniSlide').on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', function () {
+              $btn.removeAttr('disabled'); 
+            });
+          }  
+        });
+      }
+      animationActionSlide();
 
       console.log('Exe end'); 
     </script>
