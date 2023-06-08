@@ -57,16 +57,13 @@
       }
       .impress-mouse-timeout {
         cursor: none;
-      }  
-      .impress-mouse-timeout div#impress-toolbar{
-        display: none;
-      } 
+      }   
       .impress-enabled div#impress-toolbar {
         position: fixed;
         right: 1px;
         top: 1px; 
         z-index: 3;
-        margin: 5px;
+        margin: 5px; 
       }  
       #impress .centerVH{
         display: flex;
@@ -402,11 +399,17 @@
       //styling impress by bootstrap
       function addImpressNavigation(){
         $('#impress-navigation-ui-prev').addClass('btn btn-secondary btn-sm');
+        $('#impress-navigation-ui-prev').html('<i class="fa fa-arrow-left"></i>');
         $('#impress-navigation-ui-select').addClass('form-select form-select-sm');
+        $('#impress-navigation-ui-select').remove();
         $('#impress-navigation-ui-next').addClass('btn btn-secondary btn-sm');
+        $('#impress-navigation-ui-next').html('<i class="fa fa-arrow-right"></i>'); 
+        
+        $('#impress-toolbar-group-10').remove(); 
         $('#impress-autoplay-playpause').remove(); 
-        $('#impress-toolbar').append('<span><button id="helpBtn" class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fa fa-question-circle"></i></button></span>');
-        $('#impress-toolbar').append('<span><button id="printBtn" class="btn btn-secondary btn-sm" type="button"><i class="fa fa-print"></i></button></span>');
+        $('#impress-toolbar').prepend('<span><button id="helpBtn"  class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fa fa-question-circle"></i></button></span>');
+        $('#impress-toolbar').prepend('<span><button id="printBtn" class="btn btn-secondary btn-sm" type="button"><i class="fa fa-print"></i></button></span>');
+        $('#impress-toolbar').prepend('<span><button id="homeBtn"  class="btn btn-secondary btn-sm" type="button" ><i class="fa fa-home"></i></button></span>');
         $('#impress-toolbar').addClass('input-group');
         $('#impress-toolbar span').addClass('input-group-text'); 
         //impress action
@@ -420,7 +423,12 @@
         $('#consoleBtn').off('click');
         $('#consoleBtn').on('click',function(){ 
           impressConsole().open();
-        });   
+        });  
+        $('#homeBtn').off('click');
+        $('#homeBtn').on('click',function(){ 
+          apiImpress.goto('overview');
+        });  
+
         $('#printBtn').off('click');
         $('#printBtn').on('click',function(){  
           apiImpress.tear(); 
