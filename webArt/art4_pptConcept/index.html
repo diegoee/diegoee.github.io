@@ -364,18 +364,9 @@
     <script type="text/javascript" src="https://cdn.plot.ly/plotly-2.20.0.min.js" c></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/impress/impress.js/js/impress.js"></script>
     <script type="text/javascript">  
-      console.log('Exe start');   
+      console.log('Exe start');  
 
-      //start
-      $('#impress').attr({
-        'data-transition-duration': 1000,
-        'data-width': 1,
-        'data-height': 1,
-        'data-max-scale': 1,
-        'data-min-scale': 1,
-        'data-perspective': 1,
-        'data-autoplay': 0
-      });  
+      var apiImpress = undefined;
 
       function sizing(){ 
         var w = ($(window).width()>1024)?1024:$(window).width();
@@ -410,15 +401,39 @@
           'data-rotate-y': -0.005,
           'data-rotate-z': 1.5
         });
-      } 
+      }  
+      
+      function exe(){  
+        //start
+        $('#impress').attr({
+          'data-transition-duration': 1000,
+          'data-width': 1,
+          'data-height': 1,
+          'data-max-scale': 1,
+          'data-min-scale': 1,
+          'data-perspective': 1,
+          'data-autoplay': 0
+        });
 
-      sizing();
-      $(window).on('resize',sizing);  
-      var apiImpress = impress('impress');
-      apiImpress.init();    
+        sizing();
+        $(window).on('resize',sizing);  
+        var apiImpress = impress('impress');
+        apiImpress.init();  
 
+        //Templates init 
+        var $templates = $('.slide').filter(function(i,e){ 
+          return $(e).attr('id').indexOf('templateSlide')!==-1;
+        });  
+        $('#indexSlide').append('<ul></ul>');
+        $templates.each(function(){ 
+          $('#indexSlide ul').append('<li><a href="#'+$(this).attr('id')+'">'+$(this).attr('id')+'</a></li>');
+        }); 
+        return apiImpress;
+      }
+      apiImpress = exe();
+   
       //styling impress by bootstrap
-      function addImpressNavigation(){
+      function addImpressNavigation(apiImpress){
         $('#impress-navigation-ui-prev').addClass('btn btn-secondary btn-sm');
         $('#impress-navigation-ui-prev').html('<i class="fa fa-arrow-left"></i>');
         $('#impress-navigation-ui-select').addClass('form-select form-select-sm');
@@ -463,21 +478,12 @@
           sizing();
           apiImpress = impress('impress');
           apiImpress.init(); 
-          addImpressNavigation();
+          addImpressNavigation(apiImpress);
           createChart();
-          animationActionSlide();
+          animationActionSlide(apiImpress);
         });  
       }
-      addImpressNavigation(); 
-
-      //Templates init 
-      var $templates = $('.slide').filter(function(i,e){ 
-        return $(e).attr('id').indexOf('templateSlide')!==-1;
-      });  
-      $('#indexSlide').append('<ul></ul>');
-      $templates.each(function(){ 
-        $('#indexSlide ul').append('<li><a href="#'+$(this).attr('id')+'">'+$(this).attr('id')+'</a></li>');
-      }); 
+      addImpressNavigation(apiImpress); 
 
       //Templates grah  
       function createChart(){  
@@ -579,12 +585,10 @@
         $('.nextBtn').html('<i class="fa fa-arrow-right"></i>');
         $('.nextBtn').removeAttr('disabled'); 
       } 
-      function animationActionSlide(){
+
+      function animationActionSlide(apiImpress){
         resetActionSlide();
-        $('#impress').off('impress:stepleave');
-        $('#impress').on('impress:stepleave', function(){
-          resetActionSlide(); 
-        }); 
+
         $('.nextBtn').off('click');
         $('.nextBtn').on('click', function(){ 
           var $e = $('.nextBtn').parents().filter(function(){ 
@@ -621,8 +625,16 @@
             });
           }  
         });
+
+        $('#impress').off('impress:stepleave');
+        $('#impress').on('impress:stepleave', function(event){            
+          resetActionSlide(); 
+        });  
+
       }
-      animationActionSlide();
+      animationActionSlide(apiImpress);
+      
+      
       console.log('Exe end'); 
     </script>
   </body>
