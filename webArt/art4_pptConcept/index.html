@@ -340,8 +340,7 @@
         <h2 class="aniSlide showSlide" n="4">Caracola</h2>
         <div class="notes">Notas template 04</div>
       </div>  
-
-      
+            
       <!--templateSlide-05-->
       <div id="templateSlide-05" class="step slide">
         <h1><a href="#indexSlide">Template-05</a></h1>   
@@ -427,7 +426,7 @@
         $('#indexSlide').append('<ul></ul>');
         $templates.each(function(){ 
           $('#indexSlide ul').append('<li><a href="#'+$(this).attr('id')+'">'+$(this).attr('id')+'</a></li>');
-        }); 
+        });  
         return apiImpress;
       }
       apiImpress = exe();
@@ -632,8 +631,7 @@
         });  
 
       }
-      animationActionSlide(apiImpress);
-      
+      animationActionSlide(apiImpress);      
       
       console.log('Exe end'); 
     </script>
