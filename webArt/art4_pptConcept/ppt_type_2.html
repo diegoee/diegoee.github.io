@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Art4: ppt Concept: revealjs</title> 
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"> 
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"> 
+
+    <style>  
+      #menuBtn{
+        position: absolute; 
+        top: 5px;
+        right: 5px; 
+        z-index: 100;
+      }
+      #menuBtn button{
+        background-color: var(--r-link-color);
+      }
+      @media print { 
+        #menuBtn{
+          display: none;
+        }   
+        .notes{
+          display: none;
+        } 
+      }
+    </style>   
+  </head>
+  <body>   
+
+    <div id="menuBtn">
+      <button id="homeBtn"   class="btn btn-sm" type="button"><i class="fa fa-home"></i></button>
+      <button id="overBtn"   class="btn btn-sm" type="button"><i class="fa fa-square"></i></button>
+      <button id="printBtn"  class="btn btn-sm" type="button"><i class="fa fa-print"></i></button> 
+      <button id="reloadBtn" class="btn btn-sm" type="button" ><i class="fa fa-sync"></i></button>
+      <button id="helpBtn"   class="btn btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fa fa-question-circle"></i></button>
+    </div>
+
+    <div id="helpModal" class="modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1>Ayuda</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h2>
+              Pantalla completa
+            </h2>
+            <p>Presionando <b>F</b> entramos en el modo pantalla completa. PAra salir pulsamos <b>ESC</b></p>
+            <h2>
+              Consola
+            </h2> 
+            <p>Presionando <b>S</b>: Entramos en el modo presentador</p>
+            <h2> 
+              Navegación por teclado
+            </h2> 
+            <p>Use la flecha del teclado <b>izq.(<)</b> y <b>der.(>)</b> para la navegación por la presentación</p>
+            <h2> 
+              Saltar slide
+            </h2> 
+            <p>Presionando <b>G</b> para introducir el número o el id de la slide e  ir a la slide deseada. Presione <b>Enter</b> para ir</p>
+            <h2> 
+              Presentación en espera
+            </h2> 
+            <p>Presionando <b>B</b> ó <b>.</b> para entrar en modo standby</p>
+          </div> 
+        </div>
+      </div>
+    </div>
+
+		<div class="reveal">
+			<div class="slides">
+				<section id="startSlide" data-auto-animate z> 
+          <h1>Bienvenidos</h1>  
+          <h3>Presentación plantilla</h3>   
+          <aside  class="notes">
+            <p>Potada de la presentación</p>
+            <p>Primera slide de inicio</p>
+          </aside >
+        </section>
+				<section id="indexSlide" data-auto-animate>
+          <h1>Índice</h1>    
+          <aside class="notes">
+            <p>Tabla de contenidos</p>
+            <p>Templates listos para usar.</p>
+          </aside>
+        </section>
+				<section id="templateSlide-01" data-auto-animate>
+          <h2>Slide 1: Tabla</h2>    
+          <table class="table table-hover table-striped table-bordered table-sm">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Value 1</th>
+                <th>Value 2</th>
+                <th>Value 3</th>
+              </tr>
+            </thead>
+            <tbody> 
+              <tr >
+                <td>item1</td>
+                <td>5</td>
+                <td>6</td>
+                <td>6</td>
+              </tr> 
+              <tr class="table-danger">
+                <td>item2</td>
+                <td>7</td>
+                <td>8</td>
+                <td>6</td>
+              </tr> 
+              <tr class="table-success">
+                <td>item3</td>
+                <td>3</td>
+                <td>4</td>
+                <td>6</td>
+              </tr> 
+              <tr>
+                <td>item4</td>
+                <td>6</td>
+                <td>7</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>item5</td>
+                <td>6</td>
+                <td>8</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>item6</td>
+                <td>9</td>
+                <td>6</td>
+                <td>7</td>
+              </tr>
+            </tbody>
+          </table> 
+        </section>
+				<section id="templateSlide-02" data-auto-animate> 
+          <h2>Slide 2: Texto e imagen</h2>   
+          <div class="alert alert-danger" role="alert"> Texto e imágenes</div>  
+          <div class="container">
+            <div class="row">
+              <div class="col-md-12 mb-1">
+                <div class="card">
+                  <div class="row g-0">
+                    <div class="col-md-4">
+                      <img src="https://jooinn.com/images/black-n-white-1.jpg" class="img-fluid rounded-start" alt="https://jooinn.com/images/black-n-white-1.jpg">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title">Imagen 1</h5>
+                        <p class="card-text">Texto descriptivo de la imagen 1.</p>
+                        <p class="card-text"><small class="text-muted">Espectacular instantanea</small></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 mb-1">
+                <div class="card">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title">Imagen 2</h5>
+                        <p class="card-text">Texto descriptivo de la imagen 2.</p>
+                        <p class="card-text"><small class="text-muted">Belleza superlativa</small></p>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <img src="https://live.staticflickr.com/7326/11561568936_d683587d9e_b.jpg" class="img-fluid rounded-start" alt="https://live.staticflickr.com/7326/11561568936_d683587d9e_b.jpg">
+                    </div>
+                  </div>
+                </div>
+              </div> 
+            </div>
+          </div> 
+        </section>
+				<section id="templateSlide-03" data-auto-animate>
+          <h2>Slide 3: Gráficos</h2>   
+          <div class="alert alert-success" role="alert"> Gráficos dinámicos </div> 
+          <div class="container">
+            <div class="row">
+              <div class="col-md-6 chart" id="chart-templateSlide-02-01"></div>
+              <div class="col-md-6 chart" id="chart-templateSlide-02-02"></div> 
+            </div>
+            <div class="row">
+              <div class="col-md-12 chart" id="chart-templateSlide-02-03"></div>
+            </div> 
+          </div> 
+        </section>
+				<section id="templateSlide-04" data-auto-animate>        
+          <h2>Slide 4: Animaciones</h2>
+          <div class="alert alert-primary" role="alert"> Transiciones</div> 
+          <p class="fragment">Fade in</p>
+          <p class="fragment fade-out">Fade out</p>
+          <p class="fragment highlight-red">Highlight red</p>
+          <p class="fragment fade-in-then-out">Fade in, then out</p>
+          <p class="fragment fade-up">Slide up while fading in</p>
+        </section>
+				<section id="templateSlide-05" data-auto-animate> 
+          <h2>Slide 5: Texto extenso</h2> 
+          <div class="alert alert-primary" role="alert"> Texto </div> 
+          <h3>Title 1</h3>
+          <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p> 
+          <h4>Title 2</h4>
+          <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p> 
+          <h5>Title 3</h5>
+          <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p>  
+        </section>
+				<section id="endSlide" data-auto-animate>
+          <h1>Gracias ;)</h1> 
+        </section>
+			</div>
+		</div> 
+		
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>  
+
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>		
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/notes/notes.min.js" ></script>
+
+    <script type="text/javascript">  
+      console.log('Exe start');  
+
+      function createChart(){  
+        $('#chart-templateSlide-02-01').height($(window).height()/4);
+        $('#chart-templateSlide-02-02').height($(window).height()/4);
+        $('#chart-templateSlide-02-03').height($(window).height()/4);           
+
+        Plotly.newPlot('chart-templateSlide-02-01', [{
+          x: ['Item 1', 'Item 2', 'Item 3'],
+          y: [20, 14, 23],
+          name: 'Dataset 1',
+          type: 'bar'
+        }, {
+          x: ['Item 1', 'Item 2', 'Item 3'],
+          y: [12, 18, 29],
+          name: 'Dataset 2',
+          type: 'bar'
+        }, {
+          x: ['Item 1', 'Item 2', 'Item 3'],
+          y: [12, 18, 29],
+          name: 'Dataset 3',
+          type: 'bar'
+        }],{
+          barmode: 'stack',  
+          title: 'Chart 1',
+          paper_bgcolor: 'rgb(211, 211, 211)',
+          plot_bgcolor: 'rgb(211, 211, 211)',
+          showlegend: true,
+          margin: {
+            l: 20,
+            r: 20,
+            b: 20,
+            t: 40,
+            pad: 0
+          } 
+        },{
+          responsive: true,
+          displayModeBar: false 
+        }); 
+
+        Plotly.newPlot('chart-templateSlide-02-02', [{
+          values: [300, 50, 100, 200],
+          labels: ['Dataset 1', 'Dataset 2', 'Dataset 3', 'Dataset 4'],
+          type: 'pie'
+        }], {   
+          title: 'Chart 2',
+          paper_bgcolor: 'rgb(211, 211, 211)',
+          plot_bgcolor: 'rgb(211, 211, 211)',
+          showlegend: true,
+          margin: {
+            l: 20,
+            r: 20,
+            b: 20,
+            t: 40,
+            pad: 0
+          } 
+        },{
+          responsive: true,
+          displayModeBar: false 
+        });
+
+        Plotly.newPlot('chart-templateSlide-02-03', [{
+          x: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          y: [1, 2, 4, 3, 4, 3, 1, 2, 3],
+          name: 'Dataset 1',
+          type: 'scatter'
+        }, {
+          x: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          y: [3, 4, 1, 1, 2, 1, 3, 4, 5],
+          name: 'Dataset 2',
+          type: 'scatter'
+        }, {
+          x: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          y: [3, 1, 2, 2, 3, 2, 4, 5, 6],
+          name: 'Dataset 3',
+          type: 'scatter'
+        }], { 
+          title: 'Chart 3',
+          paper_bgcolor: 'rgb(211, 211, 211)',
+          plot_bgcolor: 'rgb(211, 211, 211)',
+          showlegend: true,
+          margin: {
+            l: 20,
+            r: 20,
+            b: 20,
+            t: 40,
+            pad: 0
+          } 
+        },{
+          responsive: true,
+          displayModeBar: false 
+        }); 
+      }
+
+			Reveal.initialize({
+        autoAnimateEasing: 'ease-out',
+        autoAnimateDuration: 2,
+        touch: false,
+        slideNumber: 'c/t',
+				hash: true,
+        showNotes: false,
+        controlsTutorial: true,
+        controlsLayout: 'bottom-right',
+        center: true, 
+        mouseWheel: false,
+        hideInactiveCursor: true,
+        hideCursorTime: 1000, 
+        plugins: [ RevealNotes]
+			}).then(function(){
+        //Templates init 
+        var $templates = $('.slides section').filter(function(i,e){  
+          if($(e).attr('id')!==undefined){
+            return $(e).attr('id').indexOf('templateSlide')!==-1;
+          }else{ 
+            return false;
+          }          
+        });   
+        $('#indexSlide').append('<ul></ul>');
+        $templates.each(function(){ 
+          $('#indexSlide ul').append('<li><a href="#'+$(this).attr('id')+'">'+$(this).attr('id')+'</a></li>');
+        });  
+        Reveal.sync();
+
+        $('#printBtn').on('click',function(){  
+          window.print();   
+        });  
+        $('#overBtn').on('click',function(){
+          Reveal.toggleOverview();  
+        });  
+        $('#homeBtn').on('click',function(){
+          Reveal.toggleOverview(false);  
+          Reveal.slide(0);  
+        }); 
+        $('#reloadBtn').on('click',function(){  
+          location.reload();
+        }); 
+ 
+        $(window).on('resize',function(){ 
+          Reveal.sync();
+          createChart();
+        }); 
+        
+        createChart();
+      }); 
+       
+      console.log('Exe end'); 
+    </script>
+  </body>
+</html>
