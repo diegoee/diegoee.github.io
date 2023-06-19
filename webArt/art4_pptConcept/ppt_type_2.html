@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
     <title>Web Art4: ppt Concept: revealjs</title> 
-
+    
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
-
-    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"> 
-    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"> 
+    
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">   
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">     
 
     <style>  
       #menuBtn{
@@ -19,20 +19,25 @@
         right: 5px; 
         z-index: 100;
       }
-      #menuBtn button{
+      #menuBtn{
         background-color: var(--r-link-color);
       }  
       .scrollable-container { 
-          max-height: 500px;
+          max-height: 600px;
           overflow-y: auto;
       } 
+      table thead th { 
+        position: sticky; 
+        top: 0; 
+        z-index: 1; 
+      }
       @media print { 
         #menuBtn{
           display: none;
         }   
-        .notes{
+        #menu{
           display: none;
-        } 
+        }  
         .scrollable-container { 
           max-height: none; 
         }
@@ -40,51 +45,28 @@
     </style>   
   </head>
   <body>   
+     
+    <button id="menuBtn" class="btn btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu"><i class="fa fa-bars"></i></button>
 
-    <div id="menuBtn">
-      <button id="homeBtn"   class="btn btn-sm" type="button"><i class="fa fa-home"></i></button>
-      <button id="overBtn"   class="btn btn-sm" type="button"><i class="fa fa-square"></i></button>
-      <button id="printBtn"  class="btn btn-sm" type="button"><i class="fa fa-print"></i></button> 
-      <button id="reloadBtn" class="btn btn-sm" type="button" ><i class="fa fa-sync"></i></button>
-      <button id="helpBtn"   class="btn btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fa fa-question-circle"></i></button>
-    </div>
-
-    <div id="helpModal" class="modal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1>Ayuda</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <h2>
-              Pantalla completa
-            </h2>
-            <p>Presionando <b>F</b> entramos en el modo pantalla completa. PAra salir pulsamos <b>ESC</b></p>
-            <h2>
-              Consola
-            </h2> 
-            <p>Presionando <b>S</b>: Entramos en el modo presentador</p>
-            <h2> 
-              Navegación por teclado
-            </h2> 
-            <p>Use la flecha del teclado <b>izq.(<)</b> y <b>der.(>)</b> para la navegación por la presentación</p>
-            <h2> 
-              Saltar slide
-            </h2> 
-            <p>Presionando <b>G</b> para introducir el número o el id de la slide e  ir a la slide deseada. Presione <b>Enter</b> para ir</p>
-            <h2> 
-              Presentación en espera
-            </h2> 
-            <p>Presionando <b>B</b> ó <b>.</b> para entrar en modo standby</p>
-          </div> 
-        </div>
+    <div class="offcanvas offcanvas-end" id="menu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
-    </div>
+      <div class="offcanvas-body"> 
+        <div class="container">
+          <div class="row"><div class="col"><button id="helpBtn"   class="btn btn-sm" type="button"><i class="fa fa-question-circle" ></i> Ayuda             </button></div></div> 
+          <div class="row"><div class="col"><button id="homeBtn"   class="btn btn-sm" type="button"><i class="fa fa-home"            ></i> Inicio            </button></div></div>
+          <div class="row"><div class="col"><button id="overBtn"   class="btn btn-sm" type="button"><i class="fa fa-list-alt"        ></i> Overview          </button></div></div>
+          <div class="row"><div class="col"><button id="printBtn"  class="btn btn-sm" type="button"><i class="fa fa-print"           ></i> imprimir          </button></div></div>   
+          <div class="row"><div class="col"><button id="resumeBtn" class="btn btn-sm" type="button"><i class="fa fa-eye-slash"       ></i> Pausa presentación</button></div></div> 
+        </div> 
+      </div>
+    </div> 
 
 		<div class="reveal">
 			<div class="slides">
-				<section id="startSlide" data-auto-animate z> 
+				<section id="startSlide"> 
           <h1>Bienvenidos</h1>  
           <h3>Presentación plantilla</h3>   
           <aside  class="notes">
@@ -92,16 +74,15 @@
             <p>Primera slide de inicio</p>
           </aside >
         </section>
-				<section id="indexSlide" data-auto-animate>
+				<section id="indexSlide">
           <h1>Índice</h1>    
           <aside class="notes">
             <p>Tabla de contenidos</p>
             <p>Templates listos para usar.</p>
           </aside>
         </section>
-				<section id="templateSlide-01" data-auto-animate>
-          <h2>Slide 1: Tabla</h2>    
-          <div class="alert alert-primary" role="alert"> Texto e imágenes</div>  
+				<section id="templateSlide-01">
+          <h2>Slide 1: Tabla</h2>     
           <div class="scrollable-container">
             <table class="table table-hover table-striped table-bordered table-sm">
               <thead>
@@ -117,10 +98,9 @@
             </table> 
           </div>
         </section>
-				<section id="templateSlide-02" data-auto-animate> 
+				<section id="templateSlide-02"> 
           <h2>Slide 2: Texto e imagen</h2>   
-          <div class="alert alert-primary" role="alert"> Texto e imágenes</div>  
-          <div class="scrollable-container">
+          <div class="scrollable-container">  
             <div class="container">
               <div class="row">
                 <div class="col-md-12 mb-1">
@@ -159,63 +139,67 @@
             </div> 
           </div> 
         </section>
-				<section id="templateSlide-03" data-auto-animate>
-          <h2>Slide 3: Gráficos</h2>   
-          <div class="alert alert-primary" role="alert"> Gráficos dinámicos </div>  
+				<section id="templateSlide-03">
+          <h2>Slide 3: Gráficos</h2>    
           <div class="container scrollable-container"> 
             <div class="row">
-              <div class="col-md-6" id="chart-templateSlide-02-01"></div>
-              <div class="col-md-6" id="chart-templateSlide-02-02"></div> 
+              <div class="col-6" id="chart-templateSlide-02-01"></div>
+              <div class="col-6" id="chart-templateSlide-02-02"></div> 
             </div>
             <div class="row">
-              <div class="col-md-12" id="chart-templateSlide-02-03"></div>
+              <div class="col-12" id="chart-templateSlide-02-03"></div>
             </div> 
           </div>  
         </section>
-				<section id="templateSlide-04">        
+				<section id="templateSlide-04" >        
           <h2>Slide 4: Animaciones</h2>
-          <div class="alert alert-primary" role="alert"> Transiciones</div> 
-          <div class=""> 
-            <p class="fragment">Fade in</p>
-            <p class="fragment fade-out">Fade out</p>
-            <p class="fragment highlight-red">Highlight red</p>
-            <p class="fragment fade-in-then-out">Fade in, then out</p>
-            <p class="fragment fade-up">Slide up while fading in</p>
-          </div>  
+          <div class="fragment fade-in          alert alert-primary"  role="alert"> fade-in</div> 
+          <div class="fragment fade-in-then-out alert alert-success"  role="alert"> fade-in-then-out</div>  
+          <div class="fragment fade-up          alert alert-info"     role="alert"> fade-up</div>   
+          <div class="fragment fade-down        alert alert-danger"   role="alert"> fade-down</div>   
         </section>
-				<section id="templateSlide-05" data-auto-animate> 
+				<section id="templateSlide-05"> 
           <h2>Slide 5: Texto extenso</h2>  
-          <div class="alert alert-primary" role="alert"> Texto </div> 
-          <div class="scrollable-container"> 
+          <div class="scrollable-container">  
             <h3>Title 1</h3>
             <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p> 
             <h4>Title 2</h4>
             <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p> 
             <h5>Title 3</h5>
+            <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p> 
+            <h4>Title 4</h4>
+            <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p>  
+            <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p>  
             <p>Bla bla ba. blabla lalal blaba. Bla bla ba. blabla lalal blabaBla bla ba. blabla lalal blabaBla bla ba. blabla lalal blaba</p>  
           </div>  
         </section>
-				<section id="endSlide" data-auto-animate>
-          <h1 class="r-fit-text">Gracias ;)</h1> 
+				<section id="endSlide">
+          <h1 class="r-fit-text">Gracias ;)</h1>  
+          <aside  class="notes">
+            <p>This is the end</p> 
+          </aside >
         </section>
 			</div>
 		</div> 
 		
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
     <script type="text/javascript" src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>  
 
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>		
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/notes/notes.min.js" ></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/notes/notes.min.js" ></script>  
 
     <script type="text/javascript">  
-      console.log('Exe start');  
+      console.log('Exe start'); 
+      // https://getbootstrap.com/docs/5.3/getting-started/introduction/
+      // https://revealjs.com/api/ 
+
       function rndFillTable(){    
         var classType = ["table-danger","table-success"];
         var c = 'table-danger';
-        var e = '<tr class="'+c+'"><td>item'+0+'</td><td>6</td><td>7</td><td>6</td></tr>';
+        var e = '<tr class="'+c+'"><td>item '+0+'</td><td>6</td><td>7</td><td>6</td></tr>';
         var $e = $('#templateSlide-01 table');
-        var n = 8;
+        var n = 20;
 
         function getRandomInt(min, max){ 
           return Math.floor(Math.random() * (max - min + 1) ) + min;
@@ -227,12 +211,16 @@
           }else {
             c  = classType[getRandomInt(0, classType.length-1)];
           }
-          e  = '<tr class="'+c+'"><td>item'+(i+1)+'</td><td>'+Math.round(Math.random()*100)/100+'</td><td>'+Math.round(Math.random()*100)+'</td><td>'+Math.round(Math.random()*10)+'</td></tr>';
+          e  = '<tr class="'+c+'"><td>item '+(i+1)+'</td><td>'+Math.round(Math.random()*100)/100+'</td><td>'+Math.round(Math.random()*100)+'</td><td>'+Math.round(Math.random()*10)+'</td></tr>';
           $e.append(e);
         } 
       }
 
       function createChart(){  
+        $('#chart-templateSlide-02-01').html(' ');
+        $('#chart-templateSlide-02-02').html(' ');
+        $('#chart-templateSlide-02-03').html(' ');  
+
         $('#chart-templateSlide-02-01').height($(window).height()/3);
         $('#chart-templateSlide-02-02').height($(window).height()/3);
         $('#chart-templateSlide-02-03').height($(window).height()/3);           
@@ -324,21 +312,16 @@
         }); 
       }
 
-			Reveal.initialize({
-        autoAnimateEasing: 'ease-out',
-        autoAnimateDuration: 2,
-        touch: false,
-        slideNumber: 'c/t',
-				hash: true,
-        showNotes: false,
-        controlsTutorial: true,
-        controlsLayout: 'bottom-right',
-        center: false, 
-        mouseWheel: false,
-        hideInactiveCursor: true,
-        hideCursorTime: 1000, 
-        plugins: [ RevealNotes]
-			}).then(function(){
+      function toogleMenu(){
+        var open = $('#menu').hasClass('show');
+        if(open){
+          $('#menu .offcanvas-header button').trigger('click');
+        }else{
+          $('#menuBtn').trigger('click');
+        }
+      }
+ 
+      function exeAfterInitReveal(){ 
         //Templates init 
         var $templates = $('.slides section').filter(function(i,e){  
           if($(e).attr('id')!==undefined){
@@ -347,34 +330,74 @@
             return false;
           }          
         });   
+
         $('#indexSlide').append('<ul></ul>');
         $templates.each(function(){ 
           $('#indexSlide ul').append('<li><a href="#'+$(this).attr('id')+'">'+$(this).attr('id')+'</a></li>');
         });  
-        Reveal.sync();
+        
+        rndFillTable();
+        createChart(); 
 
-        $('#printBtn').on('click',function(){  
-          window.print();   
-        });  
-        $('#overBtn').on('click',function(){
-          Reveal.toggleOverview();  
-        });  
+        //button action menu
+        $('#helpBtn').on('click',function(){ 
+          Reveal.sync();
+          toogleMenu()  
+          Reveal.toggleHelp();  
+        });
         $('#homeBtn').on('click',function(){
+          Reveal.sync();
+          toogleMenu()
           Reveal.toggleOverview(false);  
           Reveal.slide(0);  
+        });
+        $('#overBtn').on('click',function(){
+          Reveal.sync();
+          toogleMenu()
+          Reveal.toggleOverview();   
         }); 
-        $('#reloadBtn').on('click',function(){  
-          location.reload();
-        }); 
- 
+        $('#printBtn').on('click',function(){  
+          Reveal.sync();
+          toogleMenu();
+          window.print();   
+        });  
+        $('#resumeBtn').on('click',function(){  
+          Reveal.sync();
+          toogleMenu();  
+          Reveal.togglePause(); 
+        });  
+
         $(window).on('resize',function(){ 
           Reveal.sync();
           createChart();
-        }); 
+        });  
+        //Reveal action
+        Reveal.sync();
 
-        rndFillTable();
-        createChart();
-      }); 
+        Reveal.on('slidechanged', function(event){ 
+          $('.slides section').removeAttr('hidden');
+          if($(event.currentSlide).attr('id')==='templateSlide-03'){
+            createChart(); 
+          }
+        }); 
+        Reveal.on('overviewshown',function(event){ 
+          $('.slides section').removeAttr('hidden');
+        });
+
+      }
+
+			Reveal.initialize({
+        autoAnimateEasing: 'ease-out',
+        transition: 'zoom',
+        autoAnimateDuration: 0.5,
+        touch: false,
+        slideNumber: 'c/t',
+				hash: true,
+        //center: false, 
+        hideInactiveCursor: true,
+        hideCursorTime: 1000, 
+        plugins: [ RevealNotes ]
+			}).then(exeAfterInitReveal); 
        
       console.log('Exe end'); 
     </script>
