@@ -11,13 +11,15 @@ class AppGiroValues:
     #Read, cleaning and formating MOVMENTS 
     data = pd.read_csv(os.path.dirname(__file__)+'/'+'giro_count.csv', sep=',') 
     data = data[data['ISIN']!='NLFLATEXACNT']
-    data = data[~data['Descripción'].str.contains('Cuenta')]  
+    data = data[data['Descripción'].notnull()]  
+    data = data[~data['Descripción'].str.contains('Cuenta')]   
     data = data[['Fecha','Producto','Descripción','Unnamed: 8']] 
     data.columns = ['Fecha', 'ID_Producto', 'Desc', 'CastflowEUR']
+    data = data[data['Fecha'].notnull()]  
     data['N'] = 1 
     data = data[['Fecha','ID_Producto','Desc','N','CastflowEUR']] 
     data['Fecha'] = pd.to_datetime(data['Fecha'], format='%d-%m-%Y') 
-       
+    print(data)
     data.loc[data['Desc'] == 'flatex Deposit'      , 'ID_Producto'] = 'INPUT' 
     data.loc[data['Desc'] == 'Ingreso'             , 'ID_Producto'] = 'INPUT' 
     data.loc[data['Desc'].str.contains('Tax')      , 'ID_Producto'] = 'TAX' 
@@ -34,7 +36,7 @@ class AppGiroValues:
     data['Total'] = data['N']*data['CastflowEUR']
     data = data[data['CastflowEUR']!=0]
     data.sort_values(by=['Fecha','Desc'], inplace=True, ascending=True)
-    print('MOVEMENTS')
+    print('\nMOVEMENTS')
     print(data)
     
     #AUX function to get data STOCKS
@@ -44,8 +46,8 @@ class AppGiroValues:
       stock = pd.DataFrame.from_dict(stock[ticket]['prices'])
       stock = stock[['formatted_date','close']] 
       stock.columns = ['Fecha', 'CastflowEUR']
-      stock['Fecha'] = pd.to_datetime(stock['Fecha'], format='%Y-%m-%d')      
-      for date in pd.date_range(start=dStart, end=dEnd): 
+      stock['Fecha'] = pd.to_datetime(stock['Fecha'], format='%Y-%m-%d')   
+      for date in pd.date_range(start=dStart, end=dEnd):  
         maxDate = stock[stock['Fecha']==date]['Fecha']
         if maxDate.size==0:  
           aux = stock[stock['Fecha']==stock[stock['Fecha']<=date]['Fecha'].max()].iloc[[0]]
@@ -56,7 +58,8 @@ class AppGiroValues:
       stock['Desc'] = descTicket  
       stock = stock[['Fecha','ID_Producto','Desc','N','CastflowEUR']]
       return stock
-
+     
+    
     #Generate STOCKS values in time
     stocksData  = pd.read_json(os.path.dirname(__file__)+'/'+'stocks.json')
     stocksData['dEnd'] = dt.datetime.today().strftime("%Y-%m-%d") 
@@ -68,9 +71,13 @@ class AppGiroValues:
     stocks['CastflowEUR'] = stocks['CastflowEUR'].replace(',','.', regex=True) 
     stocks['CastflowEUR'] = stocks['CastflowEUR'].astype(float)
     stocks['Total'] = stocks['N']*stocks['CastflowEUR']
-    print('STOCKS VALUES')
+    print('\nSTOCKS VALUES')
     print(stocks[stocks['Fecha'] == stocks['Fecha'].max()])
-
+    #print('\nERROR: FALTAN datos del día 13 de junio para 2 acciones')
+    #print(stocks[stocks['Fecha']=='2023-06-12']) 
+    #print(stocks[stocks['Fecha']=='2023-06-13'])
+    #print(stocks[stocks['Fecha']=='2023-06-14'])
+     
     # Start ploting
     fig = plt.figure(figsize=(16, 26)) 
     s = stocks[stocks['ID_Producto'] == 'STOCK']['Desc'].unique()
@@ -134,16 +141,16 @@ class AppGiroValues:
     #plots 1: DATA
     plotData = pd.DataFrame({'Fecha': [ ], 'CastflowEUR': []}) 
     for date in pd.date_range(start='2022-11-20', end=dt.datetime.today().strftime('%Y-%m-%d')):  
-      value = data[(data['Fecha'] <= date) & (data['ID_Producto']!='INPUT')]['Total'].sum() 
-      value = value + stocks[stocks['Fecha'] == date]['Total'].sum()
-      value = round(value, 2) 
-      plotData = pd.concat([plotData, pd.DataFrame({'Fecha': [date.strftime('%Y-%m-%d')], 'CastflowEUR': [value]})])
+      value = data[(data['Fecha'] <= date) & (data['ID_Producto']!='INPUT')]['Total'].sum()   
+      value = value + stocks[stocks['Fecha'] == date]['Total'].sum() 
+      value = round(value, 2)    
+      plotData = pd.concat([plotData, pd.DataFrame({'Fecha': [date.strftime('%Y-%m-%d')], 'CastflowEUR': [value]})])  
 
     plotData['Max']  = round(plotData['CastflowEUR'].max() , 2)
     plotData['Min']  = round(plotData['CastflowEUR'].min() , 2)
     plotData['Mean'] = round(plotData['CastflowEUR'].mean(), 2) 
     plotData = plotData.set_index('Fecha') 
-    plotData1 = plotData  
+    plotData1 = plotData 
 
     #plots 1: MATPLOT
     ax1 = plotData1.plot(ax=ax1, kind='line', style=['.-','-','-','-'], color=['#3C7BE3','green','red','black'])
