@@ -18,8 +18,8 @@ class AppGiroValues:
     data = data[data['Fecha'].notnull()]  
     data['N'] = 1 
     data = data[['Fecha','ID_Producto','Desc','N','CastflowEUR']] 
-    data['Fecha'] = pd.to_datetime(data['Fecha'], format='%d-%m-%Y') 
-    print(data)
+    data['Fecha'] = pd.to_datetime(data['Fecha'], format='%d-%m-%Y')  
+    
     data.loc[data['Desc'] == 'flatex Deposit'      , 'ID_Producto'] = 'INPUT' 
     data.loc[data['Desc'] == 'Ingreso'             , 'ID_Producto'] = 'INPUT' 
     data.loc[data['Desc'].str.contains('Tax')      , 'ID_Producto'] = 'TAX' 
