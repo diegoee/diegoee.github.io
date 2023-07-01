@@ -37,7 +37,7 @@ class AppGiroValues:
     data = data[data['CastflowEUR']!=0]
     data.sort_values(by=['Fecha','Desc'], inplace=True, ascending=True)
     print('\nMOVEMENTS')
-    print(data)
+    print(data.set_index('Fecha'))
     
     #AUX function to get data STOCKS
     def getStockValue(ticket, N, dStart, dEnd, descTicket): 
@@ -72,7 +72,7 @@ class AppGiroValues:
     stocks['CastflowEUR'] = stocks['CastflowEUR'].astype(float)
     stocks['Total'] = stocks['N']*stocks['CastflowEUR']
     print('\nSTOCKS VALUES')
-    print(stocks[stocks['Fecha'] == stocks['Fecha'].max()])
+    print(stocks[stocks['Fecha'] == stocks['Fecha'].max()].set_index('Fecha'))
     #print('\nERROR: FALTAN datos del día 13 de junio para 2 acciones')
     #print(stocks[stocks['Fecha']=='2023-06-12']) 
     #print(stocks[stocks['Fecha']=='2023-06-13'])
@@ -285,6 +285,10 @@ class AppGiroValues:
       'Extra_color': [colortext]
     })])
     plotData3 = plotData  
+    
+
+    print('\nCOUNT STATE')
+    print(plotData3[['Desc','Value','Extra']].iloc[::-1].replace({None: ' '}).set_index('Desc'))
 
     #plots 3: MATPLOT
     ax3.set_axis_off()
@@ -404,8 +408,8 @@ class AppGiroValues:
     plt.show(block=False) 
     #plt.pause(180)
     plt.close('all')
-    
-    print('*** END: AppGiroValues  ***')
+     
+    print('\n*** END: AppGiroValues  ***')
     print('***')
 
 if __name__ == '__main__':
