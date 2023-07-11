@@ -36,11 +36,11 @@
         @page { 
           size: A4 portrait;
         } 
-        #version, #control, #menu, #text, #menuScreen, #musicScreen, #swing, #transpor{  
+        #version, #control, #menu, #text, #menuScreen, #musicScreen, #scalesAppScreen, #swing, #transpor{  
           display: none; 
         }
       } 
-      #menuScreen, #musicScreen{
+      #menuScreen, #musicScreen, #scalesAppScreen{
         position: absolute;
         margin: 0;
         padding: 0;
@@ -51,7 +51,7 @@
         z-index: 100;
         transition: ease-in-out 0.25s;
       }
-      #menuScreen.open, #musicScreen.open{
+      #menuScreen.open, #musicScreen.open, #scalesAppScreen.open{
         left: 0;    
       }  
       .closeBtnContainer{
@@ -159,6 +159,13 @@
             <div class="row mb">  
               <div class="col-md-3"></div>
               <div class="col-md-6">
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnScalesApp"><i class="fas fa-calculator"></i> Scales</button> 
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+            <div class="row mb">  
+              <div class="col-md-3"></div>
+              <div class="col-md-6">
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="btnMusic"><i class="fas fa-book"></i> Music knowledge</button> 
               </div>
               <div class="col-md-3"></div>
@@ -218,7 +225,7 @@
     </div> 
     <div id="musicScreen" class="bg-light"> 
       <div class="closeBtnContainer">
-        <button type="button" class="close" aria-label="Close" id="btnMusicClose"><i class="fas fa-times"></i></button>
+        <button type="button" class="close " aria-label="Close" id="btnMusicClose"><i class="fas fa-times"></i></button>
       </div>
       <div class="card">
         <div class="card-body"> 
@@ -248,8 +255,38 @@
               </div> 
             </div>
           </div> 
-        </div>
-        
+        </div> 
+      </div>
+    </div> 
+    <div id="scalesAppScreen" class="bg-light"> 
+      <div class="closeBtnContainer">
+        <button type="button" class="close " aria-label="Close" id="btnScalesAppClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="card">
+        <div class="card-body"> 
+          <div class="container">    
+            <div class="row mb">  
+              <div class="col-md-12 text-center"> 
+                <h5 class="card-title">Scales</h5> 
+              </div> 
+              <div class="col-md-12 text-center">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text">Note</label>
+                  </div>
+                  <select class="custom-select" id="selectScaleAppNote"></select>   
+                </div> 
+              </div> 
+
+              <div class="col-md-12">
+                <div class="input-group displayGroup">
+                  <span class="input-group-text">Resu</span>
+                  <textarea class="form-control" id="textScaleApp"></textarea>
+                </div>  
+              </div> 
+            </div> 
+          </div> 
+        </div> 
       </div>
     </div>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -259,7 +296,7 @@
     <script type="text/javascript" src="songs.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v1.8');
+      $('#version').html('v2.0');
       var app = { 
         loadE: '<div id="loading"><div class="spinner"></div></div>', 
         loadOn: function(){
@@ -409,26 +446,17 @@
 
         },
         resize: function(){  
-          $('#inputText').innerHeight($(window).innerHeight()/2);   
+          $('#inputText').innerHeight($(window).innerHeight()/2);  
+          $('#textScaleApp').innerHeight($(window).innerHeight()-200);  
           $('#menuScreen').innerHeight($(document).innerHeight()); 
           $('#musicScreen').innerHeight($(document).innerHeight()); 
+          $('#scalesAppScreen').innerHeight($(document).innerHeight());
         },
-        openCloseMenu: function(){
-          if($('#menuScreen').hasClass('open')){ 
-            $('#menuScreen').removeClass('open'); 
+        openCloseModule: function(id){
+          if($(id).hasClass('open')){ 
+            $(id).removeClass('open'); 
           }else{
-            $('#menuScreen').addClass('open'); 
-          } 
-          $(window).trigger('resize');  
-          $('html, body').animate({
-              scrollTop: 0
-          },250); 
-        }, 
-        openCloseMusic: function(){
-          if($('#musicScreen').hasClass('open')){ 
-            $('#musicScreen').removeClass('open'); 
-          }else{
-            $('#musicScreen').addClass('open'); 
+            $(id).addClass('open'); 
           } 
           $(window).trigger('resize');  
           $('html, body').animate({
@@ -456,7 +484,63 @@
             }
             //console.log(data);
           });
-        },     
+        },   
+        scalesApp: function(self){
+          console.log('scales app init');
+          //-- 
+          //self.openCloseModule('#menuScreen');
+          //$('#btnScalesApp').trigger('click');
+          //--
+          
+          var $sel = $('#selectScaleAppNote'); 
+          var $res = $('#textScaleApp');
+
+          $sel.html(' ');
+          var notes = ['C','C#/Db','D','D#/Eb','E','F','F#/Gb','G','G#/Ab','A','A#/Bb','B'];
+          for(var i in notes){  
+            $sel.append('<option value='+notes[i]+'>'+notes[i]+'</option>'); 
+          }   
+
+          function calScale(note){
+            var pos=0;
+            for(var i in notes){  
+              if(notes[i]===note){
+                pos=i;
+                break;
+              }
+            }
+            pos=parseInt(pos);
+
+            var notesCal=[]; 
+            for(var i=0; i<2; i++){
+              for(var ii in notes){  
+                notesCal.push(notes[ii]); 
+              }
+            } 
+            text='';  
+            text=text+'Pentatónica Menor\n'; 
+            text=text+notesCal[pos]+' - '+notesCal[pos+3]+' - '+notesCal[pos+5]+' - '+notesCal[pos+7]+' - '+notesCal[pos+10];  
+            text=text+'\n\n';  
+            text=text+'Pentatónica Menor (Blue note)\n';
+            text=text+notesCal[pos]+' - '+notesCal[pos+3]+' - '+notesCal[pos+5]+' - ('+notesCal[pos+6]+') - '+notesCal[pos+7]+' - '+notesCal[pos+10];
+            text=text+'\n\n';  
+            text=text+'Menor\n';
+            text=text+notesCal[pos]+' - '+notesCal[pos+2]+' - '+notesCal[pos+3]+' - '+notesCal[pos+5]+' - '+notesCal[pos+7]+' - '+notesCal[pos+8]+' - '+notesCal[pos+10];
+            text=text+'\n\n';  
+            text=text+'Pentatónica Mayor\n';
+            text=text+notesCal[pos]+' - '+notesCal[pos+2]+' - '+notesCal[pos+4]+' - '+notesCal[pos+7]+' - '+notesCal[pos+9];
+            text=text+'\n\n';   
+            text=text+'Mayor\n';
+            text=text+notesCal[pos]+' - '+notesCal[pos+2]+' - '+notesCal[pos+4]+' - '+notesCal[pos+5]+' - '+notesCal[pos+7]+' - '+notesCal[pos+9]+' - '+notesCal[pos+11];
+            text=text+'\n\n'; 
+            return text;
+          }
+ 
+          $res.val(calScale($sel.val()));
+          $sel.on('change',function(){   
+            $res.val(calScale($sel.val()));
+          });
+        },  
         init: function(){
           console.log('app exe start');
           var self = this; 
@@ -468,7 +552,7 @@
 
           $('#btnPrint').on('click',function(){ 
             window.print(); 
-            self.openCloseMenu();
+            self.openCloseModule('#menuScreen');
           });
 
           var counterFile = 0;
@@ -483,15 +567,14 @@
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
-            self.openCloseMenu();
+            self.openCloseModule('#menuScreen');
           });
 
           $('#btnMenu').on('click',function(){ 
-            self.openCloseMenu();
-          });
-
+            self.openCloseModule('#menuScreen');
+          }); 
           $('#btnMenuClose').on('click',function(){ 
-            self.openCloseMenu();
+            self.openCloseModule('#menuScreen');
           });
 
           $('#inputText').val(' ');
@@ -516,11 +599,11 @@
                 }else{
                   $('#inputText').val(' ');
                   $('#main').html('Error! Not .abc file'); 
-                }
-                self.openCloseMenu();
+                } 
+                self.openCloseModule('#menuScreen');
               });              
               reader.readAsBinaryString(myFile); 
-              self.openCloseMenu();
+              self.openCloseModule('#menuScreen');
             }   
           }); 
 
@@ -529,17 +612,25 @@
             $('#inputText').val(self.songs[i]);
             $('#selectTransporSheet').val(0);          
             $('#selectTransporPitch').val(0);
-            self.openCloseMenu();
+            self.openCloseModule('#menuScreen');
           });
 
-          $('#btnMusic').on('click',function(){  
-            self.openCloseMusic();
-            self.openCloseMenu();
-          }); 
-          
-          $('#btnMusicClose').on('click',function(){ 
-            self.openCloseMusic();
+          $('#btnMusic').on('click',function(){   
+            self.openCloseModule('#musicScreen');
+            self.openCloseModule('#menuScreen');
+          });  
+          $('#btnMusicClose').on('click',function(){  
+            self.openCloseModule('#musicScreen');
           });
+
+          $('#btnScalesApp').on('click',function(){   
+            self.openCloseModule('#scalesAppScreen');
+            self.openCloseModule('#menuScreen');
+          }); 
+          $('#btnScalesAppClose').on('click',function(){  
+            self.openCloseModule('#scalesAppScreen');
+          });
+          self.scalesApp(self);
 
           self.swingMode = false;
           $('#btnSwing').on('click',function(){ 

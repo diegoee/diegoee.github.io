@@ -137,7 +137,7 @@ class JokesList:
     self.logger.log_info(toPrint)
     from threading import Timer
     self.on=0
-    onMax=1
+    onMax=5
     sec=2
 
     def rec():
