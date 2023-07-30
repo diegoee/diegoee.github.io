@@ -1,0 +1,45 @@
+{ 
+  "songs":[{ 
+    "title": "Autumn Leaves", 
+    "swing": "on", 
+    "pitch": "0", 
+    "trans": "0", 
+    "url": "songs/Autumn_Leaves.abc"  
+  },{ 
+    "title": "All of Me (Ejercicio)", 
+    "swing": "off", 
+    "pitch": "0", 
+    "trans": "0", 
+    "url": "songs/All_of_Me.abc"  
+  },{ 
+    "title": "All of Me (no Chords)", 
+    "swing": "off", 
+    "pitch": "0", 
+    "trans": "0", 
+    "url": "songs/All_of_Me_2.abc"  
+  },{ 
+    "title": "All of Me", 
+    "swing": "off", 
+    "pitch": "0", 
+    "trans": "0", 
+    "url": "songs/All_of_Me_3.abc"   
+  },{ 
+    "title": "City of Star (My A')", 
+    "swing": "off", 
+    "pitch": "0", 
+    "trans": "0", 
+    "url": "songs/City_of_star.abc"   
+  },{ 
+    "title": "Scales", 
+    "swing": "off", 
+    "pitch": "0", 
+    "trans": "0", 
+    "url": "songs/Scales.abc"   
+  },{ 
+    "title": "Stand by Me", 
+    "swing": "off", 
+    "pitch": "0", 
+    "trans": "0", 
+    "url": "songs/Stand_by_Me.abc"   
+  }]
+}
