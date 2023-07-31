@@ -42,6 +42,28 @@
       .routeModule.open{
         left: 0;  
         top: 56px;  
+      }  
+
+      .back-to-top, .back-to-top:active, .back-to-top:focus, .back-to-top:visited {
+        display: none;
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        z-index: 1000;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 48px;
+        background: #000;
+        color: #fff;
+        cursor: pointer;
+        border: 1px solid #000;
+        border-radius: 50%;
+        text-decoration: none;
+        opacity: 0.6;
+      }
+      .back-to-top.show{
+        display: block;
       } 
 
       /*abcMusic*/
@@ -73,7 +95,7 @@
       #abcMusicFile{
         display: none;
       }
-      #abcMusicMenu{
+      #abcMusicMenu, #abcMusicPlayerEditor{
         position: absolute;
         margin: 0;
         padding: 0;
@@ -84,8 +106,9 @@
         z-index: 100;
         transition: ease-in-out 0.25s;
       }
-      #abcMusicMenu.open{
+      #abcMusicMenu.open, #abcMusicPlayerEditor.open{
         left: 0;   
+        z-index: 101;
       }
       
       /*Scales*/
@@ -143,7 +166,7 @@
 
     <div id="version"></div> 
 
-    <nav id='menu' class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav id='menu' class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
       <div class="container-fluid"> 
         <span class="navbar-brand"> 
           <a href="https://abcnotation.com/examples" class="" >Abc Anotation Music</a> 
@@ -311,7 +334,10 @@
         </div> 
       </div>
     </div>
-     
+    
+    <button id="back-to-top" class="back-to-top" title="Volver arriba">
+      <span class="fa fa-chevron-up"></span> 
+    </button>
 
     <div class="modal fade" id="modal" data-backdrop="static">
       <div class="modal-dialog">
@@ -335,7 +361,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v3.1');
+      $('#version').html('v3.2');
       var app={
         modal: {
           set: function(title,body){
@@ -360,6 +386,26 @@
             $('#loading').remove(); 
             $('body').removeClass('notScroll');
           },  
+        },
+        btnTop: {
+          init: function(){ 
+            $(window).on('scroll', function(e){
+              if($(document).scrollTop().valueOf()>125){
+                if (!$('#back-to-top').hasClass('show')){
+                  $('#back-to-top').addClass('show');
+                }  
+              }else{
+                $('#back-to-top').removeClass('show');
+              } 
+            }); 
+
+            $('#back-to-top').on('click',function(){
+              $('html, body').animate({
+                scrollTop: 0
+              },250);
+            });
+            
+          }
         },
         btnMenuHome: {
           reset: function(){
@@ -583,7 +629,7 @@
                     app.modal.show(); 
                   }else{ 
                     self.songs[pos].abc=data.responseText;   
-                    $('#inputText').val(self.songs[pos].abc);  
+                    $('#abcMusicBtnSong').trigger('click');     
                     app.loadE.off();   
                   } 
                 }
@@ -592,11 +638,25 @@
               app.loadE.off(); 
             }
           }, 
+          resetMusicSheet: function(){
+            app.loadE.on();  
+            var self = this; 
+            var tSheet = parseInt($('#selectTransporSheet').val());
+            var tPitch = parseInt($('#selectTransporPitch').val()); 
+            var musicSheet = $('#inputText').val(); 
+            if(musicSheet.trim()!==''){
+              self.createMusicSheet(musicSheet,tSheet); 
+              self.resetPlayer(tPitch); 
+            } 
+            app.loadE.off(); 
+          },
           afterRoute: function(){ 
             //Menu  
             var btnMenuE='<li class="nav-item pl remove"><a class="btn btn-outline-dark" id="abcMusicBtnMenu"><i class="fas fa-bars"></i></a></li>';
             $('#menu .nav').append(btnMenuE);  
             
+            $('#abcMusicPlayerEditor').addClass('open');
+
             $('#menu a').off('click');  
             $('#menu a').on('click',function(){  
               $('.abcjs-midi-reset').trigger('click'); 
@@ -610,25 +670,30 @@
                 $(this).removeClass('open');
                 $(this).html('<i class="fas fa-bars"></i>');
                 $('#abcMusicMenu').removeClass('open');
+                $('#abcMusicPlayerEditor').addClass('open');
                 app.btnMenuHome.on();
               }else{
                 $(this).addClass('open');
                 $(this).html('<i class="fas fa-times"></i>');
                 $('#abcMusicMenu').addClass('open');
+                $('#abcMusicPlayerEditor').removeClass('open');
                 app.btnMenuHome.off();
               } 
+              $('html, body').animate({
+                scrollTop: 0
+              },250);
             });
           }, 
           init: function(){ 
             app.loadE.on();   
             var self = this; 
             self.synth = new Tone.Synth().toMaster();
-
+            
             //player/editor abcMusic  
             self.swingMode = false;
             $('#btnSwing').on('click',function(){  
               self.swingMode=!self.swingMode;  
-              self.resetPlayer(0);   
+              self.resetMusicSheet(); 
             });  
 
             $('#selectTransporSheet').html(' ');
@@ -642,23 +707,11 @@
             $('#selectTransporPitch').val(0);
 
             $('#selectTransporSheet').on('change',function(){ 
-              app.loadE.on();  
-              var tSheet = $(this).val();
-              var tPitch = $('#selectTransporPitch').val();
-              var musicSheet = $('#inputText').val();
-              self.createMusicSheet(musicSheet,tSheet);  
-              self.resetPlayer(tPitch); 
-              app.loadE.off(); 
+              self.resetMusicSheet(); 
             });
  
-            $('#selectTransporPitch').on('change',function(){ 
-              app.loadE.on();  
-              var tSheet = $('#selectTransporSheet').val();
-              var tPitch = $(this).val();
-              var musicSheet = $('#inputText').val();
-              self.createMusicSheet(musicSheet,tSheet); 
-              self.resetPlayer(tPitch); 
-              app.loadE.off();  
+            $('#selectTransporPitch').on('change',function(){
+              self.resetMusicSheet();  
             }); 
 
             self.initKeyEvent();  
@@ -666,11 +719,7 @@
             $('#inputText').val(' ');
             $('#inputText').innerHeight($(window).innerHeight()/2); 
             $('#inputText').on('change',function(){  
-              var musicSheet = $('#inputText').val();
-              if(musicSheet!==' '){
-                self.createMusicSheet(musicSheet,0);
-                self.resetPlayer(0); 
-              }   
+              self.resetMusicSheet();    
               $('#inputText').innerHeight($(window).innerHeight()/2); 
             });  
 
@@ -694,7 +743,7 @@
                 $('#btnSwing').prop('checked', true);
               }  
               $('#abcMusicBtnMenu').trigger('click');
-              self.loadSong(i);
+              self.loadSong(i); 
             });
 
             //Print Btn
@@ -886,7 +935,8 @@
         init: function(){
           console.log('app exe start');
           this.loadE.on(); 
-          this.setHash('');     
+          this.setHash(''); 
+          this.btnTop.init();    
           this.main.init();   
           this.scales.init();
           this.abcMusic.init(); 
@@ -898,6 +948,7 @@
         }
       }
       app.init();  
+      
       /*
       //Testing
       setTimeout(function(){
@@ -905,14 +956,10 @@
         app.setHash('abcMusic'); 
         setTimeout(function(){ 
           console.log('2');
-          $('.abcjs-midi-start').trigger('click');  
-          setTimeout(function(){ 
-            console.log('3');
-            $('.abcjs-midi-start').trigger('click');  
-          },2000); 
-        },2000);
-      },125);
-      */
+          $('.abcjs-midi-start').trigger('click'); 
+        },3000);
+      },500);
+      /**/
     </script> 
   </body>
 </html>
