@@ -8,10 +8,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
     <link rel="stylesheet" type="text/css"href="https://cdn.jsdelivr.net/npm/abcjs@6.0.0-beta.35/abcjs-audio.css" />
     <style>
-      /*General*/  
-      #elements{
-        display: none
-      } 
+      /*General*/   
       #version{
         position: fixed;
         margin: 0;
@@ -29,6 +26,22 @@
       }    
       .pl{
         padding-left: 1em;
+      } 
+       
+      .routeModule{
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        left: -100%;
+        width: 100%; 
+        height: 100%; 
+        z-index: 100;
+        transition: ease-in-out 0.25s;
+      }
+      .routeModule.open{
+        left: 0;  
+        top: 56px;  
       } 
 
       /*abcMusic*/
@@ -64,7 +77,7 @@
         position: absolute;
         margin: 0;
         padding: 0;
-        top: 56;
+        top: 0;
         left: -100%;
         width: 100%; 
         height: 100%; 
@@ -72,9 +85,11 @@
         transition: ease-in-out 0.25s;
       }
       #abcMusicMenu.open{
-        left: 0;    
-      }  
-      #scalesAppScreen span{
+        left: 0;   
+      }
+      
+      /*Scales*/
+      #scales span{
         font-size: 0.75em;
       }  
 
@@ -138,166 +153,165 @@
         </ul>
       </div> 
     </nav> 
+ 
+    <div id="main" class="routeModule"> 
+      <div class="card">
+        <div class="card-body"> 
+          <div class="container mt">  
+          </div>   
+        </div>   
+      </div>  
+    </div> 
 
-    <div id="body">  
-    </div>
-
-    <div id="elements"> 
-      <div id="main"> 
+    <div id="abcMusic" class="routeModule">  
+      <div id="abcMusicMenu" class="bg-light"> 
         <div class="card">
           <div class="card-body"> 
-            <div class="container mt">  
-            </div>   
-          </div>   
-        </div>  
-      </div> 
-      <div id="abcMusic">  
-        <div id="abcMusicMenu" class="bg-light"> 
-          <div class="card">
-            <div class="card-body"> 
-              <div class="container">  
-                <div class="row mb">  
-                  <div class="col-md-3"></div>
-                  <div class="col-md-6">
-                    <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="abcMusicBtnSong"><i class="fas fa-play"></i> Load song</button> 
-                  </div>
-                  <div class="col-md-3"></div>
-                  <div class="col-md-3"></div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <select class="form-control form-control-lg" id="abcMusicSelectSong"></select> 
-                    </div> 
-                  </div>
-                  <div class="col-md-3"></div>
-                </div> 
-                <div class="row mb">    
-                  <div class="col-md-3"></div>
-                  <div class="col-md-6">
-                    <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="abcMusicBtnPrint"> <i class="fas fa-print"></i> Print song</button> 
-                  </div>
-                  <div class="col-md-3"></div> 
+            <div class="container">  
+              <div class="row mb">  
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="abcMusicBtnSong"><i class="fas fa-play"></i> Load song</button> 
                 </div>
-                <div class="row mb">  
-                  <div class="col-md-3"></div>
-                  <div class="col-md-6">
-                    <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="abcMusicBtnDownload"><i class="fas fa-download"></i> Download abc file </button> 
-                  </div>
-                  <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <select class="form-control form-control-lg" id="abcMusicSelectSong"></select> 
+                  </div> 
                 </div>
-                <div class="row mb">  
-                  <div class="col-md-3"></div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="btn btn-outline-dark btn-lg btn-block" for="abcMusicFile"><i class="fas fa-upload"></i> Load .abc file </label>
-                      <input type="file" class="form-control-file" id="abcMusicFile"> 
-                    </div>   
-                  </div>
-                  <div class="col-md-3"></div>
-                </div> 
+                <div class="col-md-3"></div>
               </div> 
-            </div>
+              <div class="row mb">    
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="abcMusicBtnPrint"> <i class="fas fa-print"></i> Print song</button> 
+                </div>
+                <div class="col-md-3"></div> 
+              </div>
+              <div class="row mb">  
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-dark btn-lg btn-block" id="abcMusicBtnDownload"><i class="fas fa-download"></i> Download abc file </button> 
+                </div>
+                <div class="col-md-3"></div>
+              </div>
+              <div class="row mb">  
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="btn btn-outline-dark btn-lg btn-block" for="abcMusicFile"><i class="fas fa-upload"></i> Load .abc file </label>
+                    <input type="file" class="form-control-file" id="abcMusicFile"> 
+                  </div>   
+                </div>
+                <div class="col-md-3"></div>
+              </div> 
+            </div> 
           </div>
         </div>
-        <div id="abcMusicPlayerEditor" class="bg-light">
-          <div id="abcMusicControl" class=""></div> 
-          <div class="container"> 
-            <div class="row">   
-              <div class="col-sm-4">    
-                <div class="card" id="swing">
-                  <div class="card-body">
-                    <div class="input-group"> 
-                      <div class="form-control custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="btnSwing">
-                        <label class="custom-control-label ml-4" for="btnSwing">Swing</label>
-                      </div>
+      </div>
+      <div id="abcMusicPlayerEditor" class="bg-light">
+        <div id="abcMusicControl" class=""></div> 
+        <div class="container"> 
+          <div class="row">   
+            <div class="col-sm-4">    
+              <div class="card" id="swing">
+                <div class="card-body">
+                  <div class="input-group"> 
+                    <div class="form-control custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="btnSwing">
+                      <label class="custom-control-label ml-4" for="btnSwing">Swing</label>
                     </div>
-                  </div> 
-                </div>  
-              </div>
-              <div class="col-sm-8">    
-                <div class="card" id="transpor">
-                  <div class="card-body">
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <label class="input-group-text">Transpor. (1/2)</label>
-                      </div>
-                      <select class="custom-select" id="selectTransporSheet"> 
-                      </select>
-                      <select class="custom-select" id="selectTransporPitch"> 
-                      </select>
-                    </div>
-                  </div>  
-                </div>  
-              </div> 
-              <div class="col-12">
-                <div id="main">Hola</div>  
-                <div id="text"  class="form-row">
-                  <div class="input-group displayGroup">
-                    <span class="input-group-text">abc</span>
-                    <textarea class="form-control" aria-label="With textarea" id="inputText"></textarea>
-                  </div> 
-                </div>
+                  </div>
+                </div> 
               </div>  
             </div>
-          </div>
-        </div>
-      </div> 
-      <div id="musicKnow"> 
-        <div class="card">
-          <div class="card-body"> 
-            <div class="container">    
-              <div class="row mb">  
-                <div class="col-md-12 text-center"> 
-                  <h5 class="card-title">Circle of fifths</h5> 
-                </div> 
-                <div class="col-md-12 text-center">
-                  <img src="assets/Img1.png" class="img-fluid" alt="Circle of fifths"> 
-                </div> 
-              </div>
-              <div class="row mb">  
-                <div class="col-md-12 text-center"> 
-                  <h6 class="card-subtitle mb-2 text-muted">Use of Circle</h6>
-                </div> 
-                <div class="col-md-12 text-center">
-                  <img src="assets/Img2.png" class="img-fluid" alt="Circle of fifths"> 
-                </div> 
-              </div>
-              <div class="row mb">  
-                <div class="col-md-12 text-center"> 
-                  <h6 class="card-title mb-2">Chords</h6>
-                </div> 
-                <div class="col-md-12 text-center">
-                  <img src="assets/Img3.png" class="img-fluid" alt="Circle of fifths"> 
-                </div> 
-              </div>
-            </div> 
-          </div> 
-        </div>
-      </div> 
-      <div id="scales">  
-        <div class="card">
-          <div class="card-body"> 
-            <div class="container">    
-              <div class="row mb">  
-                <div class="col-md-12 text-center"> 
-                  <h5 class="card-title">Scales</h5> 
-                </div> 
-                <div class="col-md-12 text-center">
+            <div class="col-sm-8">    
+              <div class="card" id="transpor">
+                <div class="card-body">
                   <div class="input-group">
                     <div class="input-group-prepend">
-                      <label class="input-group-text">Note</label>
+                      <label class="input-group-text">Transpor. (1/2)</label>
                     </div>
-                    <select class="custom-select" id="selectScaleAppNote"></select>   
-                  </div> 
+                    <select class="custom-select" id="selectTransporSheet"> 
+                    </select>
+                    <select class="custom-select" id="selectTransporPitch"> 
+                    </select>
+                  </div>
                 </div>  
-                <div class="col-md-12" id="textScaleApp"> 
-                </div>    
-              </div> 
+              </div>  
             </div> 
-          </div> 
+            <div class="col-12">
+              <div id="abcMusicMain">Hola</div>  
+              <div id="text"  class="form-row">
+                <div class="input-group displayGroup">
+                  <span class="input-group-text">abc</span>
+                  <textarea class="form-control" aria-label="With textarea" id="inputText"></textarea>
+                </div> 
+              </div>
+            </div>  
+          </div>
         </div>
       </div>
     </div> 
+
+    <div id="musicKnow" class="routeModule"> 
+      <div class="card">
+        <div class="card-body"> 
+          <div class="container">    
+            <div class="row mb">  
+              <div class="col-md-12 text-center"> 
+                <h5 class="card-title">Circle of fifths</h5> 
+              </div> 
+              <div class="col-md-12 text-center">
+                <img src="assets/Img1.png" class="img-fluid" alt="Circle of fifths"> 
+              </div> 
+            </div>
+            <div class="row mb">  
+              <div class="col-md-12 text-center"> 
+                <h6 class="card-subtitle mb-2 text-muted">Use of Circle</h6>
+              </div> 
+              <div class="col-md-12 text-center">
+                <img src="assets/Img2.png" class="img-fluid" alt="Circle of fifths"> 
+              </div> 
+            </div>
+            <div class="row mb">  
+              <div class="col-md-12 text-center"> 
+                <h6 class="card-title mb-2">Chords</h6>
+              </div> 
+              <div class="col-md-12 text-center">
+                <img src="assets/Img3.png" class="img-fluid" alt="Circle of fifths"> 
+              </div> 
+            </div>
+          </div> 
+        </div> 
+      </div>
+    </div> 
+
+    <div id="scales" class="routeModule">  
+      <div class="card">
+        <div class="card-body"> 
+          <div class="container">    
+            <div class="row mb">  
+              <div class="col-md-12 text-center"> 
+                <h5 class="card-title">Scales</h5> 
+              </div> 
+              <div class="col-md-12 text-center">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text">Note</label>
+                  </div>
+                  <select class="custom-select" id="selectScaleAppNote"></select>   
+                </div> 
+              </div>  
+              <div class="col-md-12" id="textScaleApp"> 
+              </div>    
+            </div> 
+          </div> 
+        </div> 
+      </div>
+    </div>
+     
 
     <div class="modal fade" id="modal" data-backdrop="static">
       <div class="modal-dialog">
@@ -321,7 +335,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v3.0');
+      $('#version').html('v3.1');
       var app={
         modal: {
           set: function(title,body){
@@ -399,7 +413,7 @@
             var self = this;
             //console.log(abc);
             var abc = musicSheet; 
-            this.musicSheet = abcjs.renderAbc('main',abc,{ 
+            this.musicSheet = abcjs.renderAbc('abcMusicMain',abc,{ 
               add_classes: true,
               visualTranspose: transpose,
               responsive: 'resize',
@@ -522,14 +536,14 @@
               //console.log(data);
             });
           },
-          loadListSongs: function(){ 
+          loadListSongs: function(){    
             console.log('app loadListSongs start');
             var self = this;
             $.ajax({
               url: 'songs/songs.json', 
               method: 'get',
               dataType: 'json',
-              complete: function(data,textStatus){ 
+              complete: function(data,textStatus){  
                 app.loadE.on(); 
                 if(textStatus==='error'){ 
                   app.modal.set(null,'<div class="alert alert-danger"><p>error reading json songs data</p></div>');
@@ -539,7 +553,17 @@
                   for(var i=0; i<self.songs.length; i++){ 
                     self.songs[i].abc='';
                   } 
-                  app.loadE.off();
+                  
+                  $('#abcMusicSelectSong').html(' ');
+                  if(self.songs.length!==0){
+                    for(var i in self.songs){ 
+                      $('#abcMusicSelectSong').append('<option value='+i+'>'+self.songs[i].title+'</option>');
+                    } 
+                  } 
+                  $('#abcMusicBtnMenu').trigger('click');
+                  $('#abcMusicBtnSong').trigger('click'); 
+
+                  app.loadE.off();  
                   console.log('app loadListSongs end');   
                 } 
               }
@@ -568,10 +592,38 @@
               app.loadE.off(); 
             }
           }, 
-          render: function(){ 
-            app.loadE.on();   
-            var self = this;
+          afterRoute: function(){ 
+            //Menu  
+            var btnMenuE='<li class="nav-item pl remove"><a class="btn btn-outline-dark" id="abcMusicBtnMenu"><i class="fas fa-bars"></i></a></li>';
+            $('#menu .nav').append(btnMenuE);  
             
+            $('#menu a').off('click');  
+            $('#menu a').on('click',function(){  
+              $('.abcjs-midi-reset').trigger('click'); 
+              if($('.abcjs-midi-start').hasClass('abcjs-pushed')){ 
+                $('.abcjs-midi-start').trigger('click');  
+              } 
+            }); 
+
+            $('#abcMusicBtnMenu').on('click',function(){ 
+              if($(this).hasClass('open')){
+                $(this).removeClass('open');
+                $(this).html('<i class="fas fa-bars"></i>');
+                $('#abcMusicMenu').removeClass('open');
+                app.btnMenuHome.on();
+              }else{
+                $(this).addClass('open');
+                $(this).html('<i class="fas fa-times"></i>');
+                $('#abcMusicMenu').addClass('open');
+                app.btnMenuHome.off();
+              } 
+            });
+          }, 
+          init: function(){ 
+            app.loadE.on();   
+            var self = this; 
+            self.synth = new Tone.Synth().toMaster();
+
             //player/editor abcMusic  
             self.swingMode = false;
             $('#btnSwing').on('click',function(){  
@@ -629,38 +681,9 @@
                 $('#inputText').trigger('change'); 
               }
               valSheet=$('#inputText').val();
-            },1000);    
-
-            //Menu  
-            var btnMenuE='<li class="nav-item pl remove"><a class="btn btn-outline-dark" id="abcMusicBtnMenu"><i class="fas fa-bars"></i></a></li>';
-            $('#menu .nav').append(btnMenuE);  
-            
-            $('#menu a').off('click');  
-            $('#menu a').on('click',function(){  
-              $('.abcjs-midi-reset').trigger('click'); 
-              if($('.abcjs-midi-start').hasClass('abcjs-pushed')){ 
-                $('.abcjs-midi-start').trigger('click');  
-              } 
-            }); 
-            $('#abcMusicBtnMenu').on('click',function(){ 
-              if($(this).hasClass('open')){
-                $(this).removeClass('open');
-                $(this).html('<i class="fas fa-bars"></i>');
-                $('#abcMusicMenu').removeClass('open');
-              }else{
-                $(this).addClass('open');
-                $(this).html('<i class="fas fa-times"></i>');
-                $('#abcMusicMenu').addClass('open');
-              } 
-            }); 
+            },1000);  
             
             //LoadSong Btn
-            $('#abcMusicSelectSong').html(' ');
-            if(this.songs.length!==0){
-              for(var i in this.songs){ 
-                $('#abcMusicSelectSong').append('<option value='+i+'>'+this.songs[i].title+'</option>');
-              } 
-            }
             $('#abcMusicBtnSong').on('click',function(){ 
               var i = parseInt($('#abcMusicSelectSong').val()); 
               $('#inputText').val(self.songs[i].abc);
@@ -711,7 +734,7 @@
                     $('#inputText').val(' '); 
                     app.modal.set(null,'<div class="alert alert-danger"><p>Error! Not .abc file</p></div>');
                     app.modal.show(); 
-                    $('#main').html('Error! Not .abc file'); 
+                    $('#abcMusicMain').html('Error! Not .abc file'); 
                     $('#abcMusicBtnMenu').trigger('click');
                   }  
                 });              
@@ -720,32 +743,31 @@
               }   
             });  
             
-            //init
-            $('#abcMusicBtnMenu').trigger('click');
-            $('#abcMusicBtnSong').trigger('click'); 
-            
             app.loadE.off();   
           }, 
-          init: function(){  
-            this.synth = new Tone.Synth().toMaster(); 
-          }
         },
-        modules:[{
-          name: 'Main',
-          id: 'main',
-          icon: 'fa-home',
-          elem: undefined,
-          actionAfterRender: function(){ 
-            app.btnMenuHome.reset();
-            app.btnMenuHome.off();
-            function createButton(id,name,icon, disable){
+        main: {
+          modules:[{
+            name: 'Player/Editor Abc Anotation Music',
+            id: 'abcMusic',
+            icon: 'fa-music' 
+          },{
+            name: 'Scales',
+            id: 'scales',
+            icon: 'fa-calculator' 
+          },{
+            name: 'Music Knowledge',
+            id: 'musicKnow',
+            icon: 'fa-book'
+          }],
+          init: function(){  
+            function createButton(id,name,icon){
               var e ='<div class="row mb"><div class="col-md-3"></div><div class="col-md-6"><button type="button" class="btn btn-outline-dark btn-lg btn-block" herf="'+id+'"> <i class="fas '+icon+'"></i> '+name+'</button></div><div class="col-md-3"></div></div>';
               return e;
             }  
-            for(var i=0; i<app.modules.length; i++){
-              if(app.modules[i].id!=='main'){
-                $('.container').append(createButton(app.modules[i].id,app.modules[i].name,app.modules[i].icon,false));
-              }
+            for(var i=0; i<this.modules.length; i++){ 
+                $('#main .container').append(createButton(this.modules[i].id,this.modules[i].name,this.modules[i].icon));
+               
             }
             $('button').on('click',function(){
               if($(this).attr('herf')!==undefined){
@@ -753,23 +775,9 @@
               }
             });
           }
-        },{
-          name: 'Player/Editor Abc Anotation Music',
-          id: 'abcMusic',
-          icon: 'fa-music',
-          elem: undefined, 
-          actionAfterRender: function(){
-            app.btnMenuHome.reset();
-            app.btnMenuHome.on();
-            app.abcMusic.render();
-          }
-        },{
-          name: 'Scales',
-          id: 'scales',
-          icon: 'fa-calculator',
-          elem: undefined,
-          actionAfterRender: function(){ 
-            app.btnMenuHome.on();
+        },
+        scales: {
+          init: function(){ 
             var $sel = $('#selectScaleAppNote'); 
             var $res = $('#textScaleApp');
 
@@ -836,42 +844,37 @@
               text=text+renderSacel('Menor',[0,2,3,5,7,8,10,12]);
               text=text+renderSacel('Pentatónica Mayor',[0,2,4,7,9,12]);
               text=text+renderSacel('Mayor',[0,2,4,5,7,9,11,12]); 
-  
+
               return text;
             }
-  
+
             $res.html(calScaleRender($sel.val()));
             $sel.on('change',function(){   
               $res.html(calScaleRender($sel.val()));
-            });
+            }); 
           }
-        },{
-          name: 'Music Knowledge',
-          id: 'musicKnow',
-          icon: 'fa-book',
-          elem: undefined,
-          actionAfterRender: function(){ 
-            app.btnMenuHome.reset();
-            app.btnMenuHome.on();
-          }
-        }],
-        getModuleById: function(id){
-          var mod = undefined;
-          for(var i=0; i<this.modules.length; i++){
-            if(this.modules[i].id===id){
-              mod=this.modules[i];
-              break;
-            }
-          }
-          return mod;
-        }, 
+        },
         routeHash: function(){
           var self = this;
           $(window).off('hashchange');
-          $(window).on('hashchange', function(){  
-            var mod = self.getModuleById(self.getHash());
-            $('#body').html(mod.elem); 
-            mod.actionAfterRender(); 
+          $(window).on('hashchange', function(){ 
+            self.btnMenuHome.reset();
+            self.btnMenuHome.on();
+
+            if(self.getHash()==='main'){
+              self.btnMenuHome.off();
+            }
+            if(self.getHash()==='abcMusic'){
+              self.abcMusic.afterRoute();
+            }     
+
+            $('.routeModule').removeClass('open');  
+            $('.routeModule').each(function(){  
+              if(self.getHash()===$(this).attr('id')){ 
+                $(this).addClass('open'); 
+              }
+            }); 
+
           });
         },
         setHash: function(id){ 
@@ -882,23 +885,19 @@
         },
         init: function(){
           console.log('app exe start');
-          this.loadE.on();
-          window.location.hash='';  
-          this.getModuleById('main').elem = $('#main').html();  
-          this.getModuleById('abcMusic').elem = $('#abcMusic').html(); 
-          this.getModuleById('scales').elem = $('#scales').html();
-          this.getModuleById('musicKnow').elem = $('#musicKnow').html(); 
-          $('#elements').remove();  
+          this.loadE.on(); 
+          this.setHash('');     
+          this.main.init();   
+          this.scales.init();
+          this.abcMusic.init(); 
           this.routeHash(); 
           this.setHash('main'); 
-          this.loadE.off(); 
-          this.abcMusic.init();
+          this.loadE.off();  
           this.abcMusic.loadListSongs();
           console.log('app exe end');
         }
       }
-      app.init(); 
-
+      app.init();  
       /*
       //Testing
       setTimeout(function(){
@@ -914,7 +913,6 @@
         },2000);
       },125);
       */
-      
     </script> 
   </body>
 </html>
