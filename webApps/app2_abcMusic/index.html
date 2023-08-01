@@ -124,7 +124,7 @@
         width: 100%;
         height: 100%;
         background-color: rgba(33, 33, 33, 0.85);
-        z-index: 1000; 
+        z-index: 1050; 
         font-size: 3em; 
         display: flex;
         align-items: center;
@@ -361,7 +361,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v3.2');
+      $('#version').html('v3.3');
       var app={
         modal: {
           set: function(title,body){
@@ -594,12 +594,11 @@
                 if(textStatus==='error'){ 
                   app.modal.set(null,'<div class="alert alert-danger"><p>error reading json songs data</p></div>');
                   app.modal.show(); 
-                }else{
+                }else{ 
                   self.songs=JSON.parse(data.responseText).songs;  
                   for(var i=0; i<self.songs.length; i++){ 
                     self.songs[i].abc='';
-                  } 
-                  
+                  }                   
                   $('#abcMusicSelectSong').html(' ');
                   if(self.songs.length!==0){
                     for(var i in self.songs){ 
@@ -607,31 +606,30 @@
                     } 
                   } 
                   $('#abcMusicBtnMenu').trigger('click');
-                  $('#abcMusicBtnSong').trigger('click'); 
-
-                  app.loadE.off();  
-                  console.log('app loadListSongs end');   
+                  $('#abcMusicBtnSong').trigger('click');  
                 } 
+                console.log('app loadListSongs end');   
+                app.loadE.off(); 
               }
             }); 
           },
           loadSong: function(pos){
             app.loadE.on(); 
-            var self = this; 
-            if(self.songs[pos].abc.trim()===''){  
+            var self = this;  
+            if(self.songs[pos].abc.trim()===''){   
               $.ajax({
                 url: self.songs[pos].url, 
                 method: 'get',
                 dataType: 'txt',
                 complete: function(data,textStatus){  
                   if(textStatus==='error'){ 
-                    app.modal.set(null,'<div class="alert alert-danger"><p>Error loading songs: '+self.songs[pos].name+'</p></div>');
+                    app.modal.set(null,'<div class="alert alert-danger"><p>Error loading songs: '+self.songs[pos].title+'</p></div>');
                     app.modal.show(); 
                   }else{ 
-                    self.songs[pos].abc=data.responseText;   
-                    $('#abcMusicBtnSong').trigger('click');     
-                    app.loadE.off();   
-                  } 
+                    self.songs[pos].abc=data.responseText;  
+                    $('#inputText').val(self.songs[pos].abc);  
+                  }     
+                  app.loadE.off(); 
                 }
               }); 
             }else{              
@@ -743,6 +741,7 @@
                 $('#btnSwing').prop('checked', true);
               }  
               $('#abcMusicBtnMenu').trigger('click');
+              console.log(self.songs[i].abc);
               self.loadSong(i); 
             });
 
@@ -956,9 +955,14 @@
         app.setHash('abcMusic'); 
         setTimeout(function(){ 
           console.log('2');
-          $('.abcjs-midi-start').trigger('click'); 
-        },3000);
-      },500);
+          $('#abcMusicBtnMenu').trigger('click');  
+          $('#abcMusicSelectSong').val(1); 
+          setTimeout(function(){ 
+            console.log('3');
+            $('#abcMusicBtnSong').trigger('click');  
+          },1000); 
+        },1000);
+      },1000);
       /**/
     </script> 
   </body>
