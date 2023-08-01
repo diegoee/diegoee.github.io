@@ -361,7 +361,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v3.3');
+      $('#version').html('v3.4');
       var app={
         modal: {
           set: function(title,body){
@@ -586,7 +586,7 @@
             console.log('app loadListSongs start');
             var self = this;
             $.ajax({
-              url: 'songs/songs.json', 
+              url: 'abcSongs/songs.json', 
               method: 'get',
               dataType: 'json',
               complete: function(data,textStatus){  

@@ -4,72 +4,72 @@
     "swing": "off", 
     "pitch": "0", 
     "trans": "-2", 
-    "url": "songs/hes_a_pirate.abc"  
+    "url": "abcSongs/hes_a_pirate.abc"  
   },{ 
     "title": "If you're happy and you know it (clap your hands)", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "2", 
-    "url": "songs/if_you_are_happy.abc"  
+    "url": "abcSongs/if_you_are_happy.abc"  
   },{ 
     "title": "Autumn Leaves", 
     "swing": "on", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/autumn_leaves.abc"  
+    "url": "abcSongs/autumn_leaves.abc"  
   },{ 
     "title": "All of Me (Ejercicio)", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/all_of_me.abc"  
+    "url": "abcSongs/all_of_me.abc"  
   },{ 
     "title": "All of Me (no Chords)", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/all_of_me_2.abc"  
+    "url": "abcSongs/all_of_me_2.abc"  
   },{ 
     "title": "All of Me", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/all_of_me_3.abc"   
+    "url": "abcSongs/all_of_me_3.abc"   
   },{ 
     "title": "City of Star (My A')", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/city_of_star.abc"   
+    "url": "abcSongs/city_of_star.abc"   
   },{ 
     "title": "Scales", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/scales.abc"   
+    "url": "abcSongs/scales.abc"   
   },{ 
     "title": "Stand by Me", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/stand_by_Me.abc"   
+    "url": "abcSongs/stand_by_Me.abc"   
   },{ 
     "title": "Ain't no Sunshine (Arr. Diego E. v1)", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/aint_no_sunshine.abc"  
+    "url": "abcSongs/aint_no_sunshine.abc"  
   },{ 
     "title": "Ain't no sunshine (Arr. Diego E. v1 with 'my Solo')", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/aint_no_sunshine_2.abc"  
+    "url": "abcSongs/aint_no_sunshine_2.abc"  
   },{ 
     "title": "Ain't no sunshine (Arr. Diego E. v2)", 
     "swing": "off", 
     "pitch": "0", 
     "trans": "0", 
-    "url": "songs/aint_no_sunshine_3.abc"   
+    "url": "abcSongs/aint_no_sunshine_3.abc"   
   }]
 }
