@@ -1,5 +1,11 @@
 { 
   "songs":[{ 
+    "title": "Grand Prix", 
+    "swing": "off", 
+    "pitch": "0", 
+    "trans": "2", 
+    "url": "abcSongs/grand_prix.abc"  
+  },{ 
     "title": "He's a Pirate", 
     "swing": "off", 
     "pitch": "0", 

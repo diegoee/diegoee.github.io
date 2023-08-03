@@ -950,17 +950,10 @@
       //Testing
       setTimeout(function(){
         console.log('1');
-        app.setHash('abcMusic'); 
-        setTimeout(function(){ 
-          console.log('2'); 
-          $('#abcMusicBtnMenu').trigger('click');   
-          $('#abcMusicSelectSong').val(1);
-          $('#abcMusicBtnSong').trigger('click'); 
-          setTimeout(function(){ 
-            console.log('3'); 
-            $('#abcMusicBtnMenu').trigger('click');  
-            $('#abcMusicBtnPrint').trigger('click');  
-          },1000);
+        app.setHash('abcMusic');  
+        setTimeout(function(){
+          console.log('2');
+          $('.abcjs-midi-start').trigger('click');  
         },1000);
       },1000);
       /**/
