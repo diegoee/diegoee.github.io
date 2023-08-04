@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Web Art5: void</title>   
+    <style>  
+      html,body{ 
+        padding: 0;
+        margin: 0;   
+        background-color: #333;   
+        color: #EEE;   
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+        -moz-user-select: none;  
+        -ms-user-select: none;  
+        user-select: none; 
+        -webkit-tap-highlight-color: transparent; 
+        font-family: 'Courier New', Courier, monospace; 
+        overflow: hidden; 
+      }
+      .canvas{
+        position: absolute;
+        top: 0;
+        left: 0; 
+        margin: 0;
+        padding: 0;
+      } 
+    </style>   
+  </head>
+  <body>   
+    <script type="text/javascript">  
+      console.log('App');  
+      art = { 
+        init: function(idCanvas){  
+          //variables app
+          var canvas = document.getElementById(idCanvas);
+          var ctx = canvas.getContext('2d');
+          var signal = {
+            x: [0],
+            y: [canvas.height/2] 
+          };     
+          var i = 0;
+          var loopTime = 1000/60;
+          var dir = true;  
+
+          function ampReload(){
+            var amp = 25*Math.random();
+            console.log('amp: '+Math.round(amp*100)/100);
+            return amp;
+          }
+          var amp = ampReload();
+
+          function nextY(yAnt){  
+            return yAnt + amp*(Math.random()-0.5);
+            //var k = 3.85;
+            //return k*yAnt*(1-yAnt/canvas.height);
+          }
+
+          // ani loop
+          function animation(){ 
+            if(dir){
+              i++;
+              if(i>canvas.width){
+                dir = false; 
+                amp = ampReload();
+              }
+            }else{
+              i--;
+              if(i<0){
+                dir = true; 
+                amp = ampReload();
+              }
+            }     
+            signal.y.push(nextY(signal.y[signal.y.length-1]));  
+            signal.x.push(i); 
+          }
+
+          //plot element
+          function plot(){ 
+            var radius = 1;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  
+            for (var i=0; i<signal.x.length-1; i++){  
+              ctx.beginPath(); 
+              ctx.arc(signal.x[i], signal.y[i], radius, 0, 2*Math.PI, false);  
+              ctx.fillStyle  = '#EEE'; 
+              ctx.strokeStyle = ctx.fillStyle;
+              ctx.fill();
+              ctx.stroke();
+            }   
+          }   
+
+          //exe
+          function loop(){ 
+            animation();
+            plot();  
+            setTimeout(function(){
+              requestAnimationFrame(loop);
+            },loopTime);
+          } 
+          loop();    
+        } 
+      }
+
+      dom = {
+        removeE: function(id){ 
+          var e = document.querySelector('#'+id); 
+          if(e!==null){ 
+            e.parentNode.removeChild(e);
+          }
+        },
+        createCanvas: function(id){
+          var c = document.createElement(id);    
+          c.id = id;
+          c.setAttribute('width', window.innerWidth); 
+          c.setAttribute('height', window.innerHeight);
+          return c; 
+        },
+        prependToBody: function(e){ 
+          document.body.prepend(e); 
+        },
+        init: function(){   
+          this.removeE('canvas');
+          this.prependToBody(this.createCanvas('canvas'));  
+          art.init('canvas');
+        }
+      }    
+
+      dom.init();
+      window.addEventListener('resize', function (e) { 
+        dom.init(); 
+      }); 
+    </script>
+  </body>
+</html>
