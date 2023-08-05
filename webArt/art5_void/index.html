@@ -40,21 +40,18 @@
             x: [0],
             y: [canvas.height/2] 
           };     
-          var i = 0;
-          var loopTime = 1000/60;
-          var dir = true;  
-
-          function ampReload(){
-            var amp = 25*Math.random();
-            console.log('amp: '+Math.round(amp*100)/100);
-            return amp;
-          }
-          var amp = ampReload();
+          var i = 0; 
+          var dir = true;   
 
           function nextY(yAnt){  
-            return yAnt + amp*(Math.random()-0.5);
-            //var k = 3.85;
-            //return k*yAnt*(1-yAnt/canvas.height);
+            var nextY = yAnt + (canvas.height/20)*Math.random()*(Math.random()-0.5);
+            if(nextY>canvas.height){
+              nextY=canvas.height;
+            }
+            if(nextY<0){
+              nextY=0;
+            }
+            return nextY;
           }
 
           // ani loop
@@ -62,14 +59,12 @@
             if(dir){
               i++;
               if(i>canvas.width){
-                dir = false; 
-                amp = ampReload();
+                dir = false;  
               }
             }else{
               i--;
               if(i<0){
                 dir = true; 
-                amp = ampReload();
               }
             }     
             signal.y.push(nextY(signal.y[signal.y.length-1]));  
@@ -90,15 +85,13 @@
             }   
           }   
 
-          //exe
+          //exe 
           function loop(){ 
             animation();
             plot();  
-            setTimeout(function(){
-              requestAnimationFrame(loop);
-            },loopTime);
+            requestAnimationFrame(loop);
           } 
-          loop();    
+          requestAnimationFrame(loop);    
         } 
       }
 
@@ -114,6 +107,9 @@
           c.id = id;
           c.setAttribute('width', window.innerWidth); 
           c.setAttribute('height', window.innerHeight);
+          //c.setAttribute('width', 300); 
+          //c.setAttribute('height', 300);
+          //c.style.border = "2px solid #DDD";
           return c; 
         },
         prependToBody: function(e){ 
