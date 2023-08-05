@@ -82,14 +82,13 @@
       .currentNote{
         color: #2196F3;
       }
-      @media print{
+      @media print{ 
         @page { 
-          size: A4 portrait;
-        } 
-        #version,#menu,#main,#back-to-top,#scales,#musicKnow,#modal,
-        #abcMusicMenu,#abcMusicControl,#swing,#transpor,#text{  
-          display: none; 
-        } 
+        }
+        #version, #menu, #main, #musicKnow, #scales, #back-to-top, #modal,
+        #abcMusicMenu, #abcMusicControl, #swing, #transpor, #text{  
+          display: none;  
+        }     
       } 
       #abcMusicFile{
         display: none;
@@ -953,7 +952,8 @@
         app.setHash('abcMusic');  
         setTimeout(function(){
           console.log('2');
-          $('.abcjs-midi-start').trigger('click');  
+          $('#abcMusicBtnMenu').trigger('click');  
+          $('#abcMusicBtnPrint').trigger('click'); 
         },1000);
       },1000);
       /**/
