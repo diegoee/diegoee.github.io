@@ -18,20 +18,24 @@
         -webkit-tap-highlight-color: transparent; 
         font-family: 'Courier New', Courier, monospace; 
         overflow: hidden; 
-      }
-      .canvas{
-        position: absolute;
-        top: 0;
-        left: 0; 
-        margin: 0;
-        padding: 0;
       } 
+      .btn{
+        position: absolute;
+        top: calc(50% - 10px);
+        left: calc(50% - 40px);
+        margin: 0;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
     </style>   
   </head>
   <body>   
     <script type="text/javascript">  
       console.log('App');  
       art = { 
+        end: false,
         init: function(idCanvas){  
           //variables app
           var canvas = document.getElementById(idCanvas);
@@ -41,7 +45,8 @@
             y: [canvas.height/2] 
           };     
           var i = 0; 
-          var dir = true;   
+          var dir = true; 
+          this.end = false;  
 
           function nextY(yAnt){  
             var nextY = yAnt + (canvas.height/20)*Math.random()*(Math.random()-0.5);
@@ -86,10 +91,13 @@
           }   
 
           //exe 
+          var  that = this;
           function loop(){ 
             animation();
             plot();  
-            requestAnimationFrame(loop);
+            if(!that.end){
+              requestAnimationFrame(loop);
+            }
           } 
           requestAnimationFrame(loop);    
         } 
@@ -103,22 +111,36 @@
           }
         },
         createCanvas: function(id){
-          var c = document.createElement(id);    
-          c.id = id;
-          c.setAttribute('width', window.innerWidth); 
-          c.setAttribute('height', window.innerHeight);
-          //c.setAttribute('width', 300); 
-          //c.setAttribute('height', 300);
-          //c.style.border = "2px solid #DDD";
-          return c; 
+          var canvas = document.createElement('canvas');    
+          canvas.id = id;
+          canvas.setAttribute('width', window.innerWidth); 
+          canvas.setAttribute('height', window.innerHeight);
+          //canvas.setAttribute('width', 300); 
+          //canvas.setAttribute('height', 300);
+          //canvas.style.border = "2px solid #DDD";
+          return canvas; 
         },
         prependToBody: function(e){ 
           document.body.prepend(e); 
         },
+        createButtonStart: function(id){
+          var button = document.createElement('button');    
+          button.id = id;      
+          button.setAttribute('class', 'btn');  
+          button.innerHTML = 'Start';   
+          var that = this;
+          button.addEventListener('click', function (e) { 
+            that.removeE('btn');
+            that.prependToBody(that.createCanvas('canvas'));  
+            art.init('canvas'); 
+          }); 
+          return button; 
+        },
         init: function(){   
+          art.end=true;
+          this.removeE('btn');
           this.removeE('canvas');
-          this.prependToBody(this.createCanvas('canvas'));  
-          art.init('canvas');
+          this.prependToBody(this.createButtonStart('btn'));  
         }
       }    
 
