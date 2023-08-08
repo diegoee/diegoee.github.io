@@ -50,7 +50,7 @@
           this.end = false;  
 
           function nextY(yAnt){  
-            var nextY = yAnt + (canvas.height/20)*Math.random()*(Math.random()-0.5);
+            var nextY = yAnt + (canvas.height/40)*Math.random()*(Math.random()-0.5);
             if(nextY>canvas.height){
               nextY=canvas.height;
             }
@@ -75,6 +75,15 @@
             }     
             signal.y.push(nextY(signal.y[signal.y.length-1]));  
             signal.x.push(i); 
+          }
+          
+          //for (var ii=canvas.width; ii>0; ii--){       
+          //  signal.y.push(canvas.height/2);  
+          //  signal.x.push(ii); 
+          //}
+          
+          for (var ii=0; ii<2*canvas.width; ii++){       
+            animation();
           }
 
           //plot element
@@ -146,9 +155,10 @@
       }    
 
       dom.init();
+      document.getElementById('btn').click();
       window.addEventListener('resize', function (e) { 
         dom.init(); 
-      }); 
+      });   
     </script>
   </body>
 </html>
