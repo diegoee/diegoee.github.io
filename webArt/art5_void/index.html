@@ -30,6 +30,15 @@
         padding-top: 10px;
         padding-bottom: 10px;
       }
+      .msg{
+        position: absolute; 
+        top: 0;
+        right: 0; 
+        margin: 0;
+        padding: 0; 
+        border: 0;
+        
+      }
     </style>   
   </head>
   <body>   
@@ -146,19 +155,53 @@
           }); 
           return button; 
         },
-        init: function(){   
+        createMsg: function(text){
+          var msg = document.createElement('p');    
+          msg.id = 'msg';      
+          msg.setAttribute('class', 'msg');  
+          msg.innerHTML = text; 
+          return msg; 
+        }, 
+        holdTimer: null,
+        holdDelay: 1000,
+        holdActive: false,
+        clickDownWin: function(){
+          //console.log('click Down');  
+          dom.holdTimer = setTimeout(function() {
+            dom.holdTimer = null;
+            dom.holdActive = true;   
+            dom.removeE('msg');
+            dom.prependToBody(dom.createMsg('Reset...'));  
+	        }, dom.holdDelay); 
+        }, 
+        clickUpWin: function(){
+          //console.log('click Up');  
+          dom.removeE('msg');
+          if(dom.holdTimer){
+		        clearTimeout(dom.holdTimer);    
+	        }else if (dom.holdActive) {
+		        dom.holdActive = false; 
+            dom.init(); 
+	        } 
+        },
+        exe: function(){ 
           art.end=true;
-          this.removeE('btn');
-          this.removeE('canvas');
-          this.prependToBody(this.createButtonStart('btn'));  
+          dom.removeE('btn');
+          dom.removeE('canvas');
+          dom.prependToBody(dom.createButtonStart('btn')); 
+          window.removeEventListener('resize', this.exe); 
+          window.addEventListener('resize', this.exe);   
+          window.removeEventListener('mousedown', this.clickDownWin); 
+          window.addEventListener('mousedown', this.clickDownWin);   
+          window.removeEventListener('mouseup', this.clickUpWin); 
+          window.addEventListener('mouseup', this.clickUpWin);   
+        },
+        init: function(){ 
+          this.exe();  
+          document.getElementById('btn').click();  
         }
-      }    
-
-      dom.init();
-      document.getElementById('btn').click();
-      window.addEventListener('resize', function (e) { 
-        dom.init(); 
-      });   
+      }     
+      dom.init();   
     </script>
   </body>
 </html>
