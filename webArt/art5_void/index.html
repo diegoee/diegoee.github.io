@@ -85,13 +85,8 @@
             signal.y.push(nextY(signal.y[signal.y.length-1]));  
             signal.x.push(i); 
           }
-          
-          //for (var ii=canvas.width; ii>0; ii--){       
-          //  signal.y.push(canvas.height/2);  
-          //  signal.x.push(ii); 
-          //}
-          
-          for (var ii=0; ii<2*canvas.width; ii++){       
+
+          for (var ii=0; ii<canvas.width/2; ii++){       
             animation();
           }
 
@@ -110,7 +105,7 @@
           }   
 
           //exe 
-          var  that = this;
+          var that = this;
           function loop(){ 
             animation();
             plot();  
