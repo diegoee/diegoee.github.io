@@ -29,6 +29,13 @@
         border: 0;
         padding-top: 10px;
         padding-bottom: 10px;
+        cursor: pointer;
+      }
+      .btn:active{  
+        top: calc(50% - 18px);
+        left: calc(50% - 40px);  
+        border: 5px;
+        width: 80px;
       }
       .msg{
         position: absolute; 
@@ -190,6 +197,10 @@
           window.addEventListener('mousedown', this.clickDownWin);   
           window.removeEventListener('mouseup', this.clickUpWin); 
           window.addEventListener('mouseup', this.clickUpWin);   
+          window.removeEventListener('touchstart', this.clickDownWin); 
+          window.addEventListener('touchstart', this.clickDownWin);   
+          window.removeEventListener('touchend', this.clickUpWin); 
+          window.addEventListener('touchend', this.clickUpWin);  
         },
         init: function(){ 
           this.exe();  
