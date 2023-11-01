@@ -2,12 +2,14 @@ class AppGiroValues:
   def __init__(self):
     print('***')
     print('*** START: AppGiroValues ***')  
+    
     import numpy as np
     import pandas as pd 
     import yahoofinancials as yf
     import datetime as dt
     import matplotlib.pyplot as plt 
     import os 
+
     #Read, cleaning and formating MOVMENTS 
     data = pd.read_csv(os.path.dirname(__file__)+'/'+'giro_count.csv', sep=',') 
     data = data[data['ISIN']!='NLFLATEXACNT']
