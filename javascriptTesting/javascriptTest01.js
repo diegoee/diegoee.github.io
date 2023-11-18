@@ -44,6 +44,6 @@ function exe(){
   console.log(folderFiles);
   var folderFilesJSON = createJsonTree(folderFiles);
   console.log(folderFilesJSON);
-  console.log("**** START javascriptTest01 *****"); 
+  console.log("**** END  javascriptTest01 *****"); 
 }
 exe();
