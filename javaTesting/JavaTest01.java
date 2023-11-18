@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors; 
 
-public class JavaTest{
+public class JavaTest01{
   public List<String> folderFiles;
   public String       jsonTree; 
 
-  public JavaTest() { 
+  public JavaTest01() { 
     folderFiles  = new ArrayList<String>();
     //https://www.jstree.com/
     folderFiles.add("Principal/folder1/Report1");
@@ -48,7 +48,7 @@ public class JavaTest{
   public static void main(String[] args){
     System.out.println("**** START JavaTest *****"); 
 
-    JavaTest test = new JavaTest();    
+    JavaTest01 test = new JavaTest01();    
     System.out.println("folderFiles len: "+test.folderFiles.size());  
     test.createJsonTree();
     System.out.println("jsonTree: "+test.jsonTree); 
