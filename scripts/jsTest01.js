@@ -1,5 +1,4 @@
-
-function myfnAsync(){ 
+function fn(){ 
   return new Promise(function(resolve, reject){ 
     var ms = 250;
     var counter = 0;
@@ -23,7 +22,7 @@ function myfnAsync(){
 
 function exe(){ 
   console.log("**** START javascriptTest02 *****");
-  myfnAsync().then(function(){
+  fn().then(function(){
     console.log("**** END   javascriptTest02 *****");  
   })
 }
