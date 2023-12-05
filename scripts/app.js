@@ -1,25 +1,26 @@
 //funciones auxiliares
 function bytesToGB(bytes) {
-  const gigabytes = bytes / (1024 ** 3);
-  return gigabytes.toFixed(3); // Redondea a dos decimales
+  var gigabytes = bytes / (1024 ** 3);
+  return gigabytes.toFixed(3);  
 }
 //Acciones
 function printInfoPC(){
   var os = require('os'); 
+  console.log('Nombre PC: '+os.hostname());  
   // Información del sistema operativo
   console.log('Sistema operativo: '+os.platform());
   console.log('Arquitectura: '+os.arch());
   console.log('Versión del sistema operativo: '+os.version()); 
   // Información del hardware
-  console.log('Número de núcleos: '+os.cpus().length); 
+  console.log('Número de núcleos: '+os.cpus().length);
   console.log('Memoria total (Gb): '+bytesToGB(os.totalmem())); 
-  console.log('Memoria libre (Gb): '+bytesToGB(os.freemem()));
+  console.log('Memoria libre (Gb): '+bytesToGB(os.freemem()));  
 }
 
 //main
 function exe(){  
-  console.log("**** START *****");
+  console.log("\n*******************************************\n");
   printInfoPC();   
-  console.log("**** END   *****");  
+  console.log("\n*******************************************\n");  
 }
 exe();
