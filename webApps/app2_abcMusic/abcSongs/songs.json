@@ -1,5 +1,11 @@
 { 
   "songs":[{ 
+    "title": "Blues in Green", 
+    "swing": "on", 
+    "pitch": "-2", 
+    "trans": "0", 
+    "url": "abcSongs/blue_in_green.abc"  
+  },{ 
     "title": "Grand Prix", 
     "swing": "off", 
     "pitch": "0", 
