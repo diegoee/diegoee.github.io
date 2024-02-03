@@ -1,5 +1,11 @@
 { 
   "songs":[{ 
+    "title": "Summertime", 
+    "swing": "off", 
+    "pitch": "-2", 
+    "trans": "0", 
+    "url": "abcSongs/summertime.abc"  
+  },{ 
     "title": "So What", 
     "swing": "on", 
     "pitch": "-2", 
