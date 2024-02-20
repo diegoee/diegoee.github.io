@@ -1,0 +1,214 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giro Count</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      .table{
+        font-size: 0.85em; 
+      } 
+      .table>:not(caption)>*>*{
+        padding: 0.2em; 
+      }
+      .tableSmall{
+        font-size: 0.7em;
+      }
+    </style>
+  </head>
+  <body> 
+    <div class="container"> 
+      <div class="row">
+        <div class="col mt-5">
+          <table class="table table-striped table-hover mt-3" id="countStateTable"></table>
+        </div>
+        <div class="col text-center"> 
+          <div id="graph01"></div>
+        </div> 
+      </div>
+      <div class="row">
+        <div class="col"> 
+          <div id="graph02"></div>
+        </div> 
+      </div>
+      <div class="row">
+        <div class="col-1"></div> 
+        <div class="col-10">
+          <table class="table table-striped table-hover tableSmall" id="movementsTable"></table>
+        </div> 
+        <div class="col-1"></div> 
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script id="dataScript">
+    </script>      
+    </script>
+    <script> 
+      try{
+        keys = Object.keys(countState[0]);
+        ele = '<thead class="text-center"><tr>';        
+        keys.forEach(function(e){
+          ele = ele+'<th>'+e+'</th>';
+        });
+        ele = ele+'</tr></thead>';
+        $('#countStateTable').html(ele);
+        ele = '<tbody>';        
+        countState.forEach(function(e,i){ 
+          ele = ele+'<tr>';   
+          keys.forEach(function(k){
+            if(k==='value'||k==='extra'){
+              ele = ele+'<td class="text-end">'+e[k]+'</td>'; 
+            }else{
+              ele = ele+'<td>'+e[k]+'</td>'; 
+            }
+          }); 
+          ele = ele+'</tr>';
+        });
+        ele = ele+'</tbody>';
+        $('#countStateTable').append(ele);
+        var cond = parseFloat(countState[0].value.replace('€','').trim())-parseFloat(countState[3].value.replace('€','').trim());  
+        $($('#countStateTable tbody tr')[0]).addClass('fw-bold');
+        $($('#countStateTable tbody tr')[3]).addClass('fw-bold');
+        if(cond>0){
+          $($($('#countStateTable tbody tr')[0]).find('td')[2]).addClass('text-success');
+          $($($('#countStateTable tbody tr')[3]).find('td')[2]).addClass('text-success');
+        }else{
+          $($($('#countStateTable tbody tr')[0]).find('td')[2]).addClass('text-danger');
+          $($($('#countStateTable tbody tr')[3]).find('td')[2]).addClass('text-success');
+        }
+      }catch(e){
+        $('#countStateTable').html(e);
+      } 
+ 
+      try{
+        keys = Object.keys(movements[0]);
+        ele = '<thead class="text-center"><tr>';        
+        keys.forEach(function(e){
+          ele = ele+'<th>'+e+'</th>';
+        });
+        ele = ele+'</tr></thead>';
+        $('#movementsTable').html(ele);
+        ele = '<tbody>';        
+          movements.forEach(function(e){
+          ele = ele+'<tr>'; 
+          keys.forEach(function(k){
+            if(k==='CastflowEUR'){
+              ele = ele+'<td class="text-end">'+e[k]+'</td>'; 
+            }else{
+              ele = ele+'<td>'+e[k]+'</td>'; 
+            }
+          }); 
+          ele = ele+'</tr>';
+        });
+        ele = ele+'</tbody>';
+        $('#movementsTable').append(ele);  
+      }catch(e){
+        $('#movementsTable').html(e);
+      } 
+      
+      try{  
+        Highcharts.chart('graph01',{
+          chart: {
+            type: 'pie'
+          },
+          title: {
+            text: 'Giro Count'
+          },
+          credits: {
+            enabled: false
+          }, 
+          legend: {
+            align: 'center',
+            verticalAlign: 'bottom',
+            layout: 'vertical',
+            x: 0,
+            y: 0,
+            enabled: true,
+            itemWidth: 250,
+            labelFormatter: function() {
+              return '<b>'+this.name+'</b>: '+this.y+'€ ('+(Math.round(this.percentage*100)/100)+' %)';
+            }
+          },
+          plotOptions: {
+            pie: {
+              allowPointSelect: false,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                format: '{point.percentage:.1f} % <br>{point.y} €',
+                distance: -10,
+              },
+              showInLegend: true
+            }
+          }, 
+          tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b> <br>{point.y} €'
+          },
+          series: [{ 
+            name: 'Stocks',
+            animation: {
+              duration: 0
+            },
+            colorByPoint: true,
+            data: graph01
+          }]
+        });  
+      }catch(e){
+        $('#graph01').html(e);
+      }
+
+      try{  
+        Highcharts.chart('graph02',{
+          chart: {
+            type: 'pie'
+          },
+          title: {
+            text: 'Giro Count'
+          },
+          credits: {
+            enabled: false
+          }, 
+          legend: {
+            align: 'center',
+            verticalAlign: 'bottom',
+            layout: 'vertical',
+            x: 0,
+            y: 0,
+            enabled: true,
+            itemWidth: 250,
+            labelFormatter: function() {
+              return '<b>'+this.name+'</b>: '+this.y+'€ ('+(Math.round(this.percentage*100)/100)+' %)';
+            }
+          },
+          plotOptions: {
+            pie: {
+              allowPointSelect: false,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                format: '{point.percentage:.1f} % <br>{point.y} €',
+                distance: -10,
+              },
+              showInLegend: true
+            }
+          }, 
+          tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b> <br>{point.y} €'
+          },
+          series: [{ 
+            name: 'Stocks',
+            animation: {
+              duration: 0
+            },
+            colorByPoint: true,
+            data: graph02
+          }]
+        });  
+      }catch(e){
+        $('#graph02').html(e);
+      }
+    </script>
+  </body>
+</html>

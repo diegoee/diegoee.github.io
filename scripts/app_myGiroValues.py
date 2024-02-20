@@ -2,7 +2,8 @@ class AppGiroValues:
   def __init__(self):
     print('***')
     print('*** START: AppGiroValues ***')  
-    
+    import warnings 
+    warnings.filterwarnings("ignore", category=FutureWarning)
     import numpy as np
     import pandas as pd 
     import yahoofinancials as yf
@@ -171,7 +172,7 @@ class AppGiroValues:
     ax1.annotate('Media: ' +str(plotData1['Mean'].iloc[-1])+' €'       , (plotData1.index.size-2,plotData1['Mean'].iloc[-1]), textcoords="offset points", xytext=(0,10)   , ha='center')      
     aux = str(plotData1['CastflowEUR'].iloc[-1])+' € ('+str(round(((plotData1['CastflowEUR'].iloc[-1])/round(abs(data[data['ID_Producto']=='INPUT']['Total'].sum()), 2))*100,2))+'%)'    
     ax1.annotate('B/P: '   +str(aux)                                   , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(170,-25), ha='center', fontname="Times New Roman", size=20, fontweight='bold',  color=colortext) 
-    aux = (pd.to_datetime(plotData1.index[plotData1.index.size-1], format="%Y/%m/%d")-pd.to_datetime(plotData1.index[0], format="%Y/%m/%d")).days
+    aux = (pd.to_datetime(plotData1.index[plotData1.index.size-1], format="%Y-%m-%d")-pd.to_datetime(plotData1.index[0], format="%Y-%m-%d")).days
     ax1.annotate('Timing: '+str(aux)+' days'                           , (0                     ,plotData1['Max'].iloc[-1]) , textcoords="offset points", xytext=(120,-45), ha='center') 
     
     ax1.spines['left'  ].set_color('white')
@@ -406,7 +407,7 @@ class AppGiroValues:
       )  
     
     fig.tight_layout(pad=0.5) 
-    fig.savefig(os.path.dirname(__file__)+'/'+'CarteraGiro.png', bbox_inches='tight', dpi=300)
+    fig.savefig(os.path.dirname(__file__)+'/'+'CarteraGiroPy.png', bbox_inches='tight', dpi=300)
     plt.show(block=False) 
     #plt.pause(180)
     plt.close('all')
