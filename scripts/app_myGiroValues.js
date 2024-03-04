@@ -2,6 +2,8 @@
 function print(msg,opt) {
   if(opt==='error'){
     console.error(msg); 
+  }else if(opt==='table'){ 
+    console.table(msg);  
   }else{ 
     console.log(msg); 
   }
@@ -44,21 +46,6 @@ function readJson(file){
     }); 
   });
 } 
-
-function createJson(data,fileName){
-	var fs = require('fs');  
-  return new Promise(function(resolve){ 
-    fs.writeFile(fileName, JSON.stringify(data), function(err){
-      if (err) {
-        print(err.message,'error');
-        resolve();
-      } else {
-        //print('Archivo JSON creado: '+fileName);
-        resolve();
-      }
-    }); 
-  }); 
-}
 
 function deleteFile(fileName){ 
   var fs = require('fs'); 
@@ -141,32 +128,31 @@ function filterBy(data,head,eHead,filter,eFilter){
   return data;
 } 
 
-async function generateImageFromHTML(htmlContent,filesJsonData){
-  var puppeteer = require('puppeteer'); 
+async function createHtml(jsonData){
   var cheerio = require('cheerio'); 
-  
-  var $ = cheerio.load(htmlContent);
-  $('#dataScript').html(' ');
-  var code = '';
-  var data = undefined;
-  for(var i=0; i<filesJsonData.length; i++){
-    data = await readJson(filesJsonData[i]);
-    data = JSON.stringify(data); 
-    code = code+' var '+filesJsonData[i].replaceAll('app_myGiroValues_','').replaceAll('.json','')+'='+data+';'
-  } 
-  $('#dataScript').html(code); 
-  htmlContent = $.html();
-  //print(htmlContent);
+  var htmlContent = await readHtml('app_myGiroValues_template.html'); 
+  var fileRes ='app_myGiroValues_result.html'; 
 
-  var browser = await puppeteer.launch();
-  var page = await browser.newPage(); 
-  await page.setContent(htmlContent); 
-  var file = 'CarteraGiroJS.pdf';  
-  await page.pdf({
-    path: file,
-    format: 'A3',
+  await deleteFile(fileRes); 
+
+  var $ = cheerio.load(htmlContent);
+  $('#dataScript').html(' ');  
+  var code =' var data = '+JSON.stringify(jsonData)+';' 
+  $('#dataScript').html(code); 
+  htmlContent = $.html(); 
+
+  var fs = require('fs');  
+  return new Promise(function(resolve){ 
+    fs.writeFile(fileRes, htmlContent, function(err){
+      if (err) {
+        print(err.message,'error');
+        resolve();
+      } else { 
+        resolve();
+      }
+    }); 
   });
-  await browser.close();
+
 }
 
 //----- main -----
@@ -174,13 +160,13 @@ async function main(){
   console.time('Exe script'); 
 	print('*** START: AppGiroValues ***');  
   var moment = require('moment'); 
- 
-  //print('Data Load');
+   
+  print('Data Load');
 	var data = await getGiroCsvData('giro_count.csv');   
   var head = data[0]; 
   data.shift(); 	
-
-  //print('Filter data');
+  
+  print('Filter data');
   data = filterBy(data,head,'Fecha','!=',''); 
   data = filterBy(data,head,'ISIN','!=','NLFLATEXACNT'); 
   data = filterBy(data,head,'Descripción','not contain','Cuenta'); 
@@ -237,7 +223,7 @@ async function main(){
     e[0] = moment(moment(e[0],'YYYY-MM-DD').toDate()).format('DD/MM/YYYY'); 
   });  
 
-  //print('MOVEMENTS');   
+  print('MOVEMENTS');   
   var movements = data.map(function(fila) {
     var objetoFila = {};
     head.forEach(function(columna, indice) {
@@ -245,29 +231,64 @@ async function main(){
     });
     return objetoFila;
   });   
-  delete data,head;   
+  delete data,head;  
+  
+  print(movements,'table');
 
-  //print('STOCKS VALUES');  
+  print('STOCKS VALUES');  
   var stocks = await readJson('stocks.json');  
-  for (let i = 0; i < stocks.length; i++) {    
+  for (var i = 0; i < stocks.length; i++) {    
     if(stocks[i].dEnd==='2099-12-31'){
       stocks[i].dEnd = moment().format('YYYY-MM-DD');
     } 
     aux = await getStockValueYahoo(stocks[i].ticker, stocks[i].N, stocks[i].dStart, stocks[i].dEnd, stocks[i].desc);
+    
+    for (var ii=0; ii<aux.dates.length; ii++){ 
+      aux.dates[ii]=moment(aux.dates[ii],'YYYY-MM-DD').format('DD/MM/YYYY');
+    }
     stocks[i].dates=aux.dates;
-    stocks[i].prices=aux.prices; 
-    delete stocks[i].dStart; 
-    delete stocks[i].dEnd; 
-  }
+    stocks[i].prices=aux.prices;  
+    stocks[i].dStart = moment(stocks[i].dStart,'YYYY-MM-DD').format('DD/MM/YYYY');
+    stocks[i].dEnd   = moment(stocks[i].dEnd  ,'YYYY-MM-DD').format('DD/MM/YYYY');
+  } 
   
+  stocks.forEach(function(s){
+    var currentDate = moment(s.dStart,'DD/MM/YYYY');
+    var endDate     = moment(s.dEnd  ,'DD/MM/YYYY');
+    var dates =[];
+    var prices=[];
+    while (currentDate.isSameOrBefore(endDate)) {
+      dates.push(currentDate.format('DD/MM/YYYY')); 
+      currentDate.add(1, 'day'); 
+    }   
+     
+    prices.push(s.prices[0]); 
+    for (var i = 1; i<dates.length; i++) { 
+      var notFound=true; 
+      for (var ii = 0; ii<s.dates.length; ii++) { 
+        if(s.dates[ii]===dates[i]){
+          notFound=false;
+          prices.push(s.prices[ii]);
+          break;
+        } 
+      } 
+      if(notFound){ 
+        prices.push(prices[prices.length-1]); 
+      }
+    }
+  
+    s.dates =dates;
+    s.prices=prices;
+  });
+
   var stocksValues = [];
-  stocks.forEach(function(e){   
+  stocks.forEach(function(s){   
     stocksValues.push({
-      id:     e.desc+'-'+e.dates[e.dates.length-1]+'-'+Math.round(e.prices[e.prices.length-1]*100)/100,
-      desc:   e.desc, 
-      fecha:  e.dates[e.dates.length-1], 
-      price:  Math.round(e.prices[e.prices.length-1]*100)/100, 
-      n:      e.N,
+      id:     s.desc+'-'+s.dates[s.dates.length-1]+'-'+Math.round(s.prices[s.prices.length-1]*100)/100,
+      desc:   s.desc, 
+      fecha:  s.dates[s.dates.length-1], 
+      price:  Math.round(s.prices[s.prices.length-1]*100)/100, 
+      n:      s.N,
       total:  0
     }); 
   });
@@ -291,10 +312,25 @@ async function main(){
   delete aux;
   stocksValues.sort(function(a,b){
     return a.desc.localeCompare(b.desc);
-  });  
-    
-  //print('COUNT STATE');  
-  var countState=[];  
+  });    
+  print(stocksValues,'table');
+  
+  print('data 2 plot'); 
+  var dataJSON = {}; 
+  dataJSON.stocksValues=stocksValues;
+  dataJSON.movements   =movements; 
+  dataJSON.stocks      =stocks;
+  
+  print('COUNT STATE');  
+  var countState = [];   
+  var graph01Data = []; 
+  var graph02Data = {
+    bpNumber: null,
+    bp:       null,
+    timming:  null,
+    categories:  null,
+    series:   [] 
+  };   
 
   var a1 = [];
   var a2 = [];
@@ -327,6 +363,9 @@ async function main(){
     value: (Math.round((a1+a2)*100)/100)+' €',
     extra: 'B/P: '+(Math.round((a3)*100)/100)+' €' 
   });
+  
+  graph02Data.bpNumber = (Math.round((a3)*100)/100);
+  graph02Data.bp = 'B/P: '+(Math.round((a3)*100)/100)+' €';
  
   countState.push({
     info: 'Stocks',
@@ -354,6 +393,8 @@ async function main(){
     value: (Math.round(a3*100)/100)+' €',
     extra: 'B/P: '+(Math.round(((a1+a2-a3)/(a1+a2))*10000)/100)+'%' 
   });
+  
+  graph02Data.bp = graph02Data.bp+' ('+(Math.round(((a1+a2-a3)/(a1+a2))*10000)/100)+'%)'; 
 
   a3=[];
   movements.forEach(function(e){
@@ -369,6 +410,17 @@ async function main(){
     value: a3+' €',
     extra: '' 
   }); 
+
+  graph01Data.push({
+    name: 'CASH',
+    y: a3 
+  }); 
+  stocksValues.forEach(function(e){
+    graph01Data.push({
+      name: e.desc,
+      y: Math.round(e.n*e.price*100)/100 
+    }); 
+  });  
 
   a3=[];
   movements.forEach(function(e){
@@ -386,8 +438,8 @@ async function main(){
   });
  
   a3 = [];
-  stocks.forEach(function(e){  
-    a3.push(moment(e.dates[0]));  
+  stocks.forEach(function(e){ 
+    a3.push(moment(e.dates[0],'DD/MM/YYYY'));  
   });  
   a3 = moment().diff(moment.min(a3), 'days');
   countState.push({
@@ -395,87 +447,108 @@ async function main(){
     value: a3+' day(s)',
     extra: '' 
   });
+  graph02Data.timming = a3+' day(s)';
 
   countState.push({
     info: 'Distinct Stocks',
     value: ''+stocksValues.length,
     extra: '' 
   });
-  delete a1,a2,a3;  
+  delete a1,a2,a3;   
   
-  //print('Generate data graph 01'); 
-  var graph01Data = [];
-  aux=[];
-  movements.forEach(function(e){
-    if(e.ID_Producto.trim()==='TAX DIV'||e.ID_Producto.trim()==='DIV'){
-      aux.push(parseFloat(e.CastflowEUR.replaceAll('€','').trim())); 
-    }
-  }); 
-  aux = Math.round(aux.reduce(function(a,b){ 
-    return a+b; 
-  },0)*100)/100;  
-  graph01Data.push({
-    name: 'CASH',
-    y: aux 
-  }); 
-  stocksValues.forEach(function(e){
-    graph01Data.push({
-      name: e.desc,
-      y: Math.round(e.n*e.price*100)/100 
+  print(countState,'table');
+  dataJSON.countState=countState;  
+  print('graph01Data done');
+  dataJSON.graph01Data=graph01Data;
+   
+  var iniDate = moment(movements[0].Fecha,'DD/MM/YYYY'); 
+  var endDate = moment(movements[0].Fecha,'DD/MM/YYYY'); 
+  movements.forEach(function(e){ 
+    iniDate = moment.min(iniDate,moment(e.Fecha,'DD/MM/YYYY'));
+    endDate = moment.max(endDate,moment(e.Fecha,'DD/MM/YYYY'));
+  });
+  var dates=[];
+  var currentDate = iniDate.clone();
+  while (currentDate.isSameOrBefore(endDate)) {
+    dates.push(currentDate.format('DD/MM/YYYY')); 
+    currentDate.add(1, 'day'); 
+  }
+  graph02Data.categories=dates;
+  var aux = [];
+  var val  = 0;
+  var max  = 0;
+  var mean = 0;
+  var min  = 0;
+   
+  dates.forEach(function(d,di){  
+    val=0;
+    stocks.forEach(function(s,si){  
+      for(var i=0; i<s.dates.length; i++){
+        if(s.dates[i]===d){
+          val = val+s.N*s.prices[i];
+          break; 
+        }
+      } 
+    });
+    
+    var ref = 0;
+    movements.forEach(function(m,mi){  
+      if(moment(m.Fecha,'DD/MM/YYYY').isSameOrBefore(moment(d,'DD/MM/YYYY'))){
+        val = val+parseFloat(m.CastflowEUR.replaceAll('€','')); 
+        if(m.ID_Producto.trim()==='INPUT'){
+          ref = ref+parseFloat(m.CastflowEUR.replaceAll('€','')); 
+        }
+      } 
     }); 
-  }); 
-
-  //print('Generate data graph 02'); 
-  var graph02Data = []; 
-  /*
-  plotData = pd.DataFrame({'Fecha': [ ], 'CastflowEUR': []}) 
-    for date in pd.date_range(start='2022-11-20', end=dt.datetime.today().strftime('%Y-%m-%d')):  
-      value = data[(data['Fecha'] <= date) & (data['ID_Producto']!='INPUT')]['Total'].sum()   
-      value = value + stocks[stocks['Fecha'] == date]['Total'].sum() 
-      value = round(value, 2)    
-      plotData = pd.concat([plotData, pd.DataFrame({'Fecha': [date.strftime('%Y-%m-%d')], 'CastflowEUR': [value]})])  
-
-    plotData['Max']  = round(plotData['CastflowEUR'].max() , 2)
-    plotData['Min']  = round(plotData['CastflowEUR'].min() , 2)
-    plotData['Mean'] = round(plotData['CastflowEUR'].mean(), 2) 
-    plotData = plotData.set_index('Fecha') 
-    plotData1 = plotData 
-  */
-  //print('Create files to Template');  
-  await createJson(movements,'app_myGiroValues_movements.json');
-  await createJson(countState,'app_myGiroValues_countState.json'); 
-  await createJson(graph01Data,'app_myGiroValues_graph01.json');  
-  await createJson(graph02Data,'app_myGiroValues_graph02.json'); 
-  var htmlContent = await readHtml('app_myGiroValues_template.html'); 
-  var filesJsonData=[ 
-    'app_myGiroValues_movements.json',
-    'app_myGiroValues_countState.json',
-    'app_myGiroValues_graph01.json',
-    'app_myGiroValues_graph02.json'
-  ];
-  /*
-  print(graph02Data);
-  /*
-  var cheerio = require('cheerio');  
-  var $ = cheerio.load(htmlContent);
-  $('#dataScript').html(' ');
-  var code = '';
-  var data = undefined;
-  for(var i=0; i<filesJsonData.length; i++){
-    data = await readJson(filesJsonData[i]);
-    data = JSON.stringify(data); 
-    code = code+' var '+filesJsonData[i].replaceAll('app_myGiroValues_','').replaceAll('.json','')+'='+data+';'
-  } 
-  $('#dataScript').html(code); 
-  htmlContent = $.html();
-  print(htmlContent);
-  /**/
-
-  await generateImageFromHTML(htmlContent,filesJsonData);
-  for(var i=0; i<filesJsonData.length; i++){
-    await deleteFile(filesJsonData[i]); 
-  }  
+    val = val - ref;
+    max = Math.max(max,val);
+    min = Math.min(min,val);
+    aux.push(Math.round(val*100)/100);
+  });
+  graph02Data.series.push({ 
+    name: 'CashflowEUR',
+    data: aux 
+  });
   
+  aux = [];
+  dates.forEach(function(){  
+    aux.push(Math.round(max*100)/100);
+  });
+  graph02Data.series.push({ 
+    name: 'Max',
+    data: aux 
+  });
+  
+  graph02Data.series[0].data.forEach(function(e){  
+    mean=mean+e;
+  });
+  mean=mean/graph02Data.series[0].data.length;
+
+  aux = [];
+  dates.forEach(function(){  
+    aux.push(Math.round(mean*100)/100);
+  });
+  graph02Data.series.push({ 
+    name: 'Mean',
+    data: aux 
+  });
+
+  aux = [];
+  dates.forEach(function(){  
+    aux.push(Math.round(min*100)/100);
+  });
+  graph02Data.series.push({ 
+    name: 'Min',
+    data: aux 
+  }); 
+    
+  print('graph02Data done');
+  dataJSON.graph02Data=graph02Data;
+  
+  /**/
+  print('Create HTML from Data and Template'); 
+  await createHtml(dataJSON);  
+
 	print('*** END: AppGiroValues  ***');   
   console.timeEnd('Exe script');
 }

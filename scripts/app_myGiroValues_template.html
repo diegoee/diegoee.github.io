@@ -37,15 +37,24 @@
           <table class="table table-striped table-hover tableSmall" id="movementsTable"></table>
         </div> 
         <div class="col-1"></div> 
+      </div> 
+      <div class="row"> 
+        <div id="graph03"></div> 
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js" ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
     <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script id="dataScript">
-    </script>      
+    <script id="dataScript">      
     </script>
-    <script> 
+    <script>   
+      console.log(data);
+      var countState=data.countState;
+      var movements =data.movements;
+      var graph01   =data.graph01Data;
+      var graph02   =data.graph02Data;
+      var graph03   =data.graph03Data;
+    
       try{
         keys = Object.keys(countState[0]);
         ele = '<thead class="text-center"><tr>';        
@@ -76,12 +85,12 @@
           $($($('#countStateTable tbody tr')[3]).find('td')[2]).addClass('text-success');
         }else{
           $($($('#countStateTable tbody tr')[0]).find('td')[2]).addClass('text-danger');
-          $($($('#countStateTable tbody tr')[3]).find('td')[2]).addClass('text-success');
+          $($($('#countStateTable tbody tr')[3]).find('td')[2]).addClass('text-danger');
         }
       }catch(e){
         $('#countStateTable').html(e);
       } 
- 
+
       try{
         keys = Object.keys(movements[0]);
         ele = '<thead class="text-center"><tr>';        
@@ -148,9 +157,9 @@
           },
           series: [{ 
             name: 'Stocks',
-            animation: {
-              duration: 0
-            },
+            //animation: {
+            //  duration: 0
+            //},
             colorByPoint: true,
             data: graph01
           }]
@@ -160,55 +169,59 @@
       }
 
       try{  
-        Highcharts.chart('graph02',{
+        var ele = (graph02.bpNumber>0?
+          '<span class="text-success fw-bold">'+graph02.bp+'</span> - timing: '+graph02.timming:
+          '<span class="text-danger fw-bold">'+graph02.bp+' </span> - timing: '+graph02.timming
+        );
+        ele = '<div class="text-end fs-5">'+ele+'</div>';
+        $('#graph02').before(ele);
+        graph02.series.forEach(function(e){
+          e.lineWidth = 1.25;
+          e.marker = {radius: 0};
+          //e.animation = {
+          //  duration: 0
+          //}
+        });
+        graph02.series[0].lineWidth = 3,
+        graph02.series[0].marker = {radius: 4}
+        graph02.series[0].color='#3333FF';
+        graph02.series[1].color='#009900';
+        graph02.series[2].color='#000000';
+        graph02.series[3].color='#FF0000';
+
+        Highcharts.chart('graph02',{ 
           chart: {
-            type: 'pie'
+            height: 500,
+            type: 'spline',
+            zoomType: 'xy',
           },
           title: {
-            text: 'Giro Count'
-          },
+            text: 'Evolución valores B/P' 
+          }, 
           credits: {
             enabled: false
           }, 
-          legend: {
-            align: 'center',
-            verticalAlign: 'bottom',
-            layout: 'vertical',
-            x: 0,
-            y: 0,
-            enabled: true,
-            itemWidth: 250,
-            labelFormatter: function() {
-              return '<b>'+this.name+'</b>: '+this.y+'€ ('+(Math.round(this.percentage*100)/100)+' %)';
-            }
-          },
-          plotOptions: {
-            pie: {
-              allowPointSelect: false,
-              cursor: 'pointer',
-              dataLabels: {
-                enabled: true,
-                format: '{point.percentage:.1f} % <br>{point.y} €',
-                distance: -10,
-              },
-              showInLegend: true
-            }
-          }, 
-          tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b> <br>{point.y} €'
-          },
-          series: [{ 
-            name: 'Stocks',
-            animation: {
-              duration: 0
+          yAxis: {
+            title: {
+              text: 'EUR'
             },
-            colorByPoint: true,
-            data: graph02
-          }]
-        });  
+            max: graph02.series[1].data[0], 
+            min: graph02.series[3].data[0]
+          }, 
+          xAxis: {
+            categories: graph02.categories
+          }, 
+          series: graph02.series
+        });    
       }catch(e){
         $('#graph02').html(e);
       }
+
+      try{   
+        $('#graph03').html('On progress');
+      }catch(e){
+        $('#graph03').html(e);
+      } 
     </script>
   </body>
 </html>
