@@ -14,13 +14,25 @@
       .tableSmall{
         font-size: 0.7em;
       }
+      .collpaseBtn::before{
+        content: " - ";
+      } 
+      .collpaseBtn.on::before{
+        content: " + ";
+      }
+      .collpaseBtn::after{
+        content: " - ";
+      } 
+      .collpaseBtn.on::after{
+        content: " + ";
+      }
     </style>
   </head>
   <body> 
     <div class="container"> 
       <div class="row">
         <div class="col mt-2 text-center">
-          <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#section01">
+          <button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target="#section01">
             Giro Count
           </button>
         </div> 
@@ -35,7 +47,7 @@
       </div>
       <div class="row">
         <div class="col mt-2 text-center">
-          <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#section02">
+          <button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target="#section02">
             Evolución valores B/P
           </button>
         </div> 
@@ -47,7 +59,7 @@
       </div>
       <div class="row">
         <div class="col mt-2 text-center">
-          <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#section03">
+          <button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target="#section03">
             Movimentos de cuenta
         </button>
         </div> 
@@ -61,7 +73,7 @@
       </div> 
       <div class="row">
         <div class="col mt-2 text-center">
-          <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#section04">
+          <button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target="#section04">
             Evolución de los valores adquiridos
         </button>
         </div> 
@@ -83,6 +95,10 @@
       var graph02   =data.graph02Data;
       var graph03   =data.graph03Data;
     
+      $('.collpaseBtn').on('click',function(){
+        $(this).toggleClass('on');
+      });
+
       try{
         keys = Object.keys(countState[0]);
         ele = '<thead class="text-center"><tr>';        
