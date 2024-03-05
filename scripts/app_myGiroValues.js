@@ -153,6 +153,14 @@ async function createHtml(jsonData){
     }); 
   });
 
+} 
+
+function distinctArrayObject(array, propertyName) {
+  return array.filter(function(obj, index, self){
+    return index === self.findIndex(function(t){
+        return t[propertyName] === obj[propertyName]
+      }); 
+  }); 
 }
 
 //----- main -----
@@ -292,11 +300,8 @@ async function main(){
       total:  0
     }); 
   });
-  aux = stocksValues.filter(function(valor, indice, self) {
-    return self.findIndex(function(objeto){
-      return objeto.id === valor.id;
-    }) === indice;
-  });
+  aux = distinctArrayObject(stocksValues,'id');
+  
   aux.forEach(function(e){
     var n = 0;
     for(var i=0; i<stocksValues.length; i++){
@@ -317,9 +322,9 @@ async function main(){
   
   print('data 2 plot'); 
   var dataJSON = {}; 
-  dataJSON.stocksValues=stocksValues;
+  //dataJSON.stocksValues=stocksValues;
   dataJSON.movements   =movements; 
-  dataJSON.stocks      =stocks;
+  //dataJSON.stocks      =stocks;
   
   print('COUNT STATE');  
   var countState = [];   
@@ -541,11 +546,48 @@ async function main(){
     name: 'Min',
     data: aux 
   }); 
+  delete aux;
     
   print('graph02Data done');
   dataJSON.graph02Data=graph02Data;
   
-  /**/
+  var graph03Data=[]; 
+  var aux = [];
+  stocks.forEach(function(e){
+    aux.push({
+      ticker: e.ticker
+    })
+  });
+  aux = distinctArrayObject(aux,'ticker'); 
+  aux.forEach(function(a){
+    stocks.forEach(function(s){
+      if(a.ticker===s.ticker){
+        a.desc=s.desc;
+      }
+    });
+    a.n     =0;
+    a.date  =[];
+    a.prices=[];
+  }); 
+  aux.forEach(function(a){
+    for(var i=0; i<stocks.length; i++){ 
+      if(a.ticker===stocks[i].ticker){
+        a.date  =stocks[i].dates; 
+        a.prices=stocks[i].prices; 
+        a.n=a.n+stocks[i].N;
+      }
+    } 
+  });
+  aux.forEach(function(a){
+    for(var i=0; i<a.prices.length; i++){ 
+      a.prices[i]=Math.round(a.prices[i]*100)/100; 
+    } 
+  });
+  graph03Data=aux;  
+  
+  print('graph03Data done');
+  dataJSON.graph03Data=graph03Data;
+  
   print('Create HTML from Data and Template'); 
   await createHtml(dataJSON);  
 
