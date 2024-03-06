@@ -295,10 +295,10 @@ async function main(){
   var stocksValues = [];
   stocks.forEach(function(s){   
     stocksValues.push({
-      id:     s.desc+'-'+s.dates[s.dates.length-1]+'-'+Math.round(s.prices[s.prices.length-1]*100)/100,
+      id:     s.desc+'-'+s.dates[s.dates.length-1]+'-'+s.prices[s.prices.length-1],
       desc:   s.desc, 
       fecha:  s.dates[s.dates.length-1], 
-      price:  Math.round(s.prices[s.prices.length-1]*100)/100, 
+      price:  s.prices[s.prices.length-1], 
       n:      s.N,
       total:  0
     }); 
@@ -313,7 +313,8 @@ async function main(){
       }
     }
     e.n=n;
-    e.total=n*Math.round(e.price*100)/100+' €'; 
+    e.total=Math.round(n*e.price*100)/100+' €'; 
+    e.price=Math.round(e.price*100)/100
     delete e.id;
   });
   stocksValues=aux;
@@ -325,9 +326,7 @@ async function main(){
   
   print('data 2 plot'); 
   var dataJSON = {}; 
-  //dataJSON.stocksValues=stocksValues;
   dataJSON.movements   =movements; 
-  //dataJSON.stocks      =stocks;
   
   print('COUNT STATE');  
   var countState = [];   
@@ -351,7 +350,7 @@ async function main(){
   },0); 
   
   stocksValues.forEach(function(e){ 
-      a2.push(parseFloat(e.total.replaceAll('€','').trim())); 
+    a2.push(parseFloat(e.total.replaceAll('€','').trim())); 
   });
   a2 = a2.reduce(function(a,b){ 
     return a+b; 
@@ -386,7 +385,11 @@ async function main(){
     value: (Math.round(a1*100)/100)+' €',
     extra: (Math.round((a1/(a1+a2))*10000)/100)+'% Cartera' 
   }); 
- 
+  graph01Data.push({
+    name: 'CASH',
+    y: (Math.round(a1*100)/100) 
+  }); 
+
   a3=[];
   movements.forEach(function(e){
     if(e.ID_Producto.trim()==='INPUT'){
@@ -417,12 +420,8 @@ async function main(){
     info: 'Cash Div',
     value: a3+' €',
     extra: '' 
-  }); 
-
-  graph01Data.push({
-    name: 'CASH',
-    y: a3 
-  }); 
+  });  
+  
   stocksValues.forEach(function(e){
     graph01Data.push({
       name: e.desc,
@@ -445,17 +444,16 @@ async function main(){
     extra: '' 
   });
  
-  a3 = [];
+  a3 = []; 
   stocks.forEach(function(e){ 
     a3.push(moment(e.dates[0],'DD/MM/YYYY'));  
-  });  
-  a3 = moment().diff(moment.min(a3), 'days');
+  });   
   countState.push({
     info: 'Timing',
-    value: a3+' day(s)',
-    extra: '' 
+    value: moment().diff(moment.min(a3), 'days')+' day(s)',
+    extra: 'Ini: '+moment.min(a3).format('DD/MM/YYYY') 
   });
-  graph02Data.timming = a3+' day(s)';
+  graph02Data.timming = moment().diff(moment.min(a3), 'days')+' day(s)';
 
   countState.push({
     info: 'Distinct Stocks',
@@ -470,10 +468,9 @@ async function main(){
   dataJSON.graph01Data=graph01Data;
    
   var iniDate = moment(movements[0].Fecha,'DD/MM/YYYY'); 
-  var endDate = moment(movements[0].Fecha,'DD/MM/YYYY'); 
+  var endDate = moment(); 
   movements.forEach(function(e){ 
     iniDate = moment.min(iniDate,moment(e.Fecha,'DD/MM/YYYY'));
-    endDate = moment.max(endDate,moment(e.Fecha,'DD/MM/YYYY'));
   });
   var dates=[];
   var currentDate = iniDate.clone();
@@ -633,9 +630,9 @@ async function main(){
     var aux = a.n*(a.series[0].data[a.series[0].data.length-1]-a.series[0].data[0]);
     a.situ=a.situ+' B/P: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
     aux = a.n*(a.series[1].data[a.series[1].data.length-1]-a.series[0].data[0]);
-    a.situ=a.situ+': B/P max: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    a.situ=a.situ+'<br> B/P max: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
     aux = a.n*(a.series[3].data[a.series[3].data.length-1]-a.series[0].data[0]);
-    a.situ=a.situ+', B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    a.situ=a.situ+'<br> B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
   });   
   
   print('graph03Data done');
