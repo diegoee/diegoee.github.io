@@ -38,17 +38,17 @@
         </div> 
       </div>
       <div class="row collapse show" id="section01">
-        <div class="col mt-5">
+        <div class="col-md-6 mt-5">
           <table class="table table-striped table-hover mt-3" id="countStateTable"></table>
         </div>
-        <div class="col text-center"> 
+        <div class="col-md-6 text-center"> 
           <div id="graph01"></div>
         </div> 
       </div>
       <div class="row">
         <div class="col mt-2 text-center">
           <button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target="#section02">
-            Evolución valores B/P
+            Evolución valor GIRO Count B/P
           </button>
         </div> 
       </div>
@@ -60,7 +60,7 @@
       <div class="row">
         <div class="col mt-2 text-center">
           <button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target="#section03">
-            Movimentos de cuenta
+            Movimientos de cuenta
         </button>
         </div> 
       </div>
@@ -98,6 +98,9 @@
       $('.collpaseBtn').on('click',function(){
         $(this).toggleClass('on');
       });
+      //$($('.collpaseBtn')[0]).trigger('click');
+      //$($('.collpaseBtn')[1]).trigger('click');
+      //$($('.collpaseBtn')[2]).trigger('click');
 
       try{
         keys = Object.keys(countState[0]);
@@ -262,7 +265,50 @@
       }
 
       try{   
-        $('#graph03').html('--');
+        console.log(graph03);
+        $('#graph03').html(' ');
+        graph03.forEach(function(stock,si){
+          $('#graph03').append('<div class="row"><div class="col"><div id="graph03s'+si+'"></div></div></div>');
+          var ele = '<div class="row">'
+          ele = ele+'<div class="col-md-6 text-start fs-5">'+stock.desc+' (N='+stock.n+')'+'</div>';
+          ele = ele+'<div class="col-md-6 text-end ">'+stock.situ+'</div>';
+          ele = ele+'</div>';
+          $('#graph03s'+si).before(ele);
+          stock.series.forEach(function(e){
+            e.lineWidth = 1.25;
+            e.marker = {radius: 0}; 
+          });
+          stock.series[0].lineWidth = 3,
+          stock.series[0].marker = {radius: 4}
+          stock.series[0].color='#3333FF';
+          stock.series[1].color='#009900';
+          stock.series[2].color='#000000';
+          stock.series[3].color='#FF0000';
+          Highcharts.chart('graph03s'+si,{ 
+            chart: {
+              height: 500,
+              type: 'spline',
+              zoomType: 'xy',
+            },
+            title: {
+              text: ' ' 
+            }, 
+            credits: {
+              enabled: false
+            }, 
+            yAxis: {
+              title: {
+                text: 'EUR'
+              },
+              max: stock.series[1].data[0], 
+              min: stock.series[3].data[0]
+            }, 
+            xAxis: {
+              categories: stock.dates
+            }, 
+            series: stock.series
+          }); 
+        }); 
       }catch(e){
         $('#graph03').html(e);
       } 

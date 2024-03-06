@@ -168,6 +168,9 @@ async function main(){
   console.time('Exe script'); 
 	print('*** START: AppGiroValues ***');  
   var moment = require('moment'); 
+  var path = require('path');
+  print('Root script:'); 
+  print(' '+path.resolve()); 
    
   print('Data Load');
 	var data = await getGiroCsvData('giro_count.csv');   
@@ -241,7 +244,7 @@ async function main(){
   });   
   delete data,head;  
   
-  print(movements,'table');
+  //print(movements,'table');
 
   print('STOCKS VALUES');  
   var stocks = await readJson('stocks.json');  
@@ -551,39 +554,89 @@ async function main(){
   print('graph02Data done');
   dataJSON.graph02Data=graph02Data;
   
-  var graph03Data=[]; 
-  var aux = [];
+  var graph03Data=[];  
   stocks.forEach(function(e){
-    aux.push({
+    graph03Data.push({
       ticker: e.ticker
     })
   });
-  aux = distinctArrayObject(aux,'ticker'); 
-  aux.forEach(function(a){
+  graph03Data = distinctArrayObject(graph03Data,'ticker'); 
+  graph03Data.forEach(function(a){
     stocks.forEach(function(s){
       if(a.ticker===s.ticker){
         a.desc=s.desc;
       }
     });
     a.n     =0;
-    a.date  =[];
-    a.prices=[];
+    a.dates =[];
+    a.series=[];
   }); 
-  aux.forEach(function(a){
+  graph03Data.forEach(function(a){
+    var dates = undefined;
+    var prices = undefined;
     for(var i=0; i<stocks.length; i++){ 
       if(a.ticker===stocks[i].ticker){
-        a.date  =stocks[i].dates; 
-        a.prices=stocks[i].prices; 
+        dates = stocks[i].dates;
+        prices= stocks[i].prices;
         a.n=a.n+stocks[i].N;
       }
     } 
+    a.dates =dates; 
+    a.series.push({
+      name: 'value',
+      data: prices
+    });
   });
-  aux.forEach(function(a){
-    for(var i=0; i<a.prices.length; i++){ 
-      a.prices[i]=Math.round(a.prices[i]*100)/100; 
-    } 
-  });
-  graph03Data=aux;  
+  graph03Data.forEach(function(a){
+    a.series.forEach(function(s){
+      var max = s.data[0];
+      var min = s.data[0];
+      for(var i=0; i<s.data.length; i++){ 
+        s.data[i]=Math.round(s.data[i]*100)/100; 
+        max = Math.max(max,s.data[i]);
+        min = Math.min(min,s.data[i]);
+      } 
+      var mean = 0;
+      s.data.forEach(function(e){  
+        mean=mean+e;
+      });
+      mean=mean/s.data.length;
+    
+      var aux = []; 
+      s.data.forEach(function(){  
+        aux.push(Math.round(max*100)/100);
+      });
+      a.series.push({ 
+        name: 'Max',
+        data: aux 
+      });
+
+      aux = [];
+      s.data.forEach(function(){  
+        aux.push(Math.round(mean*100)/100);
+      });
+      a.series.push({ 
+        name: 'Mean',
+        data: aux 
+      });
+    
+      aux = [];
+      s.data.forEach(function(){  
+        aux.push(Math.round(min*100)/100);
+      });
+      a.series.push({ 
+        name: 'Min',
+        data: aux 
+      }); 
+    });
+    a.situ=' ';
+    var aux = a.n*(a.series[0].data[a.series[0].data.length-1]-a.series[0].data[0]);
+    a.situ=a.situ+' B/P: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    aux = a.n*(a.series[1].data[a.series[1].data.length-1]-a.series[0].data[0]);
+    a.situ=a.situ+': B/P max: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    aux = a.n*(a.series[3].data[a.series[3].data.length-1]-a.series[0].data[0]);
+    a.situ=a.situ+', B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+  });   
   
   print('graph03Data done');
   dataJSON.graph03Data=graph03Data;
