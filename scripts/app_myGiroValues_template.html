@@ -88,19 +88,12 @@
     <script id="dataScript">      
     </script>
     <script>   
-      console.log(data);
+      //console.log(data);
       var countState=data.countState;
       var movements =data.movements;
       var graph01   =data.graph01Data;
       var graph02   =data.graph02Data;
       var graph03   =data.graph03Data;
-    
-      $('.collpaseBtn').on('click',function(){
-        $(this).toggleClass('on');
-      });
-      //$($('.collpaseBtn')[0]).trigger('click');
-      //$($('.collpaseBtn')[1]).trigger('click');
-      //$($('.collpaseBtn')[2]).trigger('click');
 
       try{
         keys = Object.keys(countState[0]);
@@ -312,6 +305,13 @@
       }catch(e){
         $('#graph03').html(e);
       } 
+       
+      $('.collpaseBtn').on('click',function(){
+        $(this).toggleClass('on');
+      });
+      //$($('.collpaseBtn')[0]).trigger('click');
+      //$($('.collpaseBtn')[1]).trigger('click');
+      //$($('.collpaseBtn')[2]).trigger('click');
     </script>
   </body>
 </html>
