@@ -75,7 +75,7 @@
         <div class="col mt-2 text-center">
           <button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target="#section04">
             Evolución de los valores adquiridos
-        </button>
+          </button>
         </div> 
       </div>
       <div class="row collapse show" id="section04"> 
@@ -268,10 +268,10 @@
         console.log(graph03);
         $('#graph03').html(' ');
         graph03.forEach(function(stock,si){
-          $('#graph03').append('<div class="row"><div class="col"><div id="graph03s'+si+'"></div></div></div>');
+          $('#graph03').append('<div class="row"><div class="col"><div class="graph03s'+si+' collapse show " id="graph03s'+si+'"></div></div></div>');
           var ele = '<div class="row">'
-          ele = ele+'<div class="col-md-6 text-start fs-5">'+stock.desc+' (N='+stock.n+')'+'</div>';
-          ele = ele+'<div class="col-md-6 text-end ">'+stock.situ+'</div>';
+          ele = ele+'<div class="col-md-6 text-start fs-5"><button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target=".graph03s'+si+'"> '+stock.desc+' (N='+stock.n+')'+'</button></div>';
+          ele = ele+'<div class="col-md-6 text-end graph03s'+si+' collapse show ">'+stock.situ+'</div>';
           ele = ele+'</div>';
           $('#graph03s'+si).before(ele);
           stock.series.forEach(function(e){

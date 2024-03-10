@@ -451,14 +451,14 @@ async function main(){
   countState.push({
     info: 'Timing',
     value: moment().diff(moment.min(a3), 'days')+' day(s)',
-    extra: 'Ini: '+moment.min(a3).format('DD/MM/YYYY') 
+    extra: 'Ini.: '+moment.min(a3).format('DD/MM/YYYY') 
   });
   graph02Data.timming = moment().diff(moment.min(a3), 'days')+' day(s)';
 
   countState.push({
     info: 'Distinct Stocks',
     value: ''+stocksValues.length,
-    extra: '' 
+    extra: 'Tod.: '+moment().format('DD/MM/YYYY') 
   });
   delete a1,a2,a3;   
   
