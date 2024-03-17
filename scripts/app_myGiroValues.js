@@ -570,6 +570,9 @@ async function main(){
     }); 
   }); 
   var uniStocks=distinctArrayObject(uniStocks,'ticker');
+  uniStocks.sort(function(a,b){
+    return a.desc.localeCompare(b.desc);
+  }); 
   var st=uniStocks.length;
   uniStocks.forEach(function(s,si){    
     console.log((si+1)+'/'+st+' -> ['+s.ticker+']'+s.desc);  
