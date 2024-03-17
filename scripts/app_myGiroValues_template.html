@@ -54,8 +54,9 @@
       </div>
       <div class="row collapse show" id="section02" >
         <div class="col"> 
-          <div id="graph02"></div>
-        </div> 
+          <div id="graph0201"></div>
+          <div id="graph0202"></div>
+        </div>   
       </div>
       <div class="row">
         <div class="col mt-2 text-center">
@@ -88,12 +89,11 @@
     <script id="dataScript">      
     </script>
     <script>   
-      //console.log(data);
       var countState=data.countState;
       var movements =data.movements;
       var graph01   =data.graph01Data;
       var graph02   =data.graph02Data;
-      var graph03   =data.graph03Data;
+      var graph03   =data.graph03Data; 
 
       try{
         keys = Object.keys(countState[0]);
@@ -196,10 +196,7 @@
             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b> <br>{point.y} €'
           },
           series: [{ 
-            name: 'Stocks',
-            //animation: {
-            //  duration: 0
-            //},
+            name: 'Stocks', 
             colorByPoint: true,
             data: graph01
           }]
@@ -209,18 +206,12 @@
       }
 
       try{  
-        var ele = (graph02.bpNumber>0?
-          '<span class="text-success fw-bold">'+graph02.bp+'</span> - timing: '+graph02.timming:
-          '<span class="text-danger fw-bold">'+graph02.bp+' </span> - timing: '+graph02.timming
-        );
-        ele = '<div class="text-end fs-5">'+ele+'</div>';
-        $('#graph02').before(ele);
+        var  ele = '<div class="text-end fs-5"><span class="fw-bold '+(graph02.bpNumber>0?'text-success':'text-danger')+'">';
+        ele=ele+graph02.bp+'</span> - timing: '+graph02.timming+'</div>';
+        $('#graph0201').before(ele);
         graph02.series.forEach(function(e){
           e.lineWidth = 1.25;
           e.marker = {radius: 0};
-          //e.animation = {
-          //  duration: 0
-          //}
         });
         graph02.series[0].lineWidth = 3,
         graph02.series[0].marker = {radius: 4}
@@ -228,8 +219,12 @@
         graph02.series[1].color='#009900';
         graph02.series[2].color='#000000';
         graph02.series[3].color='#FF0000';
-
-        Highcharts.chart('graph02',{ 
+ 
+        var series=[];
+        for(var i=0; i<3; i++){
+          series.push(graph02.series[i]); 
+        } 
+        Highcharts.chart('graph0201',{ 
           chart: {
             height: 500,
             type: 'spline',
@@ -247,24 +242,84 @@
             },
             max: graph02.series[1].data[0], 
             min: graph02.series[3].data[0]
-          }, 
+          },  
+          tooltip: { 
+              split: true
+          },
           xAxis: {
             categories: graph02.categories
           }, 
-          series: graph02.series
-        });    
+          series: series
+        }); 
+
+        var  ele = '<div class="text-end"><button id="graph0202Btn" type="button" class="btn btn-light">% or total</button></div>';
+        $('#graph0202').before(ele); 
+        series=[];
+        for(var i=4; i<graph02.series.length; i++){
+          series.push(graph02.series[i]); 
+        }
+        var chart0102 = Highcharts.chart('graph0202',{ 
+          chart: {
+            height: 500,
+            type: 'area',
+            zoomType: 'xy',
+          },
+          title: {
+            text: ' ' 
+          }, 
+          credits: {
+            enabled: false
+          }, 
+          tooltip: { 
+            split: true
+          },
+          plotOptions: { 
+            area: {
+              stacking: 'normal' 
+            }
+          },
+          yAxis: {
+            title: {
+              text: 'EUR'
+            }
+          },   
+          xAxis: {
+            categories: graph02.categories
+          }, 
+          series: series
+        }); 
+
+        $('#graph0202Btn').on('click',function(){
+          var mode=chart0102.options.plotOptions.area.stacking;
+          if(mode==='normal'){
+            mode='percent';
+          }else{
+            mode='normal';
+          }
+          chart0102.update({
+            plotOptions: { 
+              area: {
+                stacking: mode
+              }
+            }
+          });
+        });
+
       }catch(e){
-        $('#graph02').html(e);
+        $('#graph0201').html(e);
       }
 
       try{   
-        console.log(graph03);
         $('#graph03').html(' ');
         graph03.forEach(function(stock,si){
           $('#graph03').append('<div class="row"><div class="col"><div class="graph03s'+si+' collapse show " id="graph03s'+si+'"></div></div></div>');
           var ele = '<div class="row">'
           ele = ele+'<div class="col-md-6 text-start fs-5"><button class="btn btn-light collpaseBtn" type="button" data-bs-toggle="collapse" data-bs-target=".graph03s'+si+'"> '+stock.desc+' (N='+stock.n+')'+'</button></div>';
-          ele = ele+'<div class="col-md-6 text-end graph03s'+si+' collapse show ">'+stock.situ+'</div>';
+          ele = ele+'<div class="col-md-6 text-end graph03s'+si+' collapse show ">';
+          ele = ele+'<div class="col-12 fw-bold '+(parseFloat(stock.bpNumber)>0?'text-success':'text-danger')+'">'+stock.bp+'</div>';
+          ele = ele+'<div class="col-12">'+stock.bpMax+'</div>';
+          ele = ele+'<div class="col-12">'+stock.bpMin+'</div>'; 
+          ele = ele+'</div>';
           ele = ele+'</div>';
           $('#graph03s'+si).before(ele);
           stock.series.forEach(function(e){
@@ -309,9 +364,7 @@
       $('.collpaseBtn').on('click',function(){
         $(this).toggleClass('on');
       });
-      //$($('.collpaseBtn')[0]).trigger('click');
-      //$($('.collpaseBtn')[1]).trigger('click');
-      //$($('.collpaseBtn')[2]).trigger('click');
+      //$($('.collpaseBtn')[0]).trigger('click'); 
     </script>
   </body>
 </html>

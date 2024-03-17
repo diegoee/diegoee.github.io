@@ -479,14 +479,13 @@ async function main(){
     currentDate.add(1, 'day'); 
   }
   graph02Data.categories=dates;
-  var aux = [];
-  var val  = 0;
+  var aux = []; 
   var max  = 0;
   var mean = 0;
   var min  = 0;
    
   dates.forEach(function(d,di){  
-    val=0;
+    var val=0;
     stocks.forEach(function(s,si){  
       for(var i=0; i<s.dates.length; i++){
         if(s.dates[i]===d){
@@ -505,6 +504,7 @@ async function main(){
         }
       } 
     }); 
+
     val = val - ref;
     max = Math.max(max,val);
     min = Math.min(min,val);
@@ -545,6 +545,50 @@ async function main(){
   graph02Data.series.push({ 
     name: 'Min',
     data: aux 
+  }); 
+
+  aux = [];
+  dates.forEach(function(d,di){   
+    var val=0;
+    movements.forEach(function(m,mi){  
+      if(moment(m.Fecha,'DD/MM/YYYY').isSameOrBefore(moment(d,'DD/MM/YYYY'))){ 
+        val = val+parseFloat(m.CastflowEUR.replaceAll('€','')); 
+      } 
+    });  
+    aux.push(Math.round(val*100)/100);
+  });
+  graph02Data.series.push({ 
+    name: 'Cash',
+    data: aux 
+  });  
+ 
+  var uniStocks=[];
+  stocks.forEach(function(s,si){ 
+    uniStocks.push({
+      ticker: s.ticker,
+      desc: s.desc
+    }); 
+  }); 
+  var uniStocks=distinctArrayObject(uniStocks,'ticker');
+  var st=uniStocks.length;
+  uniStocks.forEach(function(s,si){    
+    console.log((si+1)+'/'+st+' -> ['+s.ticker+']'+s.desc);  
+    var aux = [];
+    dates.forEach(function(d,di){   
+      var val=0;
+      stocks.forEach(function(ss,ssi){ 
+        ss.dates.forEach(function(dd,ddi){ 
+          if((s.ticker===ss.ticker)&&moment(dd,'DD/MM/YYYY').isSame(moment(d,'DD/MM/YYYY'))){ 
+            val = val+ss.N*ss.prices[ddi]; 
+          } 
+        });
+      });  
+      aux.push(Math.round(val*100)/100);
+    }); 
+    graph02Data.series.push({ 
+      name: s.desc,
+      data: aux 
+    });   
   }); 
   delete aux;
     
@@ -625,14 +669,17 @@ async function main(){
         name: 'Min',
         data: aux 
       }); 
-    });
-    a.situ=' ';
+    }); 
     var aux = a.n*(a.series[0].data[a.series[0].data.length-1]-a.series[0].data[0]);
-    a.situ=a.situ+' B/P: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    a.bp='B/P: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    a.bpNumber=Math.round((aux)*100)/100;
+
     aux = a.n*(a.series[1].data[a.series[1].data.length-1]-a.series[0].data[0]);
-    a.situ=a.situ+'<br> B/P max: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    a.bpMax='B/P max: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+
     aux = a.n*(a.series[3].data[a.series[3].data.length-1]-a.series[0].data[0]);
-    a.situ=a.situ+'<br> B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    a.bpMin='B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)'
+ 
   });   
   
   print('graph03Data done');
