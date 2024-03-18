@@ -207,7 +207,7 @@
 
       try{  
         var  ele = '<div class="text-end fs-5"><span class="fw-bold '+(graph02.bpNumber>0?'text-success':'text-danger')+'">';
-        ele=ele+graph02.bp+'</span> - timing: '+graph02.timming+'</div>';
+        ele=ele+graph02.bp+'</span> - timing: '+graph02.timing+'</div>';
         $('#graph0201').before(ele);
         graph02.series.forEach(function(e){
           e.lineWidth = 1.25;
@@ -319,6 +319,7 @@
           ele = ele+'<div class="col-12 fw-bold '+(parseFloat(stock.bpNumber)>0?'text-success':'text-danger')+'">'+stock.bp+'</div>';
           ele = ele+'<div class="col-12">'+stock.bpMax+'</div>';
           ele = ele+'<div class="col-12">'+stock.bpMin+'</div>'; 
+          ele = ele+'<div class="col-12">timing: '+stock.timing+'</div>';
           ele = ele+'</div>';
           ele = ele+'</div>';
           $('#graph03s'+si).before(ele);

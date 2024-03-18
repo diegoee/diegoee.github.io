@@ -163,6 +163,15 @@ function distinctArrayObject(array, propertyName) {
   }); 
 }
 
+function convertirADias(dias){
+  var moment = require('moment'); 
+  const duracion = moment.duration(dias, 'days');
+  const years = Math.floor(duracion.asYears());
+  const months = Math.floor(duracion.asMonths()) % 12;
+  const days = Math.floor(duracion.asDays()) % 30; 
+  return years+'año(s) '+months+'mes(es) '+days+'día(s)';
+}
+
 //----- main -----
 async function main(){ 
   console.time('Exe script'); 
@@ -334,7 +343,7 @@ async function main(){
   var graph02Data = {
     bpNumber: null,
     bp:       null,
-    timming:  null,
+    timing:  null,
     categories:  null,
     series:   [] 
   };   
@@ -450,10 +459,10 @@ async function main(){
   });   
   countState.push({
     info: 'Timing',
-    value: moment().diff(moment.min(a3), 'days')+' day(s)',
+    value: convertirADias(moment().diff(moment.min(a3),'days')),
     extra: 'Ini.: '+moment.min(a3).format('DD/MM/YYYY') 
   });
-  graph02Data.timming = moment().diff(moment.min(a3), 'days')+' day(s)';
+  graph02Data.timing = convertirADias(moment().diff(moment.min(a3),'days'));
 
   countState.push({
     info: 'Distinct Stocks',
@@ -575,7 +584,7 @@ async function main(){
   }); 
   var st=uniStocks.length;
   uniStocks.forEach(function(s,si){    
-    console.log((si+1)+'/'+st+' -> ['+s.ticker+']'+s.desc);  
+    console.log((si+1)+'/'+st+' -> ['+s.ticker+'] '+s.desc);  
     var aux = [];
     dates.forEach(function(d,di){   
       var val=0;
@@ -681,7 +690,8 @@ async function main(){
     a.bpMax='B/P max: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
 
     aux = a.n*(a.series[3].data[a.series[3].data.length-1]-a.series[0].data[0]);
-    a.bpMin='B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)'
+    a.bpMin='B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
+    a.timing=convertirADias(moment(a.dates[a.dates.length-1],'DD/MM/YYYY').diff(moment(a.dates[0],'DD/MM/YYYY'),'days'));
  
   });   
   
