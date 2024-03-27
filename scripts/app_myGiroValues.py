@@ -12,7 +12,7 @@ class AppGiroValues:
     import os 
 
     #Read, cleaning and formating MOVEMENTS 
-    data = pd.read_csv(os.path.dirname(__file__)+'/'+'giro_count.csv', sep=',') 
+    data = pd.read_csv(os.path.dirname(__file__)+'/'+'degiro_count.csv', sep=',') 
     data = data[data['ISIN']!='NLFLATEXACNT']
     data = data[data['Descripción'].notnull()]  
     data = data[~data['Descripción'].str.contains('Cuenta')]   

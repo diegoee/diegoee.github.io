@@ -182,7 +182,7 @@ async function main(){
   print(' '+path.resolve()); 
    
   print('Data Load');
-	var data = await getGiroCsvData('giro_count.csv');   
+	var data = await getGiroCsvData('degiro_count.csv');   
   var head = data[0]; 
   data.shift(); 	
   

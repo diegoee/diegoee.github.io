@@ -244,7 +244,7 @@
             min: graph02.series[3].data[0]
           },  
           tooltip: { 
-              split: true
+            split: true
           },
           xAxis: {
             categories: graph02.categories
@@ -354,7 +354,10 @@
             }, 
             xAxis: {
               categories: stock.dates
-            }, 
+            },   
+            tooltip: { 
+              split: true
+            },
             series: stock.series
           }); 
         }); 
