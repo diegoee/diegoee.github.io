@@ -68,9 +68,10 @@
           Runner.run(runner,engine);
 
           //objects
-          var cirA  = Bodies.circle(w/2, h/2, 50,{ frictionAir: 0.010 });
-          var boxA  = Bodies.rectangle(w/2-25,150,100,100,{ frictionAir: 0.010 });
-          var boxB  = Bodies.rectangle(w/2+25,  0,100,100,{ frictionAir: 0.010 });
+          var r = (w>h?h/7.5:w/7.5);
+          var cirA  = Bodies.circle(w/2, h/2, r,{ frictionAir: 0.010 });
+          var boxA  = Bodies.rectangle(w/2-25,150,2*r,2*r,{ frictionAir: 0.010 });
+          var boxB  = Bodies.rectangle(w/2+25,  0,2*r,2*r,{ frictionAir: 0.010 });
           var sideD = Bodies.rectangle(     0,1*h,2*w,  5,{ isStatic: true });
           var sideU = Bodies.rectangle(     0,  0,2*w,  5,{ isStatic: true });
           var sideL = Bodies.rectangle(     0,  0,  5,2*h,{ isStatic: true });
@@ -108,14 +109,22 @@
           // Ajustar la gravedad según el acelerómetro
           if (window.DeviceOrientationEvent) {//(false){//
             $(window).off('deviceorientation');
-            $(window).on('deviceorientation', function(event) {
-              // Convertir los datos del acelerómetro en una dirección de gravedad
-              var gamma = event.originalEvent.gamma; // Obtener el ángulo de inclinación izquierda/derecha
-              var beta = event.originalEvent.beta;   // Obtener el ángulo de inclinación adelante/atrás 
-              // Ajustar la gravedad en función de los ángulos
-              engine.world.gravity.x = gamma / 90;  // Convertir a un rango de -1 a 1
-              engine.world.gravity.y = beta / 90;   // Convertir a un rango de -1 a 1
-            });
+            $(window).on('deviceorientation', function(event) { 
+             // Acceder a los datos del acelerómetro
+             var x = Math.round(event.originalEvent.gamma);
+             var y = Math.round(event.originalEvent.beta);
+             // Ajustar la gravedad en función de los datos de orientación
+             engine.world.gravity.x = x/90; // Normalizar los valores entre -1 y 1
+             engine.world.gravity.y = y/90;
+             if (window.orientation===90){ //landspace
+               engine.world.gravity.x = +1*y/90; 
+               engine.world.gravity.y = -1*x/90;
+             }
+             if (window.orientation===-90){ //landspace
+               engine.world.gravity.x = -1*y/90; 
+               engine.world.gravity.y = +1*x/90;
+             }
+           }); 
           }else{
             log('El dispositivo no soporta DeviceOrientationEvent.');
           }
