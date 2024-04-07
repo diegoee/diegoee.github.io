@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Web Art5: Physics</title>   
+    <style> 
+      html,body{ 
+        padding: 0;
+        margin: 0;
+        background-color: #333; 
+        color: #BBB; 
+      }   
+      #main{
+        position: absolute;
+        padding: 0;
+        margin: 5px;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        background-color: #BBB;
+      }
+    </style>   
+  </head>
+  <body>     
+    <div id="main"></div> 
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script type="text/javascript">
+      var app={
+        log(text){ 
+          console.log(text);  
+        },
+        cleanLog: function(){
+          console.clear(); 
+        },
+        createScene: function($el){
+          var log = this.log;
+          $el.html(' ');
+
+          // module aliases
+          var Engine = Matter.Engine;
+          var Render = Matter.Render;
+          var Runner = Matter.Runner;
+          var Bodies = Matter.Bodies;
+          var Mouse  = Matter.Mouse;
+          var MouseConstraint = Matter.MouseConstraint;
+          var Mouse = Matter.Mouse;
+          var Composite = Matter.Composite;
+ 
+          var engine = Engine.create();
+          var runner = Runner.create();
+
+          var w = Math.ceil($el.width());
+          var h = Math.ceil($el.height());
+  
+          var render = Render.create({
+            element: $el.get(0),
+            engine:  engine,
+            options: {
+              width:  w,
+              height: h,
+              wireframes:   false,
+              showVelocity: true
+            }
+          });
+
+          Render.run(render);
+          Runner.run(runner,engine);
+
+          //objects
+          var cirA  = Bodies.circle(w/2, h/2, 50,{ frictionAir: 0.010 });
+          var boxA  = Bodies.rectangle(w/2-25,150,100,100,{ frictionAir: 0.010 });
+          var boxB  = Bodies.rectangle(w/2+25,  0,100,100,{ frictionAir: 0.010 });
+          var sideD = Bodies.rectangle(     0,1*h,2*w,  5,{ isStatic: true });
+          var sideU = Bodies.rectangle(     0,  0,2*w,  5,{ isStatic: true });
+          var sideL = Bodies.rectangle(     0,  0,  5,2*h,{ isStatic: true });
+          var sideR = Bodies.rectangle(     w,  0,  5,2*h,{ isStatic: true });
+
+          Composite.add(engine.world, [
+            boxA, 
+            boxB, 
+            cirA,
+            sideL,
+            sideR,
+            sideU,
+            sideD
+          ]);
+
+          // add mouse control
+          var mouse = Mouse.create(render.canvas);
+          var mouseConstraint = MouseConstraint.create(engine,{
+            mouse: mouse,
+            constraint: {
+              stiffness: 0.2,
+              render: {
+                visible: true
+              }
+            }
+          });
+
+          Composite.add(engine.world, mouseConstraint);
+          render.mouse = mouse;
+          Render.lookAt(render,{
+            min: { x: 0, y: 0 },
+            max: { x: w, y: h }
+          });
+
+          // Ajustar la gravedad según el acelerómetro
+          if (window.DeviceOrientationEvent) {//(false){//
+            $(window).off('deviceorientation');
+            $(window).on('deviceorientation', function(event) {
+              // Convertir los datos del acelerómetro en una dirección de gravedad
+              var gamma = event.originalEvent.gamma; // Obtener el ángulo de inclinación izquierda/derecha
+              var beta = event.originalEvent.beta;   // Obtener el ángulo de inclinación adelante/atrás 
+              // Ajustar la gravedad en función de los ángulos
+              engine.world.gravity.x = gamma / 90;  // Convertir a un rango de -1 a 1
+              engine.world.gravity.y = beta / 90;   // Convertir a un rango de -1 a 1
+            });
+          }else{
+            log('El dispositivo no soporta DeviceOrientationEvent.');
+          }
+        },
+        exe: function(){
+          var self = this;
+          self.cleanLog();
+          var log = self.log;
+          log('Exe start'); 
+          var $el = $('#main'); 
+          self.createScene($el);
+          $(window).off('resize');
+          $(window).on('resize',function(){ 
+            self.createScene($el);
+          });
+          log('Exe end'); 
+        }
+      } 
+      app.exe();  
+  </script>  
+  </body>
+</html>
