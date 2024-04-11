@@ -32,9 +32,9 @@
         },
         cleanLog: function(){
           console.clear(); 
-        },
+        }, 
         createScene: function($el){
-          var log = this.log;
+          var log = this.log; 
           $el.html(' '); 
           var w = Math.ceil($el.width());
           var h = Math.ceil($el.height()); 
@@ -49,23 +49,27 @@
             engine:  engine,
             options: {
               width:  w,
-              height: h,
-              wireframes:   false,
+              height: h,  
+              wireframes:   false, 
+              showAngleIndicator: false,
+              showCollisions: true,
               showVelocity: true
             }
           });
 
           //objects
-          var radi = (w>h?h/25:w/25);
-          var cirA = Matter.Bodies.circle(1*w/4, 3*h/4, radi,{ frictionAir: 0.0, isStatic: false });
-          var cirB = Matter.Bodies.circle(3*w/4, 1*h/4, radi,{ frictionAir: 0.0, isStatic: false });  
-          var cirC = Matter.Bodies.circle(1*w/2, 1*h/2, radi,{ frictionAir: 1.0, isStatic: false });  
-          cirA.mass = 10;
-          cirB.mass = 10;
-          cirC.mass = 10;
-          Matter.Body.setVelocity(cirA, { x:  1*Math.random()+1, y:  1*Math.random()+1 });  
-          Matter.Body.setVelocity(cirB, { x: -1*Math.random()-1, y: -1*Math.random()-1 });  
-          Matter.Body.setVelocity(cirC, { x:                  0, y:                  0 });    
+          var radi = (w>h?h/25:w/25); 
+          var cirA = Matter.Bodies.circle(1*w/4, 3*h/4, radi,{ frictionAir: 0.0, isStatic: false, render: { opacity: 1, fillStyle: '#FFFF00', } });
+          var cirB = Matter.Bodies.circle(3*w/4, 1*h/4, radi,{ frictionAir: 0.0, isStatic: false, render: { opacity: 1, fillStyle: '#0000FF', }  });  
+          var cirC = Matter.Bodies.circle(1*w/2, 1*h/2, radi,{ frictionAir: 1.0, isStatic: false, render: { opacity: 1, fillStyle: '#FF0000', } });
+          
+          var mass = 10;  
+          cirA.mass = mass;
+          cirB.mass = mass;
+          cirC.mass = mass;
+          Matter.Body.setVelocity(cirA, { x:    1*Math.random()+1, y:    1*Math.random()+1 });  
+          Matter.Body.setVelocity(cirB, { x:   -1*Math.random()-1, y:   -1*Math.random()-1 });  
+          Matter.Body.setVelocity(cirC, { x:                    0, y:                    0 });    
           Matter.Composite.add(engine.world, [  
             cirA,
             cirB,
@@ -127,7 +131,7 @@
             });
 
             Matter.Render.startViewTransform(render);
-            render.context.globalAlpha = 0.7;
+            render.context.globalAlpha = 0.4;
 
             for (var i=0; i<hisA.length; i++) {
               var point = hisA[i].position;
@@ -141,9 +145,8 @@
               var speed = hisB[i].speed; 
               var hue = 250 + Math.round((1 - Math.min(1, speed / 10)) * 400);
               render.context.fillStyle = 'hsl('+hue+', 100%, 50%)';
-              render.context.fillRect(point.x, point.y, 2, 2);
-            }
-
+              render.context.fillRect(point.x, point.y, 2, 2); 
+            } 
             render.context.globalAlpha = 1;
             Matter.Render.endViewTransform(render);
 
@@ -152,7 +155,7 @@
             }
             if (hisB.length > 3000) {
               hisB.pop();
-            }
+            }   
           });
 
           Matter.Render.run(render);
