@@ -67,9 +67,9 @@
           cirA.mass = mass;
           cirB.mass = mass;
           cirC.mass = mass;
-          Matter.Body.setVelocity(cirA, { x:    1*Math.random()+1, y:    1*Math.random()+1 });  
-          Matter.Body.setVelocity(cirB, { x:   -1*Math.random()-1, y:   -1*Math.random()-1 });  
-          Matter.Body.setVelocity(cirC, { x:                    0, y:                    0 });    
+          Matter.Body.setVelocity(cirA, { x: 10*(Math.random()-0.5), y: 10*(Math.random()-0.5) });  
+          Matter.Body.setVelocity(cirB, { x: 10*(Math.random()-0.5), y: 10*(Math.random()-0.5) });  
+          Matter.Body.setVelocity(cirC, { x:                      0, y:                      0 });    
           Matter.Composite.add(engine.world, [  
             cirA,
             cirB,
