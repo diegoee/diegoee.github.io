@@ -40,7 +40,8 @@
           var h = Math.ceil($el.height()); 
 
           var engine = Matter.Engine.create();
-          var runner = Matter.Runner.create(); 
+          var runner = Matter.Runner.create();
+          
           engine.world.gravity.x = 0; 
           engine.world.gravity.y = 0;   
   
@@ -52,30 +53,54 @@
               height: h,  
               wireframes:   false, 
               showAngleIndicator: false,
-              showCollisions: true,
+              showCollisions: false,
               showVelocity: true
             }
           });
 
           //objects
           var radi = (w>h?h/25:w/25); 
-          var cirA = Matter.Bodies.circle(1*w/4, 3*h/4, radi,{ frictionAir: 0.0, isStatic: false, render: { opacity: 1, fillStyle: '#FFFF00', } });
-          var cirB = Matter.Bodies.circle(3*w/4, 1*h/4, radi,{ frictionAir: 0.0, isStatic: false, render: { opacity: 1, fillStyle: '#0000FF', }  });  
-          var cirC = Matter.Bodies.circle(1*w/2, 1*h/2, radi,{ frictionAir: 1.0, isStatic: false, render: { opacity: 1, fillStyle: '#FF0000', } });
+          var cirA = Matter.Bodies.circle(1*w/4, 3*h/4, radi);
+          var cirB = Matter.Bodies.circle(3*w/4, 1*h/4, radi);  
+          var cirC = Matter.Bodies.circle(1*w/2, 1*h/2, radi);
+          
+          cirA.frictionAir=0.0;
+          cirA.isStatic=false; 
+          cirA.render.opacity=1;
+          cirA.render.fillStyle='#FFFF00';
+          cirA.collisionFilter.category=0x0002;
+          cirA.collisionFilter.mask=0x0001;
+          
+          cirB.frictionAir=0.0;
+          cirB.isStatic=false; 
+          cirB.render.opacity=1;
+          cirB.render.fillStyle='#0000FF';
+          cirB.collisionFilter.category=0x0004;
+          cirB.collisionFilter.mask=0x0001;
+         
+          cirC.frictionAir=1.0;
+          cirC.isStatic=false; 
+          cirC.render.opacity=1;
+          cirC.render.fillStyle='#FF0000';
+          cirC.collisionFilter.category=0x0008;
+          cirC.collisionFilter.mask=0x0001;          
           
           var mass = 10;  
           cirA.mass = mass;
           cirB.mass = mass;
           cirC.mass = mass;
-          Matter.Body.setVelocity(cirA, { x: 10*(Math.random()-0.5), y: 10*(Math.random()-0.5) });  
-          Matter.Body.setVelocity(cirB, { x: 10*(Math.random()-0.5), y: 10*(Math.random()-0.5) });  
-          Matter.Body.setVelocity(cirC, { x:                      0, y:                      0 });    
+          
+          var mag = 5;
+          Matter.Body.setVelocity(cirA, { x: mag*(Math.random()-0.5), y: mag*(Math.random()-0.5) });  
+          Matter.Body.setVelocity(cirB, { x: mag*(Math.random()-0.5), y: mag*(Math.random()-0.5) });  
+          Matter.Body.setVelocity(cirC, { x:                       0, y:                       0 }); 
+          
           Matter.Composite.add(engine.world, [  
             cirA,
             cirB,
             cirC
-          ]); 
-
+          ]);
+          
           var stiffness = 0.00001;
           Matter.Composite.add(engine.world, [
             //add mouse control 
@@ -85,10 +110,13 @@
                 stiffness: 1,
                 render: {
                   visible: false
+                },
+                collisionFilter:{
+                  category: 0x0001
                 }
               }
             }),
-            //add force betwenn objects 
+            //add force between objects 
             Matter.Constraint.create({
                 bodyA: cirA,
                 bodyB: cirB,
@@ -120,6 +148,7 @@
 
           var hisA = [];
           var hisB = [];
+          var maxPointView=3000;
           Matter.Events.on(render, 'afterRender', function() {
             hisA.unshift({
               position: Matter.Vector.clone(cirA.position),
@@ -150,10 +179,10 @@
             render.context.globalAlpha = 1;
             Matter.Render.endViewTransform(render);
 
-            if (hisA.length > 3000) {
+            if (hisA.length > maxPointView) {
               hisA.pop();
             }
-            if (hisB.length > 3000) {
+            if (hisB.length > maxPointView) {
               hisB.pop();
             }   
           });
