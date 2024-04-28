@@ -17,7 +17,7 @@
         margin: 5px;
         width: calc(100% - 10px);
         height: calc(100% - 10px);
-        background-color: #BBB;
+        background-color: #BBB; 
       }
       #toast {
         position: fixed;
@@ -28,10 +28,9 @@
         padding: 15px 20px;
         border-radius: 5px; 
         tab-size: 2;
-        opacity: 1; 
-        z-index: 1; 
+        opacity: 1;  
       }  
-      #closeToastBtn,#openToastBtn {
+      #closeToastBtn{
         position: absolute;
         top: 5px;
         right: 10px;
@@ -40,15 +39,25 @@
         user-select: none;
       } 
       #openToastBtn { 
-        font-size: 1.25em; 
+        position: absolute;
+        top: 5px;
+        right: 10px; 
+        margin: 0.5em;  
+        font-size: 1.25em;
+        cursor: pointer;
+        user-select: none;
       } 
-      .notShow{
-        display: none;
+      .showFront{
+        z-index: 1;  
       }
     </style>   
   </head>
   <body>     
-    <div id="toast"><span id="openToastBtn">:)</span><span id="closeToastBtn" class="notShow">&times;</span><div></div></div>
+    <button id="openToastBtn" class="showFront">info</button>
+    <div id="toast">
+      <span id="closeToastBtn" class="notShow">&times;</span>
+      <div></div>
+    </div>
     <div id="main"></div> 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
@@ -60,21 +69,21 @@
         cleanLog: function(){
           console.clear(); 
         },  
+        msgToast: '', 
         initToast: function(){
           var self = this;
           $('#toast div').html('');
           $('#closeToastBtn').on('click',function(){   
-            $('#closeToastBtn').addClass('notShow'); 
-            $('#openToastBtn').removeClass('notShow'); 
+            $('#openToastBtn').addClass('showFront');  
+            $('#toast').removeClass('showFront');
             $('#toast div').html('');
           });
           $('#openToastBtn').on('click',function(){  
-            $('#openToastBtn').addClass('notShow'); 
-            $('#closeToastBtn').removeClass('notShow'); 
+            $('#openToastBtn').removeClass('showFront');  
+            $('#toast').addClass('showFront');  
             $('#toast div').html('<pre>'+self.msgToast+'</pre>');
           });
         },  
-        msgToast: '', 
         createScene: function($el){
           var self = this;
           var log = self.log; 
