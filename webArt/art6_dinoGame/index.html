@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Web Art6: Dino game</title>   
+    <style> 
+      html,body{ 
+        padding: 0;
+        margin: 0;
+        background-color: #333; 
+        color: #BBB; 
+      }  
+    </style>   
+  </head>
+  <body>    
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <script type="text/javascript"> 
+      
+      var speed= 150;
+      var w = window.innerWidth;
+      var h = window.innerHeight; 
+      var targetX;
+      var targetY;
+      var player;
+      var cursors; 
+
+      function preload() {  
+        var graphics
+        graphics = this.add.graphics(); 
+        graphics.fillStyle(0x0000ff, 1);
+        graphics.fillCircle(25, 25, 25);
+        graphics.generateTexture('playerTexture', 50, 50);
+        graphics.destroy(); 
+
+        graphics = this.add.graphics(); 
+        graphics.fillStyle(0x00ffff, 15);
+        graphics.fillCircle(10, 10, 10);
+        graphics.generateTexture('bulletTexture', 20, 20  );
+        graphics.destroy(); 
+      } 
+      
+      function create() {    
+        player = this.physics.add.sprite(w/2, 4*h/5, 'playerTexture');
+        player.setCollideWorldBounds(true); 
+        
+        bullets = this.physics.add.group({
+            classType: Phaser.Physics.Arcade.Image,
+            maxSize: 10,
+            runChildUpdate: true
+        }); 
+        targetX=player.x;
+        targetY=player.y;
+        
+        this.input.on('pointerdown', onTouchStart, this); 
+      } 
+
+      function onTouchStart(pointer) { 
+        shootBullet();
+        targetX = Math.round(pointer.x);
+        targetY = Math.round(pointer.y);
+      } 
+
+      function shootBullet() {
+        if (bullets.getTotalFree() > 0) {
+          var bullet = bullets.get(player.x, player.y-20, 'bulletTexture'); 
+          if (bullet) {
+            bullet.setActive(true);
+            bullet.setVisible(true);
+            bullet.body.velocity.y = -1.5*speed;
+            bullet.setCollideWorldBounds(true);
+            bullet.body.onWorldBounds = true;
+            bullet.body.world.on('worldbounds', function(body){
+              if (body.gameObject === bullet) {
+                bullet.setActive(false);
+                bullet.setVisible(false);
+              }
+            });
+          }
+        }
+      }
+
+      function update(){ 
+        var distX = targetX-player.x;
+        var distY = targetY-player.y;
+        var distance = Math.sqrt(distX*distX+distY*distY); 
+        if (distance > 4) { 
+          var angle = Math.atan2(distY, distX);
+          player.setVelocity(Math.cos(angle)*speed, Math.sin(angle)*speed);
+        }else{
+          player.setVelocity(0);
+        }
+      }
+
+      var config = {
+        type: Phaser.AUTO,
+        width: w, 
+        height: h,
+        physics: {
+          default: 'arcade' 
+        },
+        scene: {
+          preload: preload,
+          create: create,
+          update: update
+        },
+        scale: {
+          mode: Phaser.Scale.RESIZE,
+          autoCenter: Phaser.Scale.CENTER_BOTH
+        }
+      }; 
+      var game = new Phaser.Game(config);
+  
+    </script>  
+  </body>
+</html>
