@@ -54,8 +54,7 @@
       </div>
       <div class="row collapse show" id="section02" >
         <div class="col"> 
-          <div id="graph0201"></div>
-          <div id="graph0202"></div>
+          <div id="graph0201"></div> 
         </div>   
       </div>
       <div class="row">
@@ -221,7 +220,7 @@
         graph02.series[3].color='#FF0000';
  
         var series=[];
-        for(var i=0; i<3; i++){
+        for(var i=0; i<4; i++){
           series.push(graph02.series[i]); 
         } 
         Highcharts.chart('graph0201',{ 
@@ -250,60 +249,7 @@
             categories: graph02.categories
           }, 
           series: series
-        }); 
-
-        var  ele = '<div class="text-end"><button id="graph0202Btn" type="button" class="btn btn-light">% or total</button></div>';
-        $('#graph0202').before(ele); 
-        series=[];
-        for(var i=4; i<graph02.series.length; i++){
-          series.push(graph02.series[i]); 
-        }
-        var chart0102 = Highcharts.chart('graph0202',{ 
-          chart: {
-            height: 500,
-            type: 'area',
-            zoomType: 'xy',
-          },
-          title: {
-            text: ' ' 
-          }, 
-          credits: {
-            enabled: false
-          }, 
-          tooltip: { 
-            split: true
-          },
-          plotOptions: { 
-            area: {
-              stacking: 'normal' 
-            }
-          },
-          yAxis: {
-            title: {
-              text: 'EUR'
-            }
-          },   
-          xAxis: {
-            categories: graph02.categories
-          }, 
-          series: series
-        }); 
-
-        $('#graph0202Btn').on('click',function(){
-          var mode=chart0102.options.plotOptions.area.stacking;
-          if(mode==='normal'){
-            mode='percent';
-          }else{
-            mode='normal';
-          }
-          chart0102.update({
-            plotOptions: { 
-              area: {
-                stacking: mode
-              }
-            }
-          });
-        });
+        });  
 
       }catch(e){
         $('#graph0201').html(e);
@@ -368,7 +314,7 @@
       $('.collpaseBtn').on('click',function(){
         $(this).toggleClass('on');
       });
-      //$($('.collpaseBtn')[0]).trigger('click'); 
+      $($('[data-bs-target="#section03"]')[0]).trigger('click'); 
     </script>
   </body>
 </html>
