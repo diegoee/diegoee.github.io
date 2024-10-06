@@ -163,13 +163,53 @@ function distinctArrayObject(array, propertyName) {
   }); 
 }
 
-function convertirADias(dias){
+function convert2Days(dias){
   var moment = require('moment'); 
   const duracion = moment.duration(dias, 'days');
   const years = Math.floor(duracion.asYears());
   const months = Math.floor(duracion.asMonths()) % 12;
   const days = Math.floor(duracion.asDays()) % 30; 
   return years+'año(s) '+months+'mes(es) '+days+'día(s)';
+}
+
+var fnSta = {
+  calMax: function(arr) { 
+    return Math.max.apply(null, arr);
+  },
+  calMin: function(arr) { 
+    return Math.min.apply(null, arr);
+  },
+  calMean: function(arr){
+    var sum = arr.reduce(function(a, b){
+    return a + b
+    }, 0);
+    return sum/arr.length;
+  },
+  calMedian: function(arr){
+    var arrOrdenado = arr.slice().sort((a, b) => a - b);
+    var mitad = Math.floor(arrOrdenado.length / 2);  
+    if (arrOrdenado.length % 2 === 0) {
+      return (arrOrdenado[mitad - 1] + arrOrdenado[mitad]) / 2;
+    } else {
+      return arrOrdenado[mitad];
+    }
+  },
+  calMode: function(arr){
+    var frecuencia = {}; 
+    arr.forEach(function(num){
+        var bin = Math.floor(num);
+        frecuencia[bin] = (frecuencia[bin]||0)+1;
+    });
+    var moda = null;
+    var maxFrecuencia = 0;     
+    for (var bin in frecuencia) {
+        if (frecuencia[bin] > maxFrecuencia) {
+            maxFrecuencia = frecuencia[bin];
+            moda = bin;
+        }
+    } 
+    return moda;
+  }
 }
 
 //----- main -----
@@ -251,8 +291,7 @@ async function main(){
     });
     return objetoFila;
   });   
-  delete data,head;  
-  
+  delete data,head;    
   //print(movements,'table');
 
   print('STOCKS VALUES');  
@@ -335,17 +374,17 @@ async function main(){
   
   print('data 2 plot'); 
   var dataJSON = {}; 
-  dataJSON.movements   =movements; 
+  dataJSON.movements = movements; 
   
   print('COUNT STATE');  
   var countState = [];   
   var graph01Data = []; 
   var graph02Data = {
-    bpNumber: null,
-    bp:       null,
-    timing:  null,
-    categories:  null,
-    series:   [] 
+    bpNumber:   null,
+    bp:         null,
+    timing:     null,
+    categories: null,
+    series:     [] 
   };   
 
   var a1 = [];
@@ -459,10 +498,10 @@ async function main(){
   });   
   countState.push({
     info: 'Timing',
-    value: convertirADias(moment().diff(moment.min(a3),'days')),
+    value: convert2Days(moment().diff(moment.min(a3),'days')),
     extra: 'Ini.: '+moment.min(a3).format('DD/MM/YYYY') 
   });
-  graph02Data.timing = convertirADias(moment().diff(moment.min(a3),'days'));
+  graph02Data.timing = convert2Days(moment().diff(moment.min(a3),'days'));
 
   countState.push({
     info: 'Distinct Stocks',
@@ -475,7 +514,7 @@ async function main(){
   dataJSON.countState=countState;  
   print('graph01Data done');
   dataJSON.graph01Data=graph01Data;
-   
+  
   var iniDate = moment(movements[0].Fecha,'DD/MM/YYYY'); 
   var endDate = moment(); 
   movements.forEach(function(e){ 
@@ -489,10 +528,8 @@ async function main(){
   }
   graph02Data.categories=dates;
   var aux = []; 
-  var max  = 0;
-  var mean = 0;
-  var min  = 0;
-   
+  var auxVal  = 0; 
+  
   dates.forEach(function(d,di){  
     var val=0;
     stocks.forEach(function(s,si){  
@@ -515,46 +552,64 @@ async function main(){
     }); 
 
     val = val - ref;
-    max = Math.max(max,val);
-    min = Math.min(min,val);
     aux.push(Math.round(val*100)/100);
   });
+
   graph02Data.series.push({ 
     name: 'CashflowEUR',
     data: aux 
   });
   
+  auxVal = fnSta.calMax(graph02Data.series[0].data);
   aux = [];
   dates.forEach(function(){  
-    aux.push(Math.round(max*100)/100);
+    aux.push(Math.round(auxVal*100)/100);
   });
   graph02Data.series.push({ 
     name: 'Max',
     data: aux 
   });
   
-  graph02Data.series[0].data.forEach(function(e){  
-    mean=mean+e;
-  });
-  mean=mean/graph02Data.series[0].data.length;
 
+  auxVal = fnSta.calMean(graph02Data.series[0].data);
   aux = [];
   dates.forEach(function(){  
-    aux.push(Math.round(mean*100)/100);
+    aux.push(Math.round(auxVal*100)/100);
   });
   graph02Data.series.push({ 
     name: 'Mean',
-    data: aux 
+    data: aux
   });
 
+  auxVal = fnSta.calMin(graph02Data.series[0].data);
   aux = [];
   dates.forEach(function(){  
-    aux.push(Math.round(min*100)/100);
+    aux.push(Math.round(auxVal*100)/100);
   });
   graph02Data.series.push({ 
     name: 'Min',
     data: aux 
-  }); 
+  });  
+
+  auxVal = fnSta.calMedian(graph02Data.series[0].data);
+  aux = [];
+  dates.forEach(function(){  
+    aux.push(Math.round(auxVal*100)/100);
+  });
+  graph02Data.series.push({ 
+    name: 'Median',
+    data: aux
+  });
+
+  auxVal = fnSta.calMode(graph02Data.series[0].data);
+  aux = [];
+  dates.forEach(function(){  
+    aux.push(Math.round(auxVal*100)/100);
+  });
+  graph02Data.series.push({ 
+    name: 'Mode',
+    data: aux
+  });
 
   aux = [];
   dates.forEach(function(d,di){   
@@ -691,12 +746,13 @@ async function main(){
 
     aux = a.n*(a.series[3].data[a.series[3].data.length-1]-a.series[0].data[0]);
     a.bpMin='B/P min: '+(Math.round((aux)*100)/100)+' € ('+(Math.round((aux*100/(a.n*a.series[0].data[0]))*100)/100)+'%)';
-    a.timing=convertirADias(moment(a.dates[a.dates.length-1],'DD/MM/YYYY').diff(moment(a.dates[0],'DD/MM/YYYY'),'days'));
+    a.timing=convert2Days(moment(a.dates[a.dates.length-1],'DD/MM/YYYY').diff(moment(a.dates[0],'DD/MM/YYYY'),'days'));
  
   });   
   
   print('graph03Data done');
   dataJSON.graph03Data=graph03Data;
+  /**/
   
   print('Create HTML from Data and Template'); 
   await createHtml(dataJSON);  
