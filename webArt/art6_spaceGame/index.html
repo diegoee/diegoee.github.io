@@ -16,9 +16,8 @@
   <body>    
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-    <script type="text/javascript"> 
-      
-      var speed= 150;
+    <script type="text/javascript">       
+      var speed = 150;
       var w = window.innerWidth;
       var h = window.innerHeight; 
       var targetX;
@@ -27,8 +26,7 @@
       var cursors; 
 
       function preload() {  
-        var graphics
-        graphics = this.add.graphics(); 
+        var graphics = this.add.graphics(); 
         graphics.fillStyle(0x0000ff, 1);
         graphics.fillCircle(25, 25, 25);
         graphics.generateTexture('playerTexture', 50, 50);
@@ -46,40 +44,34 @@
         player.setCollideWorldBounds(true); 
         
         bullets = this.physics.add.group({
-            classType: Phaser.Physics.Arcade.Image,
-            maxSize: 10,
-            runChildUpdate: true
+          classType: Phaser.Physics.Arcade.Image,
+          maxSize: 10,
+          runChildUpdate: true
         }); 
         targetX=player.x;
         targetY=player.y;
         
-        this.input.on('pointerdown', onTouchStart, this); 
-      } 
-
-      function onTouchStart(pointer) { 
-        shootBullet();
-        targetX = Math.round(pointer.x);
-        targetY = Math.round(pointer.y);
-      } 
-
-      function shootBullet() {
-        if (bullets.getTotalFree() > 0) {
-          var bullet = bullets.get(player.x, player.y-20, 'bulletTexture'); 
-          if (bullet) {
-            bullet.setActive(true);
-            bullet.setVisible(true);
-            bullet.body.velocity.y = -1.5*speed;
-            bullet.setCollideWorldBounds(true);
-            bullet.body.onWorldBounds = true;
-            bullet.body.world.on('worldbounds', function(body){
-              if (body.gameObject === bullet) {
-                bullet.setActive(false);
-                bullet.setVisible(false);
-              }
-            });
+        this.input.on('pointerdown', function onTouchStart(pointer) {
+          if (bullets.getTotalFree() > 0) {
+            var bullet = bullets.get(player.x, player.y-20, 'bulletTexture'); 
+            if (bullet) {
+              bullet.setActive(true);
+              bullet.setVisible(true);
+              bullet.body.velocity.y = -1.5*speed;
+              bullet.setCollideWorldBounds(true);
+              bullet.body.onWorldBounds = true;
+              bullet.body.world.on('worldbounds', function(body){
+                if (body.gameObject === bullet) {
+                  bullet.setActive(false);
+                  bullet.setVisible(false);
+                }
+              });
+            }
           }
-        }
-      }
+          targetX = Math.round(pointer.x);
+          targetY = Math.round(pointer.y);
+        },this); 
+      }              
 
       function update(){ 
         var distX = targetX-player.x;
@@ -94,19 +86,19 @@
       }
 
       var config = {
-        type: Phaser.AUTO,
-        width: w, 
+        type:   Phaser.AUTO,
+        width:  w, 
         height: h,
         physics: {
           default: 'arcade' 
         },
         scene: {
-          preload: preload,
-          create: create,
-          update: update
+          preload:  preload,
+          create:   create,
+          update:   update
         },
         scale: {
-          mode: Phaser.Scale.RESIZE,
+          mode:       Phaser.Scale.RESIZE,
           autoCenter: Phaser.Scale.CENTER_BOTH
         }
       }; 
