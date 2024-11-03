@@ -147,7 +147,7 @@ async function createHtml(jsonData){
       if (err) {
         print(err.message,'error');
         resolve();
-      } else { 
+      } else {  
         resolve();
       }
     }); 
@@ -370,7 +370,7 @@ async function main(){
   stocksValues.sort(function(a,b){
     return a.desc.localeCompare(b.desc);
   });    
-  print(stocksValues,'table');
+  //print(stocksValues,'table');
   
   print('data 2 plot'); 
   var dataJSON = {}; 
@@ -510,7 +510,7 @@ async function main(){
   });
   delete a1,a2,a3;   
   
-  print(countState,'table');
+  //print(countState,'table');
   dataJSON.countState=countState;  
   print('graph01Data done');
   dataJSON.graph01Data=graph01Data;
@@ -759,5 +759,7 @@ async function main(){
 
 	print('*** END: AppGiroValues  ***');   
   console.timeEnd('Exe script');
+
 }
 main();
+
