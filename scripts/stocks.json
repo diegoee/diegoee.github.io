@@ -1,0 +1,31 @@
+[{
+    "ticker": "SCYR.MC", 
+    "N": 175,
+    "desc": "SACYR",
+    "dStart": "2022-11-24",
+    "dEnd": "2099-12-31"
+},{
+    "ticker": "BBVAE.MC", 
+    "N": 35,
+    "desc": "BBVA EURO STOXX 50",
+    "dStart": "2022-11-22",
+    "dEnd": "2099-12-31"
+},{
+    "ticker": "BBVAI.MC", 
+    "N": 45,
+    "desc": "BBVA IBEX35",
+    "dStart": "2023-04-18",
+    "dEnd": "2099-12-31"
+},{
+    "ticker": "BBVAI.MC", 
+    "N": 20,
+    "desc": "BBVA IBEX35",
+    "dStart": "2023-04-18",
+    "dEnd": "2099-12-31"
+},{
+    "ticker": "LOG.MC", 
+    "N": 25,  
+    "desc": "LOGISTA",
+    "dStart": "2022-12-27",
+    "dEnd": "2099-12-31"
+}]
