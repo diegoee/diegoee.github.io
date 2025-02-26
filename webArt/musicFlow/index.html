@@ -26,10 +26,18 @@
         left: calc(100% - 40px);   
         cursor: pointer;
         transition: all 0.5s ease-out; 
+      }         
+      #bpmDisplay {    
+        position: absolute;
+        bottom: 20px;
+        margin: 0; 
+        padding: 0;     
+        right: calc(100% - 40px);     
       } 
     </style>
   </head>
   <body> 
+    <div id="bpmDisplay">--</div>
     <div id="btnPlay"></div>
     <div id="visualizer"></div>
     <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.slim.min.js"></script> 
@@ -38,8 +46,8 @@
       var mic = { 
         audioContext: null,
         analyzer: null,
-        dataArray: null,
-        intervalListener: null,
+        dataArray: null, 
+        exe: false,
         configMic: async function(){
           //Init listenerMic
           try { 
@@ -52,7 +60,7 @@
            var source = this.audioContext.createMediaStreamSource(stream);              
            // Configurar el analizador de frecuencia
            this.analyzer = this.audioContext.createAnalyser();
-           this.analyzer.fftSize = 1024*2; // Mayor FFT = más barras detalladas
+           this.analyzer.fftSize = 1024*1; // Mayor FFT = más barras detalladas
            var bufferLength = this.analyzer.frequencyBinCount;
            this.dataArray = new Uint8Array(bufferLength);
            source.connect(this.analyzer);  
@@ -60,24 +68,29 @@
            console.error(error);
            alert("Error al acceder al micrófono.");
          }
-        },
+        }, 
         stop: function(){ 
-          clearInterval(this.intervalListener);
-          this.intervalListener = null;
+          this.exe=false;
         },
         start: function(fn){
           var self = this;
-          self.intervalListener = setInterval(function(){ 
-            self.analyzer.getByteFrequencyData(self.dataArray);
-            //var text = new TextDecoder().decode(dataArray); 
+          self.stop(); 
+          self.exe=true; 
+
+          function exe(){  
+            self.analyzer.getByteFrequencyData(self.dataArray); 
             var media = self.dataArray.reduce(function(acc, val){
               return acc + val;
             },0);
             media = media/self.dataArray.length;
-            if(typeof fn === 'function'){
+            if(typeof fn === 'function'){ 
               fn(media);
             }
-          }, 10); 
+            if(self.exe){
+              requestAnimationFrame(exe);
+            }
+          }
+          exe();
         }
       }
       
@@ -125,17 +138,17 @@
 
         },
         init: function(){  
-          mic.configMic();   
+          mic.configMic();  
+          app.btnPlay();  
           mic.stop();    
-          ploter.init();  
-          app.btnPlay();
+          ploter.init(); 
 
           $('#btnPlay').on('click',function(){
             if ($(this).hasClass('off')) {    
               app.btnStop();
               mic.start(function(valor){ 
                 ploter.update(valor);
-              });
+              }); 
             }else{   
               app.btnPlay();
               mic.stop(); 
