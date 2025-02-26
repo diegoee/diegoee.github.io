@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>  
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Art: Music flow</title>
+    <style> 
+      html,body{ 
+        background-color: #333; 
+        -webkit-user-select: none;  
+        -khtml-user-select: none;  
+          -moz-user-select: none;  
+            -ms-user-select: none;  
+                user-select: none; 
+        -webkit-tap-highlight-color: transparent; 
+        color: #DDD;  
+        margin: 0; 
+        padding: 0;  
+      }   
+      div{
+        margin: 0;
+        padding: 0;
+      }         
+      #btnPlay {    
+        position: absolute;
+        top: 0.5em;
+        margin: 0; 
+        padding: 0;  
+        left: calc(100% - 1.5em);  
+        font-size: 2em;   
+        cursor: pointer;
+        transition: all 0.5s ease-out; 
+      }
+    </style>
+  </head>
+  <body> 
+    <div id="btnPlay">▶</div>
+    <div id="visualizer"></div>
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.slim.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+      var mic = { 
+        audioContext: null,
+        analyzer: null,
+        dataArray: null,
+        intervalListener: null,
+        configMic: async function(){
+          //Init listenerMic
+          try { 
+           // Solicitar acceso al micrófono
+           var stream = await navigator.mediaDevices.getUserMedia({ 
+             audio: true 
+           });                
+           // Configurar el contexto de audio
+           this.audioContext = new (window.AudioContext||window.webkitAudioContext)();
+           var source = this.audioContext.createMediaStreamSource(stream);              
+           // Configurar el analizador de frecuencia
+           this.analyzer = this.audioContext.createAnalyser();
+           this.analyzer.fftSize = 1024*2; // Mayor FFT = más barras detalladas
+           var bufferLength = this.analyzer.frequencyBinCount;
+           this.dataArray = new Uint8Array(bufferLength);
+           source.connect(this.analyzer);  
+         } catch (error) {
+           console.error(error);
+           alert("Error al acceder al micrófono.");
+         }
+        },
+        stop: function(){ 
+          clearInterval(this.intervalListener);
+          this.intervalListener = null;
+        },
+        start: function(fn){
+          var self = this;
+          self.intervalListener = setInterval(function(){ 
+            self.analyzer.getByteFrequencyData(self.dataArray);
+            //var text = new TextDecoder().decode(dataArray); 
+            var media = self.dataArray.reduce(function(acc, val){
+              return acc + val;
+            },0);
+            media = media/self.dataArray.length;
+            if(typeof fn === 'function'){
+              fn(media);
+            }
+          }, 100); 
+        }
+      }
+      
+      var ploter = {
+        circulo: null,
+        radioInicial: 5, 
+        init: function(){ 
+          $('#visualizer').html(' '); 
+          // Configuración inicial
+          var ancho = window.innerWidth-4;
+          var alto = window.innerHeight-4; 
+
+          // Crear el elemento SVG
+          var svg = d3.select("#visualizer").append("svg");
+          svg.attr("width", ancho);
+          svg.attr("height", alto);
+    
+          // Crear el círculo
+          this.circulo = svg.append("circle")
+          this.circulo.attr("cx", ancho / 2);
+          this.circulo.attr("cy", alto / 2);
+          this.circulo.attr("r", this.radioInicial);
+          this.circulo.attr("fill", "#DDD");  
+            
+        },
+        update: function(valor){
+          var nuevoRadio = valor;  
+          if(nuevoRadio<this.radioInicial){
+            nuevoRadio = this.radioInicial;
+          }
+          this.circulo.transition().duration(50).attr("r", nuevoRadio);
+        }
+      }
+
+      var app = {  
+        init: function(){  
+          mic.configMic();  
+          $('#btnPlay').html('▶'); 
+          mic.stop();    
+          ploter.init(); 
+          ploter.update(this.radioInicial);   
+                   
+          $('#btnPlay').on('click',function(){
+            if (!mic.intervalListener) { 
+              $('#btnPlay').html('⏹');  
+              mic.start(function(valor){ 
+                ploter.update(valor);
+              });
+            }else{
+              $('#btnPlay').html('▶'); 
+              mic.stop(); 
+            }
+          }); 
+
+          $(window).off('resize');
+          $(window).on('resize',function(){ 
+            $('#btnPlay').html('▶'); 
+            mic.stop();
+            ploter.init();  
+            ploter.update(this.radioInicial);
+          });
+        }
+      }
+      app.init();
+ 
+
+
+      
+      
+      
+  
+    </script>
+  </body>
+</html>
