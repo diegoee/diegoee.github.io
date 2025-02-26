@@ -27,17 +27,9 @@
         cursor: pointer;
         transition: all 0.5s ease-out; 
       }         
-      #bpmDisplay {    
-        position: absolute;
-        bottom: 20px;
-        margin: 0; 
-        padding: 0;     
-        right: calc(100% - 40px);     
-      } 
     </style>
   </head>
   <body> 
-    <div id="bpmDisplay">--</div>
     <div id="btnPlay"></div>
     <div id="visualizer"></div>
     <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.slim.min.js"></script> 
@@ -79,12 +71,13 @@
 
           function exe(){  
             self.analyzer.getByteFrequencyData(self.dataArray); 
-            var media = self.dataArray.reduce(function(acc, val){
+            var avgVolume = self.dataArray.reduce(function(acc, val){
               return acc + val;
             },0);
-            media = media/self.dataArray.length;
+            avgVolume = avgVolume/self.dataArray.length; 
+
             if(typeof fn === 'function'){ 
-              fn(media);
+              fn(avgVolume);
             }
             if(self.exe){
               requestAnimationFrame(exe);
@@ -92,8 +85,8 @@
           }
           exe();
         }
-      }
-      
+      } 
+
       var ploter = {
         circulo: null,
         radioInicial: 5, 
@@ -134,20 +127,20 @@
         btnStop: function(){
           $('#btnPlay').html('<i class="fas fa-stop fa-2x"></i>');
           $('#btnPlay').removeClass('off');
-          $('#btnPlay').addClass('on');
-
-        },
+          $('#btnPlay').addClass('onn'); 
+        }, 
         init: function(){  
           mic.configMic();  
           app.btnPlay();  
-          mic.stop();    
-          ploter.init(); 
+          mic.stop();     
+          ploter.init();   
+          
 
           $('#btnPlay').on('click',function(){
             if ($(this).hasClass('off')) {    
               app.btnStop();
-              mic.start(function(valor){ 
-                ploter.update(valor);
+              mic.start(function(vol){ 
+                ploter.update(vol);
               }); 
             }else{   
               app.btnPlay();
@@ -159,7 +152,7 @@
           $(window).on('resize',function(){  
             app.btnPlay();
             mic.stop();
-            ploter.init();   
+            ploter.init();     
           });
         }
       }
