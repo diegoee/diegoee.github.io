@@ -4,6 +4,7 @@
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <title>Web Art: Music flow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <style> 
       html,body{ 
         background-color: #333; 
@@ -16,27 +17,22 @@
         color: #DDD;  
         margin: 0; 
         padding: 0;  
-      }   
-      div{
-        margin: 0;
-        padding: 0;
-      }         
+      }          
       #btnPlay {    
         position: absolute;
-        top: 0.5em;
+        top: 20px;
         margin: 0; 
-        padding: 0;  
-        left: calc(100% - 1.5em);  
-        font-size: 2em;   
+        padding: 0;     
+        left: calc(100% - 40px);   
         cursor: pointer;
         transition: all 0.5s ease-out; 
-      }
+      } 
     </style>
   </head>
   <body> 
-    <div id="btnPlay">▶</div>
+    <div id="btnPlay"></div>
     <div id="visualizer"></div>
-    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.slim.min.js"></script>
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.slim.min.js"></script> 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
       var mic = { 
@@ -104,7 +100,7 @@
           this.circulo.attr("cx", ancho / 2);
           this.circulo.attr("cy", alto / 2);
           this.circulo.attr("r", this.radioInicial);
-          this.circulo.attr("fill", "#DDD");  
+          this.circulo.attr("fill", "#DDD"); 
             
         },
         update: function(valor){
@@ -116,32 +112,41 @@
         }
       }
 
-      var app = {  
+      var app = { 
+        btnPlay: function(){ 
+          $('#btnPlay').html('<i class="fas fa-play fa-2x"></i>');
+          $('#btnPlay').removeClass('on');
+          $('#btnPlay').addClass('off');
+        }, 
+        btnStop: function(){
+          $('#btnPlay').html('<i class="fas fa-stop fa-2x"></i>');
+          $('#btnPlay').removeClass('off');
+          $('#btnPlay').addClass('on');
+
+        },
         init: function(){  
-          mic.configMic();  
-          $('#btnPlay').html('▶'); 
+          mic.configMic();   
           mic.stop();    
-          ploter.init(); 
-          ploter.update(this.radioInicial);   
-                   
+          ploter.init();  
+          app.btnPlay();
+
           $('#btnPlay').on('click',function(){
-            if (!mic.intervalListener) { 
-              $('#btnPlay').html('⏹');  
+            if ($(this).hasClass('off')) {    
+              app.btnStop();
               mic.start(function(valor){ 
                 ploter.update(valor);
               });
-            }else{
-              $('#btnPlay').html('▶'); 
+            }else{   
+              app.btnPlay();
               mic.stop(); 
             }
           }); 
 
           $(window).off('resize');
-          $(window).on('resize',function(){ 
-            $('#btnPlay').html('▶'); 
+          $(window).on('resize',function(){  
+            app.btnPlay();
             mic.stop();
-            ploter.init();  
-            ploter.update(this.radioInicial);
+            ploter.init();   
           });
         }
       }
