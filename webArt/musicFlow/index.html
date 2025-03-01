@@ -87,15 +87,15 @@
         }
       } 
 
-      var ploter = {
-        circulo: null,
+      var ploter = { 
         radioInicial: 5, 
         circulos: [],
         getRandomInt: function (min, max){ 
           return Math.floor(Math.random() * (max - min + 1) ) + min;
         },
         init: function(){ 
-          $('#visualizer').html(' '); 
+          $('#visualizer').html(' ');
+          this.circulos=[]; 
           // Configuración inicial
           var w = window.innerWidth-4;
           var h = window.innerHeight-4; 
@@ -117,8 +117,7 @@
                 this.circulos.push(circulo); 
               }
             }
-          } 
-            
+          }             
         },
         update: function(valor){
           var nuevoRadio = valor;
@@ -155,6 +154,7 @@
             }else{   
               app.btnPlay();
               mic.stop(); 
+              ploter.init();  
             }
           }); 
 
