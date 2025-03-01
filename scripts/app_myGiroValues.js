@@ -229,6 +229,7 @@ async function main(){
   print('Filter data');
   data = filterBy(data,head,'Fecha','!=',''); 
   data = filterBy(data,head,'ISIN','!=','NLFLATEXACNT'); 
+  data = filterBy(data,head,'Descripción','!=','Degiro Cash Sweep Transfer');  
   data = filterBy(data,head,'Descripción','not contain','Cuenta'); 
  
   head = ['Fecha', 'ID_Producto', 'Desc', 'CastflowEUR'];
