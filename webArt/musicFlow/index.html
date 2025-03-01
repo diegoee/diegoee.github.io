@@ -90,31 +90,41 @@
       var ploter = {
         circulo: null,
         radioInicial: 5, 
+        circulos: [],
+        getRandomInt: function (min, max){ 
+          return Math.floor(Math.random() * (max - min + 1) ) + min;
+        },
         init: function(){ 
           $('#visualizer').html(' '); 
           // Configuración inicial
-          var ancho = window.innerWidth-4;
-          var alto = window.innerHeight-4; 
+          var w = window.innerWidth-4;
+          var h = window.innerHeight-4; 
 
           // Crear el elemento SVG
           var svg = d3.select("#visualizer").append("svg");
-          svg.attr("width", ancho);
-          svg.attr("height", alto);
+          svg.attr("width", w);
+          svg.attr("height", h);
     
-          // Crear el círculo
-          this.circulo = svg.append("circle")
-          this.circulo.attr("cx", ancho / 2);
-          this.circulo.attr("cy", alto / 2);
-          this.circulo.attr("r", this.radioInicial);
-          this.circulo.attr("fill", "#DDD"); 
+          // Crear círculos
+          for(var i=0; i<w; i++){
+            for(var ii=0; ii<h; ii++){
+              if(Math.random()<0.000015){  
+                var circulo = svg.append("circle")
+                circulo.attr("cx", i);
+                circulo.attr("cy", ii);
+                circulo.attr("r", this.getRandomInt(1,this.radioInicial));
+                circulo.attr("fill", "#DDD"); 
+                this.circulos.push(circulo); 
+              }
+            }
+          } 
             
         },
         update: function(valor){
-          var nuevoRadio = valor;  
-          if(nuevoRadio<this.radioInicial){
-            nuevoRadio = this.radioInicial;
+          var nuevoRadio = valor;
+          for (var i=0; i<this.circulos.length; i++){
+            this.circulos[i].transition().duration(50).attr("r", nuevoRadio);
           }
-          this.circulo.transition().duration(50).attr("r", nuevoRadio);
         }
       }
 
