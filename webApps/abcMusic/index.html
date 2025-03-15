@@ -247,7 +247,7 @@
                 </div> 
               </div>  
             </div>
-            <div class="col-sm-8">    
+            <div class="col-sm-6">    
               <div class="card" id="transpor">
                 <div class="card-body">
                   <div class="input-group">
@@ -261,6 +261,17 @@
                   </div>
                 </div>  
               </div>  
+            </div> 
+            <div class="col-sm-2">  
+              <div class="card">
+                <div class="card-body">
+                  <div class="input-group">  
+                    <button  class="btn btn-outline-dark" id="btnPaste">
+                      <span class="fa fa-paste"></span> 
+                    </button> 
+                  </div>
+                </div> 
+              </div>   
             </div> 
             <div class="col-12">
               <div id="abcMusicMain">Hola</div>  
@@ -359,7 +370,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
     <script type="text/javascript">  
       var abcjs=window.ABCJS;  
-      $('#version').html('v3.5');
+      $('#version').html('v3.6');
       var app={
         modal: {
           set: function(title,body){
@@ -685,6 +696,15 @@
             var self = this; 
             self.synth = new Tone.Synth().toMaster();
             
+            $('#btnPaste').on('click',function(){ 
+              $('#inputText').val('--');
+              navigator.clipboard.readText().then(function(texto){
+                $('#inputText').val(texto);
+              }).catch(function(err){ 
+               $('#inputText').val(err);
+              });  
+            }); 
+
             //player/editor abcMusic  
             self.swingMode = false;
             $('#btnSwing').on('click',function(){  
