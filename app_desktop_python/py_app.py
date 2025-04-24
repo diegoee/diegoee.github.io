@@ -12,23 +12,6 @@ file_name = os.path.basename(__file__)
 print("***********") 
 print("Start: "+file_name) 
 print("root: "+root) 
-node_script="index.js"
-
-def obtener_ruta_archivo(nombre_archivo):
-  if getattr(sys, 'frozen', False):
-      # Si es un ejecutable (.exe)
-      ruta_base = sys._MEIPASS
-  else:
-      # Si está en modo desarrollo
-      ruta_base = os.path.abspath(".") 
-  return os.path.join(ruta_base, nombre_archivo)
-
-def exe_node_script():  
-  root_file = obtener_ruta_archivo(node_script)
-  terminal="";   
-  resultado = subprocess.run(["node", root_file], capture_output=True, text=True)
-  terminal=terminal+resultado.stdout
-  return terminal
 
 from kivy.app import App
 from kivy.uix.widget import Widget
