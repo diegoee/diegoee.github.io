@@ -2,9 +2,6 @@
 import time
 start_time = time.time()
 import os
-import sys
-import subprocess
-
 
 ## INIT VARIABLES    
 root = os.path.dirname(__file__) 
