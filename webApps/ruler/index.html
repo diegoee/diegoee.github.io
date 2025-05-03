@@ -5,180 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
     <title>Webapp: Ruler</title> 
     <style>
-      /*General*/ 
-      body{
-        padding: 0;
-        margin: 0; 
-      }  
-      #version{
-        position: fixed;
-        margin: 0;
-        padding: 0;
-        bottom: 0;
-        right: 5px;
-        font-size: 0.75em;
-        z-index: 200;
-      } 
-      #main {
-        margin: 5px; 
-        height: calc(100vh - 10px);
-        display: flex;
-        justify-content: center; /* Centrado horizontal */
-        align-items: center;     /* Centrado vertical */
-        background-color: #F0F0F0;
-      }
-      /*ruler*/
-      .ruler {
-        position: relative;
-        width: 100%;
-        margin: 20px auto;
-        height: 14px;
-      }
-      .ruler .cm,
-      .ruler .mm {
-        position: absolute;
-        border-left: 1px solid #555;
-        height: 14px;
-        width: 10%;
-      }
-      .ruler .cm:after {
-        position: absolute;
-        bottom: -15px;
-        font: 11px/1 sans-serif;
-      }
-      .ruler .mm {
-        height: 5px;
-      }
-      .ruler .mm:nth-of-type(5) {
-      height: 10px;
-      }
-      .ruler .cm:nth-of-type(1) {
-      left: 0%;
-      }
-      .ruler .cm:nth-of-type(1):after {
-      content: "0";
-      }
-      .ruler .cm:nth-of-type(2) {
-      left: 10%;
-      }
-      .ruler .cm:nth-of-type(2):after {
-      content: "1";
-      }
-      .ruler .cm:nth-of-type(3) {
-      left: 20%;
-      }
-      .ruler .cm:nth-of-type(3):after {
-      content: "2";
-      }
-      .ruler .cm:nth-of-type(4) {
-      left: 30%;
-      }
-      .ruler .cm:nth-of-type(4):after {
-      content: "3";
-      }
-      .ruler .cm:nth-of-type(5) {
-      left: 40%;
-      }
-      .ruler .cm:nth-of-type(5):after {
-      content: "4";
-      }
-      .ruler .cm:nth-of-type(6) {
-      left: 50%;
-      }
-      .ruler .cm:nth-of-type(6):after {
-      content: "5";
-      }
-      .ruler .cm:nth-of-type(7) {
-      left: 60%;
-      }
-      .ruler .cm:nth-of-type(7):after {
-      content: "6";
-      }
-      .ruler .cm:nth-of-type(8) {
-      left: 70%;
-      }
-      .ruler .cm:nth-of-type(8):after {
-      content: "7";
-      }
-      .ruler .cm:nth-of-type(9) {
-      left: 80%;
-      }
-      .ruler .cm:nth-of-type(9):after {
-      content: "8";
-      }
-      .ruler .cm:nth-of-type(10) {
-      left: 90%;
-      }
-      .ruler .cm:nth-of-type(10):after {
-      content: "9";
-      }
-      .ruler .cm:nth-of-type(11) {
-      left: 100%;
-      }
-      .ruler .cm:nth-of-type(11):after {
-      content: "10";
-      }
-      .ruler .mm:nth-of-type(1) {
-      left: 10%;
-      }
-      .ruler .mm:nth-of-type(2) {
-      left: 20%;
-      }
-      .ruler .mm:nth-of-type(3) {
-      left: 30%;
-      }
-      .ruler .mm:nth-of-type(4) {
-      left: 40%;
-      }
-      .ruler .mm:nth-of-type(5) {
-      left: 50%;
-      }
-      .ruler .mm:nth-of-type(6) {
-      left: 60%;
-      }
-      .ruler .mm:nth-of-type(7) {
-      left: 70%;
-      }
-      .ruler .mm:nth-of-type(8) {
-      left: 80%;
-      }
-      .ruler .mm:nth-of-type(9) {
-      left: 90%;
-      }
-      .ruler .mm:nth-of-type(10) {
-      left: 100%;
-      }
+      body {
+      --ruler-num-c: #333;
+      --ruler-num-fz: 10px;
+      --ruler-num-pi: 0.75ch;
+      --ruler-unit: 1px;
+      --ruler-x: 1;
+      --ruler-y: 1;
 
+      --ruler1-bdw: 1px;
+      --ruler1-c:  #555;
+      --ruler1-h: 10px;
+      --ruler1-space: 5;
 
+      --ruler2-bdw: 1px;
+      --ruler2-c:  #333;
+      --ruler2-h: 25px;
+      --ruler2-space: 50;
+
+      background-attachment: fixed;
+      background-image:
+        linear-gradient(90deg, var(--ruler1-c) 0 var(--ruler1-bdw), transparent 0),
+        linear-gradient(90deg, var(--ruler2-c) 0 var(--ruler2-bdw), transparent 0),
+        linear-gradient(0deg, var(--ruler1-c) 0 var(--ruler1-bdw), transparent 0),
+        linear-gradient(0deg, var(--ruler2-c) 0 var(--ruler2-bdw), transparent 0);
+      background-position: 0 0;
+      background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+      background-size:
+        calc(var(--ruler-unit) * var(--ruler1-space) * var(--ruler-x)) var(--ruler1-h),
+        calc(var(--ruler-unit) * var(--ruler2-space) * var(--ruler-x)) var(--ruler2-h),
+        var(--ruler1-h) calc(var(--ruler-unit) * var(--ruler1-space) * var(--ruler-y)),
+        var(--ruler2-h) calc(var(--ruler-unit) * var(--ruler2-space) * var(--ruler-y));
+    }
+
+    /* Ruler Numbers */
+    .ruler-x,
+    .ruler-y {
+      color: var(--ruler-num-c);
+      counter-reset: d 0;
+      display: flex;
+      font-size: var(--ruler-num-fz);
+      line-height: 1;
+      list-style: none;
+      margin: 0;
+      overflow: hidden;
+      padding: 0;
+      position: fixed;
+    }
+    .ruler-x {
+      height: var(--ruler2-h);
+      inset-block-start: 0;
+      inset-inline-start: calc(var(--ruler-unit) * var(--ruler2-space));
+      opacity: var(--ruler-x);
+      width: 100%;
+    }
+    .ruler-y {
+      flex-direction: column;
+      height: 100%;
+      inset-block-start: calc(var(--ruler-unit) * var(--ruler2-space));
+      inset-inline-start: 0;
+      opacity: var(--ruler-y);
+      width: var(--ruler2-h);
+    }
+    .ruler-x li {
+      align-self: flex-end;
+    }
+    .ruler-x li,
+    .ruler-y li {
+      counter-increment: d; /*var(--ruler2-space);*/
+      flex: 0 0 calc(var(--ruler-unit) * var(--ruler2-space));
+    }
+    .ruler-x li::after {
+      content: counter(d)"";
+      line-height: 1;
+      padding-inline-start: var(--ruler-num-pi);
+    }
+    .ruler-y li::after {
+      content: counter(d)"";
+      display: block;
+      padding-inline-end: var(--ruler-num-pi);
+      transform: rotate(-90deg) translateY(-13px);
+      transform-origin: 100% 0%;
+      text-align: end;
+      width: 100%;
+    }
+    
+    #version{
+      position: fixed;
+      margin: 0;
+      padding: 0;
+      bottom: 5px;
+      right: 10px;
+      font-size: 0.75em;
+      z-index: 200;
+    }  
+    
     </style>  
   </head>
   <body>
-    <div id="version"></div>   
-    <div id="main"> 
-      <div class='ruler'>
-        <div class='cm'> 
-        </div>
-       
-    </div>  
+    <div id="version"></div> 
+    <ul class="ruler-x"></ul>
+    <ul class="ruler-y"></ul>  
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
     <script type="text/javascript">
       $('#version').html('v1.0');
-      var app={
-        add1cm2ruler: function(){
-          var cmStart = '<div class="cm">';
-          var cmEnd = '</div>';
-          var mm = '<div class="mm"></div>';
-          var cm = cmStart;
-          for(var i=0; i<9; i++){//add 9
-            cm=cm+mm;
-          }
-          cm=cm+cmEnd;
-          $('.ruler').prepend(cm)
-        },
+      var app={ 
         init: function(){
-          for(var i=0; i<5; i++){
-            this.add1cm2ruler();
-          } 
+          var cmxMax = Math.floor($(window).width()/37.8);
+          for(var i=0; i<cmxMax; i++){
+            $('.ruler-x').append('<li></li>');
+          }  
+          var cmyMax = Math.floor($(window).height()/37.8); 
+          for(var i=0; i<cmyMax; i++){ 
+            $('.ruler-y').append('<li></li>');
+          }  
           console.log('init app');
         }
       }
