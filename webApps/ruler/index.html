@@ -18,21 +18,19 @@
         right: 10px;
         font-size: 0.75em;
         z-index: 200;
-      } 
+      }  
 
       /*RULER-X*/
       .ruler-x {
         counter-reset: c-x-cm  
-      }
-      .ruler-x .mm{    
+      }       
+      .ruler-x .mm{   
         background: linear-gradient(
           to right,
           black 0%, 
           white 25%,
           white 100%
-        );
-      }  
-      .ruler-x .mm{   
+        ); 
         position: fixed; 
         top: 0; 
         height: 15px;      
@@ -52,12 +50,50 @@
         font-size: 12px;
         color: #333;
       }    
+      .ruler-x .mm:nth-child(10)::before { 
+        content: "" ;
+      } 
+      
+      /*RULER-Y*/
+      .ruler-y {
+        counter-reset: c-y-cm  
+      } 
+      .ruler-y .mm{    
+        background: linear-gradient(
+          to top,
+          black 0%, 
+          white 25%,
+          white 100%
+        );  
+        position: fixed; 
+        left: 0; 
+        width: 15px;      
+      }      
+      .ruler-y .mm:nth-child(5n) {
+        width: 25px;     
+      }  
+      .ruler-y .mm:nth-child(10n) {
+        counter-increment: c-y-cm;
+        width: 45px;     
+      }  
+      .ruler-y .mm:nth-child(10n)::before { 
+        content: "" counter(c-y-cm) "cm";
+        position: absolute;
+        bottom: 0; 
+        left: 35px;
+        font-size: 12px;
+        color: #333;
+      }    
+      .ruler-y .mm:nth-child(10)::before { 
+        content: "" ;
+      } 
       
     </style>  
   </head>
   <body>
     <div id="version"></div> 
     <div class="ruler-x"></div> 
+    <div class="ruler-y"></div> 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
     <script type="text/javascript">
       $('#version').html('v1.0');
@@ -76,6 +112,17 @@
             });
             $('.ruler-x').append(mmEl);
           }  
+
+          $('.ruler-y').html('');      
+          var mmYmax = Math.floor($(window).width()/mmPx);           
+          for(var i=0; i<mmYmax; i++){ 
+            var mmEl = $('<div class="mm"></div>');
+            mmEl.css({
+              'top': i*mmPx,
+              'height': mmPx,
+            });
+            $('.ruler-y').append(mmEl);
+          } 
         },   
         init: function(){
           console.log('init app');
