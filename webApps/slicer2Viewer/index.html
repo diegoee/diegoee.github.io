@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>  
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Webapp: Guitar pedal Boss sl-2 pattern viewer</title>
+    <style> 
+      html,body{ 
+        background-color: #333;  
+        -webkit-tap-highlight-color: transparent; 
+        color: #DDD;  
+        margin: 0; 
+        padding: 0;    
+      }   
+      #main{ 
+        padding: 0.5em; 
+      }     
+    </style>
+  </head>
+  <body> 
+    <div id="main"></div>
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script> 
+    <script>
+      //https://sl2-patch-editor.xyz/
+      var app = {  
+        templateUrl: 'template.tsl',
+        data: undefined,
+        getDataFromTemplate: function() {
+          return new Promise(function(resolve, reject){ 
+            $.ajax({
+              url: app.templateUrl,
+              method: 'GET',
+              dataType: 'json',
+              success: function(data) {
+                console.log('success data load');
+                app.data=data; 
+                resolve(); 
+              },
+              error: function(xhr, status, error) {
+                console.error('Error  data load:', error); 
+                reject();
+              } 
+            });  
+          });
+        },
+        plotData: function(){ 
+          var data = JSON.stringify(app.data,null,2); 
+          $('#main').html('<pre>'+data+'</pre>');  
+          console.log('************** INI. List effect set ************** '); 
+          for (var i = 0; i<app.data.data[0].length; i++) { 
+            console.log(i+' - '+app.getNamePattern(app.data.data[0][i].paramSet['PATCH%COM']));
+          } 
+          console.log('************** END. List effect set ************** '); 
+        },
+        plotArraysParam: function(){   
+          console.log('************** parameter slicer ************** ');
+          var keys = Object.keys(app.data.data[0][0].paramSet);
+          keys.forEach(function(e,i){ 
+            console.log(i+' - '+e+' - l='+app.data.data[0][0].paramSet[e].length);
+          });
+        },
+        addVoidPattern: function(){  
+          var newArr = JSON.parse(JSON.stringify(app.data.data[0][0])); 
+          app.data.data[0].push(newArr); 
+        },
+        setNamePattern: function(texto,patternPos){ 
+          var resultadoHex = [];
+          for (var ii = 0; ii<texto.length; ii++) {
+            var codigoAscii = texto.charCodeAt(ii);  
+            var hex = codigoAscii.toString(16);         
+            resultadoHex.push(hex.padStart(2,'0')); 
+          } 
+          for (var ii = 0; ii<app.data.data[0][0].paramSet['PATCH%COM'].length; ii++) {
+            app.data.data[0][patternPos].paramSet['PATCH%COM'][ii]="20";
+          }
+          for (var ii = 0; ii<resultadoHex.length; ii++) {
+            app.data.data[0][patternPos].paramSet['PATCH%COM'][ii]=(resultadoHex[ii]+"").toUpperCase();
+          }  
+        },
+        getNamePattern: function(hexArray){
+          var resultado=''; 
+          for (var i = 0; i<hexArray.length; i++) { 
+            var codigoAscii = parseInt(hexArray[i], 16);           // Convertir hex a decimal
+            resultado += String.fromCharCode(codigoAscii);           // Convertir decimal a carácter
+          } 
+          return resultado; 
+        },         
+        processData: function(){ 
+          //app.plotArraysParam();
+          var posPattern = 0; 
+          var name = '--';
+          var pos = 0;
+          var seq = [];
+          var nSeq = 0;
+
+          //VOID 
+          posPattern = 0;
+          name = 'VOID';
+          app.setNamePattern(name,posPattern); 
+          
+          //PITCH 1  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'PITCH_01';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='01';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='03';
+          
+          //pitch shift
+          pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+          seq=["0C","18","0C","00"];
+          nSeq=0;
+          for(var i=pos; i<pos+24; i++){  
+            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][i]=seq[nSeq];  
+            nSeq++;
+            if(nSeq===seq.length){
+              nSeq=0;
+            }
+          }  
+
+          //PITCH 2  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'PITCH_02';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='01';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='03';
+          
+          //pitch shift
+          pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+          seq=["0C","12","18","12","0C","06","00","06"];
+          nSeq=0;
+          for(var i=pos; i<pos+24; i++){  
+            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][i]=seq[nSeq];  
+            nSeq++;
+            if(nSeq===seq.length){
+              nSeq=0;
+            }
+          } 
+
+          //PITCH 3  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'PITCH_03';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='01';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='03';
+          
+          //pitch shift
+          pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+          seq=["0C","10","14","18","14","10","0C","08","04","00","04","08"];
+          nSeq=0;
+          for(var i=pos; i<pos+24; i++){  
+            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][i]=seq[nSeq];  
+            nSeq++;
+            if(nSeq===seq.length){
+              nSeq=0;
+            }
+          }
+
+          //PITCH 4  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'PITCH_04';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='01';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='03';
+          
+          //pitch shift
+          pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+          seq=["0C","0E","10","12","14","16","18","16","14","12","10","0E","0C","0A","08","06","04","02","00","02","04","08","0A"];
+          nSeq=0;
+          for(var i=pos; i<pos+24; i++){  
+            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][i]=seq[nSeq];  
+            nSeq++;
+            if(nSeq===seq.length){
+              nSeq=0;
+            }
+          }
+
+          //PITCH 5  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'PITCH_05';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='01';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='03';
+          
+          //pitch shift
+          pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+          seq=["18","00","0C","0C","0C","0C","0C","0C"];
+          nSeq=0;
+          for(var i=pos; i<pos+24; i++){  
+            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][i]=seq[nSeq];  
+            nSeq++;
+            if(nSeq===seq.length){
+              nSeq=0;
+            }
+          }
+
+          //PITCH 6  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'PITCH_06';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='01';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='03';
+          
+          //pitch shift
+          pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+          seq=["0C","0A","0C","0E"];
+          nSeq=0;
+          for(var i=pos; i<pos+24; i++){  
+            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][i]=seq[nSeq];  
+            nSeq++;
+            if(nSeq===seq.length){
+              nSeq=0;
+            }
+          }
+
+
+          //FLANGER  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'FLANGER_01';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='02';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='00'; 
+          
+          //PHASER  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'PHASER_01';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='03';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='00'; 
+
+          //SWEEP  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'SWEEP_01';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='04';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='00'; 
+          
+          //FILTER  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'FILTER_01';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='05';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='00'; 
+          
+          //RING  
+          posPattern=app.data.data[0].length; 
+          app.addVoidPattern();
+          name = 'RING_01';
+          app.setNamePattern(name,posPattern);
+          
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='06';  
+          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='00';
+ 
+          /*
+          //50 PATTERN
+          var nPattern=50;
+          posPattern=app.data.data[0].length;
+          for(var i=0; i<nPattern; i++){ 
+            app.addVoidPattern();
+          } 
+          for(var i=posPattern; i<app.data.data[0].length; i++){ 
+            name = 'PATTERN_'+(i-posPattern+1).toString().padStart(2,'0');
+            app.setNamePattern(name,i);  
+            app.data.data[0][i].paramSet['PATCH%SLICER(1)'][0]= ((i-posPattern).toString(16).padStart(2,'0')+"").toUpperCase();  
+            app.data.data[0][i].paramSet['PATCH%SLICER(1)'][1]='01';  
+          }    
+          /**/
+          
+          app.plotData();
+        },
+        init: function(){   
+          $('#main').html(' ');  
+          this.getDataFromTemplate().then(this.processData); 
+        }          
+      } 
+      app.init(); 
+    </script>
+  </body>
+</html>
