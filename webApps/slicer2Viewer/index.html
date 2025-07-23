@@ -443,6 +443,7 @@
       var app = {  
         templateUrl: 'template.tsl',
         data: undefined,
+        voidPattern: [],
         getDataFromTemplate: function() {
           return new Promise(function(resolve, reject){ 
             $.ajax({
@@ -452,6 +453,7 @@
               success: function(data) {
                 console.log('success data template load');
                 app.data=data; 
+                app.voidPattern=JSON.parse(JSON.stringify(app.data.data[0][0])); 
                 resolve(); 
               },
               error: function(xhr, status, error) {
@@ -461,9 +463,8 @@
             });  
           });
         },
-        addVoidPattern: function(){  
-          var newArr = JSON.parse(JSON.stringify(app.data.data[0][0])); 
-          app.data.data[0].push(newArr); 
+        addVoidPattern: function(){   
+          app.data.data[0].push(app.voidPattern); 
         },
         setNamePattern: function(texto,patternPos){ 
           var resultadoHex = [];
@@ -513,55 +514,21 @@
         getInteger2Hex: function(int){
           return int.toString(16).padStart(2,'0');;
         },  
-        processData: function(){ 
-          //app.plotArraysParam();
+        processData: function(){  
           var posPattern = 0; 
           var name = '--';
           var pos = 0;
           var seq = [];
           var nSeq = 0;
+           
+          //CREATE PATTERN HERE.
+          app.data.name='Setup_pattern';
           
-          var ahora = new Date();
-          var fechaStr = ahora.getFullYear() + "" +
-          String(ahora.getMonth() + 1).padStart(2, '0') + "" +
-          String(ahora.getDate()).padStart(2, '0') + "_" +
-          String(ahora.getHours()).padStart(2, '0') + "" +
-          String(ahora.getMinutes()).padStart(2, '0')+ "" +
-          String(ahora.getSeconds()).padStart(2, '0');
-
-          app.data.name='setup_'+fechaStr;
-          //VOID 
+          //VOID PATTERN
           posPattern = 0;
-          name = 'VOID';
+          name = 'Void';
           app.setNamePattern(name,posPattern); 
           
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='00';  
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='00';
-          
-          //PITCH 1  
-          posPattern=app.data.data[0].length; 
-          app.addVoidPattern();
-          name = 'PITCH_01';
-          app.setNamePattern(name,posPattern);
-          
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][0]='32';
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][1]='01'; 
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][2]='01';  
-          app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][3]='03';
-          
-          //pitch shift
-          pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
-          seq=["0C","0E","0C","0A"];
-          nSeq=0;
-          for(var i=pos; i<pos+24; i++){  
-            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][i]=seq[nSeq];  
-            nSeq++;
-            if(nSeq===seq.length){
-              nSeq=0;
-            }
-          } 
         },
         init: function(){
           var self=this;   
@@ -643,10 +610,14 @@
                   $($(labelElem+' .inputLengthContPattern input')[ii]).prop('disabled', false); 
                   $($(labelElem+' .inputLevelContPattern input')[ii]).prop('disabled', false);
                   $($(labelElem+' .inputEffectContPattern input')[ii]).prop('disabled', false); 
-                  //inputSelectPattern
+                  //inputEffectPattern
                   check = (parseInt($(labelElem+' .inputEffectPattern').val())===1);
                   if(check){ 
                     $($(labelElem+' .inputPitchContPattern input')[ii]).prop('disabled', false);
+                  }  
+                  check = (parseInt($(labelElem+' .inputEffectPattern').val())===0);
+                  if(check){ 
+                    $($(labelElem+' .inputEffectContPattern input')[ii]).prop('disabled', true);
                   }  
                 }  
               }
@@ -807,6 +778,12 @@
         },
         setData: function(){
           app.data.name = $('#dataSetName').val();  
+          app.data.data[0]=[];
+
+          for(var i=0; i<ui.pattern.length; i++){  
+            app.addVoidPattern();
+          }
+          
           for(var i=0; i<app.data.data[0].length; i++){ 
             var idElem=ui.pattern[i]; 
             var value = 0;
@@ -892,11 +869,23 @@
             ui.getData();
             $('.container').removeClass('d-none'); 
             modal.hide();
-            //$($(ui.pattern[0]+' button')[0]).trigger('click');
-            //$($(ui.pattern[0]+' button')[2]).trigger('click');            
-            //$(ui.pattern[0]+' .inputCheckPattern').trigger('click');      
-            //$(ui.pattern[0]+' .inputSelectPattern').val('50');
-            //ui.setStatusCombos(); 
+             
+            $($(ui.pattern[0]+' button')[0]).trigger('click'); 
+            ui.setStatusCombos(); 
+          
+            /*
+            setInterval(function(){
+              var ahora = new Date();
+              var fechaStr = "" + 
+              String(ahora.getHours()).padStart(2, '0') + "" +
+              String(ahora.getMinutes()).padStart(2, '0')+ "" +
+              String(ahora.getSeconds()).padStart(2, '0');
+              $('#dataSetName').val('Setup_pattern_'+fechaStr);    
+              $('#pattern_001 .inputPatternName').val('Pat_'+fechaStr); 
+              $('#pattern_001 .inputPatternName').trigger('change'); 
+            },5000);
+            */
+
           }); 
         }
       }
