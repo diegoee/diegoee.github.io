@@ -522,6 +522,13 @@
           var name = '--';
           var pos = 0;
           var seq=[]; 
+          
+          function reemplazarCaracter(str, indice, nuevoCaracter) {
+            if (indice < 0 || indice >= str.length) {
+              throw new Error("Índice fuera de rango");
+            }
+            return str.substring(0, indice) + nuevoCaracter + str.substring(indice + 1);
+          }
            
           //******CREATE PATTERN HERE******.
           app.data.name='Setup_01';
@@ -639,14 +646,7 @@
           app.addVoidPattern();
           posPattern++;
           name = 'Void';
-          app.setNamePattern(name,posPattern);
-          
-          function reemplazarCaracter(str, indice, nuevoCaracter) {
-            if (indice < 0 || indice >= str.length) {
-              throw new Error("Índice fuera de rango");
-            }
-            return str.substring(0, indice) + nuevoCaracter + str.substring(indice + 1);
-          }
+          app.setNamePattern(name,posPattern);          
 
           //SWEEP 
           for(var i=0; i<2*nPat; i++){  
@@ -665,6 +665,7 @@
           posPattern++;
           name = 'Void';
           app.setNamePattern(name,posPattern);
+          
           //FILTER 
           for(var i=0; i<2*nPat; i++){  
             posPattern++;
