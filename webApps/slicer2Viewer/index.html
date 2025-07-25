@@ -521,9 +521,10 @@
           var posPattern = 0; 
           var name = '--';
           var pos = 0;
+          var seq=[]; 
            
           //******CREATE PATTERN HERE******.
-          app.data.name='Setup_pattern';
+          app.data.name='Setup_01';
           
           //VOID PATTERN
           posPattern = 0;
@@ -552,15 +553,22 @@
             }              
             value = app.getInteger2Hex(100);
             app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][pos]=value;
+            
+            seq=[]; 
+            for(var iii=0; iii<8; iii++){
+              seq.push(app.getRndNum(0, 24)); 
+            } 
+            seq[0]=12;
+            for(var iii=0; iii<2*8; iii++){
+              seq.push(seq[iii]); 
+            }
 
             //Step PITCH.
             pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
             for(var iii=0; iii<24; iii++){ 
-              value = app.getInteger2Hex(app.getRndNum(0,24));//RANDOM NUMBER [0,24]
+              value = app.getInteger2Hex(seq[iii]);
               app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][pos+iii]=value;
             }                
-            value = app.getInteger2Hex(12);
-            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][pos]=value;
           }
 
           for(var i=0; i<nPat; i++){  
@@ -599,14 +607,21 @@
             value = app.getInteger2Hex(100);
             app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][pos]=value;
 
+            seq=[]; 
+            for(var iii=0; iii<8; iii++){
+              seq.push(app.getRndNum(0, 100)); 
+            }             
+            seq[0]=100;
+            for(var iii=0; iii<2*8; iii++){
+              seq.push(seq[iii]); 
+            }
+
             //Step EFFECT.
             pos=4+24+24+24;//init + Step len + step level + band pass
             for(var iii=0; iii<24; iii++){ 
-              value = app.getInteger2Hex(app.getRndNum(0,100));//RANDOM NUMBER [0,100]
+              value = app.getInteger2Hex(seq[iii]);
               app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][pos+iii]=value;
             }
-            value = app.getInteger2Hex(100);
-            app.data.data[0][posPattern].paramSet['PATCH%SLICER(1)'][pos]=value;
           }
 
           for(var i=0; i<nPat; i++){  
