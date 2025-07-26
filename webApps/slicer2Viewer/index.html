@@ -697,10 +697,15 @@
 
           $('#containerAddPattern').before($e); 
         },      
-        setStatusCombos: function() {   
+        setStatusCombos: function(){   
           //reset delete modal
           $('#modalDelete span').text('--');
           $($('#modalDelete button')[2]).off('click');
+          if(ui.pattern.length<100){
+            $('#btnAddPattern').prop('disabled', false);
+          }else{
+            $('#btnAddPattern').prop('disabled', true);
+          }
           
           for(var i=0; i<ui.pattern.length; i++){ 
             var labelElem = ui.pattern[i];  
@@ -751,7 +756,7 @@
                
           }
         },
-        setActionCombos: function() {
+        setActionCombos: function(){
           var self = this;
 
           $('input[type="range"]').off('input'); 
