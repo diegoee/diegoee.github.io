@@ -31,7 +31,8 @@
               <div class="row card-text">
                 <div class="col-sm-1"></div>
                 <div class="col-sm-4 d-grid gap-2">
-                  <button type="button" class="btn btn-primary" id="btnUpload"><i class="fas fa-upload"></i> Upload .tsl</button>
+                  <button type="button" class="btn btn-primary" id="btnUpload"><i class="fas fa-upload"></i> Upload .tsl</button>      
+                  <input type="file" id="fileInput" accept=".tsl" style="display: none;" />
                 </div>
                 <div class="col-sm-2 text-center"> -- </div>
                 <div class="col-sm-4 d-grid gap-2">
@@ -112,7 +113,7 @@
                       <span class="badge text-bg-primary">PATCH%COM</span>
                     </div>
                   </div>
-                  <div class="row mt-2"> 
+                  <div class="row mt-2 slicerChannel01"> 
                     <div class="col-sm-8">
                       <h4 class="">Slicer Channel 1 Parameters. </h4>
                     </div>
@@ -122,12 +123,12 @@
                     <div class="col-auto">
                       <label class="form-label">Enabled</label>
                       <div class="form-check form-switch">
-                        <input class="form-check-input inputCheckPattern" type="checkbox" checked="on" >
+                        <input class="form-check-input inputCheckPattern01" type="checkbox" checked="on" >
                       </div>
                     </div>
                     <div class="col-auto">
                       <label class="form-label">Pattern Select:</label>
-                      <select placeholder="" class="form-select inputSelectPattern">
+                      <select placeholder="" class="form-select inputSelectPattern01">
                         <option value="50">USER</option>
                         <option value="00">PATTERN_00</option>
                         <option value="01">PATTERN_01</option>
@@ -183,7 +184,7 @@
                     </div>
                     <div class="col-auto">
                       <label class="form-label">Effect Type:</label>
-                      <select placeholder="" class="form-select inputEffectPattern">
+                      <select placeholder="" class="form-select inputEffectPattern01">
                         <option value="0">OFF</option>
                         <option value="1">PITCH</option>
                         <option value="2">FLANGER</option>
@@ -195,7 +196,7 @@
                     </div>
                     <div class="col-auto">
                       <label class="form-label">Step Number:</label>
-                      <select placeholder="" class="form-select inputStepPattern">
+                      <select placeholder="" class="form-select inputStepPattern01">
                         <option value="0">STEP_8</option>
                         <option value="1">STEP_12</option>
                         <option value="2">STEP_16</option>
@@ -203,19 +204,19 @@
                       </select>
                     </div>
                   </div> 
-                  <div class="row mt-2">  
+                  <div class="row mt-2 slicerChannel01">  
                     <div class="col-sm-12">
                       <h5 class="">Parameter Arrays.</h5>
                     </div> 
                     <div class="col-sm-12 accordion">
                       <div class="accordion-item">
                         <h2 class="accordion-header">
-                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern01"> 
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0101"> 
                             Step Length.
                           </button>
                         </h2>
-                        <div class="accordion-collapse collapse collapsePattern01">
-                          <div class="accordion-body inputLengthContPattern ">
+                        <div class="accordion-collapse collapse collapsePattern0101">
+                          <div class="accordion-body inputLengthContPattern01">
                             <div class="row row-cols-auto">
                               <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
                               <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
@@ -254,12 +255,12 @@
                       </div>
                       <div class="accordion-item">
                         <h2 class="accordion-header">
-                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern02"> 
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0102"> 
                             Step Level.
                           </button>
                         </h2>
-                        <div  class="accordion-collapse collapse collapsePattern02">
-                          <div class="accordion-body inputLevelContPattern ">
+                        <div  class="accordion-collapse collapse collapsePattern0102">
+                          <div class="accordion-body inputLevelContPattern01">
                             
                             <div class="row row-cols-auto">
                               <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
@@ -299,12 +300,12 @@
                       </div>
                       <div class="accordion-item">
                         <h2 class="accordion-header">
-                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern03"> 
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0103"> 
                             Effect Level.
                           </button>
                         </h2>
-                        <div class="accordion-collapse collapse collapsePattern03">
-                          <div class="accordion-body inputEffectContPattern">
+                        <div class="accordion-collapse collapse collapsePattern0103">
+                          <div class="accordion-body inputEffectContPattern01">
                             
                             <div class="row row-cols-auto">
                               <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
@@ -344,12 +345,290 @@
                       </div>
                       <div class="accordion-item">
                         <h2 class="accordion-header">
-                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern04"> 
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0104"> 
                             Pitch shift.
                           </button>
                         </h2>
-                        <div class="accordion-collapse collapse collapsePattern04">
-                          <div class="accordion-body inputPitchContPattern">
+                        <div class="accordion-collapse collapse collapsePattern0104">
+                          <div class="accordion-body inputPitchContPattern01">
+                            
+                            <div class="row row-cols-auto">
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                            </div>
+                            
+                            <div class="row row-cols-auto">
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div> 
+                    </div>   
+                  </div>                  
+                  <div class="row mt-2 slicerChannel02"> 
+                    <div class="col-sm-8">
+                      <h4 class="">Slicer Channel 2 Parameters. </h4>
+                    </div>
+                    <div class="col-sm-4 text-end">
+                      <span class="badge text-bg-primary">PATCH%SLICER(2)</span>
+                    </div>
+                    <div class="col-auto">
+                      <label class="form-label">Enabled</label>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input inputCheckPattern02" type="checkbox" checked="on" >
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <label class="form-label">Pattern Select:</label>
+                      <select placeholder="" class="form-select inputSelectPattern02">
+                        <option value="50">USER</option>
+                        <option value="00">PATTERN_00</option>
+                        <option value="01">PATTERN_01</option>
+                        <option value="02">PATTERN_02</option>
+                        <option value="03">PATTERN_03</option>
+                        <option value="04">PATTERN_04</option>
+                        <option value="05">PATTERN_05</option>
+                        <option value="06">PATTERN_06</option>
+                        <option value="07">PATTERN_07</option>
+                        <option value="08">PATTERN_08</option>
+                        <option value="09">PATTERN_09</option>
+                        <option value="10">PATTERN_10</option>
+                        <option value="11">PATTERN_11</option>
+                        <option value="12">PATTERN_12</option>
+                        <option value="13">PATTERN_13</option>
+                        <option value="14">PATTERN_14</option>
+                        <option value="15">PATTERN_15</option>
+                        <option value="16">PATTERN_16</option>
+                        <option value="17">PATTERN_17</option>
+                        <option value="18">PATTERN_18</option>
+                        <option value="19">PATTERN_19</option>
+                        <option value="20">PATTERN_20</option>
+                        <option value="21">PATTERN_21</option>
+                        <option value="22">PATTERN_22</option>
+                        <option value="23">PATTERN_23</option>
+                        <option value="24">PATTERN_24</option>
+                        <option value="25">PATTERN_25</option>
+                        <option value="26">PATTERN_26</option>
+                        <option value="27">PATTERN_27</option>
+                        <option value="28">PATTERN_28</option>
+                        <option value="29">PATTERN_29</option>
+                        <option value="30">PATTERN_30</option>
+                        <option value="31">PATTERN_31</option>
+                        <option value="32">PATTERN_32</option>
+                        <option value="33">PATTERN_33</option>
+                        <option value="34">PATTERN_34</option>
+                        <option value="35">PATTERN_35</option>
+                        <option value="36">PATTERN_36</option>
+                        <option value="37">PATTERN_37</option>
+                        <option value="38">PATTERN_38</option>
+                        <option value="39">PATTERN_39</option>
+                        <option value="40">PATTERN_40</option>
+                        <option value="41">PATTERN_41</option>
+                        <option value="42">PATTERN_42</option>
+                        <option value="43">PATTERN_43</option>
+                        <option value="44">PATTERN_44</option>
+                        <option value="45">PATTERN_45</option>
+                        <option value="46">PATTERN_46</option>
+                        <option value="47">PATTERN_47</option>
+                        <option value="48">PATTERN_48</option>
+                        <option value="49">PATTERN_49</option>
+                      </select>
+                    </div>
+                    <div class="col-auto">
+                      <label class="form-label">Effect Type:</label>
+                      <select placeholder="" class="form-select inputEffectPattern02">
+                        <option value="0">OFF</option>
+                        <option value="1">PITCH</option>
+                        <option value="2">FLANGER</option>
+                        <option value="3">PHASER</option>
+                        <option value="4">SWEEP</option>
+                        <option value="5">FILTER</option>
+                        <option value="6">RING</option>
+                      </select>
+                    </div>
+                    <div class="col-auto">
+                      <label class="form-label">Step Number:</label>
+                      <select placeholder="" class="form-select inputStepPattern02">
+                        <option value="0">STEP_8</option>
+                        <option value="1">STEP_12</option>
+                        <option value="2">STEP_16</option>
+                        <option value="3">STEP_24</option>
+                      </select>
+                    </div>
+                  </div> 
+                  <div class="row mt-2 slicerChannel02">  
+                    <div class="col-sm-12">
+                      <h5 class="">Parameter Arrays.</h5>
+                    </div> 
+                    <div class="col-sm-12 accordion">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0201"> 
+                            Step Length.
+                          </button>
+                        </h2>
+                        <div class="accordion-collapse collapse collapsePattern0201">
+                          <div class="accordion-body inputLengthContPattern02">
+                            <div class="row row-cols-auto">
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            </div>
+                            
+                            <div class="row row-cols-auto">
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0202"> 
+                            Step Level.
+                          </button>
+                        </h2>
+                        <div  class="accordion-collapse collapse collapsePattern0202">
+                          <div class="accordion-body inputLevelContPattern02">
+                            
+                            <div class="row row-cols-auto">
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                           
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            </div>
+
+                            <div class="row row-cols-auto">
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0203"> 
+                            Effect Level.
+                          </button>
+                        </h2>
+                        <div class="accordion-collapse collapse collapsePattern0203">
+                          <div class="accordion-body inputEffectContPattern02">
+                            
+                            <div class="row row-cols-auto">
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            </div>
+
+                            <div class="row row-cols-auto">                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                              <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="100" value="100" class="vertical-slider" disabled></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button accordion-button collapsed" type="button" aria-expanded="true" data-bs-toggle="collapse" data-bs-target=".collapsePattern0204"> 
+                            Pitch shift.
+                          </button>
+                        </h2>
+                        <div class="accordion-collapse collapse collapsePattern0204">
+                          <div class="accordion-body inputPitchContPattern02">
                             
                             <div class="row row-cols-auto">
                               <div class="col d-flex flex-column text-center"><span>0</span><input type="range" min="0" max="24" value="12" class="vertical-slider" disabled></div>
@@ -525,7 +804,7 @@
 
           //******CREATE PATTERN HERE******.
           var dat = new Date();
-          app.data.name='Setup';
+          app.data.name='Set';
           app.data.name=app.data.name+'_'+dat.getFullYear();
           app.data.name=app.data.name+''+String(dat.getMonth() + 1).padStart(2, '0');
           app.data.name=app.data.name+''+String(dat.getDate()).padStart(2, '0');
@@ -535,9 +814,10 @@
           
           //VOID PATTERN
           posPattern = 0;
-          name = 'Void';
+          name = 'Example void';
           app.setNamePattern(name,posPattern);
           
+          /*
           var nPat = 11;
 
           //PITCH
@@ -689,11 +969,14 @@
           $e.find('.collapse01').removeClass('collapse01'); 
           $e.find('[data-bs-target=".collapse01"]').attr('data-bs-target','.collapse01_'+id); 
           
-          for(var i=0; i<5; i++){ 
-            $e.find('.collapsePattern0'+i).addClass('collapsePattern0'+i+'_'+id);
-            $e.find('.collapsePattern0'+i).removeClass('collapsePattern0'+i); 
-            $e.find('[data-bs-target=".collapsePattern0'+i+'"]').attr('data-bs-target','.collapsePattern0'+i+'_'+id); 
-          } 
+          for(var ii=1; ii<=2; ii++){
+            for(var i=1; i<=4; i++){ 
+              var c = 'collapsePattern'+ii.toString().padStart(2,'0')+i.toString().padStart(2,'0');
+              $e.find('.'+c).addClass(c+'_'+id);
+              $e.find('.'+c).removeClass(c); 
+              $e.find('[data-bs-target=".'+c+'"]').attr('data-bs-target','.'+c+'_'+id); 
+            } 
+          }
 
           $('#containerAddPattern').before($e); 
         },      
@@ -706,54 +989,60 @@
           }else{
             $('#btnAddPattern').prop('disabled', true);
           }
-          
+
           for(var i=0; i<ui.pattern.length; i++){ 
             var labelElem = ui.pattern[i];  
+            
+            for(var iii=1; iii<=2; iii++){
+              var num = iii.toString().padStart(2,'0');
 
-            //inputCheckPattern  
-            var check = $(labelElem+' .inputCheckPattern').is(':checked'); 
-            if(check){
-              $(labelElem+' input').prop('disabled', false);
-              $(labelElem+' select').prop('disabled', false); 
-              //inputSelectPattern
-              check = !(parseInt($(labelElem+' .inputSelectPattern').val())===50);
-              if(check){ 
-                $(labelElem+' input').prop('disabled', true);
-                $(labelElem+' select').prop('disabled', true); 
-                $(labelElem+' .inputSelectPattern').prop('disabled', false); 
-              }else{  
-                //inputStepPattern
-                var l = parseInt($(labelElem+' .inputStepPattern').val()); 
-                l=(l===0?8:l);
-                l=(l===1?12:l);
-                l=(l===2?16:l);
-                l=(l===3?24:l);
-                $(labelElem+' .inputLengthContPattern input').prop('disabled', true); 
-                $(labelElem+' .inputLevelContPattern input').prop('disabled', true); 
-                $(labelElem+' .inputEffectContPattern input').prop('disabled', true); 
-                $(labelElem+' .inputPitchContPattern input').prop('disabled', true); 
-                for (var ii=0; ii<l ; ii++){
-                  $($(labelElem+' .inputLengthContPattern input')[ii]).prop('disabled', false); 
-                  $($(labelElem+' .inputLevelContPattern input')[ii]).prop('disabled', false);
-                  $($(labelElem+' .inputEffectContPattern input')[ii]).prop('disabled', false); 
-                  //inputEffectPattern
-                  check = (parseInt($(labelElem+' .inputEffectPattern').val())===1);
-                  if(check){ 
-                    $($(labelElem+' .inputPitchContPattern input')[ii]).prop('disabled', false);
+              //inputCheckPattern  
+              var check = $(labelElem+' .inputCheckPattern'+num).is(':checked');
+              if(check){
+                $(labelElem+' .slicerChannel'+num+' input').prop('disabled', false);
+                $(labelElem+' .slicerChannel'+num+' select').prop('disabled', false); 
+
+                //inputSelectPattern
+                check = !(parseInt($(labelElem+' .inputSelectPattern'+num).val())===50);
+                if(check){ 
+                  $(labelElem+' .slicerChannel'+num+' input').prop('disabled', true);
+                  $(labelElem+' .slicerChannel'+num+' select').prop('disabled', true);
+                  $(labelElem+' .inputSelectPattern'+num).prop('disabled', false); 
+                }else{  
+
+                  //inputStepPattern
+                  var l = parseInt($(labelElem+' .inputStepPattern'+num).val()); 
+                  l=(l===0?8:l);
+                  l=(l===1?12:l);
+                  l=(l===2?16:l);
+                  l=(l===3?24:l);
+                  $(labelElem+' .inputLengthContPattern'+num+' input').prop('disabled', true); 
+                  $(labelElem+' .inputLevelContPattern'+num+' input').prop('disabled', true); 
+                  $(labelElem+' .inputEffectContPattern'+num+' input').prop('disabled', true); 
+                  $(labelElem+' .inputPitchContPattern'+num+' input').prop('disabled', true); 
+
+                  for (var ii=0; ii<l ; ii++){
+                    $($(labelElem+' .inputLengthContPattern'+num+' input')[ii]).prop('disabled', false); 
+                    $($(labelElem+' .inputLevelContPattern'+num+' input')[ii]).prop('disabled', false);
+                    $($(labelElem+' .inputEffectContPattern'+num+' input')[ii]).prop('disabled', false); 
+                    //inputEffectPattern
+                    check = (parseInt($(labelElem+' .inputEffectPattern'+num).val())===1);
+                    if(check){ 
+                      $($(labelElem+' .inputPitchContPattern'+num+' input')[ii]).prop('disabled', false);
+                    }  
+                    check = (parseInt($(labelElem+' .inputEffectPattern'+num).val())===0);
+                    if(check){ 
+                      $($(labelElem+' .inputEffectContPattern'+num+' input')[ii]).prop('disabled', true);
+                    }  
                   }  
-                  check = (parseInt($(labelElem+' .inputEffectPattern').val())===0);
-                  if(check){ 
-                    $($(labelElem+' .inputEffectContPattern input')[ii]).prop('disabled', true);
-                  }  
-                }  
+                }
+              }else{ 
+                $(labelElem+' .slicerChannel'+num+' input').prop('disabled', true);
+                $(labelElem+' .slicerChannel'+num+' select').prop('disabled', true); 
               }
-            }else{ 
-              $(labelElem+' input').prop('disabled', true);
-              $(labelElem+' select').prop('disabled', true); 
-            }
-            $(labelElem+' .inputCheckPattern').prop('disabled', false);
-            $(labelElem+' .inputPatternName').prop('disabled', false);   
-               
+              $(labelElem+' .inputCheckPattern'+num).prop('disabled', false);
+            }           
+            $(labelElem+' .inputPatternName').prop('disabled', false);       
           }
         },
         setActionCombos: function(){
@@ -784,7 +1073,7 @@
                 ui.calNPattern();
 
               }); 
-            }); 
+            });  
 
             //inputPatternName
             $(ui.pattern[i]+' .inputPatternName').attr('elem',ui.pattern[i]);  
@@ -792,42 +1081,71 @@
             $(ui.pattern[i]+' .inputPatternName').on('change',function(){
               var labelElem = $(this).attr('elem'); 
               $($(labelElem+' button')[0]).html($(this).val());
-            }); 
- 
-            //inputCheckPattern
-            $(ui.pattern[i]+' .inputCheckPattern').attr('elem',ui.pattern[i]);
-            $(ui.pattern[i]+' .inputCheckPattern').off('change');
-            $(ui.pattern[i]+' .inputCheckPattern').on('change',function(){
-              self.setStatusCombos();
-            }); 
- 
-            //inputSelectPattern 
-            $(ui.pattern[i]+' .inputSelectPattern').attr('elem',ui.pattern[i]);
-            $(ui.pattern[i]+' .inputSelectPattern').off('change');
-            $(ui.pattern[i]+' .inputSelectPattern').on('change',function(){
-              self.setStatusCombos();
-            }); 
- 
-            //inputStepPattern
-            $(ui.pattern[i]+' .inputStepPattern').attr('elem',ui.pattern[i]);
-            $(ui.pattern[i]+' .inputStepPattern').off('change');
-            $(ui.pattern[i]+' .inputStepPattern').on('change',function(){
-              self.setStatusCombos();
-            });  
+            });
 
-            //inputEffectPattern
-            $(ui.pattern[i]+' .inputEffectPattern').attr('elem',ui.pattern[i]);
-            $(ui.pattern[i]+' .inputEffectPattern').off('change');
-            $(ui.pattern[i]+' .inputEffectPattern').on('change',function(){
-              self.setStatusCombos();
-            }); 
+            for(var ii=1; ii<=2; ii++){
+              var num = ii.toString().padStart(2,'0');           
 
+              //inputCheckPattern
+              $(ui.pattern[i]+' .inputCheckPattern'+num).attr('elem',ui.pattern[i]);
+              $(ui.pattern[i]+' .inputCheckPattern'+num).off('change');
+              $(ui.pattern[i]+' .inputCheckPattern'+num).on('change',function(){
+                self.setStatusCombos();
+              }); 
+  
+              //inputSelectPattern 
+              $(ui.pattern[i]+' .inputSelectPattern'+num).attr('elem',ui.pattern[i]);
+              $(ui.pattern[i]+' .inputSelectPattern'+num).off('change');
+              $(ui.pattern[i]+' .inputSelectPattern'+num).on('change',function(){
+                self.setStatusCombos();
+              }); 
+  
+              //inputStepPattern
+              $(ui.pattern[i]+' .inputStepPattern'+num).attr('elem',ui.pattern[i]);
+              $(ui.pattern[i]+' .inputStepPattern'+num).off('change');
+              $(ui.pattern[i]+' .inputStepPattern'+num).on('change',function(){
+                self.setStatusCombos();
+              });  
+
+              //inputEffectPattern
+              $(ui.pattern[i]+' .inputEffectPattern'+num).attr('elem',ui.pattern[i]);
+              $(ui.pattern[i]+' .inputEffectPattern'+num).off('change');
+              $(ui.pattern[i]+' .inputEffectPattern'+num).on('change',function(){
+                self.setStatusCombos();
+              }); 
+            }
           }  
         },
         setActionLoad: function(){
-          $('#btnUpload').on('click',function(){
-            alert('not upload file action created');
+          $('#fileInput').on('change', function(event) {
+            var archivo = event.target.files[0];
+            if (!archivo) {
+              console.error('No se seleccionó ningún archivo');
+              return;
+            }
+            var lector = new FileReader();
+            lector.onload = function(e){
+              try {
+                app.data = JSON.parse(e.target.result);
+                console.log(app.data);
+                ui.getData();
+                for(var i=0; i<app.data.data[0].length; i++){
+                  name = app.getNamePattern(app.data.data[0][i].paramSet['PATCH%COM']);
+                  console.log(name);
+                }
+                console.log('success data template load');
+              } catch (error) {
+                console.error("Error al leer o parsear el archivo:", error);
+              } 
+            };            
+            $('#fileInput').val('');
+            lector.readAsText(archivo);
           });
+
+          $('#btnUpload').on('click',function(){           
+            $('#fileInput').click();
+          });
+
           $('#btnDownload').on('click',function(){
             ui.setData();
             var data = JSON.stringify(app.data,null,2); 
@@ -845,6 +1163,7 @@
         },
         getData: function(){
           $('#dataSetName').val(app.data.name);  
+
           for(var i=0; i<app.data.data[0].length; i++){ 
             ui.addPattern(); 
             var idElem=ui.pattern[ui.pattern.length-1]; 
@@ -856,46 +1175,52 @@
             name = app.getNamePattern(app.data.data[0][i].paramSet['PATCH%COM']);
             $($(idElem+' button')[0]).html(name);
             $(idElem+' .inputPatternName').val(name); 
-            //Enabled
-            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][1]);
-            if(value===1){ 
-              $(idElem+' .inputCheckPattern').prop('checked', true);
-            }else{ 
-              $(idElem+' .inputCheckPattern').prop('checked', false);
+            
+            for(var iii=1; iii<=2; iii++){
+              var num = iii.toString().padStart(2,'0');
+              var param = 'PATCH%SLICER('+iii+')';
+
+              //Enabled
+              value = app.getHex2Integer(app.data.data[0][i].paramSet[param][1]);
+              if(value===1){ 
+                $(idElem+' .inputCheckPattern'+num).prop('checked', true);
+              }else{ 
+                $(idElem+' .inputCheckPattern'+num).prop('checked', false);
+              }
+              //Pattern Select 
+              value = app.getHex2Integer(app.data.data[0][i].paramSet[param][0]); 
+              $(idElem+' .inputSelectPattern'+num).val(value.toString().padStart(2,'0'));
+              //Effect Type 
+              value = app.getHex2Integer(app.data.data[0][i].paramSet[param][2]); 
+              $(idElem+' .inputEffectPattern'+num).val(value);
+              //Step Number:
+              value = app.getHex2Integer(app.data.data[0][i].paramSet[param][3]); 
+              $(idElem+' .inputStepPattern'+num).val(value);
+              //Step LENGTH.
+              pos=4;//init
+              for(var ii=pos; ii<pos+24; ii++){ 
+                value = app.getHex2Integer(app.data.data[0][i].paramSet[param][ii]);
+                $($(idElem+' .inputLengthContPattern'+num+' input')[ii-pos]).val(value);
+              } 
+              //Step LEVEL.
+              pos=4+24;//init + Step len
+              for(var ii=pos; ii<pos+24; ii++){ 
+                value = app.getHex2Integer(app.data.data[0][i].paramSet[param][ii]);
+                $($(idElem+' .inputLevelContPattern'+num+' input')[ii-pos]).val(value);
+              } 
+              //Step EFFECT.
+              pos=4+24+24+24;//init + Step len + step level + band pass
+              for(var ii=pos; ii<pos+24; ii++){ 
+                value = app.getHex2Integer(app.data.data[0][i].paramSet[param][ii]);
+                $($(idElem+' .inputEffectContPattern'+num+' input')[ii-pos]).val(value);
+              } 
+              //Step PITCH.
+              pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+              for(var ii=pos; ii<pos+24; ii++){ 
+                value = app.getHex2Integer(app.data.data[0][i].paramSet[param][ii]);
+                $($(idElem+' .inputPitchContPattern'+num+' input')[ii-pos]).val(value);
+              } 
             }
-            //Pattern Select 
-            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][0]); 
-            $(idElem+' .inputSelectPattern').val(value.toString().padStart(2,'0'));
-            //Effect Type 
-            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][2]); 
-            $(idElem+' .inputEffectPattern').val(value);
-            //Step Number:
-            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][3]); 
-            $(idElem+' .inputStepPattern').val(value);
-            //Step LENGTH.
-            pos=4;//init
-            for(var ii=pos; ii<pos+24; ii++){ 
-              value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][ii]);
-              $($(idElem+' .inputLengthContPattern input')[ii-pos]).val(value);
-            } 
-            //Step LEVEL.
-            pos=4+24;//init + Step len
-            for(var ii=pos; ii<pos+24; ii++){ 
-              value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][ii]);
-              $($(idElem+' .inputLevelContPattern input')[ii-pos]).val(value);
-            } 
-            //Step EFFECT.
-            pos=4+24+24+24;//init + Step len + step level + band pass
-            for(var ii=pos; ii<pos+24; ii++){ 
-              value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][ii]);
-              $($(idElem+' .inputEffectContPattern input')[ii-pos]).val(value);
-            } 
-            //Step PITCH.
-            pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
-            for(var ii=pos; ii<pos+24; ii++){ 
-              value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%SLICER(1)'][ii]);
-              $($(idElem+' .inputPitchContPattern input')[ii-pos]).val(value);
-            } 
 
           } 
           ui.setActionCombos(); 
@@ -921,57 +1246,61 @@
             name = $(idElem+' .inputPatternName').val(); 
             app.data.data[0][i].paramSet['PATCH%COM']=app.setStringDecimal2HexArr(name);
             
-            //Enabled
-            value = $(idElem+' .inputCheckPattern').is(':checked')?'01':'00'; 
-            app.data.data[0][i].paramSet['PATCH%SLICER(1)'][1]=value;
-            
-            //Pattern Select 
-            value = parseInt($(idElem+' .inputSelectPattern').val());
-            value = app.getInteger2Hex(value);
-            app.data.data[0][i].paramSet['PATCH%SLICER(1)'][0]=value;
+            for(var ii=1; ii<=2; ii++){
+              var num = ii.toString().padStart(2,'0');
+              var param = 'PATCH%SLICER('+ii+')';
 
-            //Effect Type 
-            value = parseInt($(idElem+' .inputEffectPattern').val());
-            value = app.getInteger2Hex(value);
-            app.data.data[0][i].paramSet['PATCH%SLICER(1)'][2]=value;
-
-            //Step Number:            
-            value = parseInt($(idElem+' .inputStepPattern').val());
-            value = app.getInteger2Hex(value);
-            app.data.data[0][i].paramSet['PATCH%SLICER(1)'][3]=value;
-
-            //Step LENGTH.
-            pos=4;//init
-            for(var ii=0; ii<$(idElem+' .inputLengthContPattern input').length; ii++){ 
-              value = parseInt($($(idElem+' .inputLengthContPattern input')[ii]).val());
+              //Enabled
+              value = $(idElem+' .inputCheckPattern'+num).is(':checked')?'01':'00'; 
+              app.data.data[0][i].paramSet[param][1]=value;
+              
+              //Pattern Select 
+              value = parseInt($(idElem+' .inputSelectPattern'+num).val());
               value = app.getInteger2Hex(value);
-              app.data.data[0][i].paramSet['PATCH%SLICER(1)'][pos+ii]=value;
-            } 
-            
-            //Step LEVEL.
-            pos=4+24;//init + Step len
-            for(var ii=0; ii<$(idElem+' .inputLevelContPattern input').length; ii++){ 
-              value = parseInt($($(idElem+' .inputLevelContPattern input')[ii]).val());
-              value = app.getInteger2Hex(value);
-              app.data.data[0][i].paramSet['PATCH%SLICER(1)'][pos+ii]=value;
-            } 
+              app.data.data[0][i].paramSet[param][0]=value;
 
-            //Step EFFECT.
-            pos=4+24+24+24;//init + Step len + step level + band pass
-            for(var ii=0; ii<$(idElem+' .inputEffectContPattern input').length; ii++){ 
-              value = parseInt($($(idElem+' .inputEffectContPattern input')[ii]).val());
+              //Effect Type 
+              value = parseInt($(idElem+' .inputEffectPattern'+num).val());
               value = app.getInteger2Hex(value);
-              app.data.data[0][i].paramSet['PATCH%SLICER(1)'][pos+ii]=value;
-            } 
+              app.data.data[0][i].paramSet[param][2]=value;
 
-            //Step PITCH.
-            pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
-            for(var ii=0; ii<$(idElem+' .inputPitchContPattern input').length; ii++){ 
-              value = parseInt($($(idElem+' .inputPitchContPattern input')[ii]).val());
+              //Step Number:            
+              value = parseInt($(idElem+' .inputStepPattern'+num).val());
               value = app.getInteger2Hex(value);
-              app.data.data[0][i].paramSet['PATCH%SLICER(1)'][pos+ii]=value;
-            } 
+              app.data.data[0][i].paramSet[param][3]=value;
 
+              //Step LENGTH.
+              pos=4;//init
+              for(var ii=0; ii<$(idElem+' .inputLengthContPattern'+num+' input').length; ii++){ 
+                value = parseInt($($(idElem+' .inputLengthContPattern'+num+' input')[ii]).val());
+                value = app.getInteger2Hex(value);
+                app.data.data[0][i].paramSet[param][pos+ii]=value;
+              } 
+              
+              //Step LEVEL.
+              pos=4+24;//init + Step len
+              for(var ii=0; ii<$(idElem+' .inputLevelContPattern'+num+' input').length; ii++){ 
+                value = parseInt($($(idElem+' .inputLevelContPattern'+num+' input')[ii]).val());
+                value = app.getInteger2Hex(value);
+                app.data.data[0][i].paramSet[param][pos+ii]=value;
+              } 
+
+              //Step EFFECT.
+              pos=4+24+24+24;//init + Step len + step level + band pass
+              for(var ii=0; ii<$(idElem+' .inputEffectContPattern'+num+' input').length; ii++){ 
+                value = parseInt($($(idElem+' .inputEffectContPattern'+num+' input')[ii]).val());
+                value = app.getInteger2Hex(value);
+                app.data.data[0][i].paramSet[param][pos+ii]=value;
+              } 
+
+              //Step PITCH.
+              pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+              for(var ii=0; ii<$(idElem+' .inputPitchContPattern'+num+' input').length; ii++){ 
+                value = parseInt($($(idElem+' .inputPitchContPattern'+num+' input')[ii]).val());
+                value = app.getInteger2Hex(value);
+                app.data.data[0][i].paramSet[param][pos+ii]=value;
+              } 
+            }
           } 
         },
         init: function(){ 
