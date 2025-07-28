@@ -77,11 +77,14 @@
           <div class="card"> 
             <div class="card-body">  
               <div class="row card-text"> 
-                <div class="col-sm-4"> </div>
-                <div class="col-sm-4 d-grid gap-2">
+                <div class="col-sm-3"> </div>
+                <div class="col-sm-3 d-grid gap-2">
                   <button type="button" class="btn btn-light" id="btnAddPattern"><i class="fas fa-add"></i> Add Pattern</button> 
                 </div>
-                <div class="col-sm-4"> </div>
+                <div class="col-sm-3 d-grid gap-2">
+                  <button type="button" class="btn btn-light" id="btnRndPattern"><i class="fas fa-add"></i> Add <i class="fas fa-dice"></i>  Pattern</button> 
+                </div>
+                <div class="col-sm-3"> </div>
               </div>
             </div>
           </div>
@@ -679,7 +682,7 @@
     </div>
 
     <div class="modal" id="modalDelete">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Delete: <span> NAME</span>?</h5>
@@ -700,7 +703,7 @@
     </div> 
     
     <div class="modal" id="modalLoading">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Loading...</h5> 
@@ -733,6 +736,7 @@
                 console.log('success data template load');
                 app.data=data; 
                 app.voidPattern=JSON.parse(JSON.stringify(app.data.data[0][0])); 
+                app.data.data[0]=[];
                 resolve(); 
               },
               error: function(xhr, status, error) {
@@ -744,7 +748,7 @@
         },
         addVoidPattern: function(){   
           app.data.data[0].push(JSON.parse(JSON.stringify(app.voidPattern))); 
-        },
+        },    
         setNamePattern: function(texto,patternPos){ 
           var resultadoHex = [];
           for (var ii = 0; ii<texto.length; ii++) {
@@ -812,10 +816,19 @@
           app.data.name=app.data.name+''+String(dat.getMinutes()).padStart(2, '0');
           app.data.name=app.data.name+''+String(dat.getSeconds()).padStart(2, '0');
           
+          /*
           //VOID PATTERN
           posPattern = 0;
-          name = 'Example void';
+          app.addVoidPattern();
+          name = 'Void Pattern';
           app.setNamePattern(name,posPattern);
+
+          //RND PATTERN
+          posPattern++;
+          app.addPattern();
+          name = 'Rnd Pattern';
+          app.setNamePattern(name,posPattern);
+
           
           /*
           var nPat = 11;
@@ -936,9 +949,7 @@
           return new Promise(function(resolve, reject){ 
             self.getDataFromTemplate().then(function(){
               app.processData();
-              setTimeout(function(){
-                resolve(); 
-              },250);
+              resolve(); 
             }); 
           });
         }          
@@ -979,6 +990,10 @@
           }
 
           $('#containerAddPattern').before($e); 
+        },
+        addRndPattern: function(){ 
+          ui.addPattern();
+          //TODO: RANDOM VALUE INPUT/SELECT
         },      
         setStatusCombos: function(){   
           //reset delete modal
@@ -1129,10 +1144,6 @@
                 app.data = JSON.parse(e.target.result);
                 console.log(app.data);
                 ui.getData();
-                for(var i=0; i<app.data.data[0].length; i++){
-                  name = app.getNamePattern(app.data.data[0][i].paramSet['PATCH%COM']);
-                  console.log(name);
-                }
                 console.log('success data template load');
               } catch (error) {
                 console.error("Error al leer o parsear el archivo:", error);
@@ -1160,6 +1171,20 @@
             // Liberar memoria
             URL.revokeObjectURL(enlace.href);
           });
+          
+          $('#btnAddPattern').on('click',function(){
+            ui.addPattern();  
+            ui.setActionCombos(); 
+            ui.setStatusCombos();   
+            ui.calNPattern(); 
+          }); 
+
+          $('#btnRndPattern').on('click',function(){
+            ui.addRndPattern();  
+            ui.setActionCombos(); 
+            ui.setStatusCombos();   
+            ui.calNPattern(); 
+          });  
         },
         getData: function(){
           $('#dataSetName').val(app.data.name);  
@@ -1314,33 +1339,12 @@
           ui.setActionCombos(); 
           ui.setStatusCombos(); 
           ui.calNPattern();
-          $('#btnAddPattern').on('click',function(){
-            ui.addPattern();  
-            ui.setActionCombos(); 
-            ui.setStatusCombos();   
-            ui.calNPattern(); 
-          });  
           app.init().then(function(){
             ui.getData();
             $('.container').removeClass('d-none'); 
-            modal.hide();
-             
-            //$($(ui.pattern[0]+' button')[0]).trigger('click'); 
-            //ui.setStatusCombos(); 
-          
-            /*
-            setInterval(function(){
-              var ahora = new Date();
-              var fechaStr = "" + 
-              String(ahora.getHours()).padStart(2, '0') + "" +
-              String(ahora.getMinutes()).padStart(2, '0')+ "" +
-              String(ahora.getSeconds()).padStart(2, '0');
-              $('#dataSetName').val('Setup_pattern_'+fechaStr);    
-              $('#pattern_001 .inputPatternName').val('Pat_'+fechaStr); 
-              $('#pattern_001 .inputPatternName').trigger('change'); 
-            },5000);
-            */
-
+            $('#btnAddPattern').trigger('click');
+            $('#btnRndPattern').trigger('click');
+            modal.hide();            
           }); 
         }
       }
