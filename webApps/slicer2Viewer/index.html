@@ -107,8 +107,7 @@
                       <button type="button" class="btn btn-sm btn-danger btnDeletePattern" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="fas fa-trash"></i>  Delete</button>
                     </div>
                   </div>
-                  <div class="row">  
-                    
+                  <div class="row">                     
                     <div class="col-sm-8">
                       <h4 class="">Name Parameter.</h4>
                     </div>
@@ -675,7 +674,45 @@
                         </div>
                       </div> 
                     </div>   
-                  </div> 
+                  </div>                   
+                  <div class="row">                     
+                    <div class="col-sm-8">
+                      <h4 class="">Mix Parameters.</h4>
+                    </div>
+                    <div class="col-sm-4 text-end">
+                      <span class="badge text-bg-primary">PATCH%MIXER</span>
+                    </div>
+                    <div class="col-12">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input inputMixChPattern" type="checkbox">                        
+                        <label class="form-label">Mix Stereo / ch1-right&ch2-left</label>
+                      </div>
+                    </div>                    
+                    <div class="col-sm-6">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input inputCheckCh1Pattern" type="checkbox" checked="on" >                        
+                        <label class="form-label">On/Off Ch1</label>
+                      </div>     
+                      <div class="row row-cols-auto">
+                        <div class="col d-flex flex-column text-center">
+                          <span>0</span>
+                          <input type="range" min="0" max="100" value="100" class="vertical-slider inputVolCh1Pattern">
+                        </div>
+                      </div> 
+                    </div>              
+                    <div class="col-sm-6">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input inputCheckCh2Pattern" type="checkbox" checked="on" >                        
+                        <label class="form-label">On/Off Ch2</label>
+                      </div>
+                      <div class="row row-cols-auto">
+                        <div class="col d-flex flex-column text-center">
+                          <span>0</span>
+                          <input type="range" min="0" max="100" value="100" class="vertical-slider inputVolCh2Pattern">
+                        </div>
+                      </div>
+                    </div> 
+                  </div>
                 </div>
               </div>
             </div>
@@ -1060,13 +1097,25 @@
           }
 
           for(var i=0; i<ui.pattern.length; i++){ 
-            var labelElem = ui.pattern[i];  
+            var labelElem = ui.pattern[i]; 
             
+            var check = false;
+            check = !$(labelElem+' .inputCheckCh1Pattern').is(':checked');
+            $(labelElem+' .inputVolCh1Pattern').prop('disabled', false);
+            if(check){
+              $(labelElem+' .inputVolCh1Pattern').prop('disabled', true);
+            }
+            check = !$(labelElem+' .inputCheckCh2Pattern').is(':checked');
+            $(labelElem+' .inputVolCh2Pattern').prop('disabled', false);
+            if(check){
+              $(labelElem+' .inputVolCh2Pattern').prop('disabled', true);
+            }
+
             for(var iii=1; iii<=2; iii++){
               var num = iii.toString().padStart(2,'0');
 
               //inputCheckPattern  
-              var check = $(labelElem+' .inputCheckPattern'+num).is(':checked');
+              check = $(labelElem+' .inputCheckPattern'+num).is(':checked');
               if(check){
                 $(labelElem+' .slicerChannel'+num+' input').prop('disabled', false);
                 $(labelElem+' .slicerChannel'+num+' select').prop('disabled', false); 
@@ -1151,6 +1200,16 @@
               var labelElem = $(this).attr('elem'); 
               $($(labelElem+' button')[0]).html($(this).val());
             });
+
+            //input Mix
+            $(ui.pattern[i]+' .inputCheckCh1Pattern').off('change');
+            $(ui.pattern[i]+' .inputCheckCh1Pattern').on('change',function(){
+              self.setStatusCombos();
+            }); 
+            $(ui.pattern[i]+' .inputCheckCh2Pattern').off('change');
+            $(ui.pattern[i]+' .inputCheckCh2Pattern').on('change',function(){
+              self.setStatusCombos();
+            }); 
 
             for(var ii=1; ii<=2; ii++){
               var num = ii.toString().padStart(2,'0');           
@@ -1254,7 +1313,35 @@
             name = app.getNamePattern(app.data.data[0][i].paramSet['PATCH%COM']);
             $($(idElem+' button')[0]).html(name);
             $(idElem+' .inputPatternName').val(name); 
-            
+
+            //Mix channel
+            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%MIXER'][0]);
+            if(value===1){ 
+              $(idElem+' .inputMixChPattern').prop('checked', true);
+            }else{ 
+              $(idElem+' .inputMixChPattern').prop('checked', false);
+            }
+            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%MIXER'][1]);
+            if(value===1){ 
+              $(idElem+' .inputCheckCh1Pattern').prop('checked', true);
+            }else{ 
+              $(idElem+' .inputCheckCh1Pattern').prop('checked', false);
+            }            
+            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%MIXER'][2]); 
+            $(idElem+' .inputVolCh1Pattern').val(value);
+
+            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%MIXER'][3]);
+            if(value===1){ 
+              $(idElem+' .inputCheckCh2Pattern').prop('checked', true);
+            }else{ 
+              $(idElem+' .inputCheckCh2Pattern').prop('checked', false);
+            }
+            value = app.getHex2Integer(app.data.data[0][i].paramSet['PATCH%MIXER'][4]); 
+            $(idElem+' .inputVolCh2Pattern').val(value);
+
+            console.log('getData');
+            console.log(app.data.data[0][i].paramSet['PATCH%MIXER']);
+
             for(var iii=1; iii<=2; iii++){
               var num = iii.toString().padStart(2,'0');
               var param = 'PATCH%SLICER('+iii+')';
@@ -1323,6 +1410,25 @@
             name = app.getNamePattern(app.data.data[0][i].paramSet['PATCH%COM']);
             name = $(idElem+' .inputPatternName').val(); 
             app.data.data[0][i].paramSet['PATCH%COM']=app.setStringDecimal2HexArr(name);
+
+            //Mix channel
+            value = $(idElem+' .inputMixChPattern').is(':checked')?'01':'00'; 
+            app.data.data[0][i].paramSet['PATCH%MIXER'][0]=value;
+            
+            value = $(idElem+' .inputCheckCh1Pattern').is(':checked')?'01':'00'; 
+            app.data.data[0][i].paramSet['PATCH%MIXER'][1]=value;
+            value = parseInt($(idElem+' .inputVolCh1Pattern').val());
+            value = app.getInteger2Hex(value);
+            app.data.data[0][i].paramSet['PATCH%MIXER'][2]=value;
+
+            value = $(idElem+' .inputCheckCh2Pattern').is(':checked')?'01':'00'; 
+            app.data.data[0][i].paramSet['PATCH%MIXER'][3]=value;
+            value = parseInt($(idElem+' .inputVolCh2Pattern').val());
+            value = app.getInteger2Hex(value);
+            app.data.data[0][i].paramSet['PATCH%MIXER'][4]=value;
+            
+            console.log('setData');
+            console.log(app.data.data[0][i].paramSet['PATCH%MIXER']);
             
             for(var iii=1; iii<=2; iii++){
               var num = iii.toString().padStart(2,'0');
@@ -1396,8 +1502,8 @@
             ui.getData();
             $('.container').removeClass('d-none'); 
             $('#btnRndPattern').trigger('click');
-            //$('#btnAddPattern').trigger('click');
             modal.hide();            
+            $($('#pattern_001 button')[0]).trigger('click');
           }); 
         }
       }
