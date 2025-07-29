@@ -108,17 +108,21 @@
                     </div>
                   </div>
                   <div class="row">  
-                    <div class="col-8">
-                      <label class="form-label">Pattern Name:</label>
-                      <input type="text" class="form-control inputPatternName" value="">
+                    
+                    <div class="col-sm-8">
+                      <h4 class="">Name Parameter.</h4>
                     </div>
-                    <div class="col-4 text-end">
+                    <div class="col-sm-4 text-end">
                       <span class="badge text-bg-primary">PATCH%COM</span>
                     </div>
+                    <div class="col-12">
+                      <label class="form-label">Pattern Name:</label>
+                      <input type="text" class="form-control inputPatternName" value="">
+                    </div> 
                   </div>
                   <div class="row mt-2 slicerChannel01"> 
                     <div class="col-sm-8">
-                      <h4 class="">Slicer Channel 1 Parameters. </h4>
+                      <h4 class="">Slicer Channel 1 Parameters.</h4>
                     </div>
                     <div class="col-sm-4 text-end">
                       <span class="badge text-bg-primary">PATCH%SLICER(1)</span>
@@ -971,9 +975,14 @@
           
           ui.pattern.push('#'+id);
           
-          //init name
-          $e.find('.inputPatternName').val(id);
-          $($e.find('button')[0]).html(id);
+          //init name  
+          var dat = new Date();
+          var name='Void';
+          name=name+'_'+String(dat.getHours()).padStart(2, '0');
+          name=name+':'+String(dat.getMinutes()).padStart(2, '0');
+          name=name+':'+String(dat.getSeconds()).padStart(2, '0');
+          $e.find('.inputPatternName').val(name);
+          $($e.find('button')[0]).html(name);
 
           //setup accordion
           $e.find('.collapse01').addClass('collapse01_'+id);
@@ -987,13 +996,58 @@
               $e.find('.'+c).removeClass(c); 
               $e.find('[data-bs-target=".'+c+'"]').attr('data-bs-target','.'+c+'_'+id); 
             } 
-          }
+          } 
 
           $('#containerAddPattern').before($e); 
         },
         addRndPattern: function(){ 
           ui.addPattern();
-          //TODO: RANDOM VALUE INPUT/SELECT
+          var idElem=ui.pattern[ui.pattern.length-1]; 
+        
+          //Pattern Name
+          var dat = new Date();
+          var name='Rnd';
+          name=name+'_'+String(dat.getHours()).padStart(2, '0');
+          name=name+':'+String(dat.getMinutes()).padStart(2, '0');
+          name=name+':'+String(dat.getSeconds()).padStart(2, '0');
+          $(idElem+' .inputPatternName').val(name); 
+          $($(idElem+' button')[0]).html(name);
+
+          
+          for(var iii=1; iii<=2; iii++){
+            var num = iii.toString().padStart(2,'0');
+
+            //Effect Type 
+            $(idElem+' .inputEffectPattern'+num).val(app.getRndNum(0,6));
+
+            //Step Number
+            $(idElem+' .inputStepPattern'+num).val(app.getRndNum(0,3));
+
+            //Step LENGTH.
+            pos=4;//init
+            for(var ii=pos; ii<pos+24; ii++){ 
+              $($(idElem+' .inputLengthContPattern'+num+' input')[ii-pos]).val(app.getRndNum(50,100));
+            } 
+            //Step LEVEL.
+            pos=4+24;//init + Step len
+            for(var ii=pos; ii<pos+24; ii++){ 
+              $($(idElem+' .inputLevelContPattern'+num+' input')[ii-pos]).val(app.getRndNum(50,100));
+            } 
+            //Step EFFECT.
+            pos=4+24+24+24;//init + Step len + step level + band pass
+            for(var ii=pos; ii<pos+24; ii++){ 
+              $($(idElem+' .inputEffectContPattern'+num+' input')[ii-pos]).val(app.getRndNum(50,100));
+            } 
+            //Step PITCH.
+            pos=4+24+24+24+24;//init + Step len + step level + band pass + effect level
+            for(var ii=pos; ii<pos+24; ii++){ 
+              $($(idElem+' .inputPitchContPattern'+num+' input')[ii-pos]).val(app.getRndNum(0,24));
+            } 
+          }
+          
+          ui.setActionCombos(); 
+          ui.setStatusCombos(); 
+          ui.calNPattern(); 
         },      
         setStatusCombos: function(){   
           //reset delete modal
@@ -1246,7 +1300,6 @@
                 $($(idElem+' .inputPitchContPattern'+num+' input')[ii-pos]).val(value);
               } 
             }
-
           } 
           ui.setActionCombos(); 
           ui.setStatusCombos(); 
@@ -1271,9 +1324,9 @@
             name = $(idElem+' .inputPatternName').val(); 
             app.data.data[0][i].paramSet['PATCH%COM']=app.setStringDecimal2HexArr(name);
             
-            for(var ii=1; ii<=2; ii++){
-              var num = ii.toString().padStart(2,'0');
-              var param = 'PATCH%SLICER('+ii+')';
+            for(var iii=1; iii<=2; iii++){
+              var num = iii.toString().padStart(2,'0');
+              var param = 'PATCH%SLICER('+iii+')';
 
               //Enabled
               value = $(idElem+' .inputCheckPattern'+num).is(':checked')?'01':'00'; 
@@ -1342,8 +1395,8 @@
           app.init().then(function(){
             ui.getData();
             $('.container').removeClass('d-none'); 
-            $('#btnAddPattern').trigger('click');
             $('#btnRndPattern').trigger('click');
+            //$('#btnAddPattern').trigger('click');
             modal.hide();            
           }); 
         }
