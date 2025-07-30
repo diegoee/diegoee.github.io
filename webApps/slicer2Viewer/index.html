@@ -11,7 +11,7 @@
         /*writing-mode: bt-lr; /* vertical de abajo hacia arriba */
         appearance: slider-vertical; /* para Safari/Chrome */
         width: 30px;
-        height: 250px;
+        height: 150px;
       } 
     </style>
   </head>
@@ -688,10 +688,10 @@
                         <label class="form-label">Mix Stereo / ch1-right&ch2-left</label>
                       </div>
                     </div>                    
-                    <div class="col-sm-6">
+                    <div class="col-6">
                       <div class="form-check form-switch">
                         <input class="form-check-input inputCheckCh1Pattern" type="checkbox" checked="on" >                        
-                        <label class="form-label">On/Off Ch1</label>
+                        <label class="form-label">Off/On Ch1</label>
                       </div>     
                       <div class="row row-cols-auto">
                         <div class="col d-flex flex-column text-center">
@@ -700,10 +700,10 @@
                         </div>
                       </div> 
                     </div>              
-                    <div class="col-sm-6">
+                    <div class="col-6">
                       <div class="form-check form-switch">
                         <input class="form-check-input inputCheckCh2Pattern" type="checkbox" checked="on" >                        
-                        <label class="form-label">On/Off Ch2</label>
+                        <label class="form-label">Off/On Ch2</label>
                       </div>
                       <div class="row row-cols-auto">
                         <div class="col d-flex flex-column text-center">
@@ -876,7 +876,11 @@
           $('#dataNpattern').val(nPattern);
         },
         resetPattern: function(){
-
+          for(var i=0; i<ui.pattern.length; i++){ 
+            var idElem=ui.pattern[i]; 
+            $(idElem).remove();
+          }
+          ui.pattern=[];
         },
         addPattern: function(){ 
           var nPattern = ui.pattern.length+1;
