@@ -3,7 +3,7 @@
   <head>  
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <title>Webapp: Guitar pedal Boss sl-2 pattern viewer</title> 
+    <title>Webapp: Boss pedal sl-2 pattern editor</title> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/css/bootstrap.min.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">  
     <style> 
@@ -18,10 +18,25 @@
   <body>  
     <nav class="navbar bg-body-tertiary"> 
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">SL-2 Path Editor Lite</span>
+        <span class="navbar-brand mb-0 h1">SL-2 Pattern Editor (Lite)</span> 
+        <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">
+          <span class="navbar-toggler-icon"></span>
+        </button>  
       </div>
-    </nav>
+    </nav> 
 
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasWithBackdropLabel">Menu</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <p>
+          <a target=”_blank” href="https://sl2-patch-editor.xyz">sl2-patch-editor.xyz</a>
+        </p>
+      </div>
+    </div> 
+        
     <div class="container d-none">
 
       <div class="row">
@@ -34,7 +49,7 @@
                   <button type="button" class="btn btn-primary" id="btnUpload"><i class="fas fa-upload"></i> Upload .tsl</button>      
                   <input type="file" id="fileInput" accept=".tsl" style="display: none;" />
                 </div>
-                <div class="col-sm-2 text-center"> -- </div>
+                <div class="col-sm-2 text-center mt-2"></div>
                 <div class="col-sm-4 d-grid gap-2">
                   <button type="button" class="btn btn-primary" id="btnDownload"><i class="fas fa-download"></i> Download .tsl</button>
                 </div>
@@ -1375,9 +1390,9 @@
           app.init().then(function(){
             ui.getData();
             $('.container').removeClass('d-none'); 
-            $('#btnRndPattern').trigger('click');
+            $('#btnAddPattern').trigger('click');
             modal.hide();            
-            $($('#pattern_001 button')[0]).trigger('click');
+            //$($('#pattern_001 button')[0]).trigger('click');
           }); 
         }
       }
