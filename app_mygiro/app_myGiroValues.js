@@ -292,7 +292,20 @@ async function main(){
     });
     return objetoFila;
   });   
-  delete data,head;    
+  delete data,head;   
+  movements.forEach(function(e,pos){ 
+    e.TotalCashEUR=0;
+    for (var i=0; i<movements.length-pos; i++){
+      var cash = undefined
+      cash = movements[movements.length-1-i].CastflowEUR; 
+      cash = cash.replaceAll('€','').trim().replaceAll(',','.');
+      cash = parseFloat(cash); 
+      e.TotalCashEUR=e.TotalCashEUR+cash;
+    }  
+    e.TotalCashEUR=e.TotalCashEUR.toFixed(2)+' €';
+  }); 
+  //print(movements[movements.length-2]);
+  //print(movements[movements.length-1]);
   //print(movements,'table');
 
   print('STOCKS VALUES');  
