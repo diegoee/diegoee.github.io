@@ -16,7 +16,7 @@
     </style>
   </head>
   <body>  
-    <nav class="navbar bg-body-tertiary"> 
+    <nav class="navbar bg-body-tertiary sticky-top"> 
       <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">SL-2 Pattern Editor (Lite)</span> 
         <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">
@@ -31,40 +31,45 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body">
-        <p>
+         
+        <div class="row"> 
+          <div class="col-sm-12 mt-2 d-grid gap-2">
+            <button type="button" class="btn btn-primary" id="btnUpload"><i class="fas fa-upload"></i> Upload .tsl</button>      
+            <input type="file" id="fileInput" accept=".tsl" style="display: none;" />
+          </div>  
+          <div class="col-sm-12 mt-2 d-grid gap-2">
+            <button type="button" class="btn btn-primary" id="btnDownload"><i class="fas fa-download"></i> Download .tsl</button>
+          </div> 
+        </div> 
+
+        <p class="mt-4">
           <a target=”_blank” href="https://sl2-patch-editor.xyz">sl2-patch-editor.xyz</a>
         </p>
       </div>
     </div> 
         
-    <div class="container d-none">
+    <div class="container d-none mb-3">
 
-      <div class="row">
+      <div class="row mt-2">
         <div class="col-sm-12">
           <div class="card"> 
-            <div class="card-body">  
-              <div class="row card-text">
+            <div class="card-body"> 
+   
+              <div class="row"> 
                 <div class="col-sm-1"></div>
-                <div class="col-sm-4 d-grid gap-2">
-                  <button type="button" class="btn btn-primary" id="btnUpload"><i class="fas fa-upload"></i> Upload .tsl</button>      
-                  <input type="file" id="fileInput" accept=".tsl" style="display: none;" />
-                </div>
-                <div class="col-sm-2 text-center mt-2"></div>
-                <div class="col-sm-4 d-grid gap-2">
-                  <button type="button" class="btn btn-primary" id="btnDownload"><i class="fas fa-download"></i> Download .tsl</button>
-                </div>
-                <div class="col-sm-1"></div>
-              </div> 
-            </div>
-          </div>
-        </div>
-      </div> 
-      
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="card"> 
-            <div class="card-body">  
-              <div class="row card-text"> 
+                <div class="col-sm-3 mt-2 d-grid gap-2">
+                  <button type="button" class="btn btn-secondary" id="btnAddPattern"><i class="fas fa-add"></i> Add Pattern</button> 
+                </div>  
+                <div class="col-sm-3 mt-2 d-grid gap-2">
+                  <button type="button" class="btn btn-secondary" id="btnRndPattern"><i class="fas fa-add"></i> Add <i class="fas fa-dice"></i>  Pattern</button> 
+                </div>    
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3 mt-2 d-grid gap-2">
+                  <button type="button" class="btn btn-danger" id="btnDeleteAllPattern" data-bs-toggle="modal" data-bs-target="#modalDelete"><i class="fas fa-trash"></i> Delete All</button> 
+                </div>  
+              </div>   
+ 
+              <div class="row mt-2"> 
                 <div class="col-sm-3">
                   <label class="form-label">Live Set Name:</label>
                   <input id="dataSetName" type="text" class="form-control" value="--">
@@ -82,29 +87,11 @@
                   <input id="dataNpattern" type="text" class="form-control" disabled value="0">
                 </div> 
               </div> 
+
             </div>
           </div>
         </div>
       </div>  
-      
-      <div class="row" id="containerAddPattern">
-        <div class="col-sm-12">
-          <div class="card"> 
-            <div class="card-body">  
-              <div class="row card-text"> 
-                <div class="col-sm-3"> </div>
-                <div class="col-sm-3 d-grid gap-2">
-                  <button type="button" class="btn btn-light" id="btnAddPattern"><i class="fas fa-add"></i> Add Pattern</button> 
-                </div>
-                <div class="col-sm-3 d-grid gap-2">
-                  <button type="button" class="btn btn-light" id="btnRndPattern"><i class="fas fa-add"></i> Add <i class="fas fa-dice"></i>  Pattern</button> 
-                </div>
-                <div class="col-sm-3"> </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> 
 
       <div class="row d-none pattern_template" id="pattern_template">
         <div class="col-sm-12">
@@ -930,7 +917,7 @@
             } 
           } 
 
-          $('#containerAddPattern').before($e); 
+          $('#pattern_template').before($e); 
         },
         addRndPattern: function(){ 
           ui.addPattern();
@@ -1193,6 +1180,16 @@
             ui.setStatusCombos();   
             ui.calNPattern(); 
           });  
+  
+          $('#btnDeleteAllPattern').on('click',function(){
+            $('#modalDelete span').text('All Pattern (N='+$('#dataNpattern').val()+')');
+            $($('#modalDelete button')[2]).off('click');
+            $($('#modalDelete button')[2]).on('click',function(){ 
+              ui.resetPattern(); 
+              ui.calNPattern();  
+            }); 
+          });  
+
         },
         getData: function(){
           $('#dataSetName').val(app.data.name);  
