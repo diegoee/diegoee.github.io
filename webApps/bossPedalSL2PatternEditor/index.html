@@ -34,16 +34,16 @@
          
         <div class="row"> 
           <div class="col-sm-12 mt-2 d-grid gap-2">
-            <button type="button" class="btn btn-primary" id="btnUpload"><i class="fas fa-upload"></i> Upload .tsl</button>      
+            <button type="button" class="btn btn-primary" id="btnUpload" data-bs-dismiss="offcanvas" aria-label="Close"><i class="fas fa-upload"></i> Upload .tsl</button>      
             <input type="file" id="fileInput" accept=".tsl" style="display: none;" />
           </div>  
           <div class="col-sm-12 mt-2 d-grid gap-2">
-            <button type="button" class="btn btn-primary" id="btnDownload"><i class="fas fa-download"></i> Download .tsl</button>
+            <button type="button" class="btn btn-primary" id="btnDownload" data-bs-dismiss="offcanvas" aria-label="Close"><i class="fas fa-download"></i> Download .tsl</button>
           </div> 
         </div> 
 
         <p class="mt-4">
-          <a target=”_blank” href="https://sl2-patch-editor.xyz">sl2-patch-editor.xyz</a>
+          <a target="_blank" href="https://sl2-patch-editor.xyz">sl2-patch-editor.xyz</a>
         </p>
       </div>
     </div> 
@@ -1189,6 +1189,10 @@
               ui.calNPattern();  
             }); 
           });  
+
+          $('#offcanvas a').on('click',function(){
+            $('#offcanvas button.btn-close').trigger('click'); 
+          }); 
 
         },
         getData: function(){
