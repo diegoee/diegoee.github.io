@@ -122,8 +122,8 @@ function filterBy(data,head,eHead,filter,eFilter){
   }
   if(filter==='!=(number)'){
     data=data.filter(function(e){
-      return parseFloat(e[pos])!==parseFloat(eFilter);
-    });
+      return parseFloat(e[pos].replaceAll('€','').replaceAll(',','.').trim())!==eFilter;
+    }); 
   }
   return data;
 } 
@@ -231,13 +231,16 @@ async function main(){
   data = filterBy(data,head,'ISIN','!=','NLFLATEXACNT'); 
   data = filterBy(data,head,'Descripción','!=','Degiro Cash Sweep Transfer');  
   data = filterBy(data,head,'Descripción','not contain','Cuenta'); 
+  
  
   head = ['Fecha', 'ID_Producto', 'Desc', 'CastflowEUR'];
   var aux = [];
   data.forEach(function(e){ 
     aux.push([e[0],e[3],e[5],e[8]+' €']);
   });
-  data = aux;  
+  data = aux;
+ 
+  //print(data.slice(-10));
   
   data.forEach(function(e){  
     e[0] = moment(moment(e[0],'DD-MM-YYYY').toDate()).format('YYYY-MM-DD');
@@ -275,7 +278,9 @@ async function main(){
       e[1]='TAX DIV';
     }   
   });
-  data = filterBy(data,head,'CastflowEUR','!=(number)',0); 
+  data = filterBy(data,head,'CastflowEUR','!=(number)',0);    
+  
+  
 
   data.sort(function(a,b){
     return (b[0]+b[2])-(a[0]+a[2]);
@@ -293,12 +298,13 @@ async function main(){
     return objetoFila;
   });   
   delete data,head;   
+
   movements.forEach(function(e,pos){ 
     e.TotalCashEUR=0;
     for (var i=0; i<movements.length-pos; i++){
       var cash = undefined
       cash = movements[movements.length-1-i].CastflowEUR; 
-      cash = cash.replaceAll('€','').trim().replaceAll(',','.');
+      cash = cash.replaceAll('€','').replaceAll(',','.').trim();
       cash = parseFloat(cash); 
       e.TotalCashEUR=e.TotalCashEUR+cash;
     }  
@@ -405,14 +411,14 @@ async function main(){
   var a2 = [];
   var a3 = [];
   movements.forEach(function(e){
-    a1.push(parseFloat(e.CastflowEUR.replaceAll('€','').trim()));
+    a1.push(parseFloat(e.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim()));
   });  
   a1 = a1.reduce(function(a,b){ 
     return a+b; 
   },0); 
   
   stocksValues.forEach(function(e){ 
-    a2.push(parseFloat(e.total.replaceAll('€','').trim())); 
+    a2.push(parseFloat(e.total.replaceAll('€','').replaceAll(',','.').trim())); 
   });
   a2 = a2.reduce(function(a,b){ 
     return a+b; 
@@ -420,7 +426,7 @@ async function main(){
 
   movements.forEach(function(e){
     if(e.ID_Producto.trim()==='INPUT'){
-      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').trim())); 
+      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim())); 
     }
   }); 
   a3 = (a1+a2)-a3.reduce(function(a,b){ 
@@ -455,7 +461,7 @@ async function main(){
   a3=[];
   movements.forEach(function(e){
     if(e.ID_Producto.trim()==='INPUT'){
-      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').trim())); 
+      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim())); 
     }
   }); 
   a3 = a3.reduce(function(a,b){ 
@@ -472,7 +478,7 @@ async function main(){
   a3=[];
   movements.forEach(function(e){
     if(e.ID_Producto.trim()==='TAX DIV'||e.ID_Producto.trim()==='DIV'){
-      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').trim())); 
+      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim())); 
     }
   }); 
   a3 = Math.round(a3.reduce(function(a,b){ 
@@ -494,7 +500,7 @@ async function main(){
   a3=[];
   movements.forEach(function(e){
     if(e.ID_Producto.trim()==='TAX'||e.ID_Producto.trim()==='INPUT FREE'){
-      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').trim())); 
+      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim())); 
     }
   }); 
   a3 = Math.abs(Math.round(a3.reduce(function(a,b){ 
@@ -525,7 +531,8 @@ async function main(){
   delete a1,a2,a3;   
   
   //print(countState,'table');
-  dataJSON.countState=countState;  
+  dataJSON.countState=countState; 
+
   print('graph01Data done');
   dataJSON.graph01Data=graph01Data;
   
@@ -558,9 +565,9 @@ async function main(){
     var ref = 0;
     movements.forEach(function(m,mi){  
       if(moment(m.Fecha,'DD/MM/YYYY').isSameOrBefore(moment(d,'DD/MM/YYYY'))){
-        val = val+parseFloat(m.CastflowEUR.replaceAll('€','')); 
+        val = val+parseFloat(m.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim()); 
         if(m.ID_Producto.trim()==='INPUT'){
-          ref = ref+parseFloat(m.CastflowEUR.replaceAll('€','')); 
+          ref = ref+parseFloat(m.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim()); 
         }
       } 
     }); 
@@ -630,7 +637,7 @@ async function main(){
     var val=0;
     movements.forEach(function(m,mi){  
       if(moment(m.Fecha,'DD/MM/YYYY').isSameOrBefore(moment(d,'DD/MM/YYYY'))){ 
-        val = val+parseFloat(m.CastflowEUR.replaceAll('€','')); 
+        val = val+parseFloat(m.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim()); 
       } 
     });  
     aux.push(Math.round(val*100)/100);
