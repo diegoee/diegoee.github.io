@@ -242,7 +242,7 @@ async function main(){
  
   //print(data.slice(-10));
   
-  data.forEach(function(e){  
+  data.forEach(function(e){   
     e[0] = moment(moment(e[0],'DD-MM-YYYY').toDate()).format('YYYY-MM-DD');
     if(e[2]==='flatex Deposit'){
       e[1]='INPUT';
@@ -277,10 +277,11 @@ async function main(){
     if(e[2].indexOf('Retención del dividendo')!==-1){
       e[1]='TAX DIV';
     }   
+    if(e[2].indexOf('Retirada')!==-1){
+      e[1]='OUTPUT';
+    } 
   });
-  data = filterBy(data,head,'CastflowEUR','!=(number)',0);    
-  
-  
+  data = filterBy(data,head,'CastflowEUR','!=(number)',0);      
 
   data.sort(function(a,b){
     return (b[0]+b[2])-(a[0]+a[2]);
@@ -296,8 +297,7 @@ async function main(){
       objetoFila[columna] = fila[indice];
     });
     return objetoFila;
-  });   
-  delete data,head;   
+  });    
 
   movements.forEach(function(e,pos){ 
     e.TotalCashEUR=0;
@@ -310,9 +310,8 @@ async function main(){
     }  
     e.TotalCashEUR=e.TotalCashEUR.toFixed(2)+' €';
   }); 
-  //print(movements[movements.length-2]);
-  //print(movements[movements.length-1]);
-  //print(movements,'table');
+ 
+  print('Movements created');
 
   print('STOCKS VALUES');  
   var stocks = await readJson('stocks.json');  
@@ -363,12 +362,13 @@ async function main(){
   var stocksValues = [];
   stocks.forEach(function(s){   
     stocksValues.push({
-      id:     s.desc+'-'+s.dates[s.dates.length-1]+'-'+s.prices[s.prices.length-1],
-      desc:   s.desc, 
-      fecha:  s.dates[s.dates.length-1], 
-      price:  s.prices[s.prices.length-1], 
-      n:      s.N,
-      total:  0
+      id:           s.desc+'-'+s.dates[s.dates.length-1]+'-'+s.prices[s.prices.length-1],
+      desc:         s.desc,  
+      date_start:   s.dates[0], 
+      date_end:     s.dates[s.dates.length-1], 
+      price:        s.prices[s.prices.length-1], 
+      n:            s.N,
+      total:        0
     }); 
   });
   aux = distinctArrayObject(stocksValues,'id');
@@ -386,7 +386,7 @@ async function main(){
     delete e.id;
   });
   stocksValues=aux;
-  delete aux;
+
   stocksValues.sort(function(a,b){
     return a.desc.localeCompare(b.desc);
   });    
@@ -417,8 +417,11 @@ async function main(){
     return a+b; 
   },0); 
   
-  stocksValues.forEach(function(e){ 
-    a2.push(parseFloat(e.total.replaceAll('€','').replaceAll(',','.').trim())); 
+  stocksValues.forEach(function(e){
+    var fecha = moment(e.date_end,'DD/MM/YYYY');
+    if(fecha.isSameOrAfter(moment(),'day')){ 
+      a2.push(parseFloat(e.total.replaceAll('€','').replaceAll(',','.').trim())); 
+    }
   });
   a2 = a2.reduce(function(a,b){ 
     return a+b; 
@@ -467,13 +470,29 @@ async function main(){
   a3 = a3.reduce(function(a,b){ 
     return a+b; 
   },0);  
+  var a4 = Math.round(a3*100)/100;
   countState.push({
     info: 'Input Cash',
-    value: (Math.round(a3*100)/100)+' €',
+    value: (a4)+' €',
     extra: 'B/P: '+(Math.round(((a1+a2-a3)/(a1+a2))*10000)/100)+'%' 
   });
   
   graph02Data.bp = graph02Data.bp+' ('+(Math.round(((a1+a2-a3)/(a1+a2))*10000)/100)+'%)'; 
+  
+  a3=[];
+  movements.forEach(function(e){
+    if(e.ID_Producto.trim()==='OUTPUT'){
+      a3.push(parseFloat(e.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim())); 
+    }
+  }); 
+  a3 = a3.reduce(function(a,b){ 
+    return a+b; 
+  },0);  
+  countState.push({
+    info: 'Output Cash',
+    value: (Math.round(Math.abs(a3)*100)/100)+' €',
+    extra: (Math.round(Math.abs(a3/a4)*10000)/100)+' % Input' 
+  });
 
   a3=[];
   movements.forEach(function(e){
@@ -491,10 +510,13 @@ async function main(){
   });  
   
   stocksValues.forEach(function(e){
-    graph01Data.push({
-      name: e.desc,
-      y: Math.round(e.n*e.price*100)/100 
-    }); 
+    var fecha = moment(e.date_end,'DD/MM/YYYY');
+    if(fecha.isSameOrAfter(moment(),'day')){ 
+      graph01Data.push({
+        name: e.desc,
+        y: Math.round(e.n*e.price*100)/100 
+      }); 
+    }
   });  
 
   a3=[];
@@ -523,12 +545,16 @@ async function main(){
   });
   graph02Data.timing = convert2Days(moment().diff(moment.min(a3),'days'));
 
+  a3 = Array.from(stocksValues); 
+  a3 = a3.filter(function(item){  
+      return moment(item.date_end, 'DD/MM/YYYY').isSame(moment(), 'day');
+    }
+  );
   countState.push({
-    info: 'Distinct Stocks',
-    value: ''+stocksValues.length,
+    info: 'Active Stocks',
+    value: ''+a3.length,
     extra: 'Tod.: '+moment().format('DD/MM/YYYY') 
-  });
-  delete a1,a2,a3;   
+  }); 
   
   //print(countState,'table');
   dataJSON.countState=countState; 
@@ -555,7 +581,7 @@ async function main(){
     var val=0;
     stocks.forEach(function(s,si){  
       for(var i=0; i<s.dates.length; i++){
-        if(s.dates[i]===d){
+        if((s.dates[i])===d){
           val = val+s.N*s.prices[i];
           break; 
         }
@@ -564,9 +590,12 @@ async function main(){
     
     var ref = 0;
     movements.forEach(function(m,mi){  
-      if(moment(m.Fecha,'DD/MM/YYYY').isSameOrBefore(moment(d,'DD/MM/YYYY'))){
-        val = val+parseFloat(m.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim()); 
+      if(moment(m.Fecha,'DD/MM/YYYY').isSameOrBefore(moment(d,'DD/MM/YYYY'))){ 
+        val = val+parseFloat(m.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim());  
         if(m.ID_Producto.trim()==='INPUT'){
+          ref = ref+parseFloat(m.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim()); 
+        } 
+        if(m.ID_Producto.trim()==='OUTPUT'){
           ref = ref+parseFloat(m.CastflowEUR.replaceAll('€','').replaceAll(',','.').trim()); 
         }
       } 
@@ -677,8 +706,7 @@ async function main(){
       name: s.desc,
       data: aux 
     });   
-  }); 
-  delete aux;
+  });  
     
   print('graph02Data done');
   dataJSON.graph02Data=graph02Data;

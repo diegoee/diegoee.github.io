@@ -1,10 +1,4 @@
 [{
-    "ticker": "SCYR.MC", 
-    "N": 175,
-    "desc": "SACYR",
-    "dStart": "2022-11-24",
-    "dEnd": "2099-12-31"
-},{
     "ticker": "BBVAE.MC", 
     "N": 35,
     "desc": "BBVA EURO STOXX 50",
@@ -27,5 +21,11 @@
     "N": 25,  
     "desc": "LOGISTA",
     "dStart": "2022-12-27",
-    "dEnd": "2099-12-31"
+    "dEnd": "2026-01-22"
+},{
+    "ticker": "SCYR.MC", 
+    "N": 175,
+    "desc": "SACYR",
+    "dStart": "2022-11-24",
+    "dEnd": "2026-01-26"
 }]
