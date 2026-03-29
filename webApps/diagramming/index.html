@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+    <title>Webapp: Diagramming</title>  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">  
+    <style>
+      .line-numbers {
+        width: 40px;
+        background-color: #f0f0f0;
+        text-align: right;
+        padding: 10px 5px;
+        color: #888;
+        overflow: hidden; /* Evita que los números tengan su propio scroll */
+        user-select: none; /* Para que no se seleccionen al copiar el código */
+      }
+
+      textarea {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        outline: none;
+        resize: none;
+        white-space: pre; /* Evita que el texto salte de línea automáticamente */
+        overflow-x: auto;
+      }
+    </style>
+</head>
+<body>  
+
+  <nav class="navbar bg-body-tertiary sticky-top"> 
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Diagramming</span> 
+      <p>
+        Powered by: <a target="_blank" href="https://mermaid.ai/open-source/">mermaid.js (open-source)</a>
+      </p>  
+    </div>
+  </nav>   
+
+  <div class="container">  
+    <div class="row mt-2">  
+      <div class="col-sm-2 mt-2 d-grid gap-2">
+        <button type="button" class="btn btn-secondary" id="btnSave"><i class="fas fa-save"></i></button> 
+      </div>  
+      <div class="col-sm-8"> 
+        <label class="form-label">Theme:</label>
+        <select id="selTheme" class="form-select">
+          <option value="base">base</option> 
+          <option value="neutral">neutral</option> 
+          <option value="default">default</option>
+          <option value="dark">dark</option> 
+          <option value="forest">forest</option> 
+          <option value="custom1">custom 1</option> 
+        </select>  
+      </div>  
+      <div class="col-sm-2 mt-2 d-grid gap-2">
+        <button type="button" class="btn btn-success" id="btnExe"><i class="fas fa-play"></i></button> 
+      </div>    
+    </div>
+    <div class="row mt-2">   
+      <div class="col-12">
+        <div class="form-row">
+          <div class="input-group displayGroup">
+            <span class="input-group-text">Code</span> 
+            <textarea class="form-control" aria-label="With textarea" id="inputCode"></textarea> 
+          </div> 
+        </div>
+      </div>  
+    </div> 
+    <div class="row mt-2">   
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div id="result" class="text-center"> </div>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+
+  <canvas id="canvasExport" class="d-none"></canvas>
+
+  <pre id="exampleCode" class="d-none">
+---
+title: Simple sample
+---
+pie 
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+  </pre>
+
+  <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    var app={ 
+      initMermaid: function(theme){
+        // Configuración e inicialización simple
+        var themeVariables={}
+        if(theme==='custom1'){
+          themeVariables={    
+            'fontFamily': 'Courier New'
+          } 
+          theme='base';
+        } 
+        mermaid.initialize({ 
+          startOnLoad: false,
+          theme: theme,
+          suppressErrorPage: false, 
+          suppressConsoleErrors: false,
+          themeVariables: themeVariables
+        });
+      },
+      init: function(){ 
+
+        $('#inputCode').val($('#exampleCode').text());
+        $('#inputCode').innerHeight($(window).innerHeight()/3);   
+        
+        $('#btnExe').on('click', async function() { 
+          $('#result').removeClass('text-center');
+          var codeDiagram = $('#inputCode').val().trim();   
+          var uniqueId = 'graph';
+          try {           
+            var res = await mermaid.render(uniqueId, codeDiagram);  
+            $('#result').html(res.svg);  
+            $('#result').addClass('text-center'); 
+          }catch(error) { 
+            console.error("Error de sintaxis en Mermaid:", error);
+            $('#result').html('<strong>❌ Error de Sintaxis:</strong><br><small>'+error.message+'</small>'); 
+            $('#d'+uniqueId).remove(); 
+          } 
+        });
+
+        $('#selTheme').on('change', function() {
+          var theme = $(this).val();
+          app.initMermaid(theme);
+        });
+
+        $('#btnSave').on('click', function() { 
+          var $svg = $('#result svg'); 
+          if ($svg.length === 0) {
+            $('#result').html("No hay ningún diagrama renderizado para guardar.");
+            return;
+          } 
+          var svgElement = $svg[0];
+          var canvas = document.getElementById('canvasExport');
+          var ctx = canvas.getContext('2d'); 
+          var xml = new XMLSerializer().serializeToString(svgElement);
+          var svg64 = btoa(unescape(encodeURIComponent(xml)));
+          var b64Start = 'data:image/svg+xml;base64,';
+          var image64 = b64Start + svg64; 
+          var ancho = svgElement.viewBox.baseVal.width || $svg.width();
+          var alto = svgElement.viewBox.baseVal.height || $svg.height();  
+          canvas.width = ancho;
+          canvas.height = alto;
+
+          var img = new Image();
+          img.onload = function() { 
+            ctx.drawImage(img, 0, 0);  
+            const pngUrl = canvas.toDataURL("image/png");
+            const downloadLink = document.createElement("a");
+            downloadLink.href = pngUrl;
+            downloadLink.download = "graph.png"; 
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          };
+
+          img.src = image64;
+        });
+
+
+        $('#selTheme').trigger('change'); 
+        //$('#btnExe').trigger('click');
+
+      }
+    }
+    app.init();
+  </script> 
+</body>
+</html>
