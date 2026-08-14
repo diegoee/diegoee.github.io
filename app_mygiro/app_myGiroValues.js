@@ -80,13 +80,24 @@ function readHtml(fileName){
 async function getStockValueYahoo(ticket, N, dStart, dEnd, descTicket) {
   var axios = require('axios');
   var moment = require('moment');  
-  var response = await axios.get('https://query1.finance.yahoo.com/v8/finance/chart/'+ticket+'?period1='+moment(dStart).unix()+'&period2='+moment(dEnd).unix()+'&interval=1d');
-  var res ={
-    prices: response.data.chart.result[0].indicators.quote[0].close,
-    dates: response.data.chart.result[0].timestamp.map(function(timestamp){
-      return moment.unix(timestamp).format('YYYY-MM-DD')
-    })
-  } 
+  var url='https://query1.finance.yahoo.com/v8/finance/chart/'+ticket+'?period1='+moment(dStart).unix()+'&period2='+moment(dEnd).unix()+'&interval=1d';
+  
+  console.log('URL: '+url);
+  try {
+    var response = await axios.get(url); 
+    var res ={
+      prices: response.data.chart.result[0].indicators.quote[0].close,
+      dates: response.data.chart.result[0].timestamp.map(function(timestamp){
+        return moment.unix(timestamp).format('YYYY-MM-DD')
+      })
+    }
+  } catch (error) {
+    console.error('ERROR: '+error.message+': '+error.response.data.chart.error.description);    
+    var res={
+      prices: [],
+      dates: []
+    };
+  }   
   return res;
 }
 
@@ -319,6 +330,7 @@ async function main(){
     if(stocks[i].dEnd==='2099-12-31'){
       stocks[i].dEnd = moment().format('YYYY-MM-DD');
     } 
+    console.log((i+1)+'/'+stocks.length+' -> ['+stocks[i].ticker+'] (N='+ stocks[i].N +') '+stocks[i].desc+' -> fecha ini: '+stocks[i].dStart+' fecha fin: '+stocks[i].dEnd);
     aux = await getStockValueYahoo(stocks[i].ticker, stocks[i].N, stocks[i].dStart, stocks[i].dEnd, stocks[i].desc);
     
     for (var ii=0; ii<aux.dates.length; ii++){ 
