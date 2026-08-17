@@ -13,17 +13,107 @@
           -ms-user-select: none;  
               user-select: none; 
       -webkit-tap-highlight-color: transparent; 
+      margin: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    #main {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      font-size: 2rem;
+      padding: 20px;
+      box-sizing: border-box;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+
+    #countdown {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      background: rgba(0,0,0,0.25);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
 	</style>
   </head>
-  <body>    
-  <div id="main"></div>   
+  <body>
+  <div id="countdown">--</div>
+  <div id="main">--</div>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>          
 	<script type="text/javascript">
-	  var app = { 
-      exe: function(){
-        console.log('app exe ini'); 
-        console.log('app exe end'); 
+	  var app = {
+      apiUrl: 'https://www.positive-api.online/phrase/esp',
+      notFoundPhrase: '--',
+      refreshMs: 1 * 30 * 1000,
+      lastRefreshAt: null, 
+      countdownTimer: null, 
+      formatTime: function(ms) {
+        var totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+        var minutes = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
+        return ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+      },
+      deleteCountdown: function() {
+        if (this.countdownTimer) {
+          clearInterval(this.countdownTimer);
+          this.countdownTimer = null;
+        }
+      }, 
+      initCountdown: function() {
+        this.deleteCountdown();
+        this.lastRefreshAt = Date.now(); 
+        $('#countdown').text('Próxima frase: ' + this.formatTime(this.refreshMs)); 
+        this.countdownTimer = setInterval(function() {
+          app.updateCountdown();
+        }, 1000);
+      }, 
+      updateCountdown: async function() {
+        var remaining = this.refreshMs - (Date.now() - this.lastRefreshAt);
+        $('#countdown').text('Próxima frase: ' + this.formatTime(remaining)); 
+        if (remaining <= 0) { 
+          app.exe();
+        }
+      },  
+      exeAction: async function() {
+        console.log('exeAction init');
+         $('#main').text('...');
+
+        await new Promise(function(resolve) {
+          $.ajax({
+            url: app.apiUrl,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+              if (response && response.text) { 
+                $('#main').text(response.text);
+              }  
+              resolve();
+            },
+            error: function(xhr, status, error) { 
+              console.error(error);
+              $('#main').text(app.notFoundPhrase); 
+              resolve();
+            }
+          });
+        });
+
+        console.log('exeAction end');
+      },
+      exe: async function() {
+        console.log('Executing app.exe...');
+        this.deleteCountdown();
+        await this.exeAction();
+        this.initCountdown();
       }
 	  }
     app.exe();
