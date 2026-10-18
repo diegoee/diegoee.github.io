@@ -306,6 +306,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+      margin-top: 12px;
     }
 
     #chrono-display {
@@ -321,6 +322,16 @@
     #chronograph-start {
       border-color: #fb7185 !important;
       color: #fecdd3 !important;
+    }
+
+    #chronograph-visibility[aria-pressed="true"] {
+      border-color: #fb7185 !important;
+      color: #fecdd3 !important;
+    }
+
+    #day-date-visibility[aria-pressed="true"] {
+      border-color: #7dd3fc !important;
+      color: #bae6fd !important;
     }
 
     #watch {
@@ -364,6 +375,16 @@
       <h2 id="watch-menu-title">Controles del reloj</h2>
       <button id="watch-menu-close" type="button" aria-label="Cerrar menú">×</button>
     </div>
+    <section class="watch-menu-section" aria-labelledby="chrono-title">
+      <h3 id="chrono-title">Cronógrafo · 30 minutos</h3>
+      <p>Inicia o detén la medición. La subesfera indica los minutos transcurridos.</p>
+      <button id="chronograph-visibility" class="control-button" type="button" aria-pressed="true">Cronógrafo · Ocultar esfera</button>
+      <div id="chronograph-controls" role="group" aria-label="Controles del cronógrafo de 30 minutos">
+        <output id="chrono-display" aria-live="off">00:00</output>
+        <button id="chronograph-start" class="control-button" type="button">Iniciar</button>
+        <button id="chronograph-reset" class="control-button" type="button" disabled>Reiniciar</button>
+      </div>
+    </section>
     <section class="watch-menu-section" aria-labelledby="gmt-title">
       <h3 id="gmt-title">Función GMT</h3>
       <p>Configura el huso horario de referencia de la aguja GMT.</p>
@@ -372,14 +393,10 @@
       <p id="gmt-offset-help">Selecciona horas completas, desde UTC−12 hasta UTC+14.</p>
       <button id="timezone-toggle" class="control-button" type="button" aria-pressed="true">GMT · Ocultar aguja</button>
     </section>
-    <section class="watch-menu-section" aria-labelledby="chrono-title">
-      <h3 id="chrono-title">Cronógrafo · 30 minutos</h3>
-      <p>Inicia o detén la medición. La subesfera indica los minutos transcurridos.</p>
-      <div id="chronograph-controls" role="group" aria-label="Controles del cronógrafo de 30 minutos">
-        <output id="chrono-display" aria-live="off">00:00</output>
-        <button id="chronograph-start" class="control-button" type="button">Iniciar</button>
-        <button id="chronograph-reset" class="control-button" type="button" disabled>Reiniciar</button>
-      </div>
+    <section class="watch-menu-section" aria-labelledby="day-date-title">
+      <h3 id="day-date-title">Day-date</h3>
+      <p>Muestra u oculta el indicador del día y la fecha.</p>
+      <button id="day-date-visibility" class="control-button" type="button" aria-pressed="true">Day-date · Ocultar indicador</button>
     </section>
   </aside>
   <div id="watch"></div>
@@ -390,7 +407,7 @@
       apiUrl: 'https://www.positive-api.online/phrase/esp',
       notFoundPhrase: '--',
       currentPhrase: '',
-      refreshMs: 1 * 10 * 1000,
+      refreshMs: 1 * 30 * 1000,
       lastRefreshAt: null, 
       countdownTimer: null, 
       formatTime: function(ms) {
@@ -410,14 +427,14 @@
         this.lastRefreshAt = Date.now(); 
         $('#countdown').text('Próxima frase: ' + this.formatTime(this.refreshMs)); 
         this.countdownTimer = setInterval(function() {
-          app.updateCountdown();
+          posPharse.updateCountdown();
         }, 1000);
       }, 
       updateCountdown: async function() {
         var remaining = this.refreshMs - (Date.now() - this.lastRefreshAt);
         $('#countdown').text('Próxima frase: ' + this.formatTime(remaining)); 
         if (remaining <= 0) { 
-          app.exe();
+          posPharse.exe();
         }
       },  
       exeAction: async function() {
@@ -508,6 +525,8 @@
     var watch = {
       size: 400,
       showGMT: true,
+      showDayDate: true,
+      showChronograph: true,
       gmtOffsetHours: 0,
       chronoDuration: 30 * 60 * 1000,
       chronoElapsed: 0,
@@ -541,6 +560,12 @@
           var offset = Number(this.value);
           if (!Number.isInteger(offset) || offset < -12 || offset > 14) return;
           self.gmtOffsetHours = offset;
+        });
+        $('#day-date-visibility').on('click', function() {
+          self.setDayDateVisible(!self.showDayDate);
+        });
+        $('#chronograph-visibility').on('click', function() {
+          self.setChronographVisible(!self.showChronograph);
         });
         $('#chronograph-start').on('click', function() {
           self.toggleChronograph();
@@ -670,11 +695,10 @@
         }
 
         for (var i = 1; i <= 12; i++) {
-          if (i === 3) continue;
           var numberAngle = (i * 30 - 90) * Math.PI / 180;
           var radius = this.size * 0.375;
 
-          clock.append('text')
+          var hourLabel = clock.append('text')
             .attr('x', Math.cos(numberAngle) * radius)
             .attr('y', Math.sin(numberAngle) * radius + 6)
             .attr('text-anchor', 'middle')
@@ -682,6 +706,8 @@
             .style('font-size', '18px')
             .style('font-weight', '600')
             .text(i);
+
+          if (i === 3) this.hourThreeLabel = hourLabel.style('display', 'none');
         }
 
         this.dayDate = clock.append('g')
@@ -718,6 +744,7 @@
           .attr('fill', '#252525')
           .style('font-size', '15px')
           .style('font-weight', '700');
+        this.setDayDateVisible(this.showDayDate);
 
         this.chronoDial = clock.append('g')
           .attr('class', 'chronograph-minute-dial')
@@ -769,8 +796,8 @@
           .attr('stroke', '#fb7185')
           .attr('stroke-width', 1.8)
           .attr('marker-end', 'url(#chrono-arrowhead)')
-          .attr('stroke-linecap', 'round')
-          .style('display', null);
+          .attr('stroke-linecap', 'round');
+        this.setChronographVisible(this.showChronograph);
 
         this.gmtHand = clock.append('g')
           .attr('class', 'gmt-hand')
@@ -825,6 +852,22 @@
         } else {
           $('#watch-menu-toggle').trigger('focus');
         }
+      },
+      setChronographVisible: function(isVisible) {
+        this.showChronograph = isVisible;
+        this.chronoDial.style('display', isVisible ? null : 'none');
+        this.chronoSecondHand.style('display', isVisible ? null : 'none');
+        $('#chronograph-visibility')
+          .attr('aria-pressed', String(isVisible))
+          .text(isVisible ? 'Cronógrafo · Ocultar esfera' : 'Cronógrafo · Mostrar esfera');
+      },
+      setDayDateVisible: function(isVisible) {
+        this.showDayDate = isVisible;
+        this.dayDate.style('display', isVisible ? null : 'none');
+        this.hourThreeLabel.style('display', isVisible ? 'none' : null);
+        $('#day-date-visibility')
+          .attr('aria-pressed', String(isVisible))
+          .text(isVisible ? 'Day-date · Ocultar indicador' : 'Day-date · Mostrar indicador');
       },
       update: function() {
         var now = new Date();
