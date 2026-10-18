@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<meta charset="UTF-8">  
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+	<title>Web Art: Time</title>
+	<style> 
+    html,body{ 
+      background-color: #333; 
+      -webkit-user-select: none;  
+       -khtml-user-select: none;  
+         -moz-user-select: none;  
+          -ms-user-select: none;  
+              user-select: none; 
+      -webkit-tap-highlight-color: transparent; 
+      margin: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    #main {
+      position: fixed;
+      top: 8vh;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      font-size: 2rem;
+      padding: 20px 70px;
+      box-sizing: border-box;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      z-index: 1;
+    }
+
+    #countdown {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      background: rgba(0,0,0,0.25);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #watch {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(50vw, 320px);
+      height: min(50vw, 320px);
+      min-width: 140px;
+      min-height: 140px;
+      pointer-events: none;
+      z-index: 2;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.25));
+    }
+
+    #watch svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 600px) {
+      #watch {
+        top: auto;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(50vw, 220px);
+        height: min(50vw, 220px);
+      }
+    }
+	</style>
+  </head>
+  <body>
+  <div id="countdown">--</div>
+  <div id="main">--</div>
+  <div id="watch" aria-hidden="true"></div>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>          
+	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<script type="text/javascript">
+	  var posPharse = {
+      apiUrl: 'https://www.positive-api.online/phrase/esp',
+      notFoundPhrase: '--',
+      refreshMs: 1 * 30 * 1000,
+      lastRefreshAt: null, 
+      countdownTimer: null, 
+      formatTime: function(ms) {
+        var totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+        var minutes = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
+        return ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+      },
+      deleteCountdown: function() {
+        if (this.countdownTimer) {
+          clearInterval(this.countdownTimer);
+          this.countdownTimer = null;
+        }
+      }, 
+      initCountdown: function() {
+        this.deleteCountdown();
+        this.lastRefreshAt = Date.now(); 
+        $('#countdown').text('Próxima frase: ' + this.formatTime(this.refreshMs)); 
+        this.countdownTimer = setInterval(function() {
+          app.updateCountdown();
+        }, 1000);
+      }, 
+      updateCountdown: async function() {
+        var remaining = this.refreshMs - (Date.now() - this.lastRefreshAt);
+        $('#countdown').text('Próxima frase: ' + this.formatTime(remaining)); 
+        if (remaining <= 0) { 
+          app.exe();
+        }
+      },  
+      exeAction: async function() {
+        console.log('exeAction init');
+         $('#main').text('...');
+
+        await new Promise(function(resolve) {
+          $.ajax({
+            url: posPharse.apiUrl,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+              if (response && response.text) { 
+                $('#main').text(response.text);
+              }  
+              resolve();
+            },
+            error: function(xhr, status, error) { 
+              console.error(error);
+              $('#main').text(app.notFoundPhrase); 
+              resolve();
+            }
+          });
+        });
+
+        console.log('exeAction end');
+      },
+      exe: async function() {
+        console.log('Executing app.exe...');
+        this.deleteCountdown();
+        await this.exeAction();
+        this.initCountdown();
+      }
+	  } 
+    posPharse.exe();
+
+    var watch = {
+      size: 400,
+      init: function() {
+        var container = d3.select('#watch');
+        var svg = container.append('svg')
+          .attr('viewBox', '0 0 ' + this.size + ' ' + this.size)
+          .attr('preserveAspectRatio', 'xMidYMid meet');
+
+        var clock = svg.append('g')
+          .attr('transform', 'translate(' + (this.size / 2) + ',' + (this.size / 2) + ')');
+
+        clock.append('circle')
+          .attr('r', this.size * 0.46)
+          .attr('fill', '#333')
+          .attr('stroke', 'rgba(255,255,255,0.75)')
+          .attr('stroke-width', 2);
+
+        for (var i = 0; i < 60; i++) {
+          var angle = (i * 6 - 90) * Math.PI / 180;
+          var tickOuter = this.size * 0.45;
+          var tickInner = i % 5 === 0 ? this.size * 0.41 : this.size * 0.43;
+
+          clock.append('line')
+            .attr('x1', Math.cos(angle) * tickInner)
+            .attr('y1', Math.sin(angle) * tickInner)
+            .attr('x2', Math.cos(angle) * tickOuter)
+            .attr('y2', Math.sin(angle) * tickOuter)
+            .attr('stroke', i % 5 === 0 ? '#f4f4f4' : 'rgba(255,255,255,1)')
+            .attr('stroke-width', i % 5 === 0 ? 2 : 1)
+            .attr('stroke-linecap', 'round');
+        }
+
+        for (var i = 1; i <= 12; i++) {
+          var numberAngle = (i * 30 - 90) * Math.PI / 180;
+          var radius = this.size * 0.375;
+
+          clock.append('text')
+            .attr('x', Math.cos(numberAngle) * radius)
+            .attr('y', Math.sin(numberAngle) * radius + 6)
+            .attr('text-anchor', 'middle')
+            .attr('fill', '#ddd')
+            .style('font-size', '18px')
+            .style('font-weight', '600')
+            .text(i);
+        }
+
+        this.hourHand = clock.append('line')
+          .attr('stroke', '#ffffff')
+          .attr('stroke-width', 7)
+          .attr('stroke-linecap', 'round');
+        this.minuteHand = clock.append('line')
+          .attr('stroke', '#ffffff')
+          .attr('stroke-width', 5)
+          .attr('stroke-linecap', 'round');
+        this.secondHand = clock.append('line')
+          .attr('stroke', '#7dd3fc')
+          .attr('stroke-width', 3)
+          .attr('stroke-linecap', 'round');
+
+        clock.append('circle')
+          .attr('r', 9)
+          .attr('fill', '#ffffff')
+          .attr('stroke', '#333333')
+          .attr('stroke-width', 2);
+
+        this.update();
+      },
+      update: function() {
+        var now = new Date();
+        var seconds = now.getSeconds() + now.getMilliseconds() / 1000;
+        var minutes = now.getMinutes() + seconds / 60;
+        var hours = (now.getHours() % 12) + minutes / 60;
+        var radius = this.size / 2;
+        var secondAngle = (seconds / 60 * 360 - 90) * Math.PI / 180;
+        var minuteAngle = (minutes / 60 * 360 - 90) * Math.PI / 180;
+        var hourAngle = (hours / 12 * 360 - 90) * Math.PI / 180;
+
+        this.secondHand
+          .attr('x1', 0).attr('y1', 0)
+          .attr('x2', Math.cos(secondAngle) * radius * 0.7)
+          .attr('y2', Math.sin(secondAngle) * radius * 0.7);
+        this.minuteHand
+          .attr('x1', 0).attr('y1', 0)
+          .attr('x2', Math.cos(minuteAngle) * radius * 0.65)
+          .attr('y2', Math.sin(minuteAngle) * radius * 0.65);
+        this.hourHand
+          .attr('x1', 0).attr('y1', 0)
+          .attr('x2', Math.cos(hourAngle) * radius * 0.45)
+          .attr('y2', Math.sin(hourAngle) * radius * 0.45);
+
+        requestAnimationFrame(this.update.bind(this));
+      }
+    };    
+    watch.init();
+	</script> 
+  </body>
+</html>
