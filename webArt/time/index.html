@@ -18,34 +18,309 @@
       font-family: Arial, sans-serif;
     }
 
-    #main {
-      position: fixed;
-      top: 8vh;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      text-align: center;
-      color: #fff;
-      font-size: 2rem;
-      padding: 20px 70px;
-      box-sizing: border-box;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.4);
-      z-index: 1;
-    }
-
     #countdown {
-      position: fixed;
-      top: 15px;
-      right: 20px;
       background: rgba(0,0,0,0.25);
       color: #fff;
       padding: 8px 12px;
       border-radius: 999px;
       font-size: 0.9rem;
       letter-spacing: 0.03em;
-      z-index: 10;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #phrase-bar {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    #phrase-open {
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #phrase-open:hover:not(:disabled) {
+      background: rgba(0,0,0,0.6);
+    }
+
+    #phrase-open:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    #phrase-open:focus-visible,
+    #phrase-modal-close:focus-visible {
+      outline: 2px solid #7dd3fc;
+      outline-offset: 3px;
+    }
+
+    #phrase-modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(0,0,0,0.72);
+      z-index: 50;
+      opacity: 1;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+
+    #phrase-modal[hidden] {
+      display: grid;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #phrase-dialog {
+      transform: translateY(0) scale(1);
+      transition: transform 240ms ease;
+    }
+
+    #phrase-modal[hidden] #phrase-dialog {
+      transform: translateY(12px) scale(0.98);
+    }
+
+    #phrase-dialog {
+      position: relative;
+      width: min(680px, 100%);
+      min-height: 240px;
+      padding: 56px 32px 32px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 24px;
+      background: #202124;
+      color: #f4f4f5;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+
+    #phrase-dialog-title {
+      margin: 0 0 18px;
+      color: #a1a1aa;
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    #phrase-modal-text {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      line-height: 1.35;
+      text-wrap: balance;
+    }
+
+    #phrase-modal-timer {
+      margin-top: 28px;
+      color: #a1a1aa;
+      font-size: 0.85rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #phrase-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      background: transparent;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    #watch-menu-toggle {
+      position: fixed;
+      top: 16px;
+      left: 18px;
+      width: 46px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 12px;
+      padding: 8px;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font: inherit;
+      font-size: 1.35rem;
+      cursor: pointer;
+      z-index: 20;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #watch-menu-toggle:hover {
+      background: rgba(0,0,0,0.55);
+    }
+
+    #watch-menu-toggle:focus-visible,
+    #watch-menu button:focus-visible,
+    #watch-menu-close:focus-visible {
+      outline: 2px solid #7dd3fc;
+      outline-offset: 3px;
+    }
+
+    #watch-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      border: 0;
+      background: rgba(0,0,0,0.55);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 220ms ease, visibility 220ms ease;
+      z-index: 29;
+    }
+
+    #watch-menu-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #watch-menu {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: min(340px, 88vw);
+      padding: 24px;
+      box-sizing: border-box;
+      color: #f4f4f5;
+      background: #202124;
+      border-right: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 12px 0 36px rgba(0,0,0,0.35);
+      transform: translateX(-105%);
+      transition: transform 240ms ease;
+      z-index: 30;
+      overflow-y: auto;
+    }
+
+    #watch-menu.is-open {
+      transform: translateX(0);
+    }
+
+    .watch-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .watch-menu-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: 0.04em;
+    }
+
+    #watch-menu-close {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      background: transparent;
+      color: #fff;
+      font-size: 1.35rem;
+      cursor: pointer;
+    }
+
+    .watch-menu-section {
+      padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .watch-menu-section h3 {
+      margin: 0 0 8px;
+      color: #a1a1aa;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .watch-menu-section p {
+      margin: 0 0 14px;
+      color: #d4d4d8;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    #watch-menu button.control-button {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    #watch-menu button.control-button:hover:not(:disabled) {
+      background: rgba(0,0,0,0.55);
+    }
+
+    #timezone-toggle[aria-pressed="true"] {
+      border-color: #fb923c !important;
+      color: #fed7aa !important;
+    }
+
+    #gmt-offset {
+      width: 100%;
+      min-height: 42px;
+      box-sizing: border-box;
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      font: inherit;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #gmt-offset:focus-visible {
+      outline: 2px solid #fb923c;
+      outline-offset: 2px;
+    }
+
+    #chronograph-reset:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    #chronograph-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    #chrono-display {
+      grid-column: 1 / -1;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-align: left;
+      color: #fecdd3;
+    }
+
+    #chronograph-start {
+      border-color: #fb7185 !important;
+      color: #fecdd3 !important;
     }
 
     #watch {
@@ -53,10 +328,10 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: min(50vw, 320px);
-      height: min(50vw, 320px);
-      min-width: 140px;
-      min-height: 140px;
+      width: 100vw;
+      height: 90vh;
+      width: 100dvw;
+      height: 90dvh;
       pointer-events: none;
       z-index: 2;
       filter: drop-shadow(0 0 8px rgba(255,255,255,0.25));
@@ -67,28 +342,54 @@
       height: 100%;
     }
 
-    @media (max-width: 600px) {
-      #watch {
-        top: auto;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: min(50vw, 220px);
-        height: min(50vw, 220px);
-      }
-    }
 	</style>
   </head>
   <body>
-  <div id="countdown">--</div>
-  <div id="main">--</div>
-  <div id="watch" aria-hidden="true"></div>
+  <div id="phrase-bar">
+    <div id="countdown">--</div>
+    <button id="phrase-open" type="button" disabled>Ver frase</button>
+  </div>
+  <div id="phrase-modal" role="presentation" hidden>
+    <section id="phrase-dialog" role="dialog" aria-modal="true" aria-labelledby="phrase-dialog-title" aria-describedby="phrase-modal-text">
+      <button id="phrase-modal-close" type="button" aria-label="Cerrar frase">×</button>
+      <h2 id="phrase-dialog-title">Frase</h2>
+      <p id="phrase-modal-text"></p>
+      <div id="phrase-modal-timer" aria-live="off">Se cierra en 00:05</div>
+    </section>
+  </div>
+  <button id="watch-menu-toggle" type="button" aria-label="Abrir controles del reloj" aria-controls="watch-menu" aria-expanded="false">☰</button>
+  <button id="watch-menu-backdrop" type="button" aria-label="Cerrar menú del reloj" tabindex="-1"></button>
+  <aside id="watch-menu" aria-labelledby="watch-menu-title" aria-hidden="true" inert>
+    <div class="watch-menu-header">
+      <h2 id="watch-menu-title">Controles del reloj</h2>
+      <button id="watch-menu-close" type="button" aria-label="Cerrar menú">×</button>
+    </div>
+    <section class="watch-menu-section" aria-labelledby="gmt-title">
+      <h3 id="gmt-title">Función GMT</h3>
+      <p>Configura el huso horario de referencia de la aguja GMT.</p>
+      <label for="gmt-offset">Desfase respecto a UTC (horas)</label>
+      <input id="gmt-offset" type="number" min="-12" max="14" step="1" value="0" inputmode="numeric" aria-describedby="gmt-offset-help">
+      <p id="gmt-offset-help">Selecciona horas completas, desde UTC−12 hasta UTC+14.</p>
+      <button id="timezone-toggle" class="control-button" type="button" aria-pressed="true">GMT · Ocultar aguja</button>
+    </section>
+    <section class="watch-menu-section" aria-labelledby="chrono-title">
+      <h3 id="chrono-title">Cronógrafo · 30 minutos</h3>
+      <p>Inicia o detén la medición. La subesfera indica los minutos transcurridos.</p>
+      <div id="chronograph-controls" role="group" aria-label="Controles del cronógrafo de 30 minutos">
+        <output id="chrono-display" aria-live="off">00:00</output>
+        <button id="chronograph-start" class="control-button" type="button">Iniciar</button>
+        <button id="chronograph-reset" class="control-button" type="button" disabled>Reiniciar</button>
+      </div>
+    </section>
+  </aside>
+  <div id="watch"></div>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>          
 	<script src="https://d3js.org/d3.v7.min.js"></script>
 	<script type="text/javascript">
 	  var posPharse = {
       apiUrl: 'https://www.positive-api.online/phrase/esp',
       notFoundPhrase: '--',
+      currentPhrase: '',
       refreshMs: 1 * 30 * 1000,
       lastRefreshAt: null, 
       countdownTimer: null, 
@@ -121,7 +422,7 @@
       },  
       exeAction: async function() {
         console.log('exeAction init');
-         $('#main').text('...');
+        $('#phrase-open').prop('disabled', true);
 
         await new Promise(function(resolve) {
           $.ajax({
@@ -129,14 +430,18 @@
             method: 'GET',
             dataType: 'json',
             success: function(response) {
-              if (response && response.text) { 
-                $('#main').text(response.text);
+              if (response && response.text) {
+                posPharse.currentPhrase = response.text;
+                $('#phrase-open').prop('disabled', false);
+              } else {
+                posPharse.currentPhrase = '';
               }  
               resolve();
             },
             error: function(xhr, status, error) { 
               console.error(error);
-              $('#main').text(app.notFoundPhrase); 
+              posPharse.currentPhrase = '';
+              $('#phrase-open').prop('disabled', true);
               resolve();
             }
           });
@@ -153,22 +458,154 @@
 	  } 
     posPharse.exe();
 
+    var phraseModal = {
+      durationMs: 5 * 1000,
+      closesAt: null,
+      timer: null,
+      open: function() {
+        var phrase = posPharse.currentPhrase.trim();
+        if (!phrase || phrase === posPharse.notFoundPhrase || phrase === '...') return;
+
+        $('#phrase-modal-text').text(phrase);
+        $('#phrase-modal').prop('hidden', false);
+        this.closesAt = Date.now() + this.durationMs;
+        this.updateTimer();
+        clearInterval(this.timer);
+        this.timer = setInterval(this.updateTimer.bind(this), 1000);
+        $('#phrase-modal-close').trigger('focus');
+      },
+      close: function() {
+        clearInterval(this.timer);
+        this.timer = null;
+        this.closesAt = null;
+        $('#phrase-modal').prop('hidden', true);
+        $('#phrase-open').trigger('focus');
+      },
+      updateTimer: function() {
+        var remaining = Math.max(0, this.closesAt - Date.now());
+        var totalSeconds = Math.ceil(remaining / 1000);
+        var minutes = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
+        $('#phrase-modal-timer').text('Se cierra en ' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2));
+        if (remaining <= 0) this.close();
+      }
+    };
+    $('#phrase-open').on('click', function() {
+      phraseModal.open();
+    });
+    $('#phrase-modal-close').on('click', function() {
+      phraseModal.close();
+    });
+    $('#phrase-modal').on('click', function(event) {
+      if (event.target === this) phraseModal.close();
+    });
+    $(document).on('keydown', function(event) {
+      if (event.key === 'Escape' && !$('#phrase-modal').prop('hidden')) {
+        phraseModal.close();
+      }
+    });
+
     var watch = {
       size: 400,
+      showGMT: true,
+      gmtOffsetHours: 0,
+      chronoDuration: 30 * 60 * 1000,
+      chronoElapsed: 0,
+      chronoStartedAt: null,
+      chronoRunning: false,
+      lastChronoDisplaySecond: null,
       init: function() {
+        var self = this;
+        this.gmtOffsetHours = -new Date().getTimezoneOffset() / 60;
+        $('#gmt-offset').val(this.gmtOffsetHours);
+        $('#watch-menu-toggle').on('click', function() {
+          self.setMenuOpen(true);
+        });
+        $('#watch-menu-close, #watch-menu-backdrop').on('click', function() {
+          self.setMenuOpen(false);
+        });
+        $(document).on('keydown', function(event) {
+          if (event.key === 'Escape' && $('#watch-menu').hasClass('is-open')) {
+            self.setMenuOpen(false);
+          }
+        });
+        $('#timezone-toggle').on('click', function() {
+          self.showGMT = !self.showGMT;
+          self.gmtHand.style('display', self.showGMT ? null : 'none');
+          self.gmtScale.style('display', self.showGMT ? null : 'none');
+          $(this)
+            .attr('aria-pressed', String(self.showGMT))
+            .text(self.showGMT ? 'GMT · Ocultar aguja' : 'Mostrar aguja GMT');
+        });
+        $('#gmt-offset').on('input change', function() {
+          var offset = Number(this.value);
+          if (!Number.isInteger(offset) || offset < -12 || offset > 14) return;
+          self.gmtOffsetHours = offset;
+        });
+        $('#chronograph-start').on('click', function() {
+          self.toggleChronograph();
+        });
+        $('#chronograph-reset').on('click', function() {
+          self.resetChronograph();
+        });
         var container = d3.select('#watch');
         var svg = container.append('svg')
           .attr('viewBox', '0 0 ' + this.size + ' ' + this.size)
-          .attr('preserveAspectRatio', 'xMidYMid meet');
+          .attr('preserveAspectRatio', 'xMidYMid meet')
+          .attr('aria-hidden', 'true');
+
+        svg.append('defs').append('marker')
+          .attr('id', 'chrono-arrowhead')
+          .attr('viewBox', '0 0 10 10')
+          .attr('refX', 9)
+          .attr('refY', 5)
+          .attr('markerWidth', 5)
+          .attr('markerHeight', 5)
+          .attr('orient', 'auto-start-reverse')
+          .append('path')
+          .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+          .attr('fill', '#fb7185');
 
         var clock = svg.append('g')
           .attr('transform', 'translate(' + (this.size / 2) + ',' + (this.size / 2) + ')');
+
+        clock.append('circle')
+          .attr('r', this.size * 0.495)
+          .attr('fill', '#a6a6a6')
+          .attr('stroke', '#a6a6a6')
+          .attr('stroke-width', 1);
 
         clock.append('circle')
           .attr('r', this.size * 0.46)
           .attr('fill', '#333')
           .attr('stroke', 'rgba(255,255,255,0.75)')
           .attr('stroke-width', 2);
+
+        this.gmtScale = clock.append('g').attr('class', 'gmt-scale');
+        for (var gmtHourMark = 0; gmtHourMark < 24; gmtHourMark++) {
+          var gmtMarkAngle = (gmtHourMark / 24 * 360 - 90) * Math.PI / 180;
+          var gmtMarkRadius = this.size * 0.445;
+          this.gmtScale.append('circle')
+            .attr('cx', Math.cos(gmtMarkAngle) * gmtMarkRadius)
+            .attr('cy', Math.sin(gmtMarkAngle) * gmtMarkRadius)
+            .attr('r', 3)
+            .attr('fill', '#fb923c');
+        }
+
+        for (var hour = 0; hour < 24; hour += 2) {
+          var gmtAngle = (hour / 24 * 360 - 90) * Math.PI / 180;
+          var gmtRadius = this.size * 0.31;
+          var label = hour === 0 ? '24' : String(hour);
+
+          this.gmtScale.append('text')
+            .attr('x', Math.cos(gmtAngle) * gmtRadius)
+            .attr('y', Math.sin(gmtAngle) * gmtRadius + 3)
+            .attr('text-anchor', 'middle')
+            .attr('fill', '#fb923c')
+            .style('font-size', '18px')
+            .style('font-weight', '700')
+            .text(label);
+        }
 
         for (var i = 0; i < 60; i++) {
           var angle = (i * 6 - 90) * Math.PI / 180;
@@ -185,7 +622,55 @@
             .attr('stroke-linecap', 'round');
         }
 
+        var secondSubdivisions = clock.append('g').attr('class', 'minute-second-subdivisions');
+        for (var minuteIndex = 0; minuteIndex < 60; minuteIndex++) {
+          for (var subdivision = 1; subdivision <= 2; subdivision++) {
+            var secondAngle = (minuteIndex * 6 + subdivision * 2 - 90) * Math.PI / 180;
+            var secondInner = this.size * 0.44;
+            var secondOuter = this.size * 0.45;
+            secondSubdivisions.append('line')
+              .attr('x1', Math.cos(secondAngle) * secondInner)
+              .attr('y1', Math.sin(secondAngle) * secondInner)
+              .attr('x2', Math.cos(secondAngle) * secondOuter)
+              .attr('y2', Math.sin(secondAngle) * secondOuter)
+              .attr('stroke', '#ffffff')
+              .attr('stroke-width', 0.4)
+              .attr('stroke-linecap', 'round');
+          }
+        }
+
+        var minuteBezel = clock.append('g').attr('class', 'minute-bezel');
+        for (var bezelMinute = 0; bezelMinute < 60; bezelMinute++) {
+          var bezelAngle = (bezelMinute * 6 - 90) * Math.PI / 180;
+          var bezelIsLabel = bezelMinute % 5 === 0;
+
+          if (bezelIsLabel) {
+            var bezelLabelRadius = this.size * 0.474;
+            var minuteLabel = bezelMinute === 0 ? '60' : ('0' + bezelMinute).slice(-2);
+            minuteBezel.append('text')
+              .attr('x', Math.cos(bezelAngle) * bezelLabelRadius)
+              .attr('y', Math.sin(bezelAngle) * bezelLabelRadius + 3)
+              .attr('text-anchor', 'middle')
+              .attr('fill', '#252525')
+              .style('font-size', '8px')
+              .style('font-weight', '500')
+              .text(minuteLabel);
+          } else {
+            var bezelInner = this.size * 0.466;
+            var bezelOuter = this.size * 0.486;
+            minuteBezel.append('line')
+              .attr('x1', Math.cos(bezelAngle) * bezelInner)
+              .attr('y1', Math.sin(bezelAngle) * bezelInner)
+              .attr('x2', Math.cos(bezelAngle) * bezelOuter)
+              .attr('y2', Math.sin(bezelAngle) * bezelOuter)
+              .attr('stroke', '#55595b')
+              .attr('stroke-width', 0.8)
+              .attr('stroke-linecap', 'round');
+          }
+        }
+
         for (var i = 1; i <= 12; i++) {
+          if (i === 3) continue;
           var numberAngle = (i * 30 - 90) * Math.PI / 180;
           var radius = this.size * 0.375;
 
@@ -199,6 +684,107 @@
             .text(i);
         }
 
+        this.dayDate = clock.append('g')
+          .attr('class', 'day-date-indicator')
+          .attr('transform', 'translate(' + (this.size * 0.31) + ',0)')
+          .attr('role', 'img');
+        this.dayDate.append('rect')
+          .attr('x', -this.size * 0.105)
+          .attr('y', -this.size * 0.043)
+          .attr('width', this.size * 0.21)
+          .attr('height', this.size * 0.086)
+          .attr('rx', 4)
+          .attr('fill', '#e8e4d8')
+          .attr('stroke', '#77746d')
+          .attr('stroke-width', 2);
+        this.dayDate.append('line')
+          .attr('x1', this.size * 0.055)
+          .attr('x2', this.size * 0.055)
+          .attr('y1', -this.size * 0.037)
+          .attr('y2', this.size * 0.037)
+          .attr('stroke', '#aaa69c')
+          .attr('stroke-width', 1);
+        this.dayDateText = this.dayDate.append('text')
+          .attr('x', -this.size * 0.025)
+          .attr('y', this.size * 0.016)
+          .attr('text-anchor', 'middle')
+          .attr('fill', '#252525')
+          .style('font-size', '13px')
+          .style('font-weight', '700');
+        this.dateNumberText = this.dayDate.append('text')
+          .attr('x', this.size * 0.077)
+          .attr('y', this.size * 0.016)
+          .attr('text-anchor', 'middle')
+          .attr('fill', '#252525')
+          .style('font-size', '15px')
+          .style('font-weight', '700');
+
+        this.chronoDial = clock.append('g')
+          .attr('class', 'chronograph-minute-dial')
+          .attr('transform', 'translate(0,' + (-this.size * 0.16) + ')');
+        this.chronoDial.append('circle')
+          .attr('r', this.size * 0.105)
+          .attr('fill', '#292929')
+          .attr('stroke', 'rgba(255,255,255,0.7)')
+          .attr('stroke-width', 1.5);
+
+        for (var minuteMark = 0; minuteMark < 30; minuteMark++) {
+          var chronoAngle = (minuteMark / 30 * 360 - 90) * Math.PI / 180;
+          var chronoOuter = this.size * 0.097;
+          var chronoInner = minuteMark % 5 === 0 ? this.size * 0.076 : this.size * 0.085;
+          this.chronoDial.append('line')
+            .attr('x1', Math.cos(chronoAngle) * chronoInner)
+            .attr('y1', Math.sin(chronoAngle) * chronoInner)
+            .attr('x2', Math.cos(chronoAngle) * chronoOuter)
+            .attr('y2', Math.sin(chronoAngle) * chronoOuter)
+            .attr('stroke', minuteMark % 5 === 0 ? '#fda4af' : 'rgba(255,255,255,0.65)')
+            .attr('stroke-width', minuteMark % 5 === 0 ? 1.5 : 0.8)
+            .attr('stroke-linecap', 'round');
+
+          if (minuteMark % 5 === 0) {
+            var markLabel = minuteMark === 0 ? '0' : String(minuteMark);
+            var labelRadius = this.size * 0.066;
+            this.chronoDial.append('text')
+              .attr('x', Math.cos(chronoAngle) * labelRadius)
+              .attr('y', Math.sin(chronoAngle) * labelRadius + 3)
+              .attr('text-anchor', 'middle')
+              .attr('fill', '#fecdd3')
+              .style('font-size', '9px')
+              .style('font-weight', '600')
+              .text(markLabel);
+          }
+        }
+
+        this.chronoMinuteHand = this.chronoDial.append('line')
+          .attr('x1', 0).attr('y1', this.size * 0.015)
+          .attr('x2', 0).attr('y2', -this.size * 0.065)
+          .attr('stroke', '#fb7185')
+          .attr('stroke-width', 2)
+          .attr('stroke-linecap', 'round');
+        this.chronoDial.append('circle')
+          .attr('r', 2.5)
+          .attr('fill', '#fb7185');
+
+        this.chronoSecondHand = clock.append('line')
+          .attr('stroke', '#fb7185')
+          .attr('stroke-width', 1.8)
+          .attr('marker-end', 'url(#chrono-arrowhead)')
+          .attr('stroke-linecap', 'round')
+          .style('display', null);
+
+        this.gmtHand = clock.append('g')
+          .attr('class', 'gmt-hand')
+          .attr('aria-label', 'Aguja GMT de 24 horas');
+        this.gmtHand.append('line')
+          .attr('x1', 0).attr('y1', this.size * 0.035)
+          .attr('x2', 0).attr('y2', -this.size * 0.36)
+          .attr('stroke', '#fb923c')
+          .attr('stroke-width', 3)
+          .attr('stroke-linecap', 'round');
+        this.gmtHand.append('path')
+          .attr('d', 'M0,' + (-this.size * 0.39) + ' L-7,' + (-this.size * 0.35) + ' L0,' + (-this.size * 0.362) + ' L7,' + (-this.size * 0.35) + ' Z')
+          .attr('fill', '#fb923c');
+
         this.hourHand = clock.append('line')
           .attr('stroke', '#ffffff')
           .attr('stroke-width', 7)
@@ -211,6 +797,11 @@
           .attr('stroke', '#7dd3fc')
           .attr('stroke-width', 3)
           .attr('stroke-linecap', 'round');
+        this.secondHandTip = clock.append('circle')
+          .attr('r', 4)
+          .attr('fill', '#7dd3fc')
+          .attr('stroke', '#333333')
+          .attr('stroke-width', 1);
 
         clock.append('circle')
           .attr('r', 9)
@@ -220,20 +811,64 @@
 
         this.update();
       },
+      setMenuOpen: function(isOpen) {
+        var menu = $('#watch-menu');
+        menu.toggleClass('is-open', isOpen)
+          .attr('aria-hidden', String(!isOpen))
+          .prop('inert', !isOpen);
+        $('#watch-menu-backdrop').toggleClass('is-open', isOpen);
+        $('#watch-menu-toggle')
+          .attr('aria-expanded', String(isOpen))
+          .attr('aria-label', isOpen ? 'Cerrar controles del reloj' : 'Abrir controles del reloj');
+        if (isOpen) {
+          $('#watch-menu-close').trigger('focus');
+        } else {
+          $('#watch-menu-toggle').trigger('focus');
+        }
+      },
       update: function() {
         var now = new Date();
+        var weekdayNames = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+        this.dayDateText
+          .text(weekdayNames[now.getDay()])
+          .attr('fill', now.getDay() === 0 ? '#d11f2f' : '#252525');
+        this.dateNumberText.text(now.getDate());
+        this.dayDate.attr('aria-label', weekdayNames[now.getDay()] + ' ' + now.getDate());
         var seconds = now.getSeconds() + now.getMilliseconds() / 1000;
         var minutes = now.getMinutes() + seconds / 60;
         var hours = (now.getHours() % 12) + minutes / 60;
+        var gmtHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600 + this.gmtOffsetHours;
         var radius = this.size / 2;
         var secondAngle = (seconds / 60 * 360 - 90) * Math.PI / 180;
         var minuteAngle = (minutes / 60 * 360 - 90) * Math.PI / 180;
         var hourAngle = (hours / 12 * 360 - 90) * Math.PI / 180;
+        var gmtAngle = ((gmtHours % 24 + 24) % 24) / 24 * 360;
+
+        this.gmtHand.attr('transform', 'rotate(' + gmtAngle + ')');
 
         this.secondHand
           .attr('x1', 0).attr('y1', 0)
-          .attr('x2', Math.cos(secondAngle) * radius * 0.7)
-          .attr('y2', Math.sin(secondAngle) * radius * 0.7);
+          .attr('x2', Math.cos(secondAngle) * radius * 0.78)
+          .attr('y2', Math.sin(secondAngle) * radius * 0.78);
+        this.secondHandTip
+          .attr('cx', Math.cos(secondAngle) * radius * 0.72)
+          .attr('cy', Math.sin(secondAngle) * radius * 0.72);
+        var elapsed = this.getChronographElapsed();
+        if (this.chronoRunning && elapsed >= this.chronoDuration) {
+          this.chronoElapsed = this.chronoDuration;
+          this.chronoRunning = false;
+          elapsed = this.chronoElapsed;
+          this.syncChronographControls();
+        }
+        var chronoSeconds = elapsed / 1000;
+        var chronoSecondAngle = (chronoSeconds % 60 / 60 * 360 - 90) * Math.PI / 180;
+        var chronoMinuteAngle = (elapsed / this.chronoDuration * 360 - 90) * Math.PI / 180;
+        this.chronoSecondHand
+          .attr('x1', 0).attr('y1', 0)
+          .attr('x2', Math.cos(chronoSecondAngle) * radius * 0.78)
+          .attr('y2', Math.sin(chronoSecondAngle) * radius * 0.78);
+        this.chronoMinuteHand.attr('transform', 'rotate(' + (chronoMinuteAngle * 180 / Math.PI + 90) + ')');
+        this.updateChronographDisplay(elapsed);
         this.minuteHand
           .attr('x1', 0).attr('y1', 0)
           .attr('x2', Math.cos(minuteAngle) * radius * 0.65)
@@ -244,6 +879,46 @@
           .attr('y2', Math.sin(hourAngle) * radius * 0.45);
 
         requestAnimationFrame(this.update.bind(this));
+      },
+      getChronographElapsed: function() {
+        if (!this.chronoRunning) return this.chronoElapsed;
+        return Math.min(this.chronoDuration, this.chronoElapsed + (performance.now() - this.chronoStartedAt));
+      },
+      updateChronographDisplay: function(elapsed) {
+        var totalSeconds = Math.floor(elapsed / 1000);
+        if (totalSeconds === this.lastChronoDisplaySecond) return;
+        this.lastChronoDisplaySecond = totalSeconds;
+        var minutes = Math.floor(totalSeconds / 60);
+        var seconds = totalSeconds % 60;
+        $('#chrono-display').text(('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2));
+      },
+      toggleChronograph: function() {
+        if (this.chronoRunning) {
+          this.chronoElapsed = this.getChronographElapsed();
+          this.chronoRunning = false;
+        } else if (this.chronoElapsed < this.chronoDuration) {
+          this.chronoStartedAt = performance.now();
+          this.chronoRunning = true;
+        }
+        this.syncChronographControls();
+      },
+      resetChronograph: function() {
+        this.chronoRunning = false;
+        this.chronoElapsed = 0;
+        this.chronoStartedAt = null;
+        this.syncChronographControls();
+      },
+      syncChronographControls: function() {
+        var elapsed = this.getChronographElapsed();
+        if (this.chronoRunning && elapsed >= this.chronoDuration) {
+          this.chronoElapsed = this.chronoDuration;
+          this.chronoRunning = false;
+          elapsed = this.chronoElapsed;
+        }
+        $('#chronograph-start').text(this.chronoRunning ? 'Detener' : 'Iniciar');
+        var resetDisabled = elapsed === 0 && !this.chronoRunning;
+        $('#chronograph-reset').prop('disabled', resetDisabled);
+        this.updateChronographDisplay(elapsed);
       }
     };    
     watch.init();

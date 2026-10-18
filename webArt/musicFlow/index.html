@@ -3,293 +3,325 @@
   <head>  
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <title>Web Art: Music flow</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <style> 
-      html,body{ 
-        background-color: #333; 
-        -webkit-user-select: none;  
-        -khtml-user-select: none;  
-          -moz-user-select: none;  
-            -ms-user-select: none;  
-                user-select: none; 
-        -webkit-tap-highlight-color: transparent; 
-        color: #DDD;  
-        margin: 0; 
-        padding: 0;  
-      }          
-      #btnPlay {    
-        position: absolute;
-        top: 20px;
-        margin: 0; 
-        padding: 0;     
-        left: calc(100% - 40px);   
-        cursor: pointer;
-        transition: all 0.5s ease-out; 
-      }  
-      #watch {
+    <title>Web Art: Sounds Flow</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #333;
+        color: #DDD;
+        font-family: Arial, sans-serif;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #spectrogram {
         position: fixed;
         inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .toolbar {
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
         display: flex;
         align-items: center;
-        justify-content: center;
-        pointer-events: none;
-        z-index: 2;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 18px 22px;
+        background: linear-gradient(180deg, rgba(33, 33, 33, .88), rgba(33, 33, 33, 0));
       }
-      #watch svg {
-        width: min(36vw, 320px);
-        height: min(36vw, 320px);
-        max-width: 320px;
-        max-height: 320px;
-        filter: drop-shadow(0 0 8px rgba(255,255,255,0.25));
+      .heading { min-width: 0; }
+      h1 {
+        margin: 0 0 5px;
+        font-size: clamp(1rem, 3vw, 1.35rem);
+        letter-spacing: .04em;
+      }
+      #status {
+        margin: 0;
+        color: #c4c4c4;
+        font-size: .85rem;
+      }
+      #frequencyReadout {
+        position: fixed;
+        z-index: 1;
+        top: 88px;
+        left: 22px;
+        margin: 0;
+        padding: 8px 11px;
+        border: 1px solid rgba(255, 255, 255, .2);
+        border-radius: 5px;
+        background: rgba(33, 33, 33, .82);
+        color: #DDD;
+        font-size: .9rem;
+        font-variant-numeric: tabular-nums;
+        transition: opacity .25s ease;
+      }
+      #frequencyReadout:hover { opacity: .35; }
+      #micButton {
+        flex: 0 0 auto;
+        min-height: 46px;
+        padding: 0 18px;
+        border: 1px solid rgba(255,255,255,.35);
+        border-radius: 5px;
+        background: rgba(0,0,0,.35);
+        color: #DDD;
+        font-size: .95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .25s ease, opacity .25s ease;
+      }
+      #micButton:hover { background: rgba(0,0,0,.55); }
+      #micButton:focus-visible { outline: 2px solid #DDD; outline-offset: 3px; }
+      #micButton:disabled { cursor: wait; opacity: .7; }
+      .hint {
+        position: fixed;
+        right: 18px;
+        bottom: 14px;
+        color: rgba(221,221,221,.7);
+        font-size: .75rem;
+        pointer-events: none;
+      }
+      @media (max-width: 520px) {
+        .toolbar { align-items: flex-start; padding: 14px; gap: 10px; }
+        #status { max-width: 54vw; line-height: 1.35; }
+        #micButton { min-height: 42px; padding: 0 13px; font-size: .85rem; }
+        #frequencyReadout { top: 82px; left: 14px; font-size: .82rem; }
       }
     </style>
   </head>
-  <body> 
-    <div id="btnPlay"></div>
-    <div id="watch"></div>
-    <div id="visualizer"></div>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+  <body>
+    <canvas id="spectrogram" aria-label="Espectrograma de audio en tiempo real"></canvas>
+    <header class="toolbar">
+      <div class="heading">
+        <h1>Sounds Flow</h1>
+        <p id="status" role="status" aria-live="polite">Pulsa el botón para activar el micrófono.</p>
+      </div>
+      <button id="micButton" type="button">Activar micrófono</button>
+    </header>
+    <p id="frequencyReadout" aria-live="off">Frecuencia predominante: --</p>
+    <div class="hint">Frecuencias altas arriba · bajas abajo</div>
     <script>
-      var mic = { 
-        audioContext: null,
-        analyzer: null,
-        dataArray: null, 
-        exe: false,
-        configMic: async function(){
-          //Init listenerMic
-          try { 
-           // Solicitar acceso al micrófono
-           var stream = await navigator.mediaDevices.getUserMedia({ 
-             audio: true 
-           });                
-           // Configurar el contexto de audio
-           this.audioContext = new (window.AudioContext||window.webkitAudioContext)();
-           var source = this.audioContext.createMediaStreamSource(stream);              
-           // Configurar el analizador de frecuencia
-           this.analyzer = this.audioContext.createAnalyser();
-           this.analyzer.fftSize = 1024*1; // Mayor FFT = más barras detalladas
-           var bufferLength = this.analyzer.frequencyBinCount;
-           this.dataArray = new Uint8Array(bufferLength);
-           source.connect(this.analyzer);  
-         } catch (error) {
-           console.error(error);
-           alert("Error al acceder al micrófono.");
-         }
-        }, 
-        stop: function(){ 
-          this.exe=false;
-        },
-        start: function(fn){
-          var self = this;
-          self.stop(); 
-          self.exe=true; 
+      (function() {
+        var canvas = document.getElementById('spectrogram');
+        var context = canvas.getContext('2d', { alpha: false });
+        var button = document.getElementById('micButton');
+        var status = document.getElementById('status');
+        var frequencyReadout = document.getElementById('frequencyReadout');
+        var audioContext = null;
+        var analyser = null;
+        var microphoneStream = null;
+        var frequencyData = null;
+        var animationFrame = null;
+        var column = null;
+        var pixelRatio = 1;
+        var lastFrequencyUpdate = 0;
+        var colorMap = createColorMap();
+        var isRunning = false;
 
-          function exe(){  
-            self.analyzer.getByteFrequencyData(self.dataArray); 
-            var avgVolume = self.dataArray.reduce(function(acc, val){
-              return acc + val;
-            },0);
-            avgVolume = avgVolume/self.dataArray.length; 
-
-            if(typeof fn === 'function'){ 
-              fn(avgVolume);
-            }
-            if(self.exe){
-              requestAnimationFrame(exe);
-            }
+        function createColorMap() {
+          var colors = new Uint8ClampedArray(256 * 4);
+          for (var i = 0; i < 256; i++) {
+            var hue = 240 - (i / 255) * 240;
+            var saturation = 0.95;
+            var lightness = i < 18 ? 0.025 : 0.12 + (i / 255) * 0.48;
+            var chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+            var x = chroma * (1 - Math.abs((hue / 60) % 2 - 1));
+            var rgb = hue < 60 ? [chroma, x, 0] : hue < 120 ? [x, chroma, 0] :
+              hue < 180 ? [0, chroma, x] : hue < 240 ? [0, x, chroma] :
+              hue < 300 ? [x, 0, chroma] : [chroma, 0, x];
+            var match = lightness - chroma / 2;
+            var offset = i * 4;
+            colors[offset] = (rgb[0] + match) * 255;
+            colors[offset + 1] = (rgb[1] + match) * 255;
+            colors[offset + 2] = (rgb[2] + match) * 255;
+            colors[offset + 3] = 255;
           }
-          exe();
+          return colors;
         }
-      } 
-      
-      var ploter = { 
-        radioInicial: 5, 
-        circulos: [],
-        getRandomInt: function (min, max){ 
-          return Math.floor(Math.random() * (max - min + 1) ) + min;
-        },
-        init: function(){ 
-          $('#visualizer').html(' ');
-          this.circulos=[]; 
-          // Configuración inicial
-          var w = window.innerWidth-4;
-          var h = window.innerHeight-4; 
 
-          // Crear el elemento SVG
-          var svg = d3.select("#visualizer").append("svg");
-          svg.attr("width", w);
-          svg.attr("height", h);
-    
-          // Crear círculos
-          for(var i=0; i<w; i++){
-            for(var ii=0; ii<h; ii++){
-              if(Math.random()<0.000015){  
-                var circulo = svg.append("circle")
-                circulo.attr("cx", i);
-                circulo.attr("cy", ii);
-                circulo.attr("r", this.getRandomInt(1,this.radioInicial));
-                circulo.attr("fill", "#DDD"); 
-                this.circulos.push(circulo); 
-              }
-            }
-          }             
-        },
-        update: function(valor){
-          var nuevoRadio = valor;
-          for (var i=0; i<this.circulos.length; i++){
-            this.circulos[i].transition().duration(50).attr("r", nuevoRadio);
+        function resizeCanvas() {
+          pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+          var width = Math.max(1, Math.floor(window.innerWidth * pixelRatio));
+          var height = Math.max(1, Math.floor(window.innerHeight * pixelRatio));
+          if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+            context.fillStyle = '#333';
+            context.fillRect(0, 0, width, height);
+            column = context.createImageData(1, height);
           }
         }
-      }
-      
-      var watch = {
-        size: 400,
-        init: function(){
-          var container = d3.select('#watch');
-          container.html('');
 
-          var svg = container.append('svg')
-            .attr('viewBox', '0 0 ' + this.size + ' ' + this.size)
-            .attr('preserveAspectRatio', 'xMidYMid meet');
+        function drawSpectrogram() {
+          if (!isRunning || !analyser) return;
+          analyser.getByteFrequencyData(frequencyData);
 
-          var clock = svg.append('g')
-            .attr('transform', 'translate(' + (this.size/2) + ',' + (this.size/2) + ')');
+          var width = canvas.width;
+          var height = canvas.height;
+          var sampleRate = audioContext.sampleRate;
+          var binWidth = sampleRate / analyser.fftSize;
+          var minFrequency = 35;
+          var maxFrequency = Math.min(16000, sampleRate / 2);
+          var peakBin = 0;
+          var peakLevel = 0;
 
-          clock.append('circle')
-            .attr('r', this.size * 0.46)
-            .attr('fill', '#333')
-            .attr('stroke', 'rgba(255,255,255,0.75)')
-            .attr('stroke-width', 2);
-
-          for (var i = 0; i < 60; i++) {
-            var angle = (i * 6 - 90) * Math.PI / 180;
-            var tickOuter = this.size * 0.45;
-            var tickInner = i % 5 === 0 ? this.size * 0.41 : this.size * 0.43;
-
-            clock.append('line')
-              .attr('x1', Math.cos(angle) * tickInner)
-              .attr('y1', Math.sin(angle) * tickInner)
-              .attr('x2', Math.cos(angle) * tickOuter)
-              .attr('y2', Math.sin(angle) * tickOuter)
-              .attr('stroke', i % 5 === 0 ? '#f4f4f4' : 'rgba(255,255,255,1)')
-              .attr('stroke-width', i % 5 === 0 ? 2 : 1)
-              .attr('stroke-linecap', 'round');
+          if (width > 1) {
+            context.drawImage(canvas, 1, 0, width - 1, height, 0, 0, width - 1, height);
           }
 
-          for (var i = 1; i <= 12; i++) {
-            var numberAngle = (i * 30 - 90) * Math.PI / 180;
-            var radius = this.size * 0.375;
-
-            clock.append('text')
-              .attr('x', Math.cos(numberAngle) * radius)
-              .attr('y', Math.sin(numberAngle) * radius + 6)
-              .attr('text-anchor', 'middle')
-              .attr('fill', '#ddd')
-              .style('font-size', '18px')
-              .style('font-weight', '600')
-              .text(i);
+          for (var y = 0; y < height; y++) {
+            var proportion = y / Math.max(1, height - 1);
+            var frequency = maxFrequency * Math.pow(minFrequency / maxFrequency, proportion);
+            var bin = Math.min(frequencyData.length - 1, Math.max(0, Math.round(frequency / binWidth)));
+            var colorOffset = frequencyData[bin] * 4;
+            var pixelOffset = y * 4;
+            column.data[pixelOffset] = colorMap[colorOffset];
+            column.data[pixelOffset + 1] = colorMap[colorOffset + 1];
+            column.data[pixelOffset + 2] = colorMap[colorOffset + 2];
+            column.data[pixelOffset + 3] = 255;
           }
-
-          this.hourHand = clock.append('line')
-            .attr('stroke', '#ffffff')
-            .attr('stroke-width', 7)
-            .attr('stroke-linecap', 'round');
-
-          this.minuteHand = clock.append('line')
-            .attr('stroke', '#ffffff')
-            .attr('stroke-width', 5)
-            .attr('stroke-linecap', 'round');
-
-          this.secondHand = clock.append('line')
-            .attr('stroke', '#7dd3fc')
-            .attr('stroke-width', 3)
-            .attr('stroke-linecap', 'round');
-
-          clock.append('circle')
-            .attr('r', 9)
-            .attr('fill', '#ffffff')
-            .attr('stroke', '#333333')
-            .attr('stroke-width', 2);
-
-          this.update();
-          requestAnimationFrame(this.update.bind(this));
-        },
-        update: function(){
-          var now = new Date();
-          var seconds = now.getSeconds() + (now.getMilliseconds() / 1000);
-          var minutes = now.getMinutes() + (seconds / 60);
-          var hours = (now.getHours() % 12) + (minutes / 60);
-
-          var radius = this.size / 2;
-          var secondAngle = (seconds / 60 * 360 - 90) * Math.PI / 180;
-          var minuteAngle = (minutes / 60 * 360 - 90) * Math.PI / 180;
-          var hourAngle = (hours / 12 * 360 - 90) * Math.PI / 180; 
-
-          this.secondHand
-            .attr('x1', 0)
-            .attr('y1', 0)
-            .attr('x2', Math.cos(secondAngle) * (radius * 0.7))
-            .attr('y2', Math.sin(secondAngle) * (radius * 0.7));
-
-          this.minuteHand
-            .attr('x1', 0)
-            .attr('y1', 0)
-            .attr('x2', Math.cos(minuteAngle) * (radius * 0.65))
-            .attr('y2', Math.sin(minuteAngle) * (radius * 0.65));
-
-          this.hourHand
-            .attr('x1', 0)
-            .attr('y1', 0)
-            .attr('x2', Math.cos(hourAngle) * (radius * 0.45))
-            .attr('y2', Math.sin(hourAngle) * (radius * 0.45));
-
-          requestAnimationFrame(this.update.bind(this));
-        }
-      };
-
-      var app = { 
-        btnPlay: function(){ 
-          $('#btnPlay').html('<i class="fas fa-play fa-2x"></i>');
-          $('#btnPlay').removeClass('on');
-          $('#btnPlay').addClass('off');
-        }, 
-        btnStop: function(){
-          $('#btnPlay').html('<i class="fas fa-stop fa-2x"></i>');
-          $('#btnPlay').removeClass('off');
-          $('#btnPlay').addClass('on'); 
-        }, 
-        init: function(){  
-          mic.configMic();  
-          app.btnPlay();  
-          mic.stop();     
-          ploter.init(); 
-          watch.init();           
-
-          $('#btnPlay').on('click',function(){
-            if ($(this).hasClass('off')) {    
-              app.btnStop();
-              mic.start(function(vol){ 
-                ploter.update(vol);
-              }); 
-            }else{   
-              app.btnPlay();
-              mic.stop(); 
-              ploter.init();  
+          context.putImageData(column, width - 1, 0);
+          for (var i = 1; i < frequencyData.length; i++) {
+            var binFrequency = i * binWidth;
+            if (binFrequency >= minFrequency && binFrequency <= maxFrequency && frequencyData[i] > peakLevel) {
+              peakLevel = frequencyData[i];
+              peakBin = i;
             }
-          }); 
+          }
+          drawFrequencyScale(height, maxFrequency, minFrequency);
+          updateFrequencyReadout(peakBin * binWidth, peakLevel);
+          animationFrame = requestAnimationFrame(drawSpectrogram);
+        }
 
-          $(window).off('resize');
-          $(window).on('resize',function(){  
-            app.btnPlay();
-            mic.stop();
-            ploter.init();     
+        function drawFrequencyScale(height, maxFrequency, minFrequency) {
+          var scaleWidth = Math.round(72 * pixelRatio);
+          var labels = [
+            { frequency: 16000, text: '16 kHz' },
+            { frequency: 8000, text: '8 kHz' },
+            { frequency: 4000, text: '4 kHz' },
+            { frequency: 2000, text: '2 kHz' },
+            { frequency: 1000, text: '1 kHz' },
+            { frequency: 500, text: '500 Hz' },
+            { frequency: 250, text: '250 Hz' },
+            { frequency: 125, text: '125 Hz' },
+            { frequency: 60, text: '60 Hz' }
+          ];
+          context.fillStyle = 'rgba(33, 33, 33, .9)';
+          context.fillRect(0, 0, scaleWidth, height);
+          context.font = (11 * pixelRatio) + 'px Arial, sans-serif';
+          context.textAlign = 'left';
+          context.textBaseline = 'middle';
+
+          labels.forEach(function(label) {
+            if (label.frequency > maxFrequency || label.frequency < minFrequency) return;
+            var y = Math.log(maxFrequency / label.frequency) /
+              Math.log(maxFrequency / minFrequency) * (height - 1);
+            context.strokeStyle = 'rgba(221, 221, 221, .35)';
+            context.beginPath();
+            context.moveTo(scaleWidth - 7 * pixelRatio, y);
+            context.lineTo(scaleWidth, y);
+            context.stroke();
+            context.fillStyle = '#DDD';
+            context.fillText(label.text, 5 * pixelRatio, y);
           });
+          context.fillStyle = 'rgba(221, 221, 221, .45)';
+          context.fillRect(scaleWidth - 1, 0, Math.max(1, pixelRatio), height);
         }
-      }
-      app.init();
 
-    </script> 
+        function updateFrequencyReadout(frequency, level) {
+          var now = performance.now();
+          if (now - lastFrequencyUpdate < 150) return;
+          lastFrequencyUpdate = now;
+          if (level < 35) {
+            frequencyReadout.textContent = 'Frecuencia predominante: sin señal clara';
+          } else {
+            var value = frequency >= 1000
+              ? (frequency / 1000).toFixed(1) + ' kHz'
+              : Math.round(frequency) + ' Hz';
+            frequencyReadout.textContent = 'Frecuencia predominante: ' + value;
+          }
+        }
+
+        function stopMicrophone() {
+          isRunning = false;
+          if (animationFrame !== null) cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+          if (microphoneStream) {
+            microphoneStream.getTracks().forEach(function(track) { track.stop(); });
+            microphoneStream = null;
+          }
+          if (audioContext) {
+            audioContext.close();
+            audioContext = null;
+          }
+          analyser = null;
+          frequencyData = null;
+          resizeCanvas();
+          context.fillStyle = '#333';
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          frequencyReadout.textContent = 'Frecuencia predominante: --';
+          button.textContent = 'Activar micrófono';
+          status.textContent = 'Micrófono detenido. Pulsa el botón para continuar.';
+        }
+
+        async function startMicrophone() {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            status.textContent = 'Este navegador no permite acceder al micrófono. Abre la página en HTTPS o localhost.';
+            return;
+          }
+
+          button.disabled = true;
+          status.textContent = 'Esperando permiso para usar el micrófono…';
+          try {
+            microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) throw new Error('Web Audio no está disponible en este navegador.');
+            audioContext = new AudioContextClass();
+            await audioContext.resume();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+            analyser.smoothingTimeConstant = 0.72;
+            audioContext.createMediaStreamSource(microphoneStream).connect(analyser);
+            frequencyData = new Uint8Array(analyser.frequencyBinCount);
+            resizeCanvas();
+            isRunning = true;
+            button.textContent = 'Detener micrófono';
+            status.textContent = 'Escuchando… El espectrograma se desplaza de derecha a izquierda.';
+            drawSpectrogram();
+          } catch (error) {
+            if (microphoneStream) {
+              microphoneStream.getTracks().forEach(function(track) { track.stop(); });
+              microphoneStream = null;
+            }
+            if (audioContext) {
+              audioContext.close();
+              audioContext = null;
+            }
+            status.textContent = error.name === 'NotAllowedError'
+              ? 'Permiso denegado. Autoriza el micrófono en el navegador e inténtalo de nuevo.'
+              : 'No se pudo iniciar el micrófono: ' + error.message;
+          } finally {
+            button.disabled = false;
+          }
+        }
+
+        button.addEventListener('click', function() {
+          if (isRunning) stopMicrophone();
+          else startMicrophone();
+        });
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+      })();
+    </script>
   </body>
 </html>
