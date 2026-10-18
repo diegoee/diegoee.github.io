@@ -52,21 +52,52 @@
         font-size: .85rem;
       }
       #frequencyReadout {
-        position: fixed;
-        z-index: 1;
-        top: 88px;
-        left: 22px;
+        flex: 0 0 360px;
+        width: 360px;
+        height: 46px;
         margin: 0;
-        padding: 8px 11px;
+        padding: 0 9px;
         border: 1px solid rgba(255, 255, 255, .2);
         border-radius: 5px;
         background: rgba(33, 33, 33, .82);
         color: #DDD;
-        font-size: .9rem;
+        font: inherit;
         font-variant-numeric: tabular-nums;
+        line-height: 44px;
         transition: opacity .25s ease;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       #frequencyReadout:hover { opacity: .35; }
+      #levelLegend {
+        position: fixed;
+        z-index: 1;
+        left: 18px;
+        bottom: 24px;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, .2);
+        border-radius: 5px;
+        background: rgba(33, 33, 33, .88);
+        color: #DDD;
+        font-size: .75rem;
+      }
+      #levelLegend[hidden] { display: none; }
+      .legend-title { display: block; margin-bottom: 7px; }
+      .legend-scale { display: flex; align-items: stretch; gap: 7px; height: 130px; }
+      #levelGradient {
+        width: 14px;
+        height: 100%;
+        border: 1px solid rgba(255,255,255,.25);
+      }
+      .legend-labels {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 7ch;
+        line-height: 1;
+      }
       #micButton {
         flex: 0 0 auto;
         min-height: 46px;
@@ -83,6 +114,55 @@
       #micButton:hover { background: rgba(0,0,0,.55); }
       #micButton:focus-visible { outline: 2px solid #DDD; outline-offset: 3px; }
       #micButton:disabled { cursor: wait; opacity: .7; }
+      .toolbar-actions {
+        position: relative;
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 8px;
+      }
+      .toolbar-actions button {
+        min-height: 46px;
+        padding: 0 14px;
+        border: 1px solid rgba(255,255,255,.35);
+        border-radius: 5px;
+        background: rgba(0,0,0,.35);
+        color: #DDD;
+        font: inherit;
+        cursor: pointer;
+      }
+      .toolbar-actions button:hover:not(:disabled) { background: rgba(0,0,0,.55); }
+      .toolbar-actions button:focus-visible { outline: 2px solid #DDD; outline-offset: 3px; }
+      .toolbar-actions button:disabled { cursor: not-allowed; opacity: .5; }
+      #dbMenu {
+        position: absolute;
+        z-index: 5;
+        top: calc(100% + 8px);
+        right: 0;
+        width: min(280px, 86vw);
+        padding: 14px;
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 5px;
+        background: #292929;
+        box-shadow: 0 8px 24px rgba(0,0,0,.4);
+        color: #DDD;
+      }
+      #dbMenu[hidden] { display: none; }
+      #dbMenu label { display: block; margin-bottom: 12px; font-size: .9rem; }
+      #minDbRange { width: 100%; accent-color: #DDD; }
+      .db-range-labels {
+        display: flex;
+        justify-content: space-between;
+        color: #c4c4c4;
+        font-size: .75rem;
+      }
+      #minDbValue {
+        display: inline-block;
+        width: 7ch;
+        text-align: right;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
       .hint {
         position: fixed;
         right: 18px;
@@ -91,11 +171,19 @@
         font-size: .75rem;
         pointer-events: none;
       }
-      @media (max-width: 520px) {
+      @media (max-width: 940px) {
         .toolbar { align-items: flex-start; padding: 14px; gap: 10px; }
         #status { max-width: 54vw; line-height: 1.35; }
-        #micButton { min-height: 42px; padding: 0 13px; font-size: .85rem; }
-        #frequencyReadout { top: 82px; left: 14px; font-size: .82rem; }
+        .toolbar-actions { flex-direction: column; align-items: stretch; max-width: 64vw; }
+        .toolbar-actions button { min-height: 40px; padding: 0 10px; font-size: .8rem; }
+        #frequencyReadout {
+          flex: 0 0 40px;
+          width: min(360px, 64vw);
+          max-width: 100%;
+          height: 40px;
+          font-size: .8rem;
+          line-height: 38px;
+        }
       }
     </style>
   </head>
@@ -103,20 +191,52 @@
     <canvas id="spectrogram" aria-label="Espectrograma de audio en tiempo real"></canvas>
     <header class="toolbar">
       <div class="heading">
-        <h1>Sounds Flow</h1>
+        <h1>Audio Spectrum</h1>
         <p id="status" role="status" aria-live="polite">Pulsa el botón para activar el micrófono.</p>
       </div>
-      <button id="micButton" type="button">Activar micrófono</button>
+      <div class="toolbar-actions">
+        <p id="frequencyReadout" aria-live="off">Frecuencia predominante: --</p>
+        <button id="micButton" type="button">Activar micrófono</button>
+        <button id="modeButton" type="button" aria-pressed="false" title="Cambiar entre vista temporal y espectro por frecuencia">Vista: tiempo</button>
+        <button id="dbMenuButton" type="button" aria-expanded="false" aria-controls="dbMenu">Escala dB</button>
+        <div id="dbMenu" role="group" aria-label="Configuración de escala de decibelios" hidden>
+          <label for="minDbRange">Mínimo de escala: <output id="minDbValue" for="minDbRange">-100 dB</output></label>
+          <input id="minDbRange" type="range" min="-120" max="-31" step="1" value="-100">
+          <div class="db-range-labels"><span>-120 dB</span><span>-31 dB</span></div>
+        </div>
+      </div>
     </header>
-    <p id="frequencyReadout" aria-live="off">Frecuencia predominante: --</p>
+    <div id="levelLegend" aria-label="Leyenda de intensidad del espectrograma">
+      <span class="legend-title">Intensidad</span>
+      <div class="legend-scale">
+        <canvas id="levelGradient" width="1" height="256" aria-hidden="true"></canvas>
+        <div class="legend-labels" aria-hidden="true">
+          <span id="legendMax">-30 dB</span>
+          <span id="legendTickOne">-53 dB</span>
+          <span id="legendTickTwo">-77 dB</span>
+          <span id="legendMin">-100 dB</span>
+        </div>
+      </div>
+    </div>
     <div class="hint">Frecuencias altas arriba · bajas abajo</div>
     <script>
       (function() {
         var canvas = document.getElementById('spectrogram');
         var context = canvas.getContext('2d', { alpha: false });
         var button = document.getElementById('micButton');
+        var modeButton = document.getElementById('modeButton');
+        var dbMenuButton = document.getElementById('dbMenuButton');
+        var dbMenu = document.getElementById('dbMenu');
+        var minDbRange = document.getElementById('minDbRange');
+        var minDbValue = document.getElementById('minDbValue');
         var status = document.getElementById('status');
         var frequencyReadout = document.getElementById('frequencyReadout');
+        var levelLegend = document.getElementById('levelLegend');
+        var levelGradient = document.getElementById('levelGradient');
+        var legendMax = document.getElementById('legendMax');
+        var legendTickOne = document.getElementById('legendTickOne');
+        var legendTickTwo = document.getElementById('legendTickTwo');
+        var legendMin = document.getElementById('legendMin');
         var audioContext = null;
         var analyser = null;
         var microphoneStream = null;
@@ -127,6 +247,36 @@
         var lastFrequencyUpdate = 0;
         var colorMap = createColorMap();
         var isRunning = false;
+        var isFrequencyView = false;
+        var minDecibels = -100;
+        var maxDecibels = -30;
+
+        function updateDecibelScale() {
+          var range = maxDecibels - minDecibels;
+          var firstTick = Math.round(maxDecibels - range / 3);
+          var secondTick = Math.round(maxDecibels - range * 2 / 3);
+          minDbValue.value = minDecibels + ' dB';
+          minDbValue.textContent = minDecibels + ' dB';
+          legendMax.textContent = maxDecibels + ' dB';
+          legendTickOne.textContent = firstTick + ' dB';
+          legendTickTwo.textContent = secondTick + ' dB';
+          legendMin.textContent = minDecibels + ' dB';
+          if (analyser) analyser.minDecibels = minDecibels;
+        }
+
+        function drawLevelLegend() {
+          var legendContext = levelGradient.getContext('2d');
+          var image = legendContext.createImageData(1, 256);
+          for (var i = 0; i < 256; i++) {
+            var colorOffset = i * 4;
+            var pixelOffset = (255 - i) * 4;
+            image.data[pixelOffset] = colorMap[colorOffset];
+            image.data[pixelOffset + 1] = colorMap[colorOffset + 1];
+            image.data[pixelOffset + 2] = colorMap[colorOffset + 2];
+            image.data[pixelOffset + 3] = 255;
+          }
+          legendContext.putImageData(image, 0, 0);
+        }
 
         function createColorMap() {
           var colors = new Uint8ClampedArray(256 * 4);
@@ -175,6 +325,21 @@
           var peakBin = 0;
           var peakLevel = 0;
 
+          for (var i = 1; i < frequencyData.length; i++) {
+            var binFrequency = i * binWidth;
+            if (binFrequency >= minFrequency && binFrequency <= maxFrequency && frequencyData[i] > peakLevel) {
+              peakLevel = frequencyData[i];
+              peakBin = i;
+            }
+          }
+
+          if (isFrequencyView) {
+            drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth);
+            updateFrequencyReadout(peakBin * binWidth, peakLevel);
+            animationFrame = requestAnimationFrame(drawSpectrogram);
+            return;
+          }
+
           if (width > 1) {
             context.drawImage(canvas, 1, 0, width - 1, height, 0, 0, width - 1, height);
           }
@@ -191,16 +356,114 @@
             column.data[pixelOffset + 3] = 255;
           }
           context.putImageData(column, width - 1, 0);
-          for (var i = 1; i < frequencyData.length; i++) {
-            var binFrequency = i * binWidth;
-            if (binFrequency >= minFrequency && binFrequency <= maxFrequency && frequencyData[i] > peakLevel) {
-              peakLevel = frequencyData[i];
-              peakBin = i;
-            }
-          }
           drawFrequencyScale(height, maxFrequency, minFrequency);
           updateFrequencyReadout(peakBin * binWidth, peakLevel);
           animationFrame = requestAnimationFrame(drawSpectrogram);
+        }
+
+        function drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth) {
+          context.fillStyle = '#333';
+          context.fillRect(0, 0, width, height);
+
+          var left = Math.round(68 * pixelRatio);
+          var right = width - Math.round(24 * pixelRatio);
+          var top = Math.round(115 * pixelRatio);
+          var bottom = height - Math.round(52 * pixelRatio);
+          var plotWidth = right - left;
+          var plotHeight = bottom - top;
+          var dbTicks = [
+            maxDecibels,
+            Math.round(maxDecibels - (maxDecibels - minDecibels) / 3),
+            Math.round(maxDecibels - (maxDecibels - minDecibels) * 2 / 3),
+            minDecibels
+          ];
+          var labels = [
+            { frequency: 50, text: '50 Hz' },
+            { frequency: 100, text: '100 Hz' },
+            { frequency: 250, text: '250 Hz' },
+            { frequency: 500, text: '500 Hz' },
+            { frequency: 1000, text: '1 kHz' },
+            { frequency: 2000, text: '2 kHz' },
+            { frequency: 4000, text: '4 kHz' },
+            { frequency: 8000, text: '8 kHz' },
+            { frequency: 16000, text: '16 kHz' }
+          ];
+
+          context.font = (12 * pixelRatio) + 'px Arial, sans-serif';
+          context.textAlign = 'center';
+          context.textBaseline = 'top';
+          labels.forEach(function(label) {
+            if (label.frequency < minFrequency || label.frequency > maxFrequency) return;
+            var x = left + Math.log(label.frequency / minFrequency) /
+              Math.log(maxFrequency / minFrequency) * plotWidth;
+            context.strokeStyle = 'rgba(221, 221, 221, .2)';
+            context.beginPath();
+            context.moveTo(x, top);
+            context.lineTo(x, bottom);
+            context.stroke();
+            context.fillStyle = '#DDD';
+            context.fillText(label.text, x, bottom + 12 * pixelRatio);
+          });
+
+          context.font = (11 * pixelRatio) + 'px Arial, sans-serif';
+          context.textAlign = 'right';
+          context.textBaseline = 'middle';
+          dbTicks.forEach(function(decibels) {
+            var y = bottom - (decibels - minDecibels) /
+              (maxDecibels - minDecibels) * plotHeight;
+            context.strokeStyle = 'rgba(221, 221, 221, .2)';
+            context.beginPath();
+            context.moveTo(left, y);
+            context.lineTo(right, y);
+            context.stroke();
+            context.fillStyle = '#DDD';
+            context.fillText(decibels + ' dB', left - 8 * pixelRatio, y);
+          });
+
+          context.strokeStyle = 'rgba(221, 221, 221, .65)';
+          context.beginPath();
+          context.moveTo(left, top);
+          context.lineTo(left, bottom);
+          context.lineTo(right, bottom);
+          context.stroke();
+
+          var gradient = context.createLinearGradient(0, top, 0, bottom);
+          gradient.addColorStop(0, 'rgba(221, 221, 221, .75)');
+          gradient.addColorStop(1, 'rgba(221, 221, 221, .05)');
+          context.beginPath();
+          var hasPoint = false;
+          for (var bin = 1; bin < frequencyData.length; bin++) {
+            var frequency = bin * binWidth;
+            if (frequency < minFrequency || frequency > maxFrequency) continue;
+            var x = left + Math.log(frequency / minFrequency) /
+              Math.log(maxFrequency / minFrequency) * plotWidth;
+            var y = bottom - (frequencyData[bin] / 255) * plotHeight;
+            if (!hasPoint) {
+              context.moveTo(x, y);
+              hasPoint = true;
+            } else {
+              context.lineTo(x, y);
+            }
+          }
+          context.strokeStyle = '#DDD';
+          context.lineWidth = Math.max(1.5, 2 * pixelRatio);
+          context.stroke();
+          context.lineTo(right, bottom);
+          context.lineTo(left, bottom);
+          context.closePath();
+          context.fillStyle = gradient;
+          context.fill();
+
+          context.fillStyle = '#DDD';
+          context.font = '600 ' + (15 * pixelRatio) + 'px Arial, sans-serif';
+          context.textAlign = 'left';
+          context.textBaseline = 'top';
+          context.fillText('Espectro de frecuencias', left, Math.round(78 * pixelRatio));
+          context.font = (11 * pixelRatio) + 'px Arial, sans-serif';
+          context.fillStyle = 'rgba(221, 221, 221, .75)';
+          context.fillText('Nivel (dB)', left, top - 18 * pixelRatio);
+          context.textAlign = 'right';
+          context.fillText('Frecuencia', right, bottom + 12 * pixelRatio);
         }
 
         function drawFrequencyScale(height, maxFrequency, minFrequency) {
@@ -291,6 +554,8 @@
             analyser = audioContext.createAnalyser();
             analyser.fftSize = 2048;
             analyser.smoothingTimeConstant = 0.72;
+            analyser.minDecibels = minDecibels;
+            analyser.maxDecibels = maxDecibels;
             audioContext.createMediaStreamSource(microphoneStream).connect(analyser);
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
             resizeCanvas();
@@ -319,7 +584,31 @@
           if (isRunning) stopMicrophone();
           else startMicrophone();
         });
+        modeButton.addEventListener('click', function() {
+          isFrequencyView = !isFrequencyView;
+          modeButton.textContent = isFrequencyView ? 'Vista: frecuencia' : 'Vista: tiempo';
+          modeButton.setAttribute('aria-pressed', String(isFrequencyView));
+          levelLegend.hidden = isFrequencyView;
+        });
+        dbMenuButton.addEventListener('click', function() {
+          var isOpen = dbMenuButton.getAttribute('aria-expanded') === 'true';
+          dbMenuButton.setAttribute('aria-expanded', String(!isOpen));
+          dbMenu.hidden = isOpen;
+        });
+        minDbRange.addEventListener('input', function() {
+          minDecibels = Number(minDbRange.value);
+          updateDecibelScale();
+        });
+        document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape' && !dbMenu.hidden) {
+            dbMenu.hidden = true;
+            dbMenuButton.setAttribute('aria-expanded', 'false');
+            dbMenuButton.focus();
+          }
+        });
         window.addEventListener('resize', resizeCanvas);
+        updateDecibelScale();
+        drawLevelLegend();
         resizeCanvas();
       })();
     </script>
