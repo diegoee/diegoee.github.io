@@ -26,6 +26,15 @@
         inset: 0;
         width: 100%;
         height: 100%;
+        z-index: 0;
+      }
+      #frequencyMarker {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
       }
       .toolbar {
         position: fixed;
@@ -52,25 +61,16 @@
         font-size: .85rem;
       }
       #frequencyReadout {
-        flex: 0 0 360px;
-        width: 360px;
-        height: 46px;
-        margin: 0;
-        padding: 0 9px;
-        border: 1px solid rgba(255, 255, 255, .2);
-        border-radius: 5px;
-        background: rgba(33, 33, 33, .82);
-        color: #DDD;
-        font: inherit;
-        font-variant-numeric: tabular-nums;
-        line-height: 44px;
-        transition: opacity .25s ease;
-        text-align: center;
-        white-space: nowrap;
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
         overflow: hidden;
-        text-overflow: ellipsis;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
       }
-      #frequencyReadout:hover { opacity: .35; }
       #levelLegend {
         position: fixed;
         z-index: 1;
@@ -99,21 +99,35 @@
         line-height: 1;
       }
       #micButton {
-        flex: 0 0 auto;
-        min-height: 46px;
-        padding: 0 18px;
+        position: fixed;
+        z-index: 3;
+        right: 22px;
+        bottom: 22px;
+        display: grid;
+        place-items: center;
+        width: 62px;
+        height: 62px;
+        padding: 0;
         border: 1px solid rgba(255,255,255,.35);
-        border-radius: 5px;
+        border-radius: 50%;
         background: rgba(0,0,0,.35);
         color: #DDD;
-        font-size: .95rem;
-        font-weight: 700;
         cursor: pointer;
-        transition: background .25s ease, opacity .25s ease;
+        box-shadow: 0 4px 16px rgba(0,0,0,.4);
+        transition: background .2s ease, border-color .2s ease, color .2s ease, opacity .2s ease, transform .2s ease;
       }
-      #micButton:hover { background: rgba(0,0,0,.55); }
-      #micButton:focus-visible { outline: 2px solid #DDD; outline-offset: 3px; }
+      #micButton:hover:not(:disabled) { transform: translateY(-2px); background: rgba(0,0,0,.7); }
+      #micButton:focus-visible { outline: 2px solid #DDD; outline-offset: 4px; }
       #micButton:disabled { cursor: wait; opacity: .7; }
+      #micButton[aria-pressed="true"] {
+        border-color: #61d39a;
+        background: #153b2c;
+        color: #8cf0b8;
+      }
+      #micButton svg { width: 28px; height: 28px; }
+      #micButton .mic-on-icon { display: none; }
+      #micButton[aria-pressed="true"] .mic-on-icon { display: block; }
+      #micButton[aria-pressed="true"] .mic-off-icon { display: none; }
       .toolbar-actions {
         position: relative;
         display: flex;
@@ -134,7 +148,7 @@
       .toolbar-actions button:hover:not(:disabled) { background: rgba(0,0,0,.55); }
       .toolbar-actions button:focus-visible { outline: 2px solid #DDD; outline-offset: 3px; }
       .toolbar-actions button:disabled { cursor: not-allowed; opacity: .5; }
-      #dbMenu {
+      #settingsMenu {
         position: absolute;
         z-index: 5;
         top: calc(100% + 8px);
@@ -147,8 +161,14 @@
         box-shadow: 0 8px 24px rgba(0,0,0,.4);
         color: #DDD;
       }
-      #dbMenu[hidden] { display: none; }
-      #dbMenu label { display: block; margin-bottom: 12px; font-size: .9rem; }
+      #settingsMenu[hidden] { display: none; }
+      #settingsMenu label { display: block; margin-bottom: 12px; font-size: .9rem; }
+      #modeButton {
+        width: 100%;
+        margin-bottom: 14px;
+        text-align: left;
+      }
+      .settings-menu-section { padding-top: 12px; border-top: 1px solid rgba(255,255,255,.18); }
       #minDbRange { width: 100%; accent-color: #DDD; }
       .db-range-labels {
         display: flex;
@@ -165,10 +185,12 @@
       }
       .hint {
         position: fixed;
-        right: 18px;
-        bottom: 14px;
+        right: 98px;
+        bottom: 28px;
+        max-width: calc(100vw - 130px);
         color: rgba(221,221,221,.7);
         font-size: .75rem;
+        text-align: right;
         pointer-events: none;
       }
       @media (max-width: 940px) {
@@ -176,19 +198,12 @@
         #status { max-width: 54vw; line-height: 1.35; }
         .toolbar-actions { flex-direction: column; align-items: stretch; max-width: 64vw; }
         .toolbar-actions button { min-height: 40px; padding: 0 10px; font-size: .8rem; }
-        #frequencyReadout {
-          flex: 0 0 40px;
-          width: min(360px, 64vw);
-          max-width: 100%;
-          height: 40px;
-          font-size: .8rem;
-          line-height: 38px;
-        }
       }
     </style>
   </head>
   <body>
     <canvas id="spectrogram" aria-label="Espectrograma de audio en tiempo real"></canvas>
+    <canvas id="frequencyMarker" aria-hidden="true"></canvas>
     <header class="toolbar">
       <div class="heading">
         <h1>Audio Spectrum</h1>
@@ -196,16 +211,29 @@
       </div>
       <div class="toolbar-actions">
         <p id="frequencyReadout" aria-live="off">Frecuencia predominante: --</p>
-        <button id="micButton" type="button">Activar micrófono</button>
-        <button id="modeButton" type="button" aria-pressed="false" title="Cambiar entre vista temporal y espectro por frecuencia">Vista: tiempo</button>
-        <button id="dbMenuButton" type="button" aria-expanded="false" aria-controls="dbMenu">Escala dB</button>
-        <div id="dbMenu" role="group" aria-label="Configuración de escala de decibelios" hidden>
-          <label for="minDbRange">Mínimo de escala: <output id="minDbValue" for="minDbRange">-100 dB</output></label>
-          <input id="minDbRange" type="range" min="-120" max="-31" step="1" value="-100">
-          <div class="db-range-labels"><span>-120 dB</span><span>-31 dB</span></div>
+        <button id="settingsMenuButton" type="button" aria-label="Abrir opciones de vista y escala" aria-expanded="false" aria-controls="settingsMenu" title="Opciones de vista y escala">☰</button>
+        <div id="settingsMenu" role="group" aria-label="Opciones de vista y escala" hidden>
+          <button id="modeButton" type="button" aria-pressed="false" title="Cambiar entre vista temporal y espectro por frecuencia">Vista: tiempo</button>
+          <div class="settings-menu-section">
+            <label for="minDbRange">Mínimo de escala: <output id="minDbValue" for="minDbRange">-100 dB</output></label>
+            <input id="minDbRange" type="range" min="-120" max="-31" step="1" value="-100">
+            <div class="db-range-labels"><span>-120 dB</span><span>-31 dB</span></div>
+          </div>
         </div>
       </div>
     </header>
+    <button id="micButton" type="button" aria-label="Activar micrófono" aria-pressed="false" title="Activar micrófono">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <g class="mic-on-icon">
+          <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+          <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"></path>
+        </g>
+        <g class="mic-off-icon">
+          <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+          <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8M3 3l18 18"></path>
+        </g>
+      </svg>
+    </button>
     <div id="levelLegend" aria-label="Leyenda de intensidad del espectrograma">
       <span class="legend-title">Intensidad</span>
       <div class="legend-scale">
@@ -223,10 +251,12 @@
       (function() {
         var canvas = document.getElementById('spectrogram');
         var context = canvas.getContext('2d', { alpha: false });
+        var markerCanvas = document.getElementById('frequencyMarker');
+        var markerContext = markerCanvas.getContext('2d');
         var button = document.getElementById('micButton');
         var modeButton = document.getElementById('modeButton');
-        var dbMenuButton = document.getElementById('dbMenuButton');
-        var dbMenu = document.getElementById('dbMenu');
+        var settingsMenuButton = document.getElementById('settingsMenuButton');
+        var settingsMenu = document.getElementById('settingsMenu');
         var minDbRange = document.getElementById('minDbRange');
         var minDbValue = document.getElementById('minDbValue');
         var status = document.getElementById('status');
@@ -306,6 +336,8 @@
           if (canvas.width !== width || canvas.height !== height) {
             canvas.width = width;
             canvas.height = height;
+            markerCanvas.width = width;
+            markerCanvas.height = height;
             context.fillStyle = '#333';
             context.fillRect(0, 0, width, height);
             column = context.createImageData(1, height);
@@ -335,6 +367,7 @@
 
           if (isFrequencyView) {
             drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth);
+            drawDominantFrequencyMarker(peakBin * binWidth, peakLevel, minFrequency, maxFrequency, width, height);
             updateFrequencyReadout(peakBin * binWidth, peakLevel);
             animationFrame = requestAnimationFrame(drawSpectrogram);
             return;
@@ -357,8 +390,60 @@
           }
           context.putImageData(column, width - 1, 0);
           drawFrequencyScale(height, maxFrequency, minFrequency);
+          drawDominantFrequencyMarker(peakBin * binWidth, peakLevel, minFrequency, maxFrequency, width, height);
           updateFrequencyReadout(peakBin * binWidth, peakLevel);
           animationFrame = requestAnimationFrame(drawSpectrogram);
+        }
+
+        function drawDominantFrequencyMarker(frequency, level, minFrequency, maxFrequency, width, height) {
+          markerContext.clearRect(0, 0, width, height);
+          if (level < 35 || frequency < minFrequency || frequency > maxFrequency) return;
+
+          var markerColor = isFrequencyView ? '#7dd3fc' : '#ffffff';
+          markerContext.save();
+          markerContext.strokeStyle = markerColor;
+          markerContext.fillStyle = markerColor;
+          markerContext.lineWidth = Math.max(1.5, 2 * pixelRatio);
+          markerContext.setLineDash([6 * pixelRatio, 4 * pixelRatio]);
+          markerContext.beginPath();
+
+          if (isFrequencyView) {
+            var left = Math.round(68 * pixelRatio);
+            var right = width - Math.round(24 * pixelRatio);
+            var top = Math.round(115 * pixelRatio);
+            var bottom = height - Math.round(52 * pixelRatio);
+            var x = left + Math.log(frequency / minFrequency) /
+              Math.log(maxFrequency / minFrequency) * (right - left);
+            markerContext.moveTo(x, top);
+            markerContext.lineTo(x, bottom);
+          } else {
+            var y = Math.log(maxFrequency / frequency) /
+              Math.log(maxFrequency / minFrequency) * (height - 1);
+            var scaleWidth = Math.round(72 * pixelRatio);
+            markerContext.moveTo(scaleWidth, y);
+            markerContext.lineTo(width, y);
+          }
+
+          markerContext.stroke();
+
+          if (!isFrequencyView) {
+            var frequencyLabel = frequency >= 1000
+              ? (frequency / 1000).toFixed(1) + ' kHz'
+              : Math.round(frequency) + ' Hz';
+            var labelX = Math.round(78 * pixelRatio);
+            var labelY = Math.max(12 * pixelRatio, Math.min(height - 12 * pixelRatio, y - 10 * pixelRatio));
+            markerContext.setLineDash([]);
+            markerContext.font = (11 * pixelRatio) + 'px Arial, sans-serif';
+            markerContext.textAlign = 'left';
+            markerContext.textBaseline = 'middle';
+            markerContext.fillStyle = 'rgba(33, 33, 33, .92)';
+            var labelWidth = markerContext.measureText(frequencyLabel).width;
+            markerContext.fillRect(labelX - 4 * pixelRatio, labelY - 9 * pixelRatio, labelWidth + 8 * pixelRatio, 18 * pixelRatio);
+            markerContext.fillStyle = markerColor;
+            markerContext.fillText(frequencyLabel, labelX, labelY);
+          }
+
+          markerContext.restore();
         }
 
         function drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth) {
@@ -437,7 +522,17 @@
             if (frequency < minFrequency || frequency > maxFrequency) continue;
             var x = left + Math.log(frequency / minFrequency) /
               Math.log(maxFrequency / minFrequency) * plotWidth;
-            var y = bottom - (frequencyData[bin] / 255) * plotHeight;
+            var smoothedLevel = 0;
+            var smoothingWeight = 0;
+            for (var smoothingOffset = -3; smoothingOffset <= 3; smoothingOffset++) {
+              var neighborBin = bin + smoothingOffset;
+              var neighborFrequency = neighborBin * binWidth;
+              if (neighborBin < 1 || neighborFrequency < minFrequency || neighborFrequency > maxFrequency) continue;
+              var weight = 4 - Math.abs(smoothingOffset);
+              smoothedLevel += frequencyData[neighborBin] * weight;
+              smoothingWeight += weight;
+            }
+            var y = bottom - (smoothedLevel / smoothingWeight / 255) * plotHeight;
             if (!hasPoint) {
               context.moveTo(x, y);
               hasPoint = true;
@@ -517,6 +612,9 @@
 
         function stopMicrophone() {
           isRunning = false;
+          button.setAttribute('aria-pressed', 'false');
+          button.setAttribute('aria-label', 'Activar micrófono');
+          button.title = 'Activar micrófono';
           if (animationFrame !== null) cancelAnimationFrame(animationFrame);
           animationFrame = null;
           if (microphoneStream) {
@@ -532,8 +630,8 @@
           resizeCanvas();
           context.fillStyle = '#333';
           context.fillRect(0, 0, canvas.width, canvas.height);
+          markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
           frequencyReadout.textContent = 'Frecuencia predominante: --';
-          button.textContent = 'Activar micrófono';
           status.textContent = 'Micrófono detenido. Pulsa el botón para continuar.';
         }
 
@@ -544,6 +642,7 @@
           }
 
           button.disabled = true;
+          button.setAttribute('aria-busy', 'true');
           status.textContent = 'Esperando permiso para usar el micrófono…';
           try {
             microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -560,7 +659,9 @@
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
             resizeCanvas();
             isRunning = true;
-            button.textContent = 'Detener micrófono';
+            button.setAttribute('aria-pressed', 'true');
+            button.setAttribute('aria-label', 'Detener micrófono');
+            button.title = 'Detener micrófono';
             status.textContent = 'Escuchando… El espectrograma se desplaza de derecha a izquierda.';
             drawSpectrogram();
           } catch (error) {
@@ -577,6 +678,7 @@
               : 'No se pudo iniciar el micrófono: ' + error.message;
           } finally {
             button.disabled = false;
+            button.removeAttribute('aria-busy');
           }
         }
 
@@ -590,27 +692,36 @@
           modeButton.setAttribute('aria-pressed', String(isFrequencyView));
           levelLegend.hidden = isFrequencyView;
         });
-        dbMenuButton.addEventListener('click', function() {
-          var isOpen = dbMenuButton.getAttribute('aria-expanded') === 'true';
-          dbMenuButton.setAttribute('aria-expanded', String(!isOpen));
-          dbMenu.hidden = isOpen;
+        settingsMenuButton.addEventListener('click', function() {
+          var isOpen = settingsMenuButton.getAttribute('aria-expanded') === 'true';
+          settingsMenuButton.setAttribute('aria-expanded', String(!isOpen));
+          settingsMenuButton.setAttribute('aria-label', isOpen ? 'Abrir opciones de vista y escala' : 'Cerrar opciones de vista y escala');
+          settingsMenu.hidden = isOpen;
         });
         minDbRange.addEventListener('input', function() {
           minDecibels = Number(minDbRange.value);
           updateDecibelScale();
         });
         document.addEventListener('keydown', function(event) {
-          if (event.key === 'Escape' && !dbMenu.hidden) {
-            dbMenu.hidden = true;
-            dbMenuButton.setAttribute('aria-expanded', 'false');
-            dbMenuButton.focus();
+          if (event.key === 'Escape' && !settingsMenu.hidden) {
+            settingsMenu.hidden = true;
+            settingsMenuButton.setAttribute('aria-expanded', 'false');
+            settingsMenuButton.setAttribute('aria-label', 'Abrir opciones de vista y escala');
+            settingsMenuButton.focus();
+          }
+        });
+        document.addEventListener('click', function(event) {
+          if (!settingsMenu.hidden && !settingsMenu.contains(event.target) && event.target !== settingsMenuButton) {
+            settingsMenu.hidden = true;
+            settingsMenuButton.setAttribute('aria-expanded', 'false');
+            settingsMenuButton.setAttribute('aria-label', 'Abrir opciones de vista y escala');
           }
         });
         window.addEventListener('resize', resizeCanvas);
         updateDecibelScale();
         drawLevelLegend();
         resizeCanvas();
-      })();
+      })(); 
     </script>
   </body>
 </html>
