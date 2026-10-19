@@ -182,17 +182,7 @@
         text-align: right;
         white-space: nowrap;
         font-variant-numeric: tabular-nums;
-      }
-      .hint {
-        position: fixed;
-        right: 98px;
-        bottom: 28px;
-        max-width: calc(100vw - 130px);
-        color: rgba(221,221,221,.7);
-        font-size: .75rem;
-        text-align: right;
-        pointer-events: none;
-      }
+      } 
       @media (max-width: 940px) {
         .toolbar { align-items: flex-start; padding: 14px; gap: 10px; }
         #status { max-width: 54vw; line-height: 1.35; }
@@ -245,8 +235,7 @@
           <span id="legendMin">-100 dB</span>
         </div>
       </div>
-    </div>
-    <div class="hint">Frecuencias altas arriba · bajas abajo</div>
+    </div> 
     <script>
       (function() {
         var canvas = document.getElementById('spectrogram');
@@ -426,7 +415,24 @@
 
           markerContext.stroke();
 
-          if (!isFrequencyView) {
+          if (isFrequencyView) {
+            var frequencyLabel = frequency >= 1000
+              ? (frequency / 1000).toFixed(1) + ' kHz'
+              : Math.round(frequency) + ' Hz';
+            var labelY = top + 12 * pixelRatio;
+            markerContext.setLineDash([]);
+            markerContext.font = '600 ' + (12 * pixelRatio) + 'px Arial, sans-serif';
+            markerContext.textAlign = 'center';
+            markerContext.textBaseline = 'middle';
+            var labelWidth = markerContext.measureText(frequencyLabel).width;
+            var labelX = Math.max(left + labelWidth / 2 + 5 * pixelRatio,
+              Math.min(right - labelWidth / 2 - 5 * pixelRatio, x));
+            markerContext.fillStyle = 'rgba(33, 33, 33, .92)';
+            markerContext.fillRect(labelX - labelWidth / 2 - 5 * pixelRatio,
+              labelY - 10 * pixelRatio, labelWidth + 10 * pixelRatio, 20 * pixelRatio);
+            markerContext.fillStyle = markerColor;
+            markerContext.fillText(frequencyLabel, labelX, labelY);
+          } else {
             var frequencyLabel = frequency >= 1000
               ? (frequency / 1000).toFixed(1) + ' kHz'
               : Math.round(frequency) + ' Hz';
@@ -557,8 +563,8 @@
           context.font = (11 * pixelRatio) + 'px Arial, sans-serif';
           context.fillStyle = 'rgba(221, 221, 221, .75)';
           context.fillText('Nivel (dB)', left, top - 18 * pixelRatio);
-          context.textAlign = 'right';
-          context.fillText('Frecuencia', right, bottom + 12 * pixelRatio);
+          context.textAlign = 'center';
+          context.fillText('Frecuencia (Hz)', left + plotWidth / 2, bottom + 32 * pixelRatio);
         }
 
         function drawFrequencyScale(height, maxFrequency, minFrequency) {
@@ -662,7 +668,7 @@
             button.setAttribute('aria-pressed', 'true');
             button.setAttribute('aria-label', 'Detener micrófono');
             button.title = 'Detener micrófono';
-            status.textContent = 'Escuchando… El espectrograma se desplaza de derecha a izquierda.';
+            status.textContent = 'Escuchando…';
             drawSpectrogram();
           } catch (error) {
             if (microphoneStream) {
