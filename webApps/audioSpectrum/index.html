@@ -240,6 +240,8 @@
       (function() {
         var canvas = document.getElementById('spectrogram');
         var context = canvas.getContext('2d', { alpha: false });
+        var timeCanvas = document.createElement('canvas');
+        var timeContext = timeCanvas.getContext('2d', { alpha: false });
         var markerCanvas = document.getElementById('frequencyMarker');
         var markerContext = markerCanvas.getContext('2d');
         var button = document.getElementById('micButton');
@@ -325,10 +327,14 @@
           if (canvas.width !== width || canvas.height !== height) {
             canvas.width = width;
             canvas.height = height;
+            timeCanvas.width = width;
+            timeCanvas.height = height;
             markerCanvas.width = width;
             markerCanvas.height = height;
             context.fillStyle = '#333';
             context.fillRect(0, 0, width, height);
+            timeContext.fillStyle = '#333';
+            timeContext.fillRect(0, 0, width, height);
             column = context.createImageData(1, height);
           }
         }
@@ -354,16 +360,8 @@
             }
           }
 
-          if (isFrequencyView) {
-            drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth);
-            drawDominantFrequencyMarker(peakBin * binWidth, peakLevel, minFrequency, maxFrequency, width, height);
-            updateFrequencyReadout(peakBin * binWidth, peakLevel);
-            animationFrame = requestAnimationFrame(drawSpectrogram);
-            return;
-          }
-
           if (width > 1) {
-            context.drawImage(canvas, 1, 0, width - 1, height, 0, 0, width - 1, height);
+            timeContext.drawImage(timeCanvas, 1, 0, width - 1, height, 0, 0, width - 1, height);
           }
 
           for (var y = 0; y < height; y++) {
@@ -377,8 +375,18 @@
             column.data[pixelOffset + 2] = colorMap[colorOffset + 2];
             column.data[pixelOffset + 3] = 255;
           }
-          context.putImageData(column, width - 1, 0);
-          drawFrequencyScale(height, maxFrequency, minFrequency);
+          timeContext.putImageData(column, width - 1, 0);
+          drawFrequencyScale(timeContext, height, maxFrequency, minFrequency);
+
+          if (isFrequencyView) {
+            drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth);
+            drawDominantFrequencyMarker(peakBin * binWidth, peakLevel, minFrequency, maxFrequency, width, height);
+            updateFrequencyReadout(peakBin * binWidth, peakLevel);
+            animationFrame = requestAnimationFrame(drawSpectrogram);
+            return;
+          }
+
+          context.drawImage(timeCanvas, 0, 0);
           drawDominantFrequencyMarker(peakBin * binWidth, peakLevel, minFrequency, maxFrequency, width, height);
           updateFrequencyReadout(peakBin * binWidth, peakLevel);
           animationFrame = requestAnimationFrame(drawSpectrogram);
@@ -567,7 +575,7 @@
           context.fillText('Frecuencia (Hz)', left + plotWidth / 2, bottom + 32 * pixelRatio);
         }
 
-        function drawFrequencyScale(height, maxFrequency, minFrequency) {
+        function drawFrequencyScale(targetContext, height, maxFrequency, minFrequency) {
           var scaleWidth = Math.round(72 * pixelRatio);
           var labels = [
             { frequency: 16000, text: '16 kHz' },
@@ -580,26 +588,26 @@
             { frequency: 125, text: '125 Hz' },
             { frequency: 60, text: '60 Hz' }
           ];
-          context.fillStyle = 'rgba(33, 33, 33, .9)';
-          context.fillRect(0, 0, scaleWidth, height);
-          context.font = (11 * pixelRatio) + 'px Arial, sans-serif';
-          context.textAlign = 'left';
-          context.textBaseline = 'middle';
+          targetContext.fillStyle = 'rgba(33, 33, 33, .9)';
+          targetContext.fillRect(0, 0, scaleWidth, height);
+          targetContext.font = (11 * pixelRatio) + 'px Arial, sans-serif';
+          targetContext.textAlign = 'left';
+          targetContext.textBaseline = 'middle';
 
           labels.forEach(function(label) {
             if (label.frequency > maxFrequency || label.frequency < minFrequency) return;
             var y = Math.log(maxFrequency / label.frequency) /
               Math.log(maxFrequency / minFrequency) * (height - 1);
-            context.strokeStyle = 'rgba(221, 221, 221, .35)';
-            context.beginPath();
-            context.moveTo(scaleWidth - 7 * pixelRatio, y);
-            context.lineTo(scaleWidth, y);
-            context.stroke();
-            context.fillStyle = '#DDD';
-            context.fillText(label.text, 5 * pixelRatio, y);
+            targetContext.strokeStyle = 'rgba(221, 221, 221, .35)';
+            targetContext.beginPath();
+            targetContext.moveTo(scaleWidth - 7 * pixelRatio, y);
+            targetContext.lineTo(scaleWidth, y);
+            targetContext.stroke();
+            targetContext.fillStyle = '#DDD';
+            targetContext.fillText(label.text, 5 * pixelRatio, y);
           });
-          context.fillStyle = 'rgba(221, 221, 221, .45)';
-          context.fillRect(scaleWidth - 1, 0, Math.max(1, pixelRatio), height);
+          targetContext.fillStyle = 'rgba(221, 221, 221, .45)';
+          targetContext.fillRect(scaleWidth - 1, 0, Math.max(1, pixelRatio), height);
         }
 
         function updateFrequencyReadout(frequency, level) {
@@ -636,6 +644,8 @@
           resizeCanvas();
           context.fillStyle = '#333';
           context.fillRect(0, 0, canvas.width, canvas.height);
+          timeContext.fillStyle = '#333';
+          timeContext.fillRect(0, 0, timeCanvas.width, timeCanvas.height);
           markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
           frequencyReadout.textContent = 'Frecuencia predominante: --';
           status.textContent = 'Micrófono detenido. Pulsa el botón para continuar.';
@@ -693,10 +703,15 @@
           else startMicrophone();
         });
         modeButton.addEventListener('click', function() {
+          var wasFrequencyView = isFrequencyView;
           isFrequencyView = !isFrequencyView;
           modeButton.textContent = isFrequencyView ? 'Vista: frecuencia' : 'Vista: tiempo';
           modeButton.setAttribute('aria-pressed', String(isFrequencyView));
           levelLegend.hidden = isFrequencyView;
+          if (wasFrequencyView) {
+            context.drawImage(timeCanvas, 0, 0);
+            markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
+          }
         });
         settingsMenuButton.addEventListener('click', function() {
           var isOpen = settingsMenuButton.getAttribute('aria-expanded') === 'true';
