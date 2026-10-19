@@ -59,6 +59,70 @@
       cursor: default;
     }
 
+    #chronograph-top-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    #chronograph-top-controls button {
+      min-height: 38px;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 999px;
+      padding: 8px 11px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #chronograph-top-start {
+      border-color: #fb7185 !important;
+      color: #fecdd3 !important;
+    }
+
+    #chronograph-top-controls button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    #chronograph-top-controls button:focus-visible {
+      outline: 2px solid #fb7185;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 600px) {
+      #phrase-bar {
+        top: 12px;
+        right: 8px;
+        left: 8px;
+        gap: 4px;
+        justify-content: flex-end;
+      }
+
+      #countdown,
+      #phrase-open,
+      #chronograph-top-controls button {
+        font-size: 0.68rem;
+      }
+
+      #countdown,
+      #phrase-open {
+        padding: 7px 8px;
+      }
+
+      #chronograph-top-controls {
+        gap: 3px;
+      }
+
+      #chronograph-top-controls button {
+        min-height: 34px;
+        padding: 6px 7px;
+        white-space: nowrap;
+      }
+    }
+
     #phrase-open:focus-visible,
     #phrase-modal-close:focus-visible {
       outline: 2px solid #7dd3fc;
@@ -359,6 +423,10 @@
   <div id="phrase-bar">
     <div id="countdown">--</div>
     <button id="phrase-open" type="button" disabled>Ver frase</button>
+    <div id="chronograph-top-controls" role="group" aria-label="Controles rápidos del cronógrafo">
+      <button id="chronograph-top-start" type="button" aria-label="Iniciar cronógrafo" title="Iniciar cronógrafo">▶ Iniciar</button>
+      <button id="chronograph-top-reset" type="button" aria-label="Reiniciar cronógrafo" title="Reiniciar cronógrafo" disabled>↺ Reiniciar</button>
+    </div>
   </div>
   <div id="phrase-modal" role="presentation" hidden>
     <section id="phrase-dialog" role="dialog" aria-modal="true" aria-labelledby="phrase-dialog-title" aria-describedby="phrase-modal-text">
@@ -377,7 +445,7 @@
     </div>
     <section class="watch-menu-section" aria-labelledby="chrono-title">
       <h3 id="chrono-title">Cronógrafo · 30 minutos</h3>
-      <p>Inicia o detén la medición. La subesfera indica los minutos transcurridos.</p>
+      <p>Inicia o detén la medición. Las subesferas indican minutos y décimas de segundo.</p>
       <button id="chronograph-visibility" class="control-button" type="button" aria-pressed="true">Cronógrafo · Ocultar esfera</button>
       <div id="chronograph-controls" role="group" aria-label="Controles del cronógrafo de 30 minutos">
         <output id="chrono-display" aria-live="off">00:00</output>
@@ -570,7 +638,13 @@
         $('#chronograph-start').on('click', function() {
           self.toggleChronograph();
         });
+        $('#chronograph-top-start').on('click', function() {
+          self.toggleChronograph();
+        });
         $('#chronograph-reset').on('click', function() {
+          self.resetChronograph();
+        });
+        $('#chronograph-top-reset').on('click', function() {
           self.resetChronograph();
         });
         var container = d3.select('#watch');
@@ -590,6 +664,18 @@
           .append('path')
           .attr('d', 'M 0 0 L 10 5 L 0 10 z')
           .attr('fill', '#fb7185');
+
+        svg.select('defs').append('marker')
+          .attr('id', 'second-arrowhead')
+          .attr('viewBox', '0 0 10 10')
+          .attr('refX', 9)
+          .attr('refY', 5)
+          .attr('markerWidth', 3.5)
+          .attr('markerHeight', 3.5)
+          .attr('orient', 'auto')
+          .append('path')
+          .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+          .attr('fill', '#7dd3fc');
 
         var clock = svg.append('g')
           .attr('transform', 'translate(' + (this.size / 2) + ',' + (this.size / 2) + ')');
@@ -748,7 +834,7 @@
 
         this.chronoDial = clock.append('g')
           .attr('class', 'chronograph-minute-dial')
-          .attr('transform', 'translate(0,' + (-this.size * 0.16) + ')');
+          .attr('transform', 'translate(' + (-this.size * 0.14) + ',' + (this.size * 0.08) + ')');
         this.chronoDial.append('circle')
           .attr('r', this.size * 0.105)
           .attr('fill', '#292929')
@@ -792,6 +878,52 @@
           .attr('r', 2.5)
           .attr('fill', '#fb7185');
 
+        this.chronoTenthDial = clock.append('g')
+          .attr('class', 'chronograph-tenth-dial')
+          .attr('transform', 'translate(' + (this.size * 0.10) + ',' + (-this.size * 0.17) + ')');
+        this.chronoTenthDial.append('circle')
+          .attr('r', this.size * 0.085)
+          .attr('fill', '#292929')
+          .attr('stroke', 'rgba(255,255,255,0.7)')
+          .attr('stroke-width', 1.5);
+
+        for (var tenthMark = 0; tenthMark < 10; tenthMark++) {
+          var tenthAngle = (tenthMark / 10 * 360 - 90) * Math.PI / 180;
+          var tenthInner = this.size * 0.065;
+          var tenthOuter = this.size * 0.077;
+          var tenthLabelRadius = this.size * 0.052;
+          this.chronoTenthDial.append('line')
+            .attr('x1', Math.cos(tenthAngle) * tenthInner)
+            .attr('y1', Math.sin(tenthAngle) * tenthInner)
+            .attr('x2', Math.cos(tenthAngle) * tenthOuter)
+            .attr('y2', Math.sin(tenthAngle) * tenthOuter)
+            .attr('stroke', '#fda4af')
+            .attr('stroke-width', 1)
+            .attr('stroke-linecap', 'round');
+          this.chronoTenthDial.append('text')
+            .attr('x', Math.cos(tenthAngle) * tenthLabelRadius)
+            .attr('y', Math.sin(tenthAngle) * tenthLabelRadius + 3)
+            .attr('text-anchor', 'middle')
+            .attr('fill', '#fecdd3')
+            .style('font-size', '8px')
+            .style('font-weight', '600')
+            .text(tenthMark);
+        }
+
+        this.chronoTenthHand = this.chronoTenthDial.append('line')
+          .attr('x1', 0).attr('y1', this.size * 0.01)
+          .attr('x2', 0).attr('y2', -this.size * 0.043)
+          .attr('stroke', '#fb7185')
+          .attr('stroke-width', 1.8)
+          .attr('stroke-linecap', 'round');
+        this.chronoTenthDial.append('circle')
+          .attr('r', 2)
+          .attr('fill', '#fb7185');
+
+        this.chronoSecondHandTail = clock.append('line')
+          .attr('stroke', '#fb7185')
+          .attr('stroke-width', 2)
+          .attr('stroke-linecap', 'round');
         this.chronoSecondHand = clock.append('line')
           .attr('stroke', '#fb7185')
           .attr('stroke-width', 1.8)
@@ -820,9 +952,14 @@
           .attr('stroke', '#ffffff')
           .attr('stroke-width', 5)
           .attr('stroke-linecap', 'round');
+        this.secondHandTail = clock.append('line')
+          .attr('stroke', '#7dd3fc')
+          .attr('stroke-width', 3)
+          .attr('stroke-linecap', 'round');
         this.secondHand = clock.append('line')
           .attr('stroke', '#7dd3fc')
           .attr('stroke-width', 3)
+          .attr('marker-end', 'url(#second-arrowhead)')
           .attr('stroke-linecap', 'round');
         this.secondHandTip = clock.append('circle')
           .attr('r', 4)
@@ -856,6 +993,8 @@
       setChronographVisible: function(isVisible) {
         this.showChronograph = isVisible;
         this.chronoDial.style('display', isVisible ? null : 'none');
+        this.chronoTenthDial.style('display', isVisible ? null : 'none');
+        this.chronoSecondHandTail.style('display', isVisible ? null : 'none');
         this.chronoSecondHand.style('display', isVisible ? null : 'none');
         $('#chronograph-visibility')
           .attr('aria-pressed', String(isVisible))
@@ -893,9 +1032,13 @@
           .attr('x1', 0).attr('y1', 0)
           .attr('x2', Math.cos(secondAngle) * radius * 0.78)
           .attr('y2', Math.sin(secondAngle) * radius * 0.78);
+        this.secondHandTail
+          .attr('x1', 0).attr('y1', 0)
+          .attr('x2', -Math.cos(secondAngle) * radius * 0.18)
+          .attr('y2', -Math.sin(secondAngle) * radius * 0.18);
         this.secondHandTip
-          .attr('cx', Math.cos(secondAngle) * radius * 0.72)
-          .attr('cy', Math.sin(secondAngle) * radius * 0.72);
+          .attr('cx', -Math.cos(secondAngle) * radius * 0.18)
+          .attr('cy', -Math.sin(secondAngle) * radius * 0.18);
         var elapsed = this.getChronographElapsed();
         if (this.chronoRunning && elapsed >= this.chronoDuration) {
           this.chronoElapsed = this.chronoDuration;
@@ -906,11 +1049,18 @@
         var chronoSeconds = elapsed / 1000;
         var chronoSecondAngle = (chronoSeconds % 60 / 60 * 360 - 90) * Math.PI / 180;
         var chronoMinuteAngle = (elapsed / this.chronoDuration * 360 - 90) * Math.PI / 180;
+        var chronoTenths = Math.floor(elapsed / 100) % 10;
+        var chronoTenthAngle = chronoTenths * 36;
+        this.chronoSecondHandTail
+          .attr('x1', 0).attr('y1', 0)
+          .attr('x2', -Math.cos(chronoSecondAngle) * radius * 0.10)
+          .attr('y2', -Math.sin(chronoSecondAngle) * radius * 0.10);
         this.chronoSecondHand
           .attr('x1', 0).attr('y1', 0)
           .attr('x2', Math.cos(chronoSecondAngle) * radius * 0.78)
           .attr('y2', Math.sin(chronoSecondAngle) * radius * 0.78);
         this.chronoMinuteHand.attr('transform', 'rotate(' + (chronoMinuteAngle * 180 / Math.PI + 90) + ')');
+        this.chronoTenthHand.attr('transform', 'rotate(' + chronoTenthAngle + ')');
         this.updateChronographDisplay(elapsed);
         this.minuteHand
           .attr('x1', 0).attr('y1', 0)
@@ -958,9 +1108,14 @@
           this.chronoRunning = false;
           elapsed = this.chronoElapsed;
         }
-        $('#chronograph-start').text(this.chronoRunning ? 'Detener' : 'Iniciar');
+        var startLabel = this.chronoRunning ? 'Detener' : 'Iniciar';
+        $('#chronograph-start').text(startLabel);
+        $('#chronograph-top-start')
+          .text((this.chronoRunning ? 'Ⅱ ' : '▶ ') + startLabel)
+          .attr('aria-label', startLabel + ' cronógrafo')
+          .attr('title', startLabel + ' cronógrafo');
         var resetDisabled = elapsed === 0 && !this.chronoRunning;
-        $('#chronograph-reset').prop('disabled', resetDisabled);
+        $('#chronograph-reset, #chronograph-top-reset').prop('disabled', resetDisabled);
         this.updateChronographDisplay(elapsed);
       }
     };    
