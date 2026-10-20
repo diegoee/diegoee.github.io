@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">   
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+	<title>Web Art: Simulation 01</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Arial, sans-serif;
+        background: #333;
+        color: #f4f4f5;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        height: 100vh;
+        height: 100dvh;
+        min-width: 320px;
+        margin: 0;
+        padding: 32px 20px;
+        background-color: #333;
+      }
+
+      main {
+        width: min(100%, 1400px);
+        height: 100%;
+        margin: 0 auto;
+      }
+
+      .simulation {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 24px;
+        background: #202124;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      }
+
+      .simulation__header,
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 20px;
+      }
+
+      .simulation__header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .simulation__header h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .simulation__indicators {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .throughput {
+        padding: 8px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.25);
+        color: #d4d4d8;
+        font-size: 0.9rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.25);
+        color: #fff;
+        font-size: 0.9rem;
+        letter-spacing: 0.03em;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .status::before {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #a1a1aa;
+        content: "";
+      }
+
+      .status[data-running="true"]::before {
+        background: #4ade80;
+        box-shadow: 0 0 12px rgba(74, 222, 128, 0.65);
+      }
+
+      .status[data-running="true"] {
+        background: rgba(34, 197, 94, 0.2);
+        color: #bbf7d0;
+        box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
+      }
+
+      .canvas-wrap {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        background-color: #333;
+        background-image: radial-gradient(#484848 1px, transparent 1px);
+        background-position: center;
+        background-size: 22px 22px;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+        touch-action: none;
+      }
+
+      canvas.is-dragging {
+        cursor: grabbing;
+      }
+
+      .controls {
+        flex-wrap: wrap;
+        align-items: flex-end;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .control-group {
+        display: grid;
+        flex: 1 1 180px;
+        gap: 8px;
+        color: #d4d4d8;
+        font-size: 0.9rem;
+      }
+
+      .control-group__label {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      output {
+        color: #fecdd3;
+        font-variant-numeric: tabular-nums;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #fb7185;
+      }
+
+      .buttons {
+        display: flex;
+        flex: 0 1 auto;
+        gap: 10px;
+      }
+
+      .icon-button {
+        display: inline-flex;
+        width: 42px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+      .icon-button svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+
+      #toggle-button #pause-icon {
+        display: none;
+      }
+
+      #toggle-button[aria-pressed="true"] #play-icon {
+        display: none;
+      }
+
+      #toggle-button[aria-pressed="true"] #pause-icon {
+        display: block;
+      }
+
+      button {
+        min-height: 42px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 999px;
+        padding: 8px 14px;
+        background: rgba(0, 0, 0, 0.35);
+        color: #fff;
+        font: inherit;
+        font-size: 0.9rem;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.55);
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid #7dd3fc;
+        outline-offset: 3px;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 16px 12px;
+        }
+
+        .simulation__header,
+        .controls {
+          padding: 16px;
+        }
+
+        .buttons {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .buttons button {
+          flex: 0 0 42px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="simulation" aria-labelledby="simulation-title">
+        <div class="simulation__header">
+          <h2 id="simulation-title">Navegación autónoma · A → B</h2>
+          <div class="simulation__indicators">
+            <span class="throughput">Actual: <output id="arrival-rate">0 ítems/s</output></span>
+            <span class="throughput">Media móvil (15 s): <output id="arrival-average">0 ítems/s</output></span>
+            <span class="throughput">Máximo: <output id="arrival-maximum">0 ítems/s</output></span>
+            <span class="status" id="status" role="status" aria-live="polite" data-running="false">
+              En pausa
+            </span>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="simulation-canvas" aria-label="Agentes que navegan del punto A al punto B evitando obstáculos. Arrastra los obstáculos para recolocarlos.">
+            Tu navegador no admite el elemento canvas.
+          </canvas>
+        </div>
+        <div class="controls">
+          <label class="control-group" for="speed">
+            <span class="control-group__label">
+              <span>Velocidad</span>
+              <output id="speed-value" for="speed">300 px/s</output>
+            </span>
+            <input id="speed" type="range" min="100" max="1200" step="10" value="300">
+          </label>
+          <label class="control-group" for="point-size">
+            <span class="control-group__label">
+              <span>Tamaño de los ítems</span>
+              <output id="point-size-value" for="point-size">5 px</output>
+            </span>
+            <input id="point-size" type="range" min="5" max="50" step="1" value="5">
+          </label>
+          <label class="control-group" for="obstacle-count">
+            <span class="control-group__label">
+              <span>Número de obstáculos</span>
+              <output id="obstacle-count-value" for="obstacle-count">1</output>
+            </span>
+            <input id="obstacle-count" type="range" min="0" max="10" step="1" value="1">
+          </label>
+          <label class="control-group" for="agent-count">
+            <span class="control-group__label">
+              <span>Número de ítems azules</span>
+              <output id="agent-count-value" for="agent-count">50</output>
+            </span>
+            <input id="agent-count" type="range" min="1" max="500" step="1" value="50">
+          </label>
+          <div class="buttons">
+            <button class="icon-button" id="toggle-button" type="button" aria-label="Iniciar simulación" title="Iniciar simulación" aria-pressed="false">
+              <svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5.5v13l10-6.5z"></path>
+              </svg>
+              <svg id="pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 5h4v14H6zm8 0h4v14h-4z"></path>
+              </svg>
+            </button>
+            <button class="icon-button" id="reset-button" type="button" aria-label="Reiniciar simulación" title="Reiniciar simulación">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5a7 7 0 1 1-6.32 4H3.5l3.6-4 3.6 4H7.9A5 5 0 1 0 12 7z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section> 
+    </main>
+
+    <script>
+      const canvas = document.querySelector("#simulation-canvas");
+      const context = canvas.getContext("2d");
+      const speedInput = document.querySelector("#speed");
+      const speedValue = document.querySelector("#speed-value");
+      const itemSizeInput = document.querySelector("#point-size");
+      const itemSizeValue = document.querySelector("#point-size-value");
+      const obstacleCountInput = document.querySelector("#obstacle-count");
+      const obstacleCountValue = document.querySelector("#obstacle-count-value");
+      const agentCountInput = document.querySelector("#agent-count");
+      const agentCountValue = document.querySelector("#agent-count-value");
+      const toggleButton = document.querySelector("#toggle-button");
+      const resetButton = document.querySelector("#reset-button");
+      const status = document.querySelector("#status");
+      const arrivalRateValue = document.querySelector("#arrival-rate");
+      const arrivalAverageValue = document.querySelector("#arrival-average");
+      const arrivalMaximumValue = document.querySelector("#arrival-maximum");
+
+      let width = 0;
+      let height = 0;
+      let agents = [];
+      let staticObstacles = [];
+      let draggedObstacle = null;
+      let dragOffsetX = 0;
+      let dragOffsetY = 0;
+      let spawnElapsed = 0;
+      let simulationElapsed = 0;
+      let arrivalTimes = [];
+      let maximumArrivalRate = 0;
+      let running = false;
+      let lastFrame = 0;
+      const spawnInterval = 0.35;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function getRadius() {
+        return Number(itemSizeInput.value) / 2;
+      }
+
+      function getTargets() {
+        return {
+          start: { x: width * 0.07, y: height * 0.5 },
+          goal: { x: width * 0.93, y: height * 0.5 }
+        };
+      }
+
+      function overlapsObstacle(candidate, other, gap = 12) {
+        return candidate.x < other.x + other.w + gap &&
+          candidate.x + candidate.w + gap > other.x &&
+          candidate.y < other.y + other.h + gap &&
+          candidate.y + candidate.h + gap > other.y;
+      }
+
+      function findObstaclePosition(obstacles, blockWidth, blockHeight) {
+        const maxX = Math.max(0, width - blockWidth);
+        const maxY = Math.max(0, height - blockHeight);
+        for (let attempt = 0; attempt < 100; attempt += 1) {
+          const candidate = {
+            x: Math.random() * maxX,
+            y: Math.random() * maxY,
+            w: blockWidth,
+            h: blockHeight
+          };
+          if (!obstacles.some(obstacle => overlapsObstacle(candidate, obstacle))) {
+            return candidate;
+          }
+        }
+
+        const xPositions = [];
+        const yPositions = [];
+        for (let x = 0; x <= maxX; x += blockWidth + 12) {
+          xPositions.push(x);
+        }
+        for (let y = 0; y <= maxY; y += blockHeight + 12) {
+          yPositions.push(y);
+        }
+        if (xPositions[xPositions.length - 1] !== maxX) {
+          xPositions.push(maxX);
+        }
+        if (yPositions[yPositions.length - 1] !== maxY) {
+          yPositions.push(maxY);
+        }
+        for (const y of yPositions) {
+          for (const x of xPositions) {
+            const candidate = { x, y, w: blockWidth, h: blockHeight };
+            if (!obstacles.some(obstacle => overlapsObstacle(candidate, obstacle))) {
+              return candidate;
+            }
+          }
+        }
+        return null;
+      }
+
+      function updateObstacles() {
+        const count = Number(obstacleCountInput.value);
+        const blockWidth = Math.min(58, Math.max(28, width * 0.055));
+        const blockHeight = Math.min(128, Math.max(55, height * 0.24));
+        while (staticObstacles.length > count) {
+          staticObstacles.pop();
+        }
+        while (staticObstacles.length < count) {
+          const obstacle = staticObstacles.length === 0
+            ? {
+              x: Math.max(0, (width - blockWidth) / 2),
+              y: Math.max(0, (height - blockHeight) / 2),
+              w: blockWidth,
+              h: blockHeight
+            }
+            : findObstaclePosition(staticObstacles, blockWidth, blockHeight);
+          if (!obstacle) {
+            break;
+          }
+          staticObstacles.push(obstacle);
+        }
+        obstacleCountInput.value = String(staticObstacles.length);
+        obstacleCountValue.value = String(staticObstacles.length);
+      }
+
+      function keepObstaclesSeparated() {
+        const obstacles = staticObstacles;
+        const separated = [];
+
+        for (const obstacle of obstacles) {
+          if (!separated.some(existing => overlapsObstacle(obstacle, existing))) {
+            separated.push(obstacle);
+            continue;
+          }
+
+          const replacement = findObstaclePosition(separated, obstacle.w, obstacle.h);
+          if (replacement) {
+            separated.push(replacement);
+          }
+        }
+        staticObstacles = separated;
+        obstacleCountValue.value = String(staticObstacles.length);
+      }
+
+      function resizeCanvas() {
+        const bounds = canvas.getBoundingClientRect();
+        const pixelRatio = window.devicePixelRatio || 1;
+        const oldWidth = width;
+        const oldHeight = height;
+        const oldObstacles = staticObstacles;
+        width = bounds.width;
+        height = bounds.height;
+        canvas.width = Math.round(width * pixelRatio);
+        canvas.height = Math.round(height * pixelRatio);
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        if (oldWidth > 0 && oldHeight > 0) {
+          staticObstacles = oldObstacles.map(obstacle => ({
+            ...obstacle,
+            x: clamp(obstacle.x * width / oldWidth, 0, width - obstacle.w),
+            y: clamp(obstacle.y * height / oldHeight, 0, height - obstacle.h)
+          }));
+          keepObstaclesSeparated();
+        } else {
+          updateObstacles();
+        }
+        if (oldWidth > 0 && oldHeight > 0) {
+          for (const agent of agents) {
+            agent.x = clamp(agent.x * width / oldWidth, getRadius(), width - getRadius());
+            agent.y = clamp(agent.y * height / oldHeight, getRadius(), height - getRadius());
+          }
+        }
+        drawSimulation();
+      }
+
+      function createAgents() {
+        agents = [];
+        spawnElapsed = 0;
+        drawSimulation();
+      }
+
+      function getSpawnPosition() {
+        return getTargets().start;
+      }
+
+      function spawnAgent() {
+        const position = getSpawnPosition();
+        agents.push({ ...position, vx: 0, vy: 0 });
+      }
+
+      function avoidanceForce(agent, obstacleX, obstacleY, clearance, influence, speed) {
+        if (clearance >= influence) {
+          return { x: 0, y: 0 };
+        }
+        let dx = agent.x - obstacleX;
+        let dy = agent.y - obstacleY;
+        let distance = Math.hypot(dx, dy);
+        if (distance < 0.001) {
+          dx = 1;
+          dy = 0;
+          distance = 1;
+        }
+        const nx = dx / distance;
+        const ny = dy / distance;
+        const strength = clamp((influence - clearance) / influence, 0, 1.5);
+        const tangentX = -ny;
+        const tangentY = nx;
+        const targetDirectionX = width * 0.93 - agent.x;
+        const targetDirectionY = height * 0.5 - agent.y;
+        const side = tangentX * targetDirectionX + tangentY * targetDirectionY >= 0 ? 1 : -1;
+        return {
+          x: (nx * 1.2 + tangentX * side * 0.8) * speed * strength,
+          y: (ny * 1.2 + tangentY * side * 0.8) * speed * strength
+        };
+      }
+
+      function getObstacleAvoidance(agent, speed) {
+        const radius = getRadius();
+        const influence = radius + 58;
+        let forceX = 0;
+        let forceY = 0;
+
+        for (const obstacle of staticObstacles) {
+          const closestX = clamp(agent.x, obstacle.x, obstacle.x + obstacle.w);
+          const closestY = clamp(agent.y, obstacle.y, obstacle.y + obstacle.h);
+          let dx = agent.x - closestX;
+          let dy = agent.y - closestY;
+          const distance = Math.hypot(dx, dy);
+          let clearance = distance - radius;
+          let force;
+
+          if (distance < 0.001) {
+            const edges = [
+              { distance: agent.x - obstacle.x, x: -1, y: 0 },
+              { distance: obstacle.x + obstacle.w - agent.x, x: 1, y: 0 },
+              { distance: agent.y - obstacle.y, x: 0, y: -1 },
+              { distance: obstacle.y + obstacle.h - agent.y, x: 0, y: 1 }
+            ];
+            edges.sort((a, b) => a.distance - b.distance);
+            dx = edges[0].x;
+            dy = edges[0].y;
+            clearance = -edges[0].distance - radius;
+            force = avoidanceForce(agent, agent.x - dx, agent.y - dy, clearance, influence, speed);
+            force.x += dx * speed * 2;
+            force.y += dy * speed * 2;
+          } else {
+            force = avoidanceForce(agent, closestX, closestY, clearance, influence, speed);
+          }
+          forceX += force.x;
+          forceY += force.y;
+        }
+
+        return { x: forceX, y: forceY };
+      }
+
+      function getSeparation(agent, speed, snapshots) {
+        const radius = getRadius();
+        const range = radius * 4 + 12;
+        let forceX = 0;
+        let forceY = 0;
+        for (const other of snapshots) {
+          if (other.agent === agent) {
+            continue;
+          }
+          const dx = agent.x - other.x;
+          const dy = agent.y - other.y;
+          const distance = Math.hypot(dx, dy);
+          if (distance > 0 && distance < range) {
+            const strength = (1 - distance / range) * speed * 1.8;
+            forceX += (dx / distance) * strength;
+            forceY += (dy / distance) * strength;
+          }
+        }
+        return { x: forceX, y: forceY };
+      }
+
+      function resolveRectangleCollision(agent, obstacle, radius) {
+        const closestX = clamp(agent.x, obstacle.x, obstacle.x + obstacle.w);
+        const closestY = clamp(agent.y, obstacle.y, obstacle.y + obstacle.h);
+        let dx = agent.x - closestX;
+        let dy = agent.y - closestY;
+        const distance = Math.hypot(dx, dy);
+        if (distance >= radius) {
+          return;
+        }
+
+        if (distance < 0.001) {
+          const edges = [
+            { distance: agent.x - obstacle.x, x: -1, y: 0 },
+            { distance: obstacle.x + obstacle.w - agent.x, x: 1, y: 0 },
+            { distance: agent.y - obstacle.y, x: 0, y: -1 },
+            { distance: obstacle.y + obstacle.h - agent.y, x: 0, y: 1 }
+          ];
+          edges.sort((a, b) => a.distance - b.distance);
+          dx = edges[0].x;
+          dy = edges[0].y;
+          agent.x += dx * (edges[0].distance + radius);
+          agent.y += dy * (edges[0].distance + radius);
+        } else {
+          const overlap = radius - distance;
+          agent.x += (dx / distance) * overlap;
+          agent.y += (dy / distance) * overlap;
+        }
+
+        const normalLength = Math.hypot(dx, dy) || 1;
+        const normalSpeed = (agent.vx * dx + agent.vy * dy) / normalLength;
+        if (normalSpeed < 0) {
+          agent.vx -= 2 * normalSpeed * (dx / normalLength);
+          agent.vy -= 2 * normalSpeed * (dy / normalLength);
+        }
+      }
+
+      function resolveAgentCollisions(radius) {
+        for (let pass = 0; pass < 2; pass += 1) {
+          for (let i = 0; i < agents.length; i += 1) {
+            for (let j = i + 1; j < agents.length; j += 1) {
+              const first = agents[i];
+              const second = agents[j];
+              let dx = second.x - first.x;
+              let dy = second.y - first.y;
+              let distance = Math.hypot(dx, dy);
+              const minimumDistance = radius * 2;
+              if (distance >= minimumDistance) {
+                continue;
+              }
+              if (distance < 0.001) {
+                dx = 1;
+                dy = 0;
+                distance = 1;
+              }
+              const nx = dx / distance;
+              const ny = dy / distance;
+              const overlap = (minimumDistance - distance) / 2;
+              first.x -= nx * overlap;
+              first.y -= ny * overlap;
+              second.x += nx * overlap;
+              second.y += ny * overlap;
+              const relativeSpeed = (second.vx - first.vx) * nx + (second.vy - first.vy) * ny;
+              if (relativeSpeed < 0) {
+                first.vx += relativeSpeed * nx;
+                first.vy += relativeSpeed * ny;
+                second.vx -= relativeSpeed * nx;
+                second.vy -= relativeSpeed * ny;
+              }
+            }
+          }
+        }
+      }
+
+      function resolveEnvironmentCollisions(agent, radius) {
+        for (const obstacle of staticObstacles) {
+          resolveRectangleCollision(agent, obstacle, radius);
+        }
+        if (agent.x < radius || agent.x > width - radius) {
+          agent.vx *= -1;
+          agent.x = clamp(agent.x, radius, width - radius);
+        }
+        if (agent.y < radius || agent.y > height - radius) {
+          agent.vy *= -1;
+          agent.y = clamp(agent.y, radius, height - radius);
+        }
+      }
+
+      function updateSimulation(deltaTime) {
+        const radius = getRadius();
+        const speed = Number(speedInput.value);
+        const { goal } = getTargets();
+        simulationElapsed += deltaTime;
+        const targetCount = Number(agentCountInput.value);
+        if (agents.length > targetCount) {
+          agents.length = targetCount;
+        }
+        if (agents.length < targetCount) {
+          spawnElapsed += deltaTime;
+          while (agents.length < targetCount && spawnElapsed >= spawnInterval) {
+            spawnAgent();
+            spawnElapsed -= spawnInterval;
+          }
+        }
+        if (agents.length >= targetCount) {
+          spawnElapsed = 0;
+        }
+
+        const snapshots = agents.map(agent => ({ agent, x: agent.x, y: agent.y }));
+        for (let index = 0; index < agents.length; index += 1) {
+          const agent = agents[index];
+          const toGoalX = goal.x - agent.x;
+          const toGoalY = goal.y - agent.y;
+          const goalDistance = Math.hypot(toGoalX, toGoalY) || 1;
+          if (goalDistance < 30 + radius) {
+            arrivalTimes.push(simulationElapsed);
+            const spawn = getSpawnPosition();
+            agent.x = spawn.x;
+            agent.y = spawn.y;
+            agent.vx = 0;
+            agent.vy = 0;
+            continue;
+          }
+
+          const arrivalScale = clamp((goalDistance - 25) / 100, 0.35, 1);
+          const desiredX = (toGoalX / goalDistance) * speed * arrivalScale;
+          const desiredY = (toGoalY / goalDistance) * speed * arrivalScale;
+          const avoidance = getObstacleAvoidance(agent, speed);
+          const separation = getSeparation(agent, speed, snapshots);
+          let steeringX = desiredX - agent.vx + avoidance.x + separation.x;
+          let steeringY = desiredY - agent.vy + avoidance.y + separation.y;
+          const steeringLength = Math.hypot(steeringX, steeringY);
+          const maxSteering = speed * 4;
+          if (steeringLength > maxSteering) {
+            steeringX = (steeringX / steeringLength) * maxSteering;
+            steeringY = (steeringY / steeringLength) * maxSteering;
+          }
+
+          agent.vx += steeringX * deltaTime;
+          agent.vy += steeringY * deltaTime;
+          const velocity = Math.hypot(agent.vx, agent.vy);
+          if (velocity > speed) {
+            agent.vx = (agent.vx / velocity) * speed;
+            agent.vy = (agent.vy / velocity) * speed;
+          }
+          agent.x += agent.vx * deltaTime;
+          agent.y += agent.vy * deltaTime;
+
+          resolveEnvironmentCollisions(agent, radius);
+        }
+        arrivalTimes = arrivalTimes.filter(time => simulationElapsed - time < 15);
+        const currentRate = arrivalTimes.filter(time => simulationElapsed - time < 1).length;
+        const averageWindow = Math.min(simulationElapsed, 15);
+        const averageRate = averageWindow > 0 ? arrivalTimes.length / averageWindow : 0;
+        maximumArrivalRate = Math.max(maximumArrivalRate, currentRate);
+        arrivalRateValue.value = `${currentRate} ítems/s`;
+        arrivalAverageValue.value = `${averageRate.toFixed(1)} ítems/s`;
+        arrivalMaximumValue.value = `${maximumArrivalRate} ítems/s`;
+        for (let pass = 0; pass < 4; pass += 1) {
+          resolveAgentCollisions(radius);
+          for (const agent of agents) {
+            resolveEnvironmentCollisions(agent, radius);
+          }
+        }
+      }
+
+      function drawSimulation() {
+        context.clearRect(0, 0, width, height);
+        const { start, goal } = getTargets();
+        context.fillStyle = "rgba(74, 222, 128, 0.15)";
+        context.beginPath();
+        context.arc(start.x, start.y, 18, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = "#4ade80";
+        context.font = "bold 12px Arial";
+        context.fillText("A", start.x - 4, start.y + 4);
+        context.fillStyle = "rgba(251, 113, 133, 0.15)";
+        context.beginPath();
+        context.arc(goal.x, goal.y, 18, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = "#fb7185";
+        context.fillText("B", goal.x - 4, goal.y + 4);
+
+        for (const obstacle of staticObstacles) {
+          context.fillStyle = "#4b5563";
+          context.strokeStyle = "#9ca3af";
+          context.lineWidth = 1;
+          context.beginPath();
+          context.roundRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h, 8);
+          context.fill();
+          context.stroke();
+        }
+        context.fillStyle = "#7dd3fc";
+        context.strokeStyle = "#e0f2fe";
+        context.lineWidth = 2;
+        for (const agent of agents) {
+          context.beginPath();
+          context.arc(agent.x, agent.y, getRadius(), 0, Math.PI * 2);
+          context.fill();
+          const angle = Math.atan2(agent.vy, agent.vx);
+          context.beginPath();
+          context.moveTo(agent.x, agent.y);
+          context.lineTo(agent.x + Math.cos(angle) * getRadius(), agent.y + Math.sin(angle) * getRadius());
+          context.stroke();
+        }
+      }
+
+      function animate(timestamp) {
+        if (!running) {
+          return;
+        }
+        const deltaTime = lastFrame ? Math.min((timestamp - lastFrame) / 1000, 0.05) : 0;
+        lastFrame = timestamp;
+        updateSimulation(deltaTime);
+        drawSimulation();
+        requestAnimationFrame(animate);
+      }
+
+      function setRunning(nextRunning) {
+        running = nextRunning;
+        status.textContent = running ? "En marcha" : "En pausa";
+        status.dataset.running = String(running);
+        const action = running ? "Pausar" : "Iniciar";
+        toggleButton.setAttribute("aria-label", `${action} simulación`);
+        toggleButton.title = `${action} simulación`;
+        toggleButton.setAttribute("aria-pressed", String(running));
+        if (running) {
+          lastFrame = 0;
+          requestAnimationFrame(animate);
+        }
+      }
+
+      speedInput.addEventListener("input", () => {
+        speedValue.value = `${speedInput.value} px/s`;
+      });
+
+      itemSizeInput.addEventListener("input", () => {
+        itemSizeValue.value = `${itemSizeInput.value} px`;
+        drawSimulation();
+      });
+
+      obstacleCountInput.addEventListener("input", () => {
+        obstacleCountValue.value = obstacleCountInput.value;
+        updateObstacles();
+        drawSimulation();
+      });
+
+      agentCountInput.addEventListener("input", () => {
+        agentCountValue.value = agentCountInput.value;
+        const targetCount = Number(agentCountInput.value);
+        if (agents.length > targetCount) {
+          agents.length = targetCount;
+        }
+        drawSimulation();
+      });
+
+      canvas.addEventListener("pointerdown", event => {
+        const bounds = canvas.getBoundingClientRect();
+        const x = event.clientX - bounds.left;
+        const y = event.clientY - bounds.top;
+        draggedObstacle = [...staticObstacles].reverse().find(obstacle =>
+          x >= obstacle.x &&
+          x <= obstacle.x + obstacle.w &&
+          y >= obstacle.y &&
+          y <= obstacle.y + obstacle.h
+        );
+        if (!draggedObstacle) {
+          return;
+        }
+        dragOffsetX = x - draggedObstacle.x;
+        dragOffsetY = y - draggedObstacle.y;
+        canvas.classList.add("is-dragging");
+        canvas.setPointerCapture(event.pointerId);
+      });
+
+      canvas.addEventListener("pointermove", event => {
+        if (!draggedObstacle) {
+          return;
+        }
+        const bounds = canvas.getBoundingClientRect();
+        const candidate = {
+          ...draggedObstacle,
+          x: clamp(
+          event.clientX - bounds.left - dragOffsetX,
+          0,
+          width - draggedObstacle.w
+          ),
+          y: clamp(
+          event.clientY - bounds.top - dragOffsetY,
+          0,
+          height - draggedObstacle.h
+          )
+        };
+        if (!staticObstacles.some(obstacle =>
+          obstacle !== draggedObstacle && overlapsObstacle(candidate, obstacle)
+        )) {
+          draggedObstacle.x = candidate.x;
+          draggedObstacle.y = candidate.y;
+        }
+        drawSimulation();
+      });
+
+      function stopDraggingObstacle() {
+        draggedObstacle = null;
+        canvas.classList.remove("is-dragging");
+      }
+
+      canvas.addEventListener("pointerup", stopDraggingObstacle);
+      canvas.addEventListener("pointercancel", stopDraggingObstacle);
+
+      toggleButton.addEventListener("click", () => setRunning(!running));
+      resetButton.addEventListener("click", () => {
+        setRunning(false);
+        updateObstacles();
+        createAgents();
+        simulationElapsed = 0;
+        arrivalTimes = [];
+        maximumArrivalRate = 0;
+        arrivalRateValue.value = "0 ítems/s";
+        arrivalAverageValue.value = "0.0 ítems/s";
+        arrivalMaximumValue.value = "0 ítems/s";
+      });
+      window.addEventListener("resize", resizeCanvas);
+
+      obstacleCountValue.value = obstacleCountInput.value;
+      agentCountValue.value = agentCountInput.value;
+      resizeCanvas();
+    </script>
+  </body>
+</html>
