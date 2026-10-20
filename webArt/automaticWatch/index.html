@@ -437,7 +437,7 @@
       <button id="phrase-modal-close" type="button" aria-label="Cerrar frase">×</button>
       <h2 id="phrase-dialog-title">Frase</h2>
       <p id="phrase-modal-text"></p>
-      <div id="phrase-modal-timer" aria-live="off">Se cierra en 00:05</div>
+      <div id="phrase-modal-timer" aria-live="off">Se cierra en 00:10</div>
     </section>
   </div>
   <button id="watch-menu-toggle" type="button" aria-label="Abrir controles del reloj" aria-controls="watch-menu" aria-expanded="false">☰</button>
@@ -548,7 +548,7 @@
     posPharse.exe();
 
     var phraseModal = {
-      durationMs: 5 * 1000,
+      durationMs: 10 * 1000,
       closesAt: null,
       timer: null,
       open: function() {
@@ -1000,6 +1000,7 @@
         this.chronoTenthDial.style('display', isVisible ? null : 'none');
         this.chronoSecondHandTail.style('display', isVisible ? null : 'none');
         this.chronoSecondHand.style('display', isVisible ? null : 'none');
+        $('#chronograph-top-controls').toggle(isVisible);
         $('#chronograph-visibility')
           .attr('aria-pressed', String(isVisible))
           .text(isVisible ? 'Cronógrafo · Ocultar esfera' : 'Cronógrafo · Mostrar esfera');
