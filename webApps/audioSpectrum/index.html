@@ -242,6 +242,8 @@
         var context = canvas.getContext('2d', { alpha: false });
         var timeCanvas = document.createElement('canvas');
         var timeContext = timeCanvas.getContext('2d', { alpha: false });
+        var frequencySnapshotCanvas = document.createElement('canvas');
+        var frequencySnapshotContext = frequencySnapshotCanvas.getContext('2d', { alpha: false });
         var markerCanvas = document.getElementById('frequencyMarker');
         var markerContext = markerCanvas.getContext('2d');
         var button = document.getElementById('micButton');
@@ -269,6 +271,8 @@
         var colorMap = createColorMap();
         var isRunning = false;
         var isFrequencyView = false;
+        var hasFrequencySnapshot = false;
+        var hasFrequencyFrame = false;
         var minDecibels = -100;
         var maxDecibels = -30;
 
@@ -325,17 +329,37 @@
           var width = Math.max(1, Math.floor(window.innerWidth * pixelRatio));
           var height = Math.max(1, Math.floor(window.innerHeight * pixelRatio));
           if (canvas.width !== width || canvas.height !== height) {
+            var snapshotCopy = null;
+            if (hasFrequencySnapshot) {
+              snapshotCopy = document.createElement('canvas');
+              snapshotCopy.width = frequencySnapshotCanvas.width;
+              snapshotCopy.height = frequencySnapshotCanvas.height;
+              snapshotCopy.getContext('2d').drawImage(frequencySnapshotCanvas, 0, 0);
+            }
             canvas.width = width;
             canvas.height = height;
             timeCanvas.width = width;
             timeCanvas.height = height;
+            frequencySnapshotCanvas.width = width;
+            frequencySnapshotCanvas.height = height;
             markerCanvas.width = width;
             markerCanvas.height = height;
             context.fillStyle = '#333';
             context.fillRect(0, 0, width, height);
             timeContext.fillStyle = '#333';
             timeContext.fillRect(0, 0, width, height);
+            if (snapshotCopy) {
+              frequencySnapshotContext.drawImage(snapshotCopy, 0, 0, width, height);
+            } else {
+              frequencySnapshotContext.fillStyle = '#333';
+              frequencySnapshotContext.fillRect(0, 0, width, height);
+              hasFrequencySnapshot = false;
+              hasFrequencyFrame = false;
+            }
             column = context.createImageData(1, height);
+            if (isFrequencyView && hasFrequencySnapshot) {
+              context.drawImage(frequencySnapshotCanvas, 0, 0);
+            }
           }
         }
 
@@ -379,8 +403,14 @@
           drawFrequencyScale(timeContext, height, maxFrequency, minFrequency);
 
           if (isFrequencyView) {
-            drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth);
-            drawDominantFrequencyMarker(peakBin * binWidth, peakLevel, minFrequency, maxFrequency, width, height);
+            if (hasFrequencySnapshot) {
+              context.drawImage(frequencySnapshotCanvas, 0, 0);
+              markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
+            } else {
+              drawFrequencySpectrum(width, height, minFrequency, maxFrequency, binWidth);
+              drawDominantFrequencyMarker(peakBin * binWidth, peakLevel, minFrequency, maxFrequency, width, height);
+              hasFrequencyFrame = true;
+            }
             updateFrequencyReadout(peakBin * binWidth, peakLevel);
             animationFrame = requestAnimationFrame(drawSpectrogram);
             return;
@@ -646,6 +676,10 @@
           context.fillRect(0, 0, canvas.width, canvas.height);
           timeContext.fillStyle = '#333';
           timeContext.fillRect(0, 0, timeCanvas.width, timeCanvas.height);
+          frequencySnapshotContext.fillStyle = '#333';
+          frequencySnapshotContext.fillRect(0, 0, frequencySnapshotCanvas.width, frequencySnapshotCanvas.height);
+          hasFrequencySnapshot = false;
+          hasFrequencyFrame = false;
           markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
           frequencyReadout.textContent = 'Frecuencia predominante: --';
           status.textContent = 'Micrófono detenido. Pulsa el botón para continuar.';
@@ -704,6 +738,11 @@
         });
         modeButton.addEventListener('click', function() {
           var wasFrequencyView = isFrequencyView;
+          if (wasFrequencyView && hasFrequencyFrame && !hasFrequencySnapshot) {
+            frequencySnapshotContext.drawImage(canvas, 0, 0);
+            frequencySnapshotContext.drawImage(markerCanvas, 0, 0);
+            hasFrequencySnapshot = true;
+          }
           isFrequencyView = !isFrequencyView;
           modeButton.textContent = isFrequencyView ? 'Vista: frecuencia' : 'Vista: tiempo';
           modeButton.setAttribute('aria-pressed', String(isFrequencyView));
@@ -711,6 +750,8 @@
           if (wasFrequencyView) {
             context.drawImage(timeCanvas, 0, 0);
             markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
+          } else {
+            hasFrequencySnapshot = false;
           }
         });
         settingsMenuButton.addEventListener('click', function() {
