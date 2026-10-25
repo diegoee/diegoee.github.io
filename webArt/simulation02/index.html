@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Art: Simulation 02</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Arial, sans-serif;
+        background: #333;
+        color: #f4f4f5;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        min-width: 320px;
+        margin: 0;
+        padding: 32px 20px;
+        background-color: #333;
+      }
+
+      main {
+        width: min(100%, 1400px);
+        height: 100%;
+        margin: 0 auto;
+      }
+
+      .simulation {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 24px;
+        background: #202124;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      }
+
+      .simulation__header,
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 20px;
+      }
+
+      .simulation__header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .simulation__header h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .simulation__indicators {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.25);
+        color: #fff;
+        font-size: 0.9rem;
+        letter-spacing: 0.03em;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .status::before {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #a1a1aa;
+        content: "";
+      }
+
+      .status[data-running="true"] {
+        background: rgba(34, 197, 94, 0.2);
+        color: #bbf7d0;
+        box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
+      }
+
+      .status[data-running="true"]::before {
+        background: #4ade80;
+        box-shadow: 0 0 12px rgba(74, 222, 128, 0.65);
+      }
+
+      .canvas-wrap {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        background-color: #333;
+        background-image: radial-gradient(#484848 1px, transparent 1px);
+        background-position: center;
+        background-size: 22px 22px;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+        touch-action: none;
+      }
+
+      canvas.is-dragging {
+        cursor: grabbing;
+      }
+
+      .controls {
+        flex-wrap: wrap;
+        align-items: flex-end;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .control-group {
+        display: grid;
+        flex: 1 1 180px;
+        gap: 8px;
+        color: #d4d4d8;
+        font-size: 0.9rem;
+      }
+
+      .control-group__label {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      output {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #fff;
+      }
+
+      .buttons {
+        display: flex;
+        flex: 0 1 auto;
+        gap: 10px;
+      }
+
+      .icon-button {
+        display: inline-flex;
+        width: 42px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+      .icon-button svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+
+      #toggle-button #pause-icon {
+        display: none;
+      }
+
+      #toggle-button[aria-pressed="true"] #play-icon {
+        display: none;
+      }
+
+      #toggle-button[aria-pressed="true"] #pause-icon {
+        display: block;
+      }
+
+      button {
+        min-height: 42px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 999px;
+        padding: 8px 14px;
+        background: rgba(0, 0, 0, 0.35);
+        color: #fff;
+        font: inherit;
+        font-size: 0.9rem;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.55);
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid #7dd3fc;
+        outline-offset: 3px;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 16px 12px;
+        }
+
+        .simulation__header,
+        .controls {
+          padding: 16px;
+        }
+
+        .buttons {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .buttons button {
+          flex: 0 0 42px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="simulation" aria-labelledby="simulation-title">
+        <div class="simulation__header">
+          <h2 id="simulation-title">Gravedad y atracción entre cuerpos</h2>
+          <div class="simulation__indicators">
+            <span class="status" id="status" role="status" aria-live="polite" data-running="false">En pausa</span>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="simulation-canvas" aria-label="Simulación gravitatoria. Arrastra un cuerpo para moverlo o dibuja un trazo en un espacio vacío para crear otro con esa dirección.">
+            Tu navegador no admite el elemento canvas.
+          </canvas>
+        </div>
+        <div class="controls">
+          <label class="control-group" for="body-count">
+            <span class="control-group__label">
+              <span>Número de cuerpos</span>
+              <output id="body-count-value" for="body-count">3</output>
+            </span>
+            <input id="body-count" type="range" min="1" max="10" step="1" value="3">
+          </label>
+          <div class="buttons">
+            <button class="icon-button" id="toggle-button" type="button" aria-label="Iniciar simulación" title="Iniciar simulación" aria-pressed="false">
+              <svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5.5v13l10-6.5z"></path>
+              </svg>
+              <svg id="pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 5h4v14H6zm8 0h4v14h-4z"></path>
+              </svg>
+            </button>
+            <button class="icon-button" id="reset-button" type="button" aria-label="Reiniciar simulación" title="Reiniciar simulación">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5a7 7 0 1 1-6.32 4H3.5l3.6-4 3.6 4H7.9A5 5 0 1 0 12 7z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const canvas = document.querySelector("#simulation-canvas");
+      const context = canvas.getContext("2d");
+      const bodyCountInput = document.querySelector("#body-count");
+      const bodyCountValue = document.querySelector("#body-count-value");
+      const toggleButton = document.querySelector("#toggle-button");
+      const resetButton = document.querySelector("#reset-button");
+      const status = document.querySelector("#status");
+
+      const gravitationalConstant = 1200;
+      const gravityStrength = 1;
+      const softening = 18;
+      const initialBodyRadius = 10;
+      const initialSpeed = 100;
+      const maxBodyCount = 10;
+      let width = 0;
+      let height = 0;
+      let viewWidth = 0;
+      let viewHeight = 0;
+      let pixelRatio = 1;
+      let camera = null;
+      let targetCamera = null;
+      let cameraElapsed = 0;
+      let manualZoom = false;
+      let bodies = [];
+      let running = false;
+      let lastFrame = 0;
+      let draggedBody = null;
+      let creationGesture = null;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function getRadius() {
+        return initialBodyRadius;
+      }
+
+      function constrainBodyToBounds(body) {
+        body.x = clamp(body.x, body.radius, Math.max(body.radius, width - body.radius));
+        body.y = clamp(body.y, body.radius, Math.max(body.radius, height - body.radius));
+      }
+
+      function createBody(x, y, vx = 0, vy = 0, radius = getRadius()) {
+        const bodyX = clamp(x, radius, Math.max(radius, width - radius));
+        const bodyY = clamp(y, radius, Math.max(radius, height - radius));
+        return {
+          x: bodyX,
+          y: bodyY,
+          vx,
+          vy,
+          radius,
+          mass: radius * radius,
+          trails: [[{ x: bodyX, y: bodyY }]],
+          trailElapsed: 0
+        };
+      }
+
+      function createBodies() {
+        const count = Number(bodyCountInput.value);
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const spread = Math.min(width, height) * 0.36;
+        bodies = Array.from({ length: count }, (_, index) => {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.sqrt(Math.random()) * spread;
+          return createBody(
+            centerX + Math.cos(angle) * distance,
+            centerY + Math.sin(angle) * distance,
+            -Math.sin(angle) * initialSpeed,
+            Math.cos(angle) * initialSpeed,
+            index === 0 ? initialBodyRadius * 2 : initialBodyRadius
+          );
+        });
+        refreshCamera(true);
+        drawSimulation();
+      }
+
+      function resizeCanvas() {
+        const bounds = canvas.getBoundingClientRect();
+        const oldViewWidth = viewWidth;
+        const oldViewHeight = viewHeight;
+        pixelRatio = window.devicePixelRatio || 1;
+        viewWidth = bounds.width;
+        viewHeight = bounds.height;
+        canvas.width = Math.round(viewWidth * pixelRatio);
+        canvas.height = Math.round(viewHeight * pixelRatio);
+        if (oldViewWidth && oldViewHeight) {
+          const scaleX = viewWidth / oldViewWidth;
+          const scaleY = viewHeight / oldViewHeight;
+          width *= scaleX;
+          height *= scaleY;
+          bodies.forEach(body => {
+            body.trails.forEach(trail => {
+              trail.forEach(point => {
+                point.x *= scaleX;
+                point.y *= scaleY;
+              });
+            });
+            body.x *= scaleX;
+            body.y *= scaleY;
+            constrainBodyToBounds(body);
+          });
+        } else {
+          width = viewWidth;
+          height = viewHeight;
+          createBodies();
+        }
+        refreshCamera(true);
+        drawSimulation();
+      }
+
+      function expandWorld() {
+        const previousWidth = width;
+        const previousHeight = height;
+        width *= 1.1;
+        height *= 1.1;
+        const shiftX = (width - previousWidth) / 2;
+        const shiftY = (height - previousHeight) / 2;
+        bodies.forEach(body => {
+          body.x += shiftX;
+          body.y += shiftY;
+          body.trails.forEach(trail => {
+            trail.forEach(point => {
+              point.x += shiftX;
+              point.y += shiftY;
+            });
+          });
+        });
+      }
+
+      function getTargetCamera() {
+        if (bodies.length === 0) {
+          const scale = Math.min(viewWidth / width, viewHeight / height);
+          return {
+            scale,
+            offsetX: (viewWidth - width * scale) / 2,
+            offsetY: (viewHeight - height * scale) / 2
+          };
+        }
+
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        bodies.forEach(body => {
+          minX = Math.min(minX, body.x - body.radius);
+          minY = Math.min(minY, body.y - body.radius);
+          maxX = Math.max(maxX, body.x + body.radius);
+          maxY = Math.max(maxY, body.y + body.radius);
+        });
+        const padding = Math.max(24, Math.min(viewWidth, viewHeight) * 0.08);
+        const boundsWidth = Math.max(80, maxX - minX + padding * 2);
+        const boundsHeight = Math.max(80, maxY - minY + padding * 2);
+        const scale = Math.min(
+          1,
+          viewWidth * 0.94 / boundsWidth,
+          viewHeight * 0.94 / boundsHeight
+        );
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        return {
+          scale,
+          offsetX: viewWidth / 2 - centerX * scale,
+          offsetY: viewHeight / 2 - centerY * scale
+        };
+      }
+
+      function refreshCamera(reset = false) {
+        targetCamera = getTargetCamera();
+        if (reset || !camera) {
+          camera = { ...targetCamera };
+          manualZoom = false;
+        }
+        cameraElapsed = 0;
+      }
+
+      function updateCamera(deltaTime) {
+        if (manualZoom || creationGesture) {
+          return;
+        }
+        cameraElapsed += deltaTime;
+        if (cameraElapsed >= 2 || !targetCamera) {
+          refreshCamera();
+        }
+        const interpolation = 1 - Math.exp(-3 * deltaTime);
+        camera.scale += (targetCamera.scale - camera.scale) * interpolation;
+        camera.offsetX += (targetCamera.offsetX - camera.offsetX) * interpolation;
+        camera.offsetY += (targetCamera.offsetY - camera.offsetY) * interpolation;
+      }
+
+      function updateSimulation(deltaTime) {
+        const gravity = gravitationalConstant * gravityStrength;
+        const steps = Math.max(1, Math.ceil(deltaTime / (1 / 120)));
+        const stepTime = deltaTime / steps;
+
+        for (let step = 0; step < steps; step += 1) {
+          const forceX = new Float64Array(bodies.length);
+          const forceY = new Float64Array(bodies.length);
+          for (let i = 0; i < bodies.length; i += 1) {
+            for (let j = i + 1; j < bodies.length; j += 1) {
+              const first = bodies[i];
+              const second = bodies[j];
+              const dx = second.x - first.x;
+              const dy = second.y - first.y;
+              const distanceSquared = dx * dx + dy * dy + softening * softening;
+              const distance = Math.sqrt(distanceSquared);
+              const force = gravity * first.mass * second.mass / distanceSquared;
+              const fx = force * dx / distance;
+              const fy = force * dy / distance;
+              forceX[i] += fx;
+              forceY[i] += fy;
+              forceX[j] -= fx;
+              forceY[j] -= fy;
+            }
+          }
+
+          const previousPositions = new Map(
+            bodies.map(body => [body, { x: body.x, y: body.y }])
+          );
+          bodies.forEach((body, index) => {
+            body.vx += forceX[index] / body.mass * stepTime;
+            body.vy += forceY[index] / body.mass * stepTime;
+            body.vx *= 0.999;
+            body.vy *= 0.999;
+            body.x += body.vx * stepTime;
+            body.y += body.vy * stepTime;
+          });
+
+          mergeCollidingBodies(previousPositions);
+
+          while (bodies.some(body =>
+            body.x < body.radius ||
+            body.x > width - body.radius ||
+            body.y < body.radius ||
+            body.y > height - body.radius
+          )) {
+            expandWorld();
+          }
+
+          bodies.forEach(body => {
+            body.trailElapsed += stepTime;
+            if (body.trailElapsed >= 0.04) {
+              const trail = body.trails[body.trails.length - 1];
+              trail.push({ x: body.x, y: body.y });
+              if (trail.length > 220) {
+                trail.shift();
+              }
+              body.trailElapsed %= 0.04;
+            }
+          });
+        }
+      }
+
+      function mergeCollidingBodies(previousPositions) {
+        const previousCount = bodies.length;
+        for (let i = 0; i < bodies.length; i += 1) {
+          for (let j = i + 1; j < bodies.length;) {
+            const first = bodies[i];
+            const second = bodies[j];
+            const firstPrevious = previousPositions.get(first);
+            const secondPrevious = previousPositions.get(second);
+            const relativeStartX = secondPrevious.x - firstPrevious.x;
+            const relativeStartY = secondPrevious.y - firstPrevious.y;
+            const relativeMoveX =
+              (second.x - secondPrevious.x) - (first.x - firstPrevious.x);
+            const relativeMoveY =
+              (second.y - secondPrevious.y) - (first.y - firstPrevious.y);
+            const relativeMoveSquared =
+              relativeMoveX * relativeMoveX + relativeMoveY * relativeMoveY;
+            const collisionTime = relativeMoveSquared > 0
+              ? clamp(
+                -(relativeStartX * relativeMoveX + relativeStartY * relativeMoveY) /
+                  relativeMoveSquared,
+                0,
+                1
+              )
+              : 0;
+            const centerDistance = Math.hypot(
+              relativeStartX + relativeMoveX * collisionTime,
+              relativeStartY + relativeMoveY * collisionTime
+            );
+            if (centerDistance > 1.5) {
+              j += 1;
+              continue;
+            }
+
+            const combinedMass = first.mass + second.mass;
+            const firstCollisionX = firstPrevious.x + (first.x - firstPrevious.x) * collisionTime;
+            const firstCollisionY = firstPrevious.y + (first.y - firstPrevious.y) * collisionTime;
+            const secondCollisionX = secondPrevious.x + (second.x - secondPrevious.x) * collisionTime;
+            const secondCollisionY = secondPrevious.y + (second.y - secondPrevious.y) * collisionTime;
+            first.x = (firstCollisionX * first.mass + secondCollisionX * second.mass) / combinedMass;
+            first.y = (firstCollisionY * first.mass + secondCollisionY * second.mass) / combinedMass;
+            first.vx = (first.vx * first.mass + second.vx * second.mass) / combinedMass;
+            first.vy = (first.vy * first.mass + second.vy * second.mass) / combinedMass;
+            first.mass = combinedMass;
+            first.trails = [[{ x: first.x, y: first.y }]];
+            first.trailElapsed = 0;
+            bodies.splice(j, 1);
+          }
+        }
+        if (bodies.length !== previousCount) {
+          bodyCountInput.value = String(bodies.length);
+          bodyCountValue.value = String(bodies.length);
+        }
+      }
+
+      function drawSimulation() {
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        context.clearRect(0, 0, viewWidth, viewHeight);
+        const { scale, offsetX, offsetY } = camera;
+        context.setTransform(
+          pixelRatio * scale,
+          0,
+          0,
+          pixelRatio * scale,
+          pixelRatio * offsetX,
+          pixelRatio * offsetY
+        );
+        context.lineWidth = 1.5;
+        context.strokeStyle = "rgba(196, 181, 253, 0.3)";
+        bodies.forEach(body => {
+          body.trails.forEach(trail => {
+            if (trail.length < 2) {
+              return;
+            }
+            context.beginPath();
+            context.moveTo(trail[0].x, trail[0].y);
+            for (let index = 1; index < trail.length; index += 1) {
+              context.lineTo(trail[index].x, trail[index].y);
+            }
+            context.stroke();
+          });
+        });
+
+        bodies.forEach(body => {
+          const radius = body.radius;
+          context.fillStyle = "#f4f4f5";
+          context.beginPath();
+          context.arc(body.x, body.y, radius, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        bodies.forEach(body => {
+          const speed = Math.hypot(body.vx, body.vy);
+          if (speed < 1) {
+            return;
+          }
+          const angle = Math.atan2(body.vy, body.vx);
+          const vectorLength = clamp(speed * 0.12, 12, 40);
+          const endX = body.x + Math.cos(angle) * (body.radius + vectorLength);
+          const endY = body.y + Math.sin(angle) * (body.radius + vectorLength);
+          const headLength = 5;
+          context.strokeStyle = "#f4f4f5";
+          context.fillStyle = "#f4f4f5";
+          context.lineWidth = 1.5;
+          context.beginPath();
+          context.moveTo(body.x, body.y);
+          context.lineTo(endX, endY);
+          context.stroke();
+          context.beginPath();
+          context.moveTo(endX, endY);
+          context.lineTo(
+            endX - Math.cos(angle - Math.PI / 6) * headLength,
+            endY - Math.sin(angle - Math.PI / 6) * headLength
+          );
+          context.lineTo(
+            endX - Math.cos(angle + Math.PI / 6) * headLength,
+            endY - Math.sin(angle + Math.PI / 6) * headLength
+          );
+          context.closePath();
+          context.fill();
+        });
+
+        if (creationGesture) {
+          const dx = creationGesture.currentX - creationGesture.x;
+          const dy = creationGesture.currentY - creationGesture.y;
+          const distance = Math.hypot(dx, dy);
+          if (distance > 0) {
+            const angle = Math.atan2(dy, dx);
+            const endX = creationGesture.x + dx / distance * Math.min(distance, 70);
+            const endY = creationGesture.y + dy / distance * Math.min(distance, 70);
+            const headLength = 7;
+            context.strokeStyle = "#4ade80";
+            context.fillStyle = "#4ade80";
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(creationGesture.x, creationGesture.y);
+            context.lineTo(endX, endY);
+            context.stroke();
+            context.beginPath();
+            context.moveTo(endX, endY);
+            context.lineTo(
+              endX - Math.cos(angle - Math.PI / 6) * headLength,
+              endY - Math.sin(angle - Math.PI / 6) * headLength
+            );
+            context.lineTo(
+              endX - Math.cos(angle + Math.PI / 6) * headLength,
+              endY - Math.sin(angle + Math.PI / 6) * headLength
+            );
+            context.closePath();
+            context.fill();
+          }
+          context.fillStyle = "#4ade80";
+          context.beginPath();
+          context.arc(creationGesture.x, creationGesture.y, initialBodyRadius, 0, Math.PI * 2);
+          context.fill();
+        }
+      }
+
+      function animate(timestamp) {
+        if (!running) {
+          return;
+        }
+        const deltaTime = lastFrame
+          ? Math.min((timestamp - lastFrame) / 1000, 0.04)
+          : 0;
+        lastFrame = timestamp;
+        updateSimulation(deltaTime);
+        updateCamera(deltaTime);
+        drawSimulation();
+        requestAnimationFrame(animate);
+      }
+
+      function setRunning(nextRunning) {
+        running = nextRunning;
+        const action = running ? "Pausar" : "Iniciar";
+        status.textContent = running ? "En marcha" : "En pausa";
+        status.dataset.running = String(running);
+        toggleButton.setAttribute("aria-label", `${action} simulación`);
+        toggleButton.title = `${action} simulación`;
+        toggleButton.setAttribute("aria-pressed", String(running));
+        if (running) {
+          lastFrame = 0;
+          requestAnimationFrame(animate);
+        }
+      }
+
+      canvas.addEventListener("wheel", event => {
+        event.preventDefault();
+        const bounds = canvas.getBoundingClientRect();
+        const cursorX = event.clientX - bounds.left;
+        const cursorY = event.clientY - bounds.top;
+        const nextScale = clamp(
+          camera.scale * Math.exp(-event.deltaY * 0.001),
+          0.05,
+          4
+        );
+        const zoomRatio = nextScale / camera.scale;
+        camera.offsetX = cursorX - (cursorX - camera.offsetX) * zoomRatio;
+        camera.offsetY = cursorY - (cursorY - camera.offsetY) * zoomRatio;
+        camera.scale = nextScale;
+        targetCamera = { ...camera };
+        manualZoom = true;
+        drawSimulation();
+      }, { passive: false });
+
+      bodyCountInput.addEventListener("input", () => {
+        bodyCountValue.value = bodyCountInput.value;
+        const count = Number(bodyCountInput.value);
+        if (count < bodies.length) {
+          bodies.length = count;
+        } else {
+          while (bodies.length < count) {
+            const angle = Math.random() * Math.PI * 2;
+            bodies.push(createBody(
+              Math.random() * width,
+              Math.random() * height,
+              Math.cos(angle) * initialSpeed,
+              Math.sin(angle) * initialSpeed
+            ));
+          }
+        }
+        refreshCamera(true);
+        drawSimulation();
+      });
+
+      function getWorldPosition(event) {
+        const bounds = canvas.getBoundingClientRect();
+        const { scale, offsetX, offsetY } = camera;
+        return {
+          x: (event.clientX - bounds.left - offsetX) / scale,
+          y: (event.clientY - bounds.top - offsetY) / scale
+        };
+      }
+
+      canvas.addEventListener("pointerdown", event => {
+        const { x, y } = getWorldPosition(event);
+        draggedBody = [...bodies].reverse().find(body =>
+          Math.hypot(body.x - x, body.y - y) <= body.radius * 2
+        );
+        if (draggedBody) {
+          canvas.classList.add("is-dragging");
+          canvas.setPointerCapture(event.pointerId);
+          return;
+        }
+        if (bodies.length >= maxBodyCount) {
+          return;
+        }
+        creationGesture = {
+          x: clamp(x, initialBodyRadius, Math.max(initialBodyRadius, width - initialBodyRadius)),
+          y: clamp(y, initialBodyRadius, Math.max(initialBodyRadius, height - initialBodyRadius)),
+          currentX: x,
+          currentY: y
+        };
+        canvas.setPointerCapture(event.pointerId);
+        drawSimulation();
+      });
+
+      canvas.addEventListener("pointermove", event => {
+        if (!draggedBody && !creationGesture) {
+          return;
+        }
+        const { x, y } = getWorldPosition(event);
+        if (creationGesture) {
+          creationGesture.currentX = x;
+          creationGesture.currentY = y;
+          drawSimulation();
+          return;
+        }
+        draggedBody.x = clamp(
+          x,
+          Math.min(draggedBody.radius, width / 2),
+          Math.max(width - draggedBody.radius, width / 2)
+        );
+        draggedBody.y = clamp(
+          y,
+          Math.min(draggedBody.radius, height / 2),
+          Math.max(height - draggedBody.radius, height / 2)
+        );
+        draggedBody.vx = 0;
+        draggedBody.vy = 0;
+        drawSimulation();
+      });
+
+      function finishCreationGesture() {
+        if (!creationGesture) {
+          return;
+        }
+        const dx = creationGesture.currentX - creationGesture.x;
+        const dy = creationGesture.currentY - creationGesture.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance >= 5 && bodies.length < maxBodyCount) {
+          const newBody = createBody(
+            creationGesture.x,
+            creationGesture.y,
+            dx / distance * initialSpeed,
+            dy / distance * initialSpeed
+          );
+          bodies.push(newBody);
+          bodyCountInput.value = String(bodies.length);
+          bodyCountValue.value = String(bodies.length);
+          refreshCamera(true);
+        }
+        creationGesture = null;
+        drawSimulation();
+      }
+
+      function stopDragging() {
+        draggedBody = null;
+        canvas.classList.remove("is-dragging");
+      }
+
+      canvas.addEventListener("pointerup", () => {
+        if (creationGesture) {
+          finishCreationGesture();
+        } else {
+          stopDragging();
+        }
+      });
+      canvas.addEventListener("pointercancel", () => {
+        creationGesture = null;
+        stopDragging();
+        drawSimulation();
+      });
+      toggleButton.addEventListener("click", () => setRunning(!running));
+      resetButton.addEventListener("click", () => {
+        setRunning(false);
+        width = viewWidth;
+        height = viewHeight;
+        createBodies();
+      });
+      window.addEventListener("resize", resizeCanvas);
+
+      bodyCountValue.value = bodyCountInput.value;
+      resizeCanvas();
+    </script>
+  </body>
+</html>
