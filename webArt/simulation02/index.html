@@ -255,6 +255,13 @@
             </span>
             <input id="body-count" type="range" min="1" max="10" step="1" value="3">
           </label>
+          <label class="control-group" for="time-scale">
+            <span class="control-group__label">
+              <span>Velocidad del tiempo</span>
+              <output id="time-scale-value" for="time-scale">1×</output>
+            </span>
+            <input id="time-scale" type="range" min="1" max="10" step="1" value="1">
+          </label>
           <div class="buttons">
             <button class="icon-button" id="toggle-button" type="button" aria-label="Iniciar simulación" title="Iniciar simulación" aria-pressed="false">
               <svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -279,6 +286,8 @@
       const context = canvas.getContext("2d");
       const bodyCountInput = document.querySelector("#body-count");
       const bodyCountValue = document.querySelector("#body-count-value");
+      const timeScaleInput = document.querySelector("#time-scale");
+      const timeScaleValue = document.querySelector("#time-scale-value");
       const toggleButton = document.querySelector("#toggle-button");
       const resetButton = document.querySelector("#reset-button");
       const status = document.querySelector("#status");
@@ -345,7 +354,7 @@
             centerY + Math.sin(angle) * distance,
             -Math.sin(angle) * initialSpeed,
             Math.cos(angle) * initialSpeed,
-            index === 0 ? initialBodyRadius * 2 : initialBodyRadius
+            index === 0 ? initialBodyRadius * 1.5 : initialBodyRadius
           );
         });
         refreshCamera(true);
@@ -693,7 +702,7 @@
           ? Math.min((timestamp - lastFrame) / 1000, 0.04)
           : 0;
         lastFrame = timestamp;
-        updateSimulation(deltaTime);
+        updateSimulation(deltaTime * Number(timeScaleInput.value));
         updateCamera(deltaTime);
         drawSimulation();
         requestAnimationFrame(animate);
@@ -750,6 +759,10 @@
         }
         refreshCamera(true);
         drawSimulation();
+      });
+
+      timeScaleInput.addEventListener("input", () => {
+        timeScaleValue.value = `${timeScaleInput.value}×`;
       });
 
       function getWorldPosition(event) {
@@ -860,6 +873,7 @@
       window.addEventListener("resize", resizeCanvas);
 
       bodyCountValue.value = bodyCountInput.value;
+      timeScaleValue.value = `${timeScaleInput.value}×`;
       resizeCanvas();
     </script>
   </body>
