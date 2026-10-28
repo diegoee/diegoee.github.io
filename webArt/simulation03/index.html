@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Web Art: Simulation 03</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Arial, sans-serif;
+        background: #333;
+        color: #f4f4f5;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        min-width: 320px;
+        margin: 0;
+        padding: 32px 20px;
+        background-color: #333;
+      }
+
+      main {
+        width: min(100%, 1400px);
+        height: 100%;
+        margin: 0 auto;
+      }
+
+      .simulation {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 24px;
+        background: #202124;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      }
+
+      .simulation__header,
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 20px;
+      }
+
+      .simulation__header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .simulation__header h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .simulation__title-group,
+      .dialog__title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .dialog__title {
+        justify-content: space-between;
+      }
+
+      .dialog__title h2 {
+        margin: 0;
+      }
+
+      .dialog__title button {
+        display: inline-flex;
+        width: 42px;
+        flex: 0 0 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+      .dialog__title svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+
+      .simulation__indicators {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .generation,
+      .timer,
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.25);
+        color: #fff;
+        font-size: 0.9rem;
+        letter-spacing: 0.03em;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .generation {
+        color: #d4d4d8;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .timer {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .status::before {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #a1a1aa;
+        content: "";
+      }
+
+      .status[data-running="true"] {
+        background: rgba(34, 197, 94, 0.2);
+        color: #bbf7d0;
+        box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
+      }
+
+      .status[data-running="true"]::before {
+        background: #4ade80;
+        box-shadow: 0 0 12px rgba(74, 222, 128, 0.65);
+      }
+
+      .canvas-wrap {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        background-color: #333;
+        background-image: radial-gradient(#484848 1px, transparent 1px);
+        background-position: center;
+        background-size: 22px 22px;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+        touch-action: none;
+      }
+
+      canvas.is-dragging {
+        cursor: grabbing;
+      }
+
+      .controls {
+        flex-wrap: wrap;
+        align-items: flex-end;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .control-group {
+        display: grid;
+        flex: 1 1 180px;
+        gap: 8px;
+        color: #d4d4d8;
+        font-size: 0.9rem;
+      }
+
+      .control-group__label {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      output {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #fff;
+      }
+
+      .buttons {
+        display: flex;
+        flex: 0 1 auto;
+        gap: 10px;
+      }
+
+      .icon-button {
+        display: inline-flex;
+        width: 42px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+
+      .dialog {
+        width: min(460px, calc(100% - 32px));
+        max-height: min(80vh, 640px);
+        overflow: auto;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 24px;
+        background: #202124;
+        color: #f4f4f5;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+      }
+
+      .dialog::backdrop {
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(3px);
+      }
+
+      .dialog h2 {
+        margin: 0 0 16px;
+        font-size: 1.2rem;
+      }
+
+      .dialog p,
+      .dialog li {
+        color: #d4d4d8;
+        line-height: 1.55;
+      }
+
+      .dialog ul {
+        display: grid;
+        gap: 8px;
+        padding-left: 22px;
+      }
+
+      .dialog__actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+
+      .icon-button svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+
+      #toggle-button #pause-icon {
+        display: none;
+      }
+
+      #toggle-button[aria-pressed="true"] #play-icon {
+        display: none;
+      }
+
+      #toggle-button[aria-pressed="true"] #pause-icon {
+        display: block;
+      }
+
+      button {
+        min-height: 42px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 999px;
+        padding: 8px 14px;
+        background: rgba(0, 0, 0, 0.35);
+        color: #fff;
+        font: inherit;
+        font-size: 0.9rem;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.55);
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid #7dd3fc;
+        outline-offset: 3px;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 16px 12px;
+        }
+
+        .simulation__header,
+        .controls {
+          padding: 16px;
+        }
+
+        .buttons {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .buttons button {
+          flex: 0 0 auto;
+        }
+
+        .buttons .icon-button {
+          flex-basis: 42px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="simulation" aria-labelledby="simulation-title">
+        <div class="simulation__header">
+          <div class="simulation__title-group">
+            <h2 id="simulation-title">Evolución</h2>
+            <button id="rules-button" type="button" aria-haspopup="dialog" aria-controls="rules-dialog">Reglas</button>
+          </div>
+          <div class="simulation__indicators">
+            <span class="generation">Generación <output id="generation-value" for="generation-value">1</output></span>
+            <span class="timer" id="simulation-time" role="timer" aria-label="Tiempo de simulación">00:00:00</span>
+            <span class="status" id="status" role="status" aria-live="polite" data-running="false">En pausa</span>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="simulation-canvas" aria-label="Simulación de tres tipos de individuos: círculos, cuadrados y triángulos. Cada tipo vence a otro al tocarlo y lo convierte en su propia forma.">
+            Tu navegador no admite el elemento canvas.
+          </canvas>
+        </div>
+        <div class="controls">
+          <label class="control-group" for="population-count">
+            <span class="control-group__label">
+              <span>Población</span>
+              <output id="population-value" for="population-count">20</output>
+            </span>
+            <input id="population-count" type="range" min="10" max="500" step="1" value="20">
+          </label>
+          <label class="control-group" for="time-scale">
+            <span class="control-group__label">
+              <span>Velocidad del tiempo</span>
+              <output id="time-scale-value" for="time-scale">1×</output>
+            </span>
+            <input id="time-scale" type="range" min="1" max="25" step="1" value="1">
+          </label>
+          <div class="buttons">
+            <button class="icon-button" id="toggle-button" type="button" aria-label="Iniciar simulación" title="Iniciar simulación" aria-pressed="false">
+              <svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5.5v13l10-6.5z"></path>
+              </svg>
+              <svg id="pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 5h4v14H6zm8 0h4v14h-4z"></path>
+              </svg>
+            </button>
+            <button class="icon-button" id="reset-button" type="button" aria-label="Reiniciar simulación" title="Reiniciar simulación">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5a7 7 0 1 1-6.32 4H3.5l3.6-4 3.6 4H7.9A5 5 0 1 0 12 7z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="dialog" id="rules-dialog" aria-labelledby="rules-title">
+      <h2 id="rules-title">Reglas de la evolución</h2>
+      <p>Los individuos se mueven libremente por la pantalla y rebotan al llegar a los bordes.</p>
+      <ul>
+        <li>El triángulo vence al cuadrado.</li>
+        <li>El cuadrado vence al círculo.</li>
+        <li>El círculo vence al triángulo.</li>
+        <li>Cuando dos tipos distintos chocan, el derrotado se convierte en el tipo vencedor.</li>
+        <li>La simulación termina cuando solo queda un tipo.</li>
+      </ul>
+      <div class="dialog__actions">
+        <button type="button" data-close-dialog>Cerrar</button>
+      </div>
+    </dialog>
+
+    <dialog class="dialog" id="result-dialog" aria-labelledby="result-title">
+      <div class="dialog__title">
+        <h2 id="result-title">Fin de la simulación</h2>
+        <button id="close-result-button" type="button" aria-label="Cerrar ventana" title="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7a1 1 0 0 0-1.4 1.4l4.9 4.9-4.9 4.9a1 1 0 1 0 1.4 1.4l4.9-4.9 4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z"></path>
+          </svg>
+        </button>
+      </div>
+      <p id="result-message"></p>
+    </dialog>
+
+    <script>
+      const canvas = document.querySelector("#simulation-canvas");
+      const context = canvas.getContext("2d");
+      const populationInput = document.querySelector("#population-count");
+      const populationValue = document.querySelector("#population-value");
+      const generationValue = document.querySelector("#generation-value");
+      const timeScaleInput = document.querySelector("#time-scale");
+      const timeScaleValue = document.querySelector("#time-scale-value");
+      const toggleButton = document.querySelector("#toggle-button");
+      const resetButton = document.querySelector("#reset-button");
+      const rulesButton = document.querySelector("#rules-button");
+      const rulesDialog = document.querySelector("#rules-dialog");
+      const resultDialog = document.querySelector("#result-dialog");
+      const resultMessage = document.querySelector("#result-message");
+      const closeResultButton = document.querySelector("#close-result-button");
+      const simulationTime = document.querySelector("#simulation-time");
+      const status = document.querySelector("#status");
+
+      const types = ["circle", "square", "triangle"];
+      const typeColors = {
+        circle: "#60a5fa",
+        square: "#fb923c",
+        triangle: "#c084fc"
+      };
+      let width = 0;
+      let height = 0;
+      let viewWidth = 0;
+      let viewHeight = 0;
+      let pixelRatio = 1;
+      let creatures = [];
+      let running = false;
+      let lastFrame = 0;
+      let generation = 1;
+      let elapsedTime = 0;
+      let gameOver = false;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function randomBetween(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function createCreature(x, y, type = types[Math.floor(Math.random() * types.length)]) {
+        const angle = randomBetween(0, Math.PI * 2);
+        return {
+          x: clamp(x, 12, Math.max(12, width - 12)),
+          y: clamp(y, 12, Math.max(12, height - 12)),
+          vx: Math.cos(angle) * randomBetween(35, 75),
+          vy: Math.sin(angle) * randomBetween(35, 75),
+          type,
+          radius: 10,
+          turn: randomBetween(-0.7, 0.7)
+        };
+      }
+
+      function getPopulationTarget() {
+        return Number(populationInput.value);
+      }
+
+      function createPopulation() {
+        const count = getPopulationTarget();
+        creatures = Array.from({ length: count }, (_, index) => createCreature(
+          randomBetween(30, Math.max(30, width - 30)),
+          randomBetween(30, Math.max(30, height - 30)),
+          types[index % types.length]
+        ));
+        generation = 1;
+        drawSimulation();
+      }
+
+      function resizeCanvas() {
+        const bounds = canvas.getBoundingClientRect();
+        pixelRatio = window.devicePixelRatio || 1;
+        viewWidth = bounds.width;
+        viewHeight = bounds.height;
+        canvas.width = Math.round(viewWidth * pixelRatio);
+        canvas.height = Math.round(viewHeight * pixelRatio);
+        width = viewWidth;
+        height = viewHeight;
+        if (creatures.length === 0) {
+          createPopulation();
+          return;
+        }
+        creatures.forEach(creature => {
+          creature.x = clamp(creature.x, 12, Math.max(12, width - 12));
+          creature.y = clamp(creature.y, 12, Math.max(12, height - 12));
+        });
+        drawSimulation();
+      }
+
+      function defeats(attacker, defender) {
+        return (attacker === "triangle" && defender === "square") ||
+          (attacker === "square" && defender === "circle") ||
+          (attacker === "circle" && defender === "triangle");
+      }
+
+      function formatTime(milliseconds) {
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return [hours, minutes, seconds].map(value => String(value).padStart(2, "0")).join(":");
+      }
+
+      function updateTimer() {
+        simulationTime.textContent = formatTime(elapsedTime);
+      }
+
+      function checkForWinner() {
+        const remainingTypes = new Set(creatures.map(creature => creature.type));
+        if (remainingTypes.size !== 1) {
+          return false;
+        }
+        const winner = remainingTypes.values().next().value;
+        gameOver = true;
+        setRunning(false);
+        resultMessage.textContent = `El ${winner === "circle" ? "círculo" : winner === "square" ? "cuadrado" : "triángulo"} es el único tipo que queda.`;
+        resultDialog.showModal();
+        return true;
+      }
+
+      function updateSimulation(deltaTime) {
+        const totalStep = deltaTime * Number(timeScaleInput.value);
+        const stepCount = Math.max(1, Math.ceil(totalStep / (1 / 60)));
+        const step = totalStep / stepCount;
+        for (let stepIndex = 0; stepIndex < stepCount; stepIndex += 1) {
+          creatures.forEach(creature => {
+            const speed = Math.hypot(creature.vx, creature.vy) || 1;
+            creature.turn += randomBetween(-1.2, 1.2) * step;
+            const heading = Math.atan2(creature.vy, creature.vx) + creature.turn * step;
+            creature.vx = Math.cos(heading) * speed;
+            creature.vy = Math.sin(heading) * speed;
+            creature.x += creature.vx * step;
+            creature.y += creature.vy * step;
+            if (creature.x < creature.radius || creature.x > width - creature.radius) {
+              creature.vx *= -1;
+              creature.x = clamp(creature.x, creature.radius, width - creature.radius);
+            }
+            if (creature.y < creature.radius || creature.y > height - creature.radius) {
+              creature.vy *= -1;
+              creature.y = clamp(creature.y, creature.radius, height - creature.radius);
+            }
+          });
+
+          const cellSize = 24;
+          const grid = new Map();
+          creatures.forEach((creature, index) => {
+            const cellX = Math.floor(creature.x / cellSize);
+            const cellY = Math.floor(creature.y / cellSize);
+            const key = `${cellX},${cellY}`;
+            const cell = grid.get(key) || [];
+            cell.push(index);
+            grid.set(key, cell);
+          });
+
+          for (let i = 0; i < creatures.length; i += 1) {
+            const first = creatures[i];
+            const cellX = Math.floor(first.x / cellSize);
+            const cellY = Math.floor(first.y / cellSize);
+            for (let offsetX = -1; offsetX <= 1; offsetX += 1) {
+              for (let offsetY = -1; offsetY <= 1; offsetY += 1) {
+                const neighbors = grid.get(`${cellX + offsetX},${cellY + offsetY}`) || [];
+                for (const j of neighbors) {
+                  if (j <= i) {
+                    continue;
+                  }
+                  const second = creatures[j];
+                  if (first.type === second.type) {
+                    continue;
+                  }
+                  const distance = Math.hypot(second.x - first.x, second.y - first.y);
+                  if (distance > first.radius + second.radius) {
+                    continue;
+                  }
+                  if (defeats(first.type, second.type)) {
+                    second.type = first.type;
+                  } else if (defeats(second.type, first.type)) {
+                    first.type = second.type;
+                  } else {
+                    continue;
+                  }
+                  generation += 1;
+                  const separation = (first.radius + second.radius - distance) / 2;
+                  const angle = Math.atan2(second.y - first.y, second.x - first.x);
+                  first.x -= Math.cos(angle) * separation;
+                  first.y -= Math.sin(angle) * separation;
+                  second.x += Math.cos(angle) * separation;
+                  second.y += Math.sin(angle) * separation;
+                }
+              }
+            }
+          }
+          if (checkForWinner()) {
+            return;
+          }
+        }
+      }
+
+      function drawCreature(creature) {
+        const size = creature.radius;
+        context.beginPath();
+        if (creature.type === "circle") {
+          context.arc(creature.x, creature.y, size, 0, Math.PI * 2);
+        } else if (creature.type === "square") {
+          context.rect(creature.x - size, creature.y - size, size * 2, size * 2);
+        } else {
+          context.moveTo(creature.x, creature.y - size * 1.2);
+          context.lineTo(creature.x + size * 1.1, creature.y + size);
+          context.lineTo(creature.x - size * 1.1, creature.y + size);
+          context.closePath();
+        }
+        context.fillStyle = typeColors[creature.type];
+        context.fill();
+        context.strokeStyle = "rgba(255,255,255,0.8)";
+        context.lineWidth = 1.5;
+        context.stroke();
+      }
+
+      function drawSimulation() {
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        context.clearRect(0, 0, viewWidth, viewHeight);
+        creatures.forEach(drawCreature);
+        generationValue.value = String(generation);
+      }
+
+      function animate(timestamp) {
+        if (!running) {
+          return;
+        }
+        const deltaTime = lastFrame
+          ? Math.min((timestamp - lastFrame) / 1000, 0.04)
+          : 0;
+        lastFrame = timestamp;
+        const timeScale = Number(timeScaleInput.value);
+        updateSimulation(deltaTime);
+        elapsedTime += deltaTime * timeScale * 1000;
+        updateTimer();
+        drawSimulation();
+        if (running) {
+          requestAnimationFrame(animate);
+        }
+      }
+
+      function setRunning(nextRunning) {
+        if (nextRunning && gameOver) {
+          return;
+        }
+        if (running === nextRunning) {
+          return;
+        }
+        running = nextRunning;
+        updateTimer();
+        const action = running ? "Pausar" : "Iniciar";
+        status.textContent = running ? "En marcha" : "En pausa";
+        status.dataset.running = String(running);
+        toggleButton.setAttribute("aria-label", `${action} simulación`);
+        toggleButton.title = `${action} simulación`;
+        toggleButton.setAttribute("aria-pressed", String(running));
+        if (running) {
+          lastFrame = 0;
+          requestAnimationFrame(animate);
+        }
+      }
+
+      populationInput.addEventListener("input", () => {
+        populationValue.value = populationInput.value;
+        while (creatures.length > Number(populationInput.value)) {
+          creatures.pop();
+        }
+        while (creatures.length < Number(populationInput.value)) {
+          creatures.push(createCreature(
+            randomBetween(30, Math.max(30, width - 30)),
+            randomBetween(30, Math.max(30, height - 30))
+          ));
+        }
+        drawSimulation();
+      });
+
+      timeScaleInput.addEventListener("input", () => {
+        timeScaleValue.value = `${timeScaleInput.value}×`;
+      });
+
+      toggleButton.addEventListener("click", () => setRunning(!running));
+      resetButton.addEventListener("click", () => {
+        setRunning(false);
+        gameOver = false;
+        elapsedTime = 0;
+        updateTimer();
+        if (resultDialog.open) {
+          resultDialog.close();
+        }
+        createPopulation();
+      });
+      rulesButton.addEventListener("click", () => rulesDialog.showModal());
+      closeResultButton.addEventListener("click", () => resultDialog.close());
+      document.querySelectorAll("[data-close-dialog]").forEach(button => {
+        button.addEventListener("click", () => rulesDialog.close());
+      });
+      window.addEventListener("resize", resizeCanvas);
+
+      populationValue.value = populationInput.value;
+      generationValue.value = String(generation);
+      timeScaleValue.value = `${timeScaleInput.value}×`;
+      resizeCanvas();
+    </script>
+  </body>
+</html>
