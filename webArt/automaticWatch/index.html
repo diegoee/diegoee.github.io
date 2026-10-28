@@ -18,47 +18,6 @@
       font-family: Arial, sans-serif;
     }
 
-    #countdown {
-      background: rgba(0,0,0,0.25);
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      letter-spacing: 0.03em;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-
-    #phrase-bar {
-      position: fixed;
-      bottom: 15px;
-      right: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      z-index: 10;
-    }
-
-    #phrase-open {
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 999px;
-      padding: 8px 12px;
-      background: rgba(0,0,0,0.35);
-      color: #fff;
-      font: inherit;
-      font-size: 0.9rem;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-
-    #phrase-open:hover:not(:disabled) {
-      background: rgba(0,0,0,0.6);
-    }
-
-    #phrase-open:disabled {
-      opacity: 0.5;
-      cursor: default;
-    }
-
     #chronograph-top-controls {
       position: fixed;
       top: 15px;
@@ -81,9 +40,18 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
 
-    #chronograph-top-start {
-      border-color: #fb7185 !important;
-      color: #fecdd3 !important;
+    #chronograph-top-start,
+    #chronograph-start {
+      border-color: #16a34a !important;
+      background: #15803d !important;
+      color: #fff !important;
+    }
+
+    #chronograph-top-start.is-running,
+    #chronograph-start.is-running {
+      border-color: #ef4444 !important;
+      background: #dc2626 !important;
+      color: #fff !important;
     }
 
     #chronograph-top-controls button:disabled {
@@ -97,23 +65,8 @@
     }
 
     @media (max-width: 600px) {
-      #phrase-bar {
-        top: auto;
-        bottom: 12px;
-        right: 8px;
-        gap: 4px;
-        justify-content: flex-end;
-      }
-
-      #countdown,
-      #phrase-open,
       #chronograph-top-controls button {
         font-size: 0.68rem;
-      }
-
-      #countdown,
-      #phrase-open {
-        padding: 7px 8px;
       }
 
       #chronograph-top-controls {
@@ -125,93 +78,6 @@
         padding: 6px 7px;
         white-space: nowrap;
       }
-    }
-
-    #phrase-open:focus-visible,
-    #phrase-modal-close:focus-visible {
-      outline: 2px solid #7dd3fc;
-      outline-offset: 3px;
-    }
-
-    #phrase-modal {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background: rgba(0,0,0,0.72);
-      z-index: 50;
-      opacity: 1;
-      transition: opacity 220ms ease, visibility 220ms ease;
-    }
-
-    #phrase-modal[hidden] {
-      display: grid;
-      visibility: hidden;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #phrase-dialog {
-      transform: translateY(0) scale(1);
-      transition: transform 240ms ease;
-    }
-
-    #phrase-modal[hidden] #phrase-dialog {
-      transform: translateY(12px) scale(0.98);
-    }
-
-    #phrase-dialog {
-      position: relative;
-      width: min(680px, 100%);
-      min-height: 240px;
-      padding: 56px 32px 32px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 24px;
-      background: #202124;
-      color: #f4f4f5;
-      text-align: center;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
-    }
-
-    #phrase-dialog-title {
-      margin: 0 0 18px;
-      color: #a1a1aa;
-      font-size: 0.8rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    #phrase-modal-text {
-      margin: 0;
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      line-height: 1.35;
-      text-wrap: balance;
-    }
-
-    #phrase-modal-timer {
-      margin-top: 28px;
-      color: #a1a1aa;
-      font-size: 0.85rem;
-      font-variant-numeric: tabular-nums;
-    }
-
-    #phrase-modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 38px;
-      height: 38px;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 50%;
-      background: transparent;
-      color: #fff;
-      font-size: 1.4rem;
-      cursor: pointer;
     }
 
     #watch-menu-toggle {
@@ -387,11 +253,6 @@
       color: #fecdd3;
     }
 
-    #chronograph-start {
-      border-color: #fb7185 !important;
-      color: #fecdd3 !important;
-    }
-
     #chronograph-visibility[aria-pressed="true"] {
       border-color: #fb7185 !important;
       color: #fecdd3 !important;
@@ -424,21 +285,9 @@
 	</style>
   </head>
   <body>
-  <div id="phrase-bar">
-    <div id="countdown">--</div>
-    <button id="phrase-open" type="button" disabled>Ver frase</button>
-    <div id="chronograph-top-controls" role="group" aria-label="Controles rápidos del cronógrafo">
-      <button id="chronograph-top-start" type="button" aria-label="Iniciar cronógrafo" title="Iniciar cronógrafo">▶ Iniciar</button>
-      <button id="chronograph-top-reset" type="button" aria-label="Reiniciar cronógrafo" title="Reiniciar cronógrafo" disabled>↺ Reiniciar</button>
-    </div>
-  </div>
-  <div id="phrase-modal" role="presentation" hidden>
-    <section id="phrase-dialog" role="dialog" aria-modal="true" aria-labelledby="phrase-dialog-title" aria-describedby="phrase-modal-text">
-      <button id="phrase-modal-close" type="button" aria-label="Cerrar frase">×</button>
-      <h2 id="phrase-dialog-title">Frase</h2>
-      <p id="phrase-modal-text"></p>
-      <div id="phrase-modal-timer" aria-live="off">Se cierra en 00:10</div>
-    </section>
+  <div id="chronograph-top-controls" role="group" aria-label="Controles rápidos del cronógrafo">
+    <button id="chronograph-top-start" type="button" aria-label="Iniciar cronógrafo" title="Iniciar cronógrafo">▶ Iniciar</button>
+    <button id="chronograph-top-reset" type="button" aria-label="Reiniciar cronógrafo" title="Reiniciar cronógrafo" disabled>↺ Reiniciar</button>
   </div>
   <button id="watch-menu-toggle" type="button" aria-label="Abrir controles del reloj" aria-controls="watch-menu" aria-expanded="false">☰</button>
   <button id="watch-menu-backdrop" type="button" aria-label="Cerrar menú del reloj" tabindex="-1"></button>
@@ -452,7 +301,7 @@
       <p>Inicia o detén la medición. Las subesferas indican minutos y décimas de segundo.</p>
       <button id="chronograph-visibility" class="control-button" type="button" aria-pressed="true">Cronógrafo · Ocultar esfera</button>
       <div id="chronograph-controls" role="group" aria-label="Controles del cronógrafo de 30 minutos">
-        <output id="chrono-display" aria-live="off">00:00</output>
+        <output id="chrono-display" aria-live="off">00:00:00</output>
         <button id="chronograph-start" class="control-button" type="button">Iniciar</button>
         <button id="chronograph-reset" class="control-button" type="button" disabled>Reiniciar</button>
       </div>
@@ -475,125 +324,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 	<script type="text/javascript">
-	  var posPharse = {
-      apiUrl: 'https://www.positive-api.online/phrase/esp',
-      notFoundPhrase: '--',
-      currentPhrase: '',
-      refreshMs: 1 * 30 * 1000,
-      lastRefreshAt: null, 
-      countdownTimer: null, 
-      formatTime: function(ms) {
-        var totalSeconds = Math.max(0, Math.ceil(ms / 1000));
-        var minutes = Math.floor(totalSeconds / 60);
-        var seconds = totalSeconds % 60;
-        return ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
-      },
-      deleteCountdown: function() {
-        if (this.countdownTimer) {
-          clearInterval(this.countdownTimer);
-          this.countdownTimer = null;
-        }
-      }, 
-      initCountdown: function() {
-        this.deleteCountdown();
-        this.lastRefreshAt = Date.now(); 
-        $('#countdown').text('Próxima frase: ' + this.formatTime(this.refreshMs)); 
-        this.countdownTimer = setInterval(function() {
-          posPharse.updateCountdown();
-        }, 1000);
-      }, 
-      updateCountdown: async function() {
-        var remaining = this.refreshMs - (Date.now() - this.lastRefreshAt);
-        $('#countdown').text('Próxima frase: ' + this.formatTime(remaining)); 
-        if (remaining <= 0) { 
-          posPharse.exe();
-        }
-      },  
-      exeAction: async function() {
-        console.log('exeAction init');
-        $('#phrase-open').prop('disabled', true);
-
-        await new Promise(function(resolve) {
-          $.ajax({
-            url: posPharse.apiUrl,
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-              if (response && response.text) {
-                posPharse.currentPhrase = response.text;
-                $('#phrase-open').prop('disabled', false);
-              } else {
-                posPharse.currentPhrase = '';
-              }  
-              resolve();
-            },
-            error: function(xhr, status, error) { 
-              console.error(error);
-              posPharse.currentPhrase = '';
-              $('#phrase-open').prop('disabled', true);
-              resolve();
-            }
-          });
-        });
-
-        console.log('exeAction end');
-      },
-      exe: async function() {
-        console.log('Executing app.exe...');
-        this.deleteCountdown();
-        await this.exeAction();
-        this.initCountdown();
-      }
-	  } 
-    posPharse.exe();
-
-    var phraseModal = {
-      durationMs: 10 * 1000,
-      closesAt: null,
-      timer: null,
-      open: function() {
-        var phrase = posPharse.currentPhrase.trim();
-        if (!phrase || phrase === posPharse.notFoundPhrase || phrase === '...') return;
-
-        $('#phrase-modal-text').text(phrase);
-        $('#phrase-modal').prop('hidden', false);
-        this.closesAt = Date.now() + this.durationMs;
-        this.updateTimer();
-        clearInterval(this.timer);
-        this.timer = setInterval(this.updateTimer.bind(this), 1000);
-        $('#phrase-modal-close').trigger('focus');
-      },
-      close: function() {
-        clearInterval(this.timer);
-        this.timer = null;
-        this.closesAt = null;
-        $('#phrase-modal').prop('hidden', true);
-        $('#phrase-open').trigger('focus');
-      },
-      updateTimer: function() {
-        var remaining = Math.max(0, this.closesAt - Date.now());
-        var totalSeconds = Math.ceil(remaining / 1000);
-        var minutes = Math.floor(totalSeconds / 60);
-        var seconds = totalSeconds % 60;
-        $('#phrase-modal-timer').text('Se cierra en ' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2));
-        if (remaining <= 0) this.close();
-      }
-    };
-    $('#phrase-open').on('click', function() {
-      phraseModal.open();
-    });
-    $('#phrase-modal-close').on('click', function() {
-      phraseModal.close();
-    });
-    $('#phrase-modal').on('click', function(event) {
-      if (event.target === this) phraseModal.close();
-    });
-    $(document).on('keydown', function(event) {
-      if (event.key === 'Escape' && !$('#phrase-modal').prop('hidden')) {
-        phraseModal.close();
-      }
-    });
-
     var watch = {
       size: 400,
       showGMT: true,
@@ -604,7 +334,7 @@
       chronoElapsed: 0,
       chronoStartedAt: null,
       chronoRunning: false,
-      lastChronoDisplaySecond: null,
+      lastChronoDisplayHundredth: null,
       init: function() {
         var self = this;
         this.gmtOffsetHours = -new Date().getTimezoneOffset() / 60;
@@ -621,12 +351,7 @@
           }
         });
         $('#timezone-toggle').on('click', function() {
-          self.showGMT = !self.showGMT;
-          self.gmtHand.style('display', self.showGMT ? null : 'none');
-          self.gmtScale.style('display', self.showGMT ? null : 'none');
-          $(this)
-            .attr('aria-pressed', String(self.showGMT))
-            .text(self.showGMT ? 'GMT · Ocultar aguja' : 'GMT · Mostrar aguja');
+          self.setGMTVisible(!self.showGMT);
         });
         $('#gmt-offset').on('input change', function() {
           var offset = Number(this.value);
@@ -707,20 +432,25 @@
             .attr('fill', '#fb923c');
         }
 
-        for (var hour = 0; hour < 24; hour += 2) {
+        for (var hour = 1; hour <= 24; hour++) {
           var gmtAngle = (hour / 24 * 360 - 90) * Math.PI / 180;
           var gmtRadius = this.size * 0.31;
-          var label = hour === 0 ? '24' : String(hour);
 
           this.gmtScale.append('text')
             .attr('x', Math.cos(gmtAngle) * gmtRadius)
             .attr('y', Math.sin(gmtAngle) * gmtRadius + 3)
             .attr('text-anchor', 'middle')
             .attr('fill', '#fb923c')
-            .style('font-size', '18px')
+            .style('font-size', '14px')
             .style('font-weight', '700')
-            .text(label);
+            .text(hour);
         }
+        this.gmtScale
+          .style('pointer-events', 'all')
+          .style('cursor', 'pointer')
+          .on('click', function() {
+            self.setGMTVisible(false);
+          });
 
         for (var i = 0; i < 60; i++) {
           var angle = (i * 6 - 90) * Math.PI / 180;
@@ -784,6 +514,22 @@
           }
         }
 
+        for (var bezelMinute = 0; bezelMinute < 60; bezelMinute++) {
+          for (var subdivision = 1; subdivision < 4; subdivision++) {
+            var subdivisionAngle = (bezelMinute * 6 + subdivision * 1.5 - 90) * Math.PI / 180;
+            var subdivisionInner = this.size * 0.475;
+            var subdivisionOuter = this.size * 0.4650;
+            minuteBezel.append('line')
+              .attr('x1', Math.cos(subdivisionAngle) * subdivisionInner)
+              .attr('y1', Math.sin(subdivisionAngle) * subdivisionInner)
+              .attr('x2', Math.cos(subdivisionAngle) * subdivisionOuter)
+              .attr('y2', Math.sin(subdivisionAngle) * subdivisionOuter)
+              .attr('stroke', '#55595b')
+              .attr('stroke-width', 0.25)
+              .attr('stroke-linecap', 'round');
+          }
+        }
+
         for (var i = 1; i <= 12; i++) {
           var numberAngle = (i * 30 - 90) * Math.PI / 180;
           var radius = this.size * 0.375;
@@ -834,6 +580,12 @@
           .attr('fill', '#252525')
           .style('font-size', '15px')
           .style('font-weight', '700');
+        this.dayDate
+          .style('pointer-events', 'all')
+          .style('cursor', 'pointer')
+          .on('click', function() {
+            self.setDayDateVisible(false);
+          });
         this.setDayDateVisible(this.showDayDate);
 
         this.chronoDial = clock.append('g')
@@ -933,6 +685,25 @@
           .attr('stroke-width', 1.8)
           .attr('marker-end', 'url(#chrono-arrowhead)')
           .attr('stroke-linecap', 'round');
+        var hideChronographOnClick = function() {
+          self.setChronographVisible(false);
+        };
+        this.chronoDial
+          .style('pointer-events', 'all')
+          .style('cursor', 'pointer')
+          .on('click', hideChronographOnClick);
+        this.chronoTenthDial
+          .style('pointer-events', 'all')
+          .style('cursor', 'pointer')
+          .on('click', hideChronographOnClick);
+        this.chronoSecondHandTail
+          .style('pointer-events', 'all')
+          .style('cursor', 'pointer')
+          .on('click', hideChronographOnClick);
+        this.chronoSecondHand
+          .style('pointer-events', 'all')
+          .style('cursor', 'pointer')
+          .on('click', hideChronographOnClick);
         this.setChronographVisible(this.showChronograph);
 
         this.gmtHand = clock.append('g')
@@ -947,6 +718,12 @@
         this.gmtHand.append('path')
           .attr('d', 'M0,' + (-this.size * 0.39) + ' L-7,' + (-this.size * 0.35) + ' L0,' + (-this.size * 0.362) + ' L7,' + (-this.size * 0.35) + ' Z')
           .attr('fill', '#fb923c');
+        this.gmtHand
+          .style('pointer-events', 'all')
+          .style('cursor', 'pointer')
+          .on('click', function() {
+            self.setGMTVisible(false);
+          });
 
         this.hourHand = clock.append('line')
           .attr('stroke', '#ffffff')
@@ -1012,6 +789,14 @@
         $('#day-date-visibility')
           .attr('aria-pressed', String(isVisible))
           .text(isVisible ? 'Day-date · Ocultar indicador' : 'Day-date · Mostrar indicador');
+      },
+      setGMTVisible: function(isVisible) {
+        this.showGMT = isVisible;
+        this.gmtHand.style('display', isVisible ? null : 'none');
+        this.gmtScale.style('display', isVisible ? null : 'none');
+        $('#timezone-toggle')
+          .attr('aria-pressed', String(isVisible))
+          .text(isVisible ? 'GMT · Ocultar aguja' : 'GMT · Mostrar aguja');
       },
       update: function() {
         var now = new Date();
@@ -1083,12 +868,17 @@
         return Math.min(this.chronoDuration, this.chronoElapsed + (performance.now() - this.chronoStartedAt));
       },
       updateChronographDisplay: function(elapsed) {
-        var totalSeconds = Math.floor(elapsed / 1000);
-        if (totalSeconds === this.lastChronoDisplaySecond) return;
-        this.lastChronoDisplaySecond = totalSeconds;
-        var minutes = Math.floor(totalSeconds / 60);
-        var seconds = totalSeconds % 60;
-        $('#chrono-display').text(('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2));
+        var totalHundredths = Math.floor(elapsed / 10);
+        if (totalHundredths === this.lastChronoDisplayHundredth) return;
+        this.lastChronoDisplayHundredth = totalHundredths;
+        var minutes = Math.floor(totalHundredths / 6000);
+        var seconds = Math.floor(totalHundredths / 100) % 60;
+        var hundredths = totalHundredths % 100;
+        $('#chrono-display').text(
+          ('0' + minutes).slice(-2) + ':' +
+          ('0' + seconds).slice(-2) + ':' +
+          ('0' + hundredths).slice(-2)
+        );
       },
       toggleChronograph: function() {
         if (this.chronoRunning) {
@@ -1114,11 +904,14 @@
           elapsed = this.chronoElapsed;
         }
         var startLabel = this.chronoRunning ? 'Detener' : 'Iniciar';
-        $('#chronograph-start').text(startLabel);
+        $('#chronograph-start')
+          .text(startLabel)
+          .toggleClass('is-running', this.chronoRunning);
         $('#chronograph-top-start')
           .text((this.chronoRunning ? 'Ⅱ ' : '▶ ') + startLabel)
           .attr('aria-label', startLabel + ' cronógrafo')
-          .attr('title', startLabel + ' cronógrafo');
+          .attr('title', startLabel + ' cronógrafo')
+          .toggleClass('is-running', this.chronoRunning);
         var resetDisabled = elapsed === 0 && !this.chronoRunning;
         $('#chronograph-reset, #chronograph-top-reset').prop('disabled', resetDisabled);
         this.updateChronographDisplay(elapsed);
