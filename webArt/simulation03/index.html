@@ -101,8 +101,7 @@
         justify-content: flex-end;
         gap: 10px;
       }
-
-      .generation,
+ 
       .timer,
       .status {
         display: inline-flex;
@@ -116,12 +115,7 @@
         letter-spacing: 0.03em;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       }
-
-      .generation {
-        color: #d4d4d8;
-        font-variant-numeric: tabular-nums;
-      }
-
+ 
       .timer {
         color: #fff;
         font-variant-numeric: tabular-nums;
@@ -327,8 +321,7 @@
             <h2 id="simulation-title">Evolución</h2>
             <button id="rules-button" type="button" aria-haspopup="dialog" aria-controls="rules-dialog">Reglas</button>
           </div>
-          <div class="simulation__indicators">
-            <span class="generation">Generación <output id="generation-value" for="generation-value">1</output></span>
+          <div class="simulation__indicators"> 
             <span class="timer" id="simulation-time" role="timer" aria-label="Tiempo de simulación">00:00:00</span>
             <span class="status" id="status" role="status" aria-live="polite" data-running="false">En pausa</span>
           </div>
@@ -403,8 +396,7 @@
       const canvas = document.querySelector("#simulation-canvas");
       const context = canvas.getContext("2d");
       const populationInput = document.querySelector("#population-count");
-      const populationValue = document.querySelector("#population-value");
-      const generationValue = document.querySelector("#generation-value");
+      const populationValue = document.querySelector("#population-value"); 
       const timeScaleInput = document.querySelector("#time-scale");
       const timeScaleValue = document.querySelector("#time-scale-value");
       const toggleButton = document.querySelector("#toggle-button");
@@ -430,8 +422,7 @@
       let pixelRatio = 1;
       let creatures = [];
       let running = false;
-      let lastFrame = 0;
-      let generation = 1;
+      let lastFrame = 0; 
       let elapsedTime = 0;
       let gameOver = false;
 
@@ -466,8 +457,7 @@
           randomBetween(30, Math.max(30, width - 30)),
           randomBetween(30, Math.max(30, height - 30)),
           types[index % types.length]
-        ));
-        generation = 1;
+        )); 
         drawSimulation();
       }
 
@@ -581,8 +571,7 @@
                     first.type = second.type;
                   } else {
                     continue;
-                  }
-                  generation += 1;
+                  } 
                   const separation = (first.radius + second.radius - distance) / 2;
                   const angle = Math.atan2(second.y - first.y, second.x - first.x);
                   first.x -= Math.cos(angle) * separation;
@@ -622,8 +611,7 @@
       function drawSimulation() {
         context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         context.clearRect(0, 0, viewWidth, viewHeight);
-        creatures.forEach(drawCreature);
-        generationValue.value = String(generation);
+        creatures.forEach(drawCreature); 
       }
 
       function animate(timestamp) {
@@ -701,8 +689,7 @@
       });
       window.addEventListener("resize", resizeCanvas);
 
-      populationValue.value = populationInput.value;
-      generationValue.value = String(generation);
+      populationValue.value = populationInput.value; 
       timeScaleValue.value = `${timeScaleInput.value}×`;
       resizeCanvas();
     </script>
